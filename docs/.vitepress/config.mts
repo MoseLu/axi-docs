@@ -10,6 +10,7 @@ const __dirname = dirname(__filename)
 export default defineConfig({
     title: "拜里斯车间管理系统",
     description: "BTC ShopFlow Project Docs",
+    base: '/docs/',
     themeConfig: {
         logo: '/favicon.ico',
         nav: [

@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "module": "esnext",            // 支持 ESM 模块
+    "moduleResolution": "node",    // 使用 Node.js 模块解析规则
+    "esModuleInterop": true,       // 允许默认导入 CommonJS 模块
+    "target": "esnext",            // 编译目标使用 ESNext 特性
+    "types": ["node"],             // 包含 Node.js 类型声明
+    "skipLibCheck": true,          // 跳过库文件类型检查，提升编译速度
+    "strict": true                 // 开启严格模式（可选）
+  }
+}

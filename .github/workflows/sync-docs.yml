@@ -1,0 +1,46 @@
+name: Sync Documentation
+
+on:
+  push:
+    branches: main ]
+    paths:
+      -uploads/md/**'
+  workflow_dispatch:
+
+jobs:
+  sync-docs:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'       
+    - name: Install pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: 8
+        
+    - name: Install dependencies
+      run: |
+        cd /www/wwwroot/axi-docs
+        pnpm install
+        
+    - name: Sync MD files
+      run: |
+        # 同步 uploads/md 到 docs/content
+        rsync -av --delete --include=*.md --exclude=* uploads/md/ docs/content/
+        
+    - name: Build documentation
+      run: |
+        cd /www/wwwroot/axi-docs
+        pnpm docs:build
+        
+    - name: Deploy to server
+      run: |
+        # 这里可以添加部署到服务器的步骤
+        # 比如使用 rsync 或 scp 上传构建产物
+        echo "Deploying to server..." 

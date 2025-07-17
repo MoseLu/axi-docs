@@ -15,9 +15,8 @@ build() {
   rm -f "$LOCK"
 }
 
-# 只监听 CLOSE_WRITE 保证宝塔/SCP 都能触发
 exec inotifywait -mrq -e close_write --format '%w%f' "$SRC" |
-while read -r FILE; do
+while IFS= read -r FILE; do
   [[ "$FILE" =~ \.md$ ]] || continue
   log "CLOSE_WRITE -> $FILE"
   build

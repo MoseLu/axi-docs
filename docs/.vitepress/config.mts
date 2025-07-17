@@ -16,7 +16,7 @@ export default defineConfig({
         logo: '/favicon.ico',
         nav: [
             { text: '首页', link: '/' },
-            { text: '指南', link: '/指南/' },
+            { text: '指南', link: '/guide' },
         ],
         sidebar: getSidebar(),
         socialLinks: [

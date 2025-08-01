@@ -30,6 +30,8 @@ jobs:
         
       - name: 上传构建产物到Release
         id: upload
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           # 创建临时release来上传构建产物
           RELEASE_TAG="build-$(date +%s)"

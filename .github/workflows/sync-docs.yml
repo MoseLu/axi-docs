@@ -55,6 +55,7 @@ jobs:
     - name: 触发部署
       uses: actions/github-script@v7
       with:
+        github-token: ${{ secrets.DEPLOY_TOKEN }}
         script: |
           const { data: response } = await github.rest.actions.createWorkflowDispatch({
             owner: 'MoseLu',

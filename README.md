@@ -1,6 +1,6 @@
 # AXI Docs - 文档站点
 
-这是一个使用 VitePress 构建的文档站点，用于测试 AXI Deploy SSH 部署架构。
+这是一个使用 VitePress 构建的现代化文档站点，提供清晰、美观的文档展示。
 
 ## 🚀 快速开始
 
@@ -15,48 +15,32 @@ pnpm docs:dev
 
 # 构建文档
 pnpm docs:build
+
+# 预览构建结果
+pnpm docs:preview
 ```
 
-### 部署测试
+### 开发环境
 
-这个项目用于测试 AXI Deploy 公共仓库的 SSH 部署功能：
+- **Node.js**: 18+
+- **包管理器**: pnpm
+- **框架**: VitePress
+- **端口**: 9000
 
-1. **构建测试**: 验证 VitePress 构建过程
-2. **部署测试**: 测试 SSH 连接和文件传输
-3. **架构验证**: 验证公共仓库工作流的调用
+## 📋 项目特性
 
-## 📋 部署配置
+### 文档功能
+- 📝 Markdown 支持
+- 🎨 自定义主题
+- 🔍 全文搜索
+- 📱 响应式设计
+- ⚡ 快速构建
 
-### 当前配置
-
-- **构建输出**: `./docs/.vitepress/dist`
-- **目标路径**: `/www/wwwroot/axi-docs`
-- **部署命令**: 
-  ```bash
-  cd /www/wwwroot/axi-docs
-  chmod -R 755 .
-  sudo systemctl reload nginx
-  ```
-
-### 测试步骤
-
-1. **推送代码** - 触发构建和部署
-2. **检查构建** - 验证 VitePress 构建成功
-3. **测试连接** - 验证 SSH 连接正常
-4. **验证部署** - 检查文件传输和命令执行
-
-## 🔧 工作流
-
-### 部署工作流
-
-- **触发条件**: 推送到 `main` 或 `master` 分支
-- **构建步骤**: Node.js + pnpm + VitePress
-- **部署步骤**: SSH 文件传输 + 命令执行
-
-### 测试工作流
-
-- **手动触发**: 测试 SSH 连接
-- **验证功能**: 检查服务器状态和权限
+### 开发体验
+- 🚀 热重载开发
+- 📦 依赖管理
+- 🔧 类型支持
+- 📋 脚本自动化
 
 ## 📁 项目结构
 
@@ -71,29 +55,88 @@ axi-docs/
 │   └── public/            # 静态资源
 ├── .github/workflows/     # GitHub Actions
 │   ├── deploy.yml         # 部署工作流
-│   └── test-connection.yml # 测试工作流
-└── package.json           # 项目配置
+│   ├── sync-docs.yml      # 文档同步
+│   └── test-connection.yml # 连接测试
+├── package.json           # 项目配置
+├── pnpm-lock.yaml        # 依赖锁定
+└── pnpm-workspace.yaml   # 工作区配置
 ```
 
-## 🎯 测试目标
+## 🛠️ 技术栈
 
-1. **验证 AXI Deploy 架构**
-   - 公共仓库工作流调用
-   - SSH 连接管理
-   - 文件传输功能
+### 核心依赖
+- **VitePress**: 静态站点生成器
+- **Vue**: 前端框架
+- **TypeScript**: 类型支持
+- **pnpm**: 包管理器
 
-2. **测试部署流程**
-   - 构建过程稳定性
-   - 部署命令执行
-   - 服务重启验证
+### 开发工具
+- **Node.js**: 运行时环境
+- **GitHub Actions**: CI/CD
+- **SSH**: 远程部署
 
-3. **架构优化**
-   - 简化配置流程
-   - 提高部署效率
-   - 增强错误处理
+## 📖 文档编写
+
+### Markdown 语法
+支持标准 Markdown 语法，以及 VitePress 扩展功能：
+
+```markdown
+# 标题
+## 二级标题
+
+- 列表项
+- 另一个列表项
+
+**粗体文本**
+*斜体文本*
+
+[链接文本](URL)
+
+```代码块```
+```
+
+### 自定义组件
+可以在文档中使用 Vue 组件和自定义样式。
+
+## 🚀 部署
+
+### 自动部署
+项目配置了 GitHub Actions 工作流，支持：
+
+- **自动构建**: 推送代码时自动构建
+- **自动部署**: 构建完成后自动部署到服务器
+- **连接测试**: 定期测试服务器连接状态
+
+### 手动部署
+```bash
+# 构建文档
+pnpm docs:build
+
+# 部署到服务器
+# 具体部署步骤请参考部署配置
+```
+
+## 🔧 配置说明
+
+### VitePress 配置
+主要配置文件位于 `docs/.vitepress/config.mts`，包含：
+
+- 站点基本信息
+- 导航菜单
+- 侧边栏配置
+- 主题设置
+
+### 构建配置
+- **输出目录**: `docs/.vitepress/dist`
+- **静态资源**: `docs/public`
+- **内容目录**: `docs/content`
 
 ## 📞 获取帮助
 
-- 📖 查看 AXI Deploy 文档
-- 🐛 报告部署问题
-- 💬 讨论架构改进
+- 📖 查看 [VitePress 文档](https://vitepress.dev/)
+- 🐛 报告问题
+- 💬 讨论改进建议
+
+## 📄 许可证
+
+本项目采用 MIT 许可证。

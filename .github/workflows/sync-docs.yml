@@ -2,9 +2,9 @@ name: Sync Documentation
 
 on:
   push:
-    branches: main ]
+    branches: [ main ]
     paths:
-      -uploads/md/**'
+      - 'uploads/md/**'
   workflow_dispatch:
 
 jobs:
@@ -21,8 +21,6 @@ jobs:
         node-version: '18'       
     - name: Install pnpm
       uses: pnpm/action-setup@v4
-      with:
-        version: 8
         
     - name: Install dependencies
       run: |

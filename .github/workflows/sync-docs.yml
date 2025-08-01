@@ -59,10 +59,7 @@ jobs:
               source_path: './docs/.vitepress/dist',
               target_path: '/www/wwwroot/axi-docs',
               exclude_files: '.git,node_modules,.env',
-              commands: |
-                cd /www/wwwroot/axi-docs
-                chmod -R 755 .
-                sudo systemctl reload nginx
+              commands: 'cd /www/wwwroot/axi-docs\nchmod -R 755 .\nsudo systemctl reload nginx'
             }
           });
           console.log('部署已触发:', response); 

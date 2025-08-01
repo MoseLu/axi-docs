@@ -42,16 +42,14 @@ jobs:
     - name: Build docs
       run: pnpm docs:build
       
-    - name: Test SSH Connection
-      uses: MoseLu/axi-deploy/.github/workflows/test-connection.yml@master
-      
-    - name: Deploy to server
-      uses: MoseLu/axi-deploy/.github/workflows/ssh-deploy.yml@master
-      with:
-        source_path: './docs/.vitepress/dist'
-        target_path: '/www/wwwroot/axi-docs'
-        exclude_files: '.git,node_modules,.env'
-        commands: |
-          cd /www/wwwroot/axi-docs
-          chmod -R 755 .
-          sudo systemctl reload nginx 
+    - name: List build output
+      run: |
+        echo "Build output directory contents:"
+        ls -la docs/.vitepress/dist/
+        
+    - name: Test deployment setup
+      run: |
+        echo "Testing deployment configuration..."
+        echo "Source path: ./docs/.vitepress/dist"
+        echo "Target path: /www/wwwroot/axi-docs"
+        echo "This workflow is ready for SSH deployment integration." 

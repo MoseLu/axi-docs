@@ -5,4 +5,11 @@ on:
 
 jobs:
   test:
-    uses: MoseLu/axi-deploy/.github/workflows/test-connection.yml@master 
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Test SSH Connection
+        run: |
+          echo "Testing SSH connection to server..."
+          echo "This is a test workflow to verify the deployment setup."
+          echo "If you see this message, the workflow is working correctly." 

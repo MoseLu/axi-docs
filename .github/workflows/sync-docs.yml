@@ -43,31 +43,12 @@ jobs:
         git commit -m "docs: 同步文档更新" || echo "No changes to commit"
         git push
         
-    - name: 上传构建产物到Release
+    - name: 上传构建产物
+      uses: actions/upload-artifact@v4
       id: upload
-      env:
-        GH_TOKEN: ${{ github.token }}
-      run: |
-        # 创建临时release来上传构建产物
-        RELEASE_TAG="build-$(date +%s)"
-        echo "release_tag=$RELEASE_TAG" >> $GITHUB_OUTPUT
-        
-        # 创建release
-        gh release create $RELEASE_TAG --title "Build $RELEASE_TAG" --notes "Build for deployment" --draft
-        
-        # 压缩构建产物
-        cd docs/.vitepress/dist
-        zip -r ../../../artifact.zip .
-        cd ../../../
-        
-        # 上传到release
-        gh release upload $RELEASE_TAG artifact.zip
-        
-        # 获取下载URL
-        DOWNLOAD_URL=$(gh release view $RELEASE_TAG --json assets --jq '.assets[0].url')
-        echo "artifact_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
-        
-        echo "构建产物已上传到: $DOWNLOAD_URL"
+      with:
+        name: dist-axi-docs
+        path: docs/.vitepress/dist/
         
     - name: 触发部署
       uses: actions/github-script@v7
@@ -81,13 +62,12 @@ jobs:
             inputs: {
               project: 'axi-docs',
               lang: 'node',
-              artifact_id: '${{ steps.upload.outputs.release_tag }}',
+              artifact_id: '${{ github.run_id }}',
               deploy_path: '/www/wwwroot/axi-docs',
               start_cmd: 'cd /www/wwwroot/axi-docs && chmod -R 755 . && sudo systemctl reload nginx',
               caller_repo: '${{ github.repository }}',
               caller_branch: '${{ github.ref_name }}',
-              caller_commit: '${{ github.sha }}',
-              artifact_url: '${{ steps.upload.outputs.artifact_url }}'
+              caller_commit: '${{ github.sha }}'
             }
           });
           console.log('部署已触发:', response); 

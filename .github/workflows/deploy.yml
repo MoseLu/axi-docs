@@ -51,4 +51,4 @@ jobs:
         commands: |
           cd /www/wwwroot/axi-docs
           chmod -R 755 .
-          sudo systemctl reload nginx 
+          sudo systemctl reload nginx

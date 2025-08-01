@@ -7,79 +7,12 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest
-    
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v4
-        
-    - name: Get pnpm store directory
-      shell: bash
-      run: |
-        echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
-        
-    - name: Setup pnpm cache
-      uses: actions/cache@v4
-      with:
-        path: ${{ env.STORE_PATH }}
-        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
-        restore-keys: |
-          ${{ runner.os }}-pnpm-store-
-          
-    - name: Install dependencies
-      run: pnpm install
-      
-    - name: Build docs
-      run: pnpm docs:build
-      
-    - name: Setup SSH environment
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SERVER_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        
-        # 获取服务器公钥指纹
-        ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
-        chmod 644 ~/.ssh/known_hosts
-        
-    - name: Test SSH connection
-      run: |
-        ssh -o ConnectTimeout=10 -p ${{ secrets.SERVER_PORT }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "echo 'SSH连接测试成功'"
-        
-    - name: Create remote directory
-      run: |
-        ssh -p ${{ secrets.SERVER_PORT }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "mkdir -p /www/wwwroot/axi-docs"
-        
-    - name: Deploy files
-      run: |
-        rsync -avz --delete \
-          -e "ssh -p ${{ secrets.SERVER_PORT }}" \
-          "./docs/.vitepress/dist/" \
-          "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}:/www/wwwroot/axi-docs/"
-          
-    - name: Execute deployment commands
-      run: |
-        ssh -p ${{ secrets.SERVER_PORT }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} << 'EOF'
+    uses: MoseLu/axi-deploy/.github/workflows/ssh-deploy.yml@master
+    with:
+      source_path: './docs/.vitepress/dist'
+      target_path: '/www/wwwroot/axi-docs'
+      exclude_files: '.git,node_modules,.env'
+      commands: |
         cd /www/wwwroot/axi-docs
         chmod -R 755 .
         sudo systemctl reload nginx
-        EOF
-        
-    - name: Verify deployment
-      run: |
-        echo "部署验证:"
-        ssh -p ${{ secrets.SERVER_PORT }} ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "ls -la /www/wwwroot/axi-docs"
-        
-    - name: Cleanup SSH keys
-      if: always()
-      run: |
-        rm -f ~/.ssh/id_rsa
-        rm -f ~/.ssh/known_hosts

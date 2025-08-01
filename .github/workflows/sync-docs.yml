@@ -19,13 +19,12 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: '18'       
+        
     - name: Install pnpm
       uses: pnpm/action-setup@v4
         
     - name: Install dependencies
-      run: |
-        cd /www/wwwroot/axi-docs
-        pnpm install
+      run: pnpm install
         
     - name: Sync MD files
       run: |
@@ -33,12 +32,12 @@ jobs:
         rsync -av --delete --include=*.md --exclude=* uploads/md/ docs/content/
         
     - name: Build documentation
-      run: |
-        cd /www/wwwroot/axi-docs
-        pnpm docs:build
+      run: pnpm docs:build
         
-    - name: Deploy to server
+    - name: Commit and push changes
       run: |
-        # 这里可以添加部署到服务器的步骤
-        # 比如使用 rsync 或 scp 上传构建产物
-        echo "Deploying to server..." 
+        git config --local user.email "action@github.com"
+        git config --local user.name "GitHub Action"
+        git add docs/content/
+        git commit -m "docs: 同步文档更新" || echo "No changes to commit"
+        git push 

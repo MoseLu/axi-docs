@@ -1,0 +1,488 @@
+/* 最高优先级深色主题滚动条样式 - 强制覆盖所有其他样式 */
+.dark *::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+.dark *::-webkit-scrollbar-track {
+  background: transparent !important;
+  border-radius: 4px !important;
+}
+
+.dark *::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.8), rgba(100, 181, 246, 0.8)) !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(79, 195, 247, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.dark *::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgba(79, 195, 247, 1), rgba(100, 181, 246, 1)) !important;
+  box-shadow: 0 0 8px rgba(79, 195, 247, 0.5) !important;
+}
+
+.dark *::-webkit-scrollbar-button {
+  display: none !important;
+}
+
+.dark *::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+/* 星空主题样式 */
+
+/* 覆盖VitePress默认的CSS变量 */
+:root {
+  --vp-c-brand-1: #4fc3f7;
+  --vp-c-brand-2: #81d4fa;
+  --vp-c-brand-3: #b3e5fc;
+  --vp-c-brand-soft: rgba(79, 195, 247, 0.1);
+}
+
+/* 深色模式下的星空背景 */
+.dark {
+  --vp-c-bg: #0a0a0a;
+  --vp-c-bg-alt: #0f0f23;
+  --vp-c-bg-elv: #1a1a3a;
+  --vp-c-bg-soft: #16213e;
+  --vp-c-border: rgba(79, 195, 247, 0.2);
+  --vp-c-divider: rgba(79, 195, 247, 0.2);
+  --vp-c-text-1: #ffffff;
+  --vp-c-text-2: #a8a8a8;
+  --vp-c-text-3: #737373;
+  --vp-c-text-code: #e6e6e6;
+  --vp-c-brand: #4fc3f7;
+  --vp-c-brand-light: #81d4fa;
+  --vp-c-brand-lighter: #b3e5fc;
+  --vp-c-brand-dark: #29b6f6;
+  --vp-c-brand-darker: #0288d1;
+  
+  background: linear-gradient(135deg, #0a0a0a 0%, #0f0f23 25%, #1a1a3a 50%, #2d1b69 75%, #16213e 100%);
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* 星星效果 */
+.dark::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(1px 1px at 20px 30px, #4fc3f7, transparent),
+    radial-gradient(1px 1px at 40px 70px, #81c784, transparent),
+    radial-gradient(1px 1px at 90px 40px, #64b5f6, transparent),
+    radial-gradient(1px 1px at 130px 80px, #9575cd, transparent),
+    radial-gradient(1px 1px at 160px 30px, #4dd0e1, transparent),
+    radial-gradient(2px 2px at 200px 50px, #fff, transparent),
+    radial-gradient(1px 1px at 250px 90px, #bbdefb, transparent),
+    radial-gradient(1px 1px at 300px 20px, #e1bee7, transparent),
+    radial-gradient(1px 1px at 350px 60px, #b3e5fc, transparent),
+    radial-gradient(1px 1px at 400px 100px, #c8e6c9, transparent),
+    radial-gradient(2px 2px at 450px 30px, #fff, transparent),
+    radial-gradient(1px 1px at 500px 70px, #4fc3f7, transparent),
+    radial-gradient(1px 1px at 550px 10px, #81c784, transparent),
+    radial-gradient(1px 1px at 600px 50px, #64b5f6, transparent),
+    radial-gradient(1px 1px at 650px 90px, #9575cd, transparent),
+    radial-gradient(1px 1px at 700px 20px, #4dd0e1, transparent),
+    radial-gradient(2px 2px at 750px 60px, #fff, transparent),
+    radial-gradient(1px 1px at 800px 100px, #bbdefb, transparent),
+    radial-gradient(1px 1px at 850px 30px, #e1bee7, transparent),
+    radial-gradient(1px 1px at 900px 70px, #b3e5fc, transparent);
+  background-repeat: repeat;
+  background-size: 300px 200px;
+  animation: sparkle 30s linear infinite, twinkle 4s ease-in-out infinite alternate;
+  z-index: -1;
+}
+
+/* 星星闪烁动画 */
+@keyframes sparkle {
+  0% {
+    transform: translateY(0px);
+  }
+  100% {
+    transform: translateY(-100px);
+  }
+}
+
+@keyframes twinkle {
+  0% {
+    opacity: 0.7;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+/* 流星效果 */
+.dark::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: 
+    linear-gradient(45deg, transparent 30%, rgba(79, 195, 247, 0.3) 50%, transparent 70%),
+    linear-gradient(135deg, transparent 20%, rgba(100, 181, 246, 0.2) 40%, transparent 60%),
+    linear-gradient(225deg, transparent 10%, rgba(149, 117, 205, 0.25) 30%, transparent 50%);
+  background-size: 400px 400px, 300px 300px, 500px 500px;
+  animation: meteor 20s linear infinite, galaxy 60s linear infinite;
+  z-index: -1;
+}
+
+@keyframes meteor {
+  0% {
+    transform: translateX(-300px) translateY(-300px);
+  }
+  100% {
+    transform: translateX(calc(100vw + 300px)) translateY(calc(100vh + 300px));
+  }
+}
+
+@keyframes galaxy {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+/* 强制所有内容区域透明 */
+.dark .VPContent,
+.dark .VPDoc,
+.dark .VPContentDoc,
+.dark .content,
+.dark .container,
+.dark .vp-doc,
+.dark .vp-doc .content,
+.dark .vp-doc .content-container,
+.dark .vp-doc .content-body,
+.dark .VPContentDoc .content,
+.dark .VPContentDoc .container,
+.dark .VPContentDoc .vp-doc,
+.dark .VPContentDoc .vp-doc .content,
+.dark .VPContentDoc .vp-doc .content-container,
+.dark .VPContentDoc .vp-doc .content-body,
+.dark .VPContentDoc *,
+.dark .vp-doc *,
+.dark .content *,
+.dark .container * {
+  background: transparent !important;
+}
+
+/* 移除自定义布局约束，恢复VitePress官方布局 */
+
+/* 导航栏和侧边栏保持半透明 */
+.dark .VPNav {
+  background: rgba(15, 15, 35, 0.8) !important;
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(79, 195, 247, 0.2);
+}
+
+.dark .VPNavBar.has-sidebar .content-body {
+  background: rgba(15, 15, 35, 0.8) !important;
+  backdrop-filter: blur(15px);
+}
+
+.dark .VPSidebar {
+  background: rgba(15, 15, 35, 0.9) !important;
+  backdrop-filter: blur(15px);
+  border-right: 1px solid rgba(79, 195, 247, 0.2);
+}
+
+/* 代码块和卡片保持半透明 */
+.dark .vp-doc div[class*='language-'],
+.dark .vp-doc .custom-block,
+.dark .vp-doc table,
+.dark .vp-doc blockquote,
+.dark .VPDocFooter .pager-link,
+.dark .VPDocAside .content-container,
+.dark .DocSearch-Hit {
+  background: rgba(15, 15, 35, 0.8) !important;
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(79, 195, 247, 0.3);
+  box-shadow: 0 0 20px rgba(79, 195, 247, 0.1);
+}
+
+.dark .vp-doc th {
+  background: rgba(79, 195, 247, 0.2) !important;
+}
+
+/* 链接样式 */
+.dark .vp-doc a {
+  color: #4fc3f7 !important;
+  text-shadow: 0 0 5px rgba(79, 195, 247, 0.3);
+}
+
+.dark .vp-doc a:hover {
+  color: #81d4fa !important;
+  text-shadow: 0 0 10px rgba(129, 212, 250, 0.5);
+}
+
+/* 标题样式 */
+.dark .vp-doc h1,
+.dark .vp-doc h2,
+.dark .vp-doc h3,
+.dark .vp-doc h4,
+.dark .vp-doc h5,
+.dark .vp-doc h6 {
+  color: #ffffff !important;
+}
+
+/* 段落文本样式 */
+.dark .vp-doc p {
+  color: #a8a8a8 !important;
+}
+
+/* 列表样式 */
+.dark .vp-doc ul,
+.dark .vp-doc ol {
+  color: #a8a8a8 !important;
+}
+
+/* 引用块样式 */
+.dark .vp-doc blockquote {
+  border-left: 4px solid #4fc3f7;
+  color: #a8a8a8;
+}
+
+/* 深色主题滚动条样式 - 星空蓝 */
+.dark {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(79, 195, 247, 0.8) transparent !important;
+}
+
+.dark::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+.dark::-webkit-scrollbar-track {
+  background: transparent !important;
+  border-radius: 4px !important;
+}
+
+.dark::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.8), rgba(100, 181, 246, 0.8)) !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(79, 195, 247, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.dark::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgba(79, 195, 247, 1), rgba(100, 181, 246, 1)) !important;
+  box-shadow: 0 0 8px rgba(79, 195, 247, 0.5) !important;
+}
+
+.dark::-webkit-scrollbar-button {
+  display: none !important;
+}
+
+.dark::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+/* 为深色主题的所有可滚动元素应用滚动条样式 */
+.dark * {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(79, 195, 247, 0.8) transparent !important;
+}
+
+.dark *::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+.dark *::-webkit-scrollbar-track {
+  background: transparent !important;
+  border-radius: 4px !important;
+}
+
+.dark *::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.8), rgba(100, 181, 246, 0.8)) !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(79, 195, 247, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.dark *::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgba(79, 195, 247, 1), rgba(100, 181, 246, 1)) !important;
+  box-shadow: 0 0 8px rgba(79, 195, 247, 0.5) !important;
+}
+
+.dark *::-webkit-scrollbar-button {
+  display: none !important;
+}
+
+.dark *::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+/* 全局滚动条样式 - 确保在所有情况下都生效 */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+  background: transparent !important;
+  border-radius: 4px !important;
+}
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(30, 64, 175, 0.8), rgba(59, 130, 246, 0.8)) !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(30, 64, 175, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgba(30, 64, 175, 1), rgba(59, 130, 246, 1)) !important;
+  box-shadow: 0 0 8px rgba(30, 64, 175, 0.5) !important;
+}
+
+html::-webkit-scrollbar-button,
+body::-webkit-scrollbar-button {
+  display: none !important;
+}
+
+html::-webkit-scrollbar-corner,
+body::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+/* 选择文本样式 */
+.dark ::selection {
+  background: rgba(79, 195, 247, 0.3);
+  color: #ffffff;
+}
+
+/* 主题切换按钮样式 */
+.dark .VPNavBarMenuLink {
+  color: #a8a8a8 !important;
+  background: transparent !important;
+  transition: color 0.3s ease !important;
+}
+
+.dark .VPNavBarMenuLink:hover {
+  color: #ffffff !important;
+  background: transparent !important;
+}
+
+/* 侧边栏链接样式 */
+.dark .VPSidebarItem .item {
+  color: #a8a8a8 !important;
+}
+
+.dark .VPSidebarItem .item:hover {
+  color: #ffffff !important;
+  background: rgba(79, 195, 247, 0.1);
+  box-shadow: 0 0 10px rgba(79, 195, 247, 0.2);
+}
+
+.dark .VPSidebarItem .item.active {
+  color: #4fc3f7 !important;
+  background: rgba(79, 195, 247, 0.1);
+  box-shadow: 0 0 15px rgba(79, 195, 247, 0.3);
+}
+
+/* 面包屑导航样式 */
+.dark .VPDocBreadcrumbs {
+  color: #737373 !important;
+}
+
+.dark .VPDocBreadcrumbs .link {
+  color: #a8a8a8 !important;
+}
+
+.dark .VPDocBreadcrumbs .link:hover {
+  color: #4fc3f7 !important;
+  text-shadow: 0 0 5px rgba(79, 195, 247, 0.3);
+}
+
+/* 页脚样式 */
+.dark .VPDocFooter {
+  border-top: 1px solid rgba(79, 195, 247, 0.2);
+}
+
+.dark .VPDocFooter .pager-link {
+  color: #a8a8a8;
+}
+
+.dark .VPDocFooter .pager-link:hover {
+  background: rgba(79, 195, 247, 0.1) !important;
+  color: #4fc3f7 !important;
+  box-shadow: 0 0 25px rgba(79, 195, 247, 0.3);
+}
+
+/* 目录样式 */
+.dark .VPDocAside .outline-link {
+  color: #a8a8a8 !important;
+}
+
+.dark .VPDocAside .outline-link:hover {
+  color: #4fc3f7 !important;
+  text-shadow: 0 0 5px rgba(79, 195, 247, 0.3);
+}
+
+.dark .VPDocAside .outline-link.active {
+  color: #4fc3f7 !important;
+  text-shadow: 0 0 8px rgba(79, 195, 247, 0.5);
+}
+
+.dark .DocSearch-Hit:hover {
+  background: rgba(79, 195, 247, 0.1) !important;
+  box-shadow: 0 0 10px rgba(79, 195, 247, 0.2);
+}
+
+/* 404页面样式调整 */
+.dark .cow {
+  filter: brightness(0.9) contrast(1.1);
+}
+
+.dark .text-box h1 {
+  text-shadow: 0 0 20px rgba(79, 195, 247, 0.8);
+}
+
+.dark .home-btn {
+  box-shadow: 0 0 20px rgba(79, 195, 247, 0.5);
+}
+
+/* 响应式调整 */
+@media (max-width: 960px) {
+  .dark .VPSidebar {
+    background: rgba(15, 15, 35, 0.95) !important;
+  }
+  
+  .dark .VPNav {
+    background: rgba(15, 15, 35, 0.95) !important;
+  }
+}
+
+/* 隐藏侧边栏遮罩层 */
+.dark .aside-curtain,
+.dark [class*="aside-curtain"],
+.dark [data-v-2b45519a].aside-curtain {
+  background: transparent !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  display: none !important;
+}
+
+/* 确保所有可能的遮罩层都被隐藏 */
+.dark .VPSidebar .aside-curtain,
+.dark .VPSidebar [class*="aside-curtain"],
+.dark [class*="aside-curtain"] {
+  background: transparent !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  display: none !important;
+} 

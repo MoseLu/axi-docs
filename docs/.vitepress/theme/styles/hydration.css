@@ -1,0 +1,186 @@
+/* 水合期间的样式过渡 */
+
+/* 在客户端JavaScript加载完成前，隐藏主题相关的元素 */
+[data-theme] {
+  opacity: 1;
+  transition: opacity 0.1s ease-in-out;
+}
+
+/* 在服务端渲染期间，使用默认样式 */
+html:not([data-theme]) {
+  /* 默认使用浅色主题样式 */
+}
+
+html:not([data-theme]) .VPNav {
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(15px);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.3) !important;
+}
+
+html:not([data-theme]) .VPNavBar {
+  background: transparent !important;
+  border-bottom: none !important;
+}
+
+html:not([data-theme]) .VPSidebar {
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(15px);
+  border-right: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 2px 0 4px rgba(255, 255, 255, 0.3) !important;
+}
+
+html:not([data-theme]) .VPContent,
+html:not([data-theme]) .VPDoc,
+html:not([data-theme]) .VPContentDoc,
+html:not([data-theme]) .content,
+html:not([data-theme]) .container,
+html:not([data-theme]) .vp-doc,
+html:not([data-theme]) .vp-doc .content,
+html:not([data-theme]) .vp-doc .content-container,
+html:not([data-theme]) .vp-doc .content-body {
+  background: transparent !important;
+}
+
+html:not([data-theme]) .vp-doc a {
+  color: #3b82f6 !important;
+  text-shadow: 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+html:not([data-theme]) .vp-doc a:hover {
+  color: #1d4ed8 !important;
+  text-shadow: 0 0 8px rgba(29, 78, 216, 0.5);
+}
+
+html:not([data-theme]) .vp-doc h1,
+html:not([data-theme]) .vp-doc h2,
+html:not([data-theme]) .vp-doc h3,
+html:not([data-theme]) .vp-doc h4,
+html:not([data-theme]) .vp-doc h5,
+html:not([data-theme]) .vp-doc h6 {
+  color: #35a3f7 !important;
+  text-shadow: 
+    -1px -1px 0 rgba(255, 255, 255, 0.8),
+    1px -1px 0 rgba(255, 255, 255, 0.8),
+    -1px 1px 0 rgba(255, 255, 255, 0.8),
+    1px 1px 0 rgba(255, 255, 255, 0.8),
+    0 0 5px rgba(53, 163, 247, 0.3);
+}
+
+/* 特别处理深色主题的水合问题 */
+html.dark:not([data-hydrated]) {
+  /* 在深色主题但未水合时，使用深色样式 */
+}
+
+html.dark:not([data-hydrated]) .VPNav {
+  background: rgba(15, 15, 35, 0.6) !important;
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(79, 195, 247, 0.2) !important;
+}
+
+html.dark:not([data-hydrated]) .VPNavBar {
+  background: transparent !important;
+  border-bottom: none !important;
+}
+
+html.dark:not([data-hydrated]) .VPSidebar {
+  background: rgba(15, 15, 35, 0.5) !important;
+  backdrop-filter: blur(15px);
+  border-right: 1px solid rgba(79, 195, 247, 0.2);
+}
+
+html.dark:not([data-hydrated]) .VPContent,
+html.dark:not([data-hydrated]) .VPDoc,
+html.dark:not([data-hydrated]) .VPContentDoc,
+html.dark:not([data-hydrated]) .content,
+html.dark:not([data-hydrated]) .container,
+html.dark:not([data-hydrated]) .vp-doc,
+html.dark:not([data-hydrated]) .vp-doc .content,
+html.dark:not([data-hydrated]) .vp-doc .content-container,
+html.dark:not([data-hydrated]) .vp-doc .content-body {
+  background: transparent !important;
+}
+
+html.dark:not([data-hydrated]) .vp-doc a {
+  color: #81d4fa !important;
+  text-shadow: 0 0 3px rgba(129, 212, 250, 0.3);
+}
+
+html.dark:not([data-hydrated]) .vp-doc a:hover {
+  color: #4fc3f7 !important;
+  text-shadow: 0 0 8px rgba(79, 195, 247, 0.5);
+}
+
+html.dark:not([data-hydrated]) .vp-doc h1,
+html.dark:not([data-hydrated]) .vp-doc h2,
+html.dark:not([data-hydrated]) .vp-doc h3,
+html.dark:not([data-hydrated]) .vp-doc h4,
+html.dark:not([data-hydrated]) .vp-doc h5,
+html.dark:not([data-hydrated]) .vp-doc h6 {
+  color: #4fc3f7 !important;
+  text-shadow: 0 0 5px rgba(79, 195, 247, 0.3);
+}
+
+/* 防止水合期间的主题闪烁 */
+html:not([data-theme]) .starry-theme,
+html:not([data-theme]) .cloud-theme {
+  opacity: 0;
+}
+
+/* 确保主题切换时的平滑过渡 */
+.starry-theme,
+.cloud-theme {
+  transition: opacity 0.2s ease-in-out;
+}
+
+/* 在客户端JavaScript加载完成后，确保主题正确显示 */
+html[data-theme] .starry-theme,
+html[data-theme] .cloud-theme {
+  opacity: 1;
+}
+
+/* 防止水合期间的布局偏移 */
+html:not([data-hydrated]) {
+  /* 在客户端JavaScript加载完成前，保持稳定的布局 */
+}
+
+/* 确保背景组件在水合期间不会闪烁 */
+html:not([data-hydrated]) .starry-theme canvas,
+html:not([data-hydrated]) .cloud-theme canvas {
+  opacity: 0;
+  transition: opacity 0.3s ease-in-out;
+}
+
+html[data-hydrated] .starry-theme canvas,
+html[data-hydrated] .cloud-theme canvas {
+  opacity: 1;
+}
+
+/* 防止主题切换时的内容闪烁 */
+html:not([data-hydrated]) .VPNav,
+html:not([data-hydrated]) .VPSidebar,
+html:not([data-hydrated]) .VPContent {
+  transition: none !important;
+}
+
+html[data-hydrated] .VPNav,
+html[data-hydrated] .VPSidebar,
+html[data-hydrated] .VPContent {
+  transition: all 0.3s ease-in-out;
+}
+
+/* 特别处理深色主题的平滑切换 */
+html.dark[data-hydrated] .starry-theme {
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out;
+}
+
+/* 确保深色主题在切换时不会闪烁 */
+html.dark .starry-theme {
+  opacity: 1;
+}
+
+/* 防止深色主题在初始化时的闪烁 */
+html.dark:not([data-hydrated]) .starry-theme {
+  opacity: 1;
+} 

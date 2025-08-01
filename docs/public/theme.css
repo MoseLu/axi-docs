@@ -1,0 +1,956 @@
+/* 星空主题样式 */
+.starry-theme {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+
+
+/* 简化的样式覆盖，不破坏原有布局 */
+.starry-theme .VPNav {
+  background: rgba(15, 15, 35, 0.6) !important;
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(79, 195, 247, 0.2) !important;
+}
+
+/* 确保只有一个边框 */
+.starry-theme .VPNav *,
+.starry-theme .VPNavBar * {
+  border-bottom: none !important;
+}
+
+.starry-theme .VPNavBar {
+  background: transparent !important;
+  border-bottom: none !important;
+}
+
+.starry-theme .VPNavBar.has-sidebar .content-body {
+  background: rgba(15, 15, 35, 0.4) !important;
+  backdrop-filter: blur(15px);
+  /* 移除重复的border-bottom，避免双重边框 */
+  border-bottom: none !important;
+}
+
+/* 侧边栏样式 */
+.starry-theme .VPSidebar {
+  background: rgba(15, 15, 35, 0.5) !important;
+  backdrop-filter: blur(15px);
+  border-right: 1px solid rgba(79, 195, 247, 0.2);
+}
+
+/* 确保分割线在侧边栏内 */
+.starry-theme .VPSidebar .divider {
+  width: calc(100% - 2rem) !important;
+  max-width: calc(100% - 2rem) !important;
+  margin: 0 1rem !important;
+  overflow: hidden !important;
+}
+
+/* 特别处理侧边栏顶部的分割线 */
+.starry-theme .VPSidebar > .divider,
+.starry-theme .VPSidebar > .content > .divider,
+.starry-theme .VPSidebar > .content-body > .divider {
+  width: calc(100% - 2rem) !important;
+  max-width: calc(100% - 2rem) !important;
+  margin: 0 1rem !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+/* 导航栏内容区域 */
+.starry-theme .VPNavBar .content {
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+.starry-theme .VPNavBar .content-body {
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+.starry-theme .VPContent,
+.starry-theme .VPDoc,
+.starry-theme .VPContentDoc,
+.starry-theme .content,
+.starry-theme .container,
+.starry-theme .vp-doc,
+.starry-theme .vp-doc .content,
+.starry-theme .vp-doc .content-container,
+.starry-theme .vp-doc .content-body {
+  background: transparent !important;
+}
+
+/* 移除自定义布局约束，恢复VitePress官方布局 */
+
+.starry-theme .vp-doc a {
+  color: #81d4fa !important;
+  text-shadow: 0 0 3px rgba(129, 212, 250, 0.3);
+}
+
+.starry-theme .vp-doc a:hover {
+  color: #4fc3f7 !important;
+  text-shadow: 0 0 8px rgba(79, 195, 247, 0.5);
+}
+
+.starry-theme .vp-doc h1,
+.starry-theme .vp-doc h2,
+.starry-theme .vp-doc h3,
+.starry-theme .vp-doc h4,
+.starry-theme .vp-doc h5,
+.starry-theme .vp-doc h6 {
+  color: #4fc3f7 !important;
+  text-shadow: 0 0 5px rgba(79, 195, 247, 0.3);
+}
+
+.starry-theme .vp-doc code {
+  background: rgba(15, 15, 35, 0.8) !important;
+  color: #81c784 !important;
+  border: 1px solid rgba(79, 195, 247, 0.5) !important;
+}
+
+.starry-theme .vp-doc pre {
+  background: rgba(15, 15, 35, 0.9) !important;
+  border: 1px solid rgba(79, 195, 247, 0.5) !important;
+  backdrop-filter: blur(10px);
+}
+
+.starry-theme .vp-doc blockquote {
+  border-left: 4px solid #4fc3f7 !important;
+  background: rgba(15, 15, 35, 0.6) !important;
+}
+
+.starry-theme .vp-doc table {
+  background: rgba(15, 15, 35, 0.8) !important;
+  border: 1px solid rgba(79, 195, 247, 0.5) !important;
+}
+
+.starry-theme .vp-doc th {
+  background: rgba(79, 195, 247, 0.1) !important;
+  color: #4fc3f7 !important;
+}
+
+.starry-theme .vp-doc td {
+  border: 1px solid rgba(79, 195, 247, 0.4) !important;
+}
+
+/* 文档内容分隔线样式 */
+.starry-theme .vp-doc hr {
+  border: none !important;
+  height: 1px !important;
+  background: linear-gradient(90deg, transparent, rgba(79, 195, 247, 0.6), transparent) !important;
+  margin: 2rem 0 !important;
+}
+
+/* 移除h2内部的水平分割线 */
+.starry-theme .vp-doc h2 + * hr {
+  display: none !important;
+}
+
+.starry-theme .vp-doc h1 {
+  color: #4fc3f7 !important;
+  text-shadow: 0 0 5px rgba(79, 195, 247, 0.3);
+  border-bottom: 1px solid rgba(79, 195, 247, 0.4) !important;
+  padding-bottom: 0.5rem !important;
+  margin-bottom: 1rem !important;
+  margin-top: 1rem !important;
+}
+
+.starry-theme .vp-doc h2 {
+  color: #4fc3f7 !important;
+  text-shadow: 0 0 5px rgba(79, 195, 247, 0.3);
+  margin-bottom: 1rem !important;
+  border-top: none !important;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+  border-bottom: 1px solid rgba(79, 195, 247, 0.4) !important;
+  padding-bottom: 0.5rem !important;
+}
+
+/* 标题与前面内容的间距 */
+.starry-theme .vp-doc * + h1,
+.starry-theme .vp-doc * + h2,
+.starry-theme .vp-doc * + h3,
+.starry-theme .vp-doc * + h4,
+.starry-theme .vp-doc * + h5,
+.starry-theme .vp-doc * + h6 {
+  margin-top: 2rem !important;
+  padding-top: 0 !important;
+  border-top: none !important;
+}
+
+/* 移除h2上方的分割线 */
+.starry-theme .vp-doc * + h2 {
+  border-top: none !important;
+  padding-top: 0 !important;
+}
+
+/* 移除h2前面元素的底部边框 */
+.starry-theme .vp-doc h1 + h2,
+.starry-theme .vp-doc p + h2,
+.starry-theme .vp-doc div + h2,
+.starry-theme .vp-doc hr + h2 {
+  border-top: none !important;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+.starry-theme .vp-doc h1 + h2::before,
+.starry-theme .vp-doc p + h2::before,
+.starry-theme .vp-doc div + h2::before,
+.starry-theme .vp-doc hr + h2::before {
+  display: none !important;
+}
+
+.starry-theme .vp-doc h3,
+.starry-theme .vp-doc h4,
+.starry-theme .vp-doc h5,
+.starry-theme .vp-doc h6 {
+  color: #4fc3f7 !important;
+  text-shadow: 0 0 5px rgba(79, 195, 247, 0.3);
+  border-bottom: 1px solid rgba(79, 195, 247, 0.4) !important;
+  padding-bottom: 0.5rem !important;
+  margin-bottom: 1rem !important;
+}
+
+/* 段落和内容分隔 */
+.starry-theme .vp-doc p {
+  margin-bottom: 1rem !important;
+  line-height: 1.6 !important;
+}
+
+/* 移除h2内部的段落分割线 */
+.starry-theme .vp-doc h2 + p + p {
+  border-top: none !important;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* 列表项分隔 */
+.starry-theme .vp-doc li {
+  margin-bottom: 0.5rem !important;
+  padding-left: 0.5rem !important;
+}
+
+.starry-theme .vp-doc li + li {
+  border-top: 1px solid rgba(79, 195, 247, 0.15) !important;
+  padding-top: 0.5rem !important;
+  margin-top: 0.5rem !important;
+}
+
+/* 移除h2内部的列表项分割线 */
+.starry-theme .vp-doc h2 + * li + li {
+  border-top: none !important;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* 文档底部导航样式 */
+.starry-theme .VPDocFooter {
+  position: relative !important;
+  margin-top: 2rem !important;
+  padding-top: 2rem !important;
+}
+
+.starry-theme .VPDocFooter .pager {
+  border: 1px solid rgba(79, 195, 247, 0.4) !important;
+  background: rgba(15, 15, 35, 0.6) !important;
+  backdrop-filter: blur(10px);
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+}
+
+.starry-theme .VPDocFooter .pager:hover {
+  border-color: rgba(79, 195, 247, 0.6) !important;
+  background: rgba(15, 15, 35, 0.8) !important;
+  box-shadow: 0 0 10px rgba(79, 195, 247, 0.2) !important;
+}
+
+.starry-theme .VPDocFooter .pager-link {
+  color: #bbdefb !important;
+  transition: all 0.3s ease !important;
+}
+
+.starry-theme .VPDocFooter .pager-link:hover {
+  color: #4fc3f7 !important;
+  text-shadow: 0 0 5px rgba(79, 195, 247, 0.3) !important;
+}
+
+.starry-theme .VPDocFooter .pager-text {
+  color: #4fc3f7 !important;
+  font-weight: 500 !important;
+}
+
+/* 隐藏空的导航按钮但保持位置 */
+.starry-theme .VPDocFooter .pager:empty {
+  visibility: hidden !important;
+}
+
+/* 本地搜索按钮样式 - 深色模式 */
+.starry-theme .VPNavBarSearch {
+  background: rgba(15, 15, 35, 0.8) !important;
+  border: 2px solid rgba(79, 195, 247, 0.5) !important;
+  border-radius: 12px !important;
+  color: #bbdefb !important;
+  transition: all 0.3s ease !important;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 4px 16px rgba(79, 195, 247, 0.15) !important;
+}
+
+/* 移除搜索框悬浮效果 */
+
+
+
+.starry-theme .VPNavBarSearch .VPNavBarSearchButton {
+  background: transparent !important;
+  border: none !important;
+  color: #bbdefb !important;
+  transition: all 0.3s ease !important;
+}
+
+/* 移除搜索按钮悬浮效果 */
+
+
+
+.starry-theme .VPNavBarSearch .VPNavBarSearchButton .VPNavBarSearchButtonKey {
+  background: rgba(79, 195, 247, 0.2) !important;
+  border: 1px solid rgba(79, 195, 247, 0.4) !important;
+  color: #bbdefb !important;
+  border-radius: 4px !important;
+  padding: 2px 6px !important;
+  font-size: 12px !important;
+}
+
+
+
+/* 本地搜索模态框样式 - 深色模式 */
+.starry-theme .VPNavBarSearchModal {
+  background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(15, 15, 35, 0.95) 25%, rgba(26, 26, 58, 0.95) 50%, rgba(45, 27, 105, 0.95) 75%, rgba(22, 33, 62, 0.95) 100%) !important;
+  backdrop-filter: blur(25px) !important;
+  border: 2px solid rgba(79, 195, 247, 0.4) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 12px 40px rgba(79, 195, 247, 0.25) !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+/* 为搜索模态框添加星空效果 */
+.starry-theme .VPNavBarSearchModal::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-image: 
+    radial-gradient(1px 1px at 20px 30px, rgba(79, 195, 247, 0.3), transparent),
+    radial-gradient(1px 1px at 40px 70px, rgba(129, 199, 132, 0.3), transparent),
+    radial-gradient(1px 1px at 90px 40px, rgba(100, 181, 246, 0.3), transparent),
+    radial-gradient(1px 1px at 130px 80px, rgba(149, 117, 205, 0.3), transparent),
+    radial-gradient(1px 1px at 160px 30px, rgba(77, 208, 225, 0.3), transparent),
+    radial-gradient(2px 2px at 200px 50px, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 250px 90px, rgba(187, 222, 251, 0.3), transparent),
+    radial-gradient(1px 1px at 300px 20px, rgba(225, 190, 231, 0.3), transparent),
+    radial-gradient(1px 1px at 350px 60px, rgba(179, 229, 252, 0.3), transparent),
+    radial-gradient(1px 1px at 400px 100px, rgba(200, 230, 201, 0.3), transparent);
+  background-repeat: repeat !important;
+  background-size: 300px 200px !important;
+  animation: sparkle 30s linear infinite !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
+
+.starry-theme .VPNavBarSearchModal .VPNavBarSearchModalInput {
+  background: rgba(15, 15, 35, 0.9) !important;
+  border: 2px solid rgba(79, 195, 247, 0.3) !important;
+  border-radius: 12px !important;
+  color: #bbdefb !important;
+  transition: all 0.3s ease !important;
+  font-size: 16px !important;
+  padding: 12px 16px !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.starry-theme .VPNavBarSearchModal .VPNavBarSearchModalInput:focus {
+  border-color: rgba(79, 195, 247, 0.6) !important;
+  box-shadow: 0 0 15px rgba(79, 195, 247, 0.3) !important;
+  background: rgba(15, 15, 35, 0.95) !important;
+}
+
+.starry-theme .VPNavBarSearchModal .VPNavBarSearchModalResult {
+  border-radius: 12px !important;
+  transition: all 0.3s ease !important;
+  border: 1px solid rgba(79, 195, 247, 0.2) !important;
+  margin: 4px 0 !important;
+  padding: 8px 12px !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+
+
+.starry-theme .VPNavBarSearchModal .VPNavBarSearchModalResult .VPNavBarSearchModalResultTitle {
+  color: #bbdefb !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+}
+
+
+
+.starry-theme .VPNavBarSearchModal .VPNavBarSearchModalResult .VPNavBarSearchModalResultContent {
+  color: rgba(187, 222, 251, 0.7) !important;
+  font-size: 13px !important;
+  line-height: 1.3 !important;
+  margin-top: 4px !important;
+}
+
+
+
+
+
+/* 为本地搜索组件添加星空效果 */
+.starry-theme .shell::before,
+.starry-theme .shell[data-v-1a3ea70d]::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-image: 
+    radial-gradient(1px 1px at 20px 30px, rgba(79, 195, 247, 0.3), transparent),
+    radial-gradient(1px 1px at 40px 70px, rgba(129, 199, 132, 0.3), transparent),
+    radial-gradient(1px 1px at 90px 40px, rgba(100, 181, 246, 0.3), transparent),
+    radial-gradient(1px 1px at 130px 80px, rgba(149, 117, 205, 0.3), transparent),
+    radial-gradient(1px 1px at 160px 30px, rgba(77, 208, 225, 0.3), transparent),
+    radial-gradient(2px 2px at 200px 50px, rgba(255, 255, 255, 0.3), transparent),
+    radial-gradient(1px 1px at 250px 90px, rgba(187, 222, 251, 0.3), transparent),
+    radial-gradient(1px 1px at 300px 20px, rgba(225, 190, 231, 0.3), transparent),
+    radial-gradient(1px 1px at 350px 60px, rgba(179, 229, 252, 0.3), transparent),
+    radial-gradient(1px 1px at 400px 100px, rgba(200, 230, 201, 0.3), transparent);
+  background-repeat: repeat !important;
+  background-size: 300px 200px !important;
+  animation: sparkle 30s linear infinite !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
+
+.starry-theme .search-bar,
+.starry-theme .search-bar[data-v-1a3ea70d] {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.starry-theme .search-input,
+.starry-theme .search-input[data-v-1a3ea70d] {
+  background: rgba(15, 15, 35, 0.9) !important;
+  border: 2px solid rgba(79, 195, 247, 0.3) !important;
+  border-radius: 12px !important;
+  color: #bbdefb !important;
+  transition: all 0.3s ease !important;
+  font-size: 16px !important;
+  padding: 12px 16px !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.starry-theme .search-input:focus,
+.starry-theme .search-input[data-v-1a3ea70d]:focus {
+  border-color: rgba(79, 195, 247, 0.6) !important;
+  box-shadow: 0 0 15px rgba(79, 195, 247, 0.3) !important;
+  background: rgba(15, 15, 35, 0.95) !important;
+}
+
+.starry-theme .search-input::placeholder,
+.starry-theme .search-input[data-v-1a3ea70d]::placeholder {
+  color: rgba(187, 222, 251, 0.6) !important;
+}
+
+.starry-theme .results,
+.starry-theme .results[data-v-1a3ea70d] {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.starry-theme .results li,
+.starry-theme .results[data-v-1a3ea70d] li {
+  border-radius: 12px !important;
+  transition: all 0.3s ease !important;
+  border: 1px solid rgba(79, 195, 247, 0.2) !important;
+  margin: 4px 0 !important;
+  padding: 8px 12px !important;
+  position: relative !important;
+  z-index: 1 !important;
+  background: rgba(15, 15, 35, 0.8) !important;
+}
+
+
+
+.starry-theme .results .no-results,
+.starry-theme .results[data-v-1a3ea70d] .no-results {
+  color: rgba(187, 222, 251, 0.7) !important;
+  font-size: 13px !important;
+  line-height: 1.3 !important;
+}
+
+.starry-theme .search-keyboard-shortcuts {
+  position: relative !important;
+  z-index: 1 !important;
+  color: rgba(187, 222, 251, 0.6) !important;
+  font-size: 12px !important;
+}
+
+.starry-theme .search-keyboard-shortcuts kbd {
+  background: rgba(79, 195, 247, 0.2) !important;
+  border: 1px solid rgba(79, 195, 247, 0.4) !important;
+  color: #bbdefb !important;
+  border-radius: 4px !important;
+  padding: 2px 6px !important;
+  font-size: 11px !important;
+}
+
+.starry-theme .search-actions button {
+  background: transparent !important;
+  border: none !important;
+  color: rgba(187, 222, 251, 0.8) !important;
+  transition: all 0.3s ease !important;
+  border-radius: 6px !important;
+  padding: 6px !important;
+}
+
+
+
+.starry-theme .local-search-icon {
+  color: rgba(187, 222, 251, 0.8) !important;
+}
+
+
+
+/* 导航栏顶部分割线 */
+.starry-theme .prev-next {
+  position: relative !important;
+}
+
+.starry-theme .prev-next::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 1px !important;
+  background: linear-gradient(90deg, rgba(79, 195, 247, 0.8), rgba(79, 195, 247, 0.4), rgba(79, 195, 247, 0.8)) !important;
+}
+
+.starry-theme .pager {
+  position: relative !important;
+}
+
+.starry-theme .pager::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 1px !important;
+  background: linear-gradient(90deg, rgba(79, 195, 247, 0.8), rgba(79, 195, 247, 0.4), rgba(79, 195, 247, 0.8)) !important;
+}
+
+/* 侧边栏样式 */
+.starry-theme .VPSidebarItem.level-0 > .item > .link {
+  color: #e3f2fd !important;
+  font-weight: 500;
+  opacity: 0.95;
+}
+
+.starry-theme .VPSidebarItem.level-1 > .item > .link {
+  color: #bbdefb !important;
+  opacity: 0.9;
+}
+
+.starry-theme .VPSidebarItem.level-2 > .item > .link {
+  color: #90caf9 !important;
+  opacity: 0.85;
+}
+
+.starry-theme .VPSidebarItem.level-3 > .item > .link {
+  color: #81d4fa !important;
+  opacity: 0.8;
+}
+
+/* 悬停样式 - 只对文档链接生效 */
+.starry-theme .VPSidebarItem:not(.has-children .item .link:hover) {
+  color: #4fc3f7 !important;
+}
+
+/* VitePress原生支持分类展开收起，无需额外设置光标 */
+
+/* 覆盖文档链接的悬停状态 */
+.starry-theme .VPSidebarItem:not(.has-children .item .link:hover > .text) {
+  color: #4fc3f7 !important;
+}
+
+.starry-theme .VPSidebarItem:not(.has-children .item .link:hover *),
+.starry-theme .VPSidebarItem:not(.has-children .item .link:hover .title),
+.starry-theme .VPSidebarItem:not(.has-children .item .link:hover .desc) {
+  color: #4fc3f7 !important;
+}
+
+.starry-theme .VPSidebarItem .item .link.active {
+  color: #4fc3f7 !important;
+}
+
+/* 覆盖VitePress默认的选中状态样式 */
+.starry-theme .VPSidebarItem.level-0.is-active > .item .link > .text,
+.starry-theme .VPSidebarItem.level-1.is-active > .item .link > .text,
+.starry-theme .VPSidebarItem.level-2.is-active > .item .link > .text,
+.starry-theme .VPSidebarItem.level-3.is-active > .item .link > .text,
+.starry-theme .VPSidebarItem.level-4.is-active > .item .link > .text,
+.starry-theme .VPSidebarItem.level-5.is-active > .item .link > .text {
+  color: #4fc3f7 !important;
+}
+
+/* 覆盖所有选中状态的链接样式 */
+.starry-theme .VPSidebarItem.is-active > .item .link {
+  color: #4fc3f7 !important;
+}
+
+/* 导航栏样式 */
+.starry-theme .VPNavBarTitle {
+  color: #bbdefb !important;
+  text-shadow: 0 0 5px rgba(187, 222, 251, 0.3);
+  font-weight: normal;
+  transition: all 0.3s ease;
+  /* 移除边框 */
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.starry-theme .VPNavBarTitle:hover {
+  color: #4fc3f7 !important;
+  text-shadow: 0 0 10px rgba(79, 195, 247, 0.5);
+  /* 悬停时也不显示边框 */
+  border: none !important;
+  background: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* 首页标签链接样式 - 确保悬浮时没有背景 */
+.starry-theme .VPNavBarTitle a,
+.starry-theme .VPNavBarTitle a:visited,
+.starry-theme .VPNavBarTitle a:link {
+  color: #bbdefb !important;
+  text-shadow: 0 0 5px rgba(187, 222, 251, 0.3);
+  text-decoration: none !important;
+  transition: all 0.3s ease;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.starry-theme .VPNavBarTitle a:hover {
+  color: #4fc3f7 !important;
+  text-shadow: 0 0 10px rgba(79, 195, 247, 0.5);
+  text-decoration: none !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* 确保所有可能的导航栏标题元素都不会有背景 */
+.starry-theme .VPNavBarTitle *,
+.starry-theme .VPNavBarTitle a *,
+.starry-theme .VPNavBarTitle span,
+.starry-theme .VPNavBarTitle div {
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.starry-theme .VPNavBarTitle:hover *,
+.starry-theme .VPNavBarTitle a:hover *,
+.starry-theme .VPNavBarTitle:hover span,
+.starry-theme .VPNavBarTitle:hover div {
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.starry-theme .VPNavBarMenuLink {
+  color: #ffffff !important;
+  transition: all 0.3s ease;
+  opacity: 0.9;
+  /* 移除边框 */
+  border: none !important;
+  background: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.starry-theme .VPNavBarMenuLink:hover {
+  color: #81d4fa !important;
+  text-shadow: 0 0 8px rgba(129, 212, 250, 0.6);
+  background: transparent !important;
+  opacity: 1;
+  /* 悬停时只显示文字变色，不显示背景 */
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.starry-theme .VPNavBarMenuLink.active {
+  text-shadow: 0 0 8px rgba(129, 212, 250, 0.6);
+  opacity: 1;
+  /* 激活状态也不显示边框 */
+  border: none !important;
+  background: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* 移除所有导航栏元素的边框 */
+.starry-theme .VPNavBar *,
+.starry-theme .VPNavBarTitle *,
+.starry-theme .VPNavBarMenuLink *,
+.starry-theme .VPNavBarMenu *,
+.starry-theme .VPNavBarMenuButton *,
+.starry-theme .VPNavBarAppearance *,
+.starry-theme .VPNavBarSocialLink *,
+.starry-theme .VPNavBarTranslation * {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* 移除导航栏容器的边框 */
+.starry-theme .VPNavBar {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.starry-theme .VPNavBar .content {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.starry-theme .VPNavBar .content-body {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* 搜索框样式 */
+.starry-theme .DocSearch-Button {
+  background: rgba(15, 15, 35, 0.8) !important;
+  border: 2px solid rgba(79, 195, 247, 0.4) !important;
+  color: #bbdefb !important;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(79, 195, 247, 0.15) !important;
+}
+
+.starry-theme .DocSearch-Button:hover {
+  background: rgba(15, 15, 35, 0.9) !important;
+  border-color: rgba(79, 195, 247, 0.6) !important;
+  box-shadow: 0 0 15px rgba(79, 195, 247, 0.3);
+}
+
+/* 主题切换按钮 */
+.starry-theme .VPNavBarAppearance {
+  color: #bbdefb !important;
+  transition: all 0.3s ease;
+}
+
+.starry-theme .VPNavBarAppearance:hover {
+  color: #4fc3f7 !important;
+  text-shadow: 0 0 5px rgba(79, 195, 247, 0.3);
+}
+
+/* 移动端菜单 */
+.starry-theme .VPNavBarMenu {
+  background: rgba(15, 15, 35, 0.95) !important;
+  backdrop-filter: blur(15px);
+  border: none !important;
+  box-shadow: 0 4px 20px rgba(79, 195, 247, 0.1);
+}
+
+
+
+/* 导航栏分隔线已隐藏 */
+
+/* 隐藏所有分割线容器 */
+.starry-theme .divider {
+  display: none !important;
+}
+
+/* 隐藏所有分割线 */
+.starry-theme .divider-line {
+  display: none !important;
+}
+
+/* 所有分割线都已隐藏 */
+
+/* 隐藏或调整侧边栏遮罩层 */
+.starry-theme .aside-curtain {
+  background: transparent !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* 确保遮罩层不会显示黑色 */
+.starry-theme [data-v-2b45519a].aside-curtain {
+  background: transparent !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* 移动端侧边栏遮罩层样式 */
+.starry-theme .VPSidebar .aside-curtain,
+.starry-theme .VPSidebar [class*="aside-curtain"],
+.starry-theme [class*="aside-curtain"] {
+  background: transparent !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  display: none !important;
+}
+
+/* 深色主题滚动条样式 - 星空蓝 */
+.starry-theme {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(79, 195, 247, 0.8) transparent !important;
+}
+
+.starry-theme::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+.starry-theme::-webkit-scrollbar-track {
+  background: transparent !important;
+  border-radius: 4px !important;
+}
+
+.starry-theme::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.8), rgba(100, 181, 246, 0.8)) !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(79, 195, 247, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.starry-theme::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgba(79, 195, 247, 1), rgba(100, 181, 246, 1)) !important;
+  box-shadow: 0 0 8px rgba(79, 195, 247, 0.5) !important;
+}
+
+.starry-theme::-webkit-scrollbar-button {
+  display: none !important;
+}
+
+.starry-theme::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+/* 为深色主题的所有可滚动元素应用滚动条样式 */
+.starry-theme * {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(79, 195, 247, 0.8) transparent !important;
+}
+
+.starry-theme *::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+.starry-theme *::-webkit-scrollbar-track {
+  background: transparent !important;
+  border-radius: 4px !important;
+}
+
+.starry-theme *::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(79, 195, 247, 0.8), rgba(100, 181, 246, 0.8)) !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(79, 195, 247, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.starry-theme *::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgba(79, 195, 247, 1), rgba(100, 181, 246, 1)) !important;
+  box-shadow: 0 0 8px rgba(79, 195, 247, 0.5) !important;
+}
+
+.starry-theme *::-webkit-scrollbar-button {
+  display: none !important;
+}
+
+.starry-theme *::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+/* 全局滚动条样式 - 确保在所有情况下都生效 */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+  background: transparent !important;
+  border-radius: 4px !important;
+}
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(30, 64, 175, 0.8), rgba(59, 130, 246, 0.8)) !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(30, 64, 175, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgba(30, 64, 175, 1), rgba(59, 130, 246, 1)) !important;
+  box-shadow: 0 0 8px rgba(30, 64, 175, 0.5) !important;
+}
+
+html::-webkit-scrollbar-button,
+body::-webkit-scrollbar-button {
+  display: none !important;
+}
+
+html::-webkit-scrollbar-corner,
+body::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+/* 强制移除暗色模式下导航栏标题的所有背景效果 */
+.starry-theme .starry-theme .VPNavBarTitle,
+.starry-theme .starry-theme .VPNavBarTitle *,
+.starry-theme .starry-theme .VPNavBarTitle a,
+.starry-theme .starry-theme .VPNavBarTitle a *,
+.starry-theme .starry-theme .VPNavBarTitle:hover,
+.starry-theme .starry-theme .VPNavBarTitle:hover *,
+.starry-theme .starry-theme .VPNavBarTitle a:hover,
+.starry-theme .starry-theme .VPNavBarTitle a:hover *,
+.starry-theme .starry-theme .VPNavBarTitle span,
+.starry-theme .starry-theme .VPNavBarTitle div,
+.starry-theme .starry-theme .VPNavBarTitle:hover span,
+.starry-theme .starry-theme .VPNavBarTitle:hover div {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+} 

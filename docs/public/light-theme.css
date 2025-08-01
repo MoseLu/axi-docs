@@ -1,0 +1,1090 @@
+/* 最高优先级滚动条样式 - 强制覆盖所有其他样式 */
+*::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+*::-webkit-scrollbar-track {
+  background: transparent !important;
+  border-radius: 4px !important;
+}
+
+*::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(30, 64, 175, 0.8), rgba(59, 130, 246, 0.8)) !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(30, 64, 175, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgba(30, 64, 175, 1), rgba(59, 130, 246, 1)) !important;
+  box-shadow: 0 0 8px rgba(30, 64, 175, 0.5) !important;
+}
+
+*::-webkit-scrollbar-button {
+  display: none !important;
+}
+
+*::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+/* 亮色主题基础样式 */
+
+
+/* 蓝天白云主题样式 - 仅在亮色模式下生效 */
+.cloud-theme {
+  min-height: 100vh;
+  position: relative;
+  overflow-x: hidden;
+}
+
+/* 亮色主题样式覆盖 - 使用更具体的选择器确保只在亮色模式下生效 */
+.cloud-theme .VPNav {
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(15px);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.3) !important;
+}
+
+/* 确保只有一个边框 */
+.cloud-theme .VPNav *,
+.cloud-theme .VPNavBar * {
+  border-bottom: none !important;
+}
+
+.cloud-theme .VPNavBar {
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(15px);
+  border-bottom: none !important;
+}
+
+.cloud-theme .VPNavBar.has-sidebar .content-body {
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(15px);
+  /* 移除重复的border-bottom，避免双重边框 */
+  border-bottom: none !important;
+}
+
+/* 侧边栏样式 */
+.cloud-theme .VPSidebar {
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(15px);
+  border-right: 2px solid rgba(255, 255, 255, 0.8);
+  box-shadow: 2px 0 4px rgba(255, 255, 255, 0.3) !important;
+}
+
+/* 确保分割线在侧边栏内 */
+.cloud-theme .VPSidebar .divider {
+  width: calc(100% - 2rem) !important;
+  max-width: calc(100% - 2rem) !important;
+  margin: 0 1rem !important;
+  overflow: hidden !important;
+}
+
+/* 特别处理侧边栏顶部的分割线 */
+.cloud-theme .VPSidebar > .divider,
+.cloud-theme .VPSidebar > .content > .divider,
+.cloud-theme .VPSidebar > .content-body > .divider {
+  width: calc(100% - 2rem) !important;
+  max-width: calc(100% - 2rem) !important;
+  margin: 0 1rem !important;
+  overflow: hidden !important;
+  position: relative !important;
+}
+
+/* 导航栏内容区域 */
+.cloud-theme .VPNavBar .content {
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+.cloud-theme .VPNavBar .content-body {
+  max-width: 100% !important;
+  overflow: hidden !important;
+}
+
+.cloud-theme .VPContent,
+.cloud-theme .VPDoc,
+.cloud-theme .VPContentDoc,
+.cloud-theme .content,
+.cloud-theme .container,
+.cloud-theme .vp-doc,
+.cloud-theme .vp-doc .content,
+.cloud-theme .vp-doc .content-container,
+.cloud-theme .vp-doc .content-body {
+  background: transparent !important;
+}
+
+/* 移除自定义布局约束，恢复VitePress官方布局 */
+
+.cloud-theme .vp-doc a {
+  color: #3b82f6 !important;
+  text-shadow: 0 0 3px rgba(59, 130, 246, 0.3);
+}
+
+.cloud-theme .vp-doc a:hover {
+  color: #1d4ed8 !important;
+  text-shadow: 0 0 8px rgba(29, 78, 216, 0.5);
+}
+
+.cloud-theme .vp-doc h1,
+.cloud-theme .vp-doc h2,
+.cloud-theme .vp-doc h3,
+.cloud-theme .vp-doc h4,
+.cloud-theme .vp-doc h5,
+.cloud-theme .vp-doc h6 {
+  color: #35a3f7 !important;
+  text-shadow: 
+    -1px -1px 0 rgba(255, 255, 255, 0.8),
+    1px -1px 0 rgba(255, 255, 255, 0.8),
+    -1px 1px 0 rgba(255, 255, 255, 0.8),
+    1px 1px 0 rgba(255, 255, 255, 0.8),
+    0 0 5px rgba(53, 163, 247, 0.3);
+}
+
+.cloud-theme .vp-doc code {
+  background: rgba(255, 255, 255, 0.9) !important;
+  color: #2e7d32 !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 1px 3px rgba(255, 255, 255, 0.3) !important;
+}
+
+.cloud-theme .vp-doc pre {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border: 2px solid rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.3) !important;
+}
+
+.cloud-theme .vp-doc blockquote {
+  border-left: 4px solid #1976d2 !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+}
+
+.cloud-theme .vp-doc table {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 2px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 2px 8px rgba(255, 255, 255, 0.3) !important;
+}
+
+.cloud-theme .vp-doc th {
+  background: rgba(135, 206, 235, 0.2) !important;
+  color: #1565c0 !important;
+}
+
+.cloud-theme .vp-doc td {
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: 0 1px 2px rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 文档内容分隔线样式 - 使用白云颜色 */
+.cloud-theme .vp-doc hr {
+  border: none !important;
+  height: 2px !important;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 1), transparent) !important;
+  margin: 2rem 0 !important;
+  box-shadow: 0 0 5px rgba(255, 255, 255, 0.5) !important;
+}
+
+/* 移除h2内部的水平分割线 */
+.cloud-theme .vp-doc h2 + * hr {
+  display: none !important;
+}
+
+.cloud-theme .vp-doc h1 {
+  color: #35a3f7 !important;
+  text-shadow: 
+    -1px -1px 0 rgba(255, 255, 255, 0.9),
+    1px -1px 0 rgba(255, 255, 255, 0.9),
+    -1px 1px 0 rgba(255, 255, 255, 0.9),
+    1px 1px 0 rgba(255, 255, 255, 0.9),
+    0 0 8px rgba(53, 163, 247, 0.4);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.8) !important;
+  padding-bottom: 0.5rem !important;
+  margin-bottom: 1rem !important;
+  margin-top: 1rem !important;
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.3) !important;
+}
+
+.cloud-theme .vp-doc h2 {
+  color: #35a3f7 !important;
+  text-shadow: 
+    -1px -1px 0 rgba(255, 255, 255, 0.8),
+    1px -1px 0 rgba(255, 255, 255, 0.8),
+    -1px 1px 0 rgba(255, 255, 255, 0.8),
+    1px 1px 0 rgba(255, 255, 255, 0.8),
+    0 0 6px rgba(53, 163, 247, 0.3);
+  margin-bottom: 1rem !important;
+  border-top: none !important;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.8) !important;
+  padding-bottom: 0.5rem !important;
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.3) !important;
+}
+
+/* 标题与前面内容的间距 */
+.cloud-theme .vp-doc * + h1,
+.cloud-theme .vp-doc * + h2,
+.cloud-theme .vp-doc * + h3,
+.cloud-theme .vp-doc * + h4,
+.cloud-theme .vp-doc * + h5,
+.cloud-theme .vp-doc * + h6 {
+  margin-top: 2rem !important;
+  padding-top: 0 !important;
+  border-top: none !important;
+}
+
+/* 移除h2上方的分割线 */
+.cloud-theme .vp-doc * + h2 {
+  border-top: none !important;
+  padding-top: 0 !important;
+}
+
+/* 移除h2前面元素的底部边框 */
+.cloud-theme .vp-doc h1 + h2,
+.cloud-theme .vp-doc p + h2,
+.cloud-theme .vp-doc div + h2,
+.cloud-theme .vp-doc hr + h2 {
+  border-top: none !important;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+.cloud-theme .vp-doc h1 + h2::before,
+.cloud-theme .vp-doc p + h2::before,
+.cloud-theme .vp-doc div + h2::before,
+.cloud-theme .vp-doc hr + h2::before {
+  display: none !important;
+}
+
+.cloud-theme .vp-doc h3,
+.cloud-theme .vp-doc h4,
+.cloud-theme .vp-doc h5,
+.cloud-theme .vp-doc h6 {
+  color: #35a3f7 !important;
+  text-shadow: 
+    -1px -1px 0 rgba(255, 255, 255, 0.8),
+    1px -1px 0 rgba(255, 255, 255, 0.8),
+    -1px 1px 0 rgba(255, 255, 255, 0.8),
+    1px 1px 0 rgba(255, 255, 255, 0.8),
+    0 0 5px rgba(53, 163, 247, 0.3);
+  border-bottom: 2px solid rgba(255, 255, 255, 0.8) !important;
+  padding-bottom: 0.5rem !important;
+  margin-bottom: 1rem !important;
+  box-shadow: 0 2px 4px rgba(255, 255, 255, 0.3) !important;
+}
+
+/* 段落和内容分隔 */
+.cloud-theme .vp-doc p {
+  margin-bottom: 1rem !important;
+  line-height: 1.6 !important;
+  color: #333 !important;
+}
+
+
+
+.cloud-theme .hero-subtitle {
+  color: #666666 !important;
+  text-shadow: none !important;
+  font-weight: 400 !important;
+  font-size: 1.5rem !important;
+}
+
+.cloud-theme .hero-description {
+  color: #666666 !important;
+  text-shadow: none !important;
+  font-size: 1.2rem !important;
+  line-height: 1.6 !important;
+}
+
+/* 首页其他标题样式 */
+.cloud-theme .section h2 {
+  color: #000000 !important;
+  text-shadow: none !important;
+  border-bottom: 2px solid rgba(0, 0, 0, 0.1) !important;
+  font-weight: 600 !important;
+}
+
+.cloud-theme .feature h3,
+.cloud-theme .category-card h3,
+.cloud-theme .feature-detail h3,
+.cloud-theme .philosophy-item h3 {
+  color: #000000 !important;
+  text-shadow: none !important;
+  font-weight: 600 !important;
+}
+
+.cloud-theme .cta-section h2 {
+  color: #000000 !important;
+  text-shadow: none !important;
+  font-weight: 600 !important;
+}
+
+
+
+/* 首页段落文本样式 */
+.cloud-theme .hero-description,
+.cloud-theme .feature p,
+.cloud-theme .category-card p,
+.cloud-theme .feature-detail p,
+.cloud-theme .philosophy-item p,
+.cloud-theme .cta-section p {
+  color: #666666 !important;
+  text-shadow: none !important;
+  line-height: 1.6 !important;
+}
+
+/* 首页链接样式 */
+.cloud-theme .category-card a {
+  color: #1e88e5 !important;
+  text-decoration: none !important;
+  text-shadow: none !important;
+}
+
+.cloud-theme .category-card a:hover {
+  color: #1976d2 !important;
+  text-decoration: underline !important;
+}
+
+/* 移除h2内部的段落分割线 */
+.cloud-theme .vp-doc h2 + p + p {
+  border-top: none !important;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+/* 列表项分隔 */
+.cloud-theme .vp-doc li {
+  margin-bottom: 0.5rem !important;
+  padding-left: 0.5rem !important;
+  color: #333 !important;
+}
+
+.cloud-theme .vp-doc li + li {
+  border-top: 1px solid rgba(255, 255, 255, 0.6) !important;
+  padding-top: 0.5rem !important;
+  margin-top: 0.5rem !important;
+  box-shadow: 0 -1px 2px rgba(255, 255, 255, 0.2) !important;
+}
+
+/* 移除h2内部的列表项分割线 */
+.cloud-theme .vp-doc h2 + * li + li {
+  border-top: none !important;
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+
+
+/* 文档底部导航样式 */
+.cloud-theme .VPDocFooter {
+  position: relative !important;
+  margin-top: 2rem !important;
+  padding-top: 2rem !important;
+}
+
+.cloud-theme .VPDocFooter .pager {
+  border: 1px solid rgba(79, 195, 247, 0.6) !important;
+  background: rgba(255, 255, 255, 0.9) !important;
+  backdrop-filter: blur(10px);
+  border-radius: 8px !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 2px 8px rgba(79, 195, 247, 0.2) !important;
+}
+
+.cloud-theme .VPDocFooter .pager:hover {
+  border-color: rgba(79, 195, 247, 0.8) !important;
+  background: rgba(255, 255, 255, 1) !important;
+  box-shadow: 0 0 15px rgba(79, 195, 247, 0.4) !important;
+}
+
+.cloud-theme .VPDocFooter .pager-link {
+  background: transparent !important;
+  border: 1px solid rgba(79, 195, 247, 0.3) !important;
+  color: rgba(79, 195, 247, 0.8) !important;
+  transition: all 0.3s ease !important;
+}
+
+.cloud-theme .VPDocFooter .pager-link:hover {
+  background: rgba(79, 195, 247, 0.1) !important;
+  border-color: rgba(79, 195, 247, 0.6) !important;
+  color: rgba(79, 195, 247, 1) !important;
+  box-shadow: 0 0 10px rgba(79, 195, 247, 0.2) !important;
+}
+
+.cloud-theme .VPDocFooter .pager-text {
+  color: #4fc3f7 !important;
+  font-weight: 500 !important;
+}
+
+/* 隐藏空的导航按钮但保持位置 */
+.cloud-theme .VPDocFooter .pager:empty {
+  visibility: hidden !important;
+}
+
+/* 本地搜索按钮样式 - 浅色模式 */
+.cloud-theme .VPNavBarSearch {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 2px solid rgba(79, 195, 247, 0.6) !important;
+  border-radius: 12px !important;
+  color: rgba(79, 195, 247, 0.8) !important;
+  transition: all 0.3s ease !important;
+  backdrop-filter: blur(15px);
+  box-shadow: 0 4px 16px rgba(79, 195, 247, 0.15) !important;
+}
+
+/* 移除搜索框悬浮效果 */
+
+
+
+.cloud-theme .VPNavBarSearch .VPNavBarSearchButton {
+  background: transparent !important;
+  border: none !important;
+  color: rgba(79, 195, 247, 0.8) !important;
+  transition: all 0.3s ease !important;
+}
+
+/* 移除搜索按钮悬浮效果 */
+
+
+
+.cloud-theme .VPNavBarSearch .VPNavBarSearchButton .VPNavBarSearchButtonKey {
+  background: rgba(79, 195, 247, 0.2) !important;
+  border: 1px solid rgba(79, 195, 247, 0.4) !important;
+  color: rgba(79, 195, 247, 0.8) !important;
+  border-radius: 4px !important;
+  padding: 2px 6px !important;
+  font-size: 12px !important;
+}
+
+
+
+/* 本地搜索模态框样式 - 浅色模式 */
+.cloud-theme .VPNavBarSearchModal {
+  background: rgba(255, 255, 255, 0.98) !important;
+  backdrop-filter: blur(25px) !important;
+  border: 2px solid rgba(79, 195, 247, 0.4) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 12px 40px rgba(79, 195, 247, 0.25) !important;
+}
+
+.cloud-theme .VPNavBarSearchModal .VPNavBarSearchModalInput {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 2px solid rgba(79, 195, 247, 0.3) !important;
+  border-radius: 12px !important;
+  color: rgba(79, 195, 247, 0.8) !important;
+  transition: all 0.3s ease !important;
+  font-size: 16px !important;
+  padding: 12px 16px !important;
+}
+
+.cloud-theme .VPNavBarSearchModal .VPNavBarSearchModalInput:focus {
+  border-color: rgba(79, 195, 247, 0.6) !important;
+  box-shadow: 0 0 15px rgba(79, 195, 247, 0.3) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+}
+
+.cloud-theme .VPNavBarSearchModal .VPNavBarSearchModalResult {
+  border-radius: 12px !important;
+  transition: all 0.3s ease !important;
+  border: 1px solid rgba(79, 195, 247, 0.2) !important;
+  margin: 4px 0 !important;
+  padding: 8px 12px !important;
+}
+
+
+
+.cloud-theme .VPNavBarSearchModal .VPNavBarSearchModalResult .VPNavBarSearchModalResultTitle {
+  color: rgba(79, 195, 247, 0.8) !important;
+  font-weight: 600 !important;
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+}
+
+
+
+.cloud-theme .VPNavBarSearchModal .VPNavBarSearchModalResult .VPNavBarSearchModalResultContent {
+  color: rgba(79, 195, 247, 0.7) !important;
+  font-size: 13px !important;
+  line-height: 1.3 !important;
+  margin-top: 4px !important;
+}
+
+
+
+/* 本地搜索组件样式 - 浅色模式 */
+.cloud-theme .shell,
+.cloud-theme .shell[data-v-1a3ea70d] {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 248, 255, 0.95) 25%, rgba(230, 245, 255, 0.95) 50%, rgba(220, 240, 255, 0.95) 75%, rgba(210, 235, 255, 0.95) 100%) !important;
+  backdrop-filter: blur(25px) !important;
+  border: 2px solid rgba(79, 195, 247, 0.4) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 12px 40px rgba(79, 195, 247, 0.25) !important;
+  position: relative !important;
+  overflow: hidden !important;
+  padding: 12px !important;
+  margin: 64px auto !important;
+  width: min(100vw - 60px, 900px) !important;
+  height: min-content !important;
+  max-height: min(100vh - 128px, 900px) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 16px !important;
+}
+
+/* 为本地搜索组件添加云朵效果 */
+.cloud-theme .shell::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100% !important;
+  height: 100% !important;
+  background-image: 
+    radial-gradient(20px 20px at 50px 50px, rgba(79, 195, 247, 0.1), transparent),
+    radial-gradient(30px 30px at 150px 30px, rgba(100, 181, 246, 0.1), transparent),
+    radial-gradient(25px 25px at 250px 80px, rgba(129, 199, 132, 0.1), transparent),
+    radial-gradient(35px 35px at 350px 40px, rgba(149, 117, 205, 0.1), transparent),
+    radial-gradient(20px 20px at 450px 70px, rgba(77, 208, 225, 0.1), transparent);
+  background-repeat: no-repeat !important;
+  background-size: 500px 300px !important;
+  animation: float 20s ease-in-out infinite !important;
+  z-index: 0 !important;
+  pointer-events: none !important;
+}
+
+/* 覆盖VitePress的本地搜索CSS变量 - 浅色模式 */
+.cloud-theme [data-v-1a3ea70d] {
+  --vp-local-search-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(240, 248, 255, 0.95) 25%, rgba(230, 245, 255, 0.95) 50%, rgba(220, 240, 255, 0.95) 75%, rgba(210, 235, 255, 0.95) 100%) !important;
+  --vp-local-search-border: 2px solid rgba(79, 195, 247, 0.4) !important;
+  --vp-local-search-border-radius: 16px !important;
+  --vp-local-search-shadow: 0 12px 40px rgba(79, 195, 247, 0.25) !important;
+}
+
+.cloud-theme .search-bar {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.cloud-theme .search-input {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 2px solid rgba(79, 195, 247, 0.3) !important;
+  border-radius: 12px !important;
+  color: rgba(79, 195, 247, 0.8) !important;
+  transition: all 0.3s ease !important;
+  font-size: 16px !important;
+  padding: 12px 16px !important;
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.cloud-theme .search-input:focus {
+  border-color: rgba(79, 195, 247, 0.6) !important;
+  box-shadow: 0 0 15px rgba(79, 195, 247, 0.3) !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+}
+
+.cloud-theme .search-input::placeholder {
+  color: rgba(79, 195, 247, 0.6) !important;
+}
+
+.cloud-theme .results {
+  position: relative !important;
+  z-index: 1 !important;
+}
+
+.cloud-theme .results li {
+  border-radius: 12px !important;
+  transition: all 0.3s ease !important;
+  border: 1px solid rgba(79, 195, 247, 0.2) !important;
+  margin: 4px 0 !important;
+  padding: 8px 12px !important;
+  position: relative !important;
+  z-index: 1 !important;
+  background: rgba(255, 255, 255, 0.8) !important;
+}
+
+
+
+.cloud-theme .results .no-results {
+  color: rgba(79, 195, 247, 0.7) !important;
+  font-size: 13px !important;
+  line-height: 1.3 !important;
+}
+
+.cloud-theme .search-keyboard-shortcuts {
+  position: relative !important;
+  z-index: 1 !important;
+  color: rgba(79, 195, 247, 0.6) !important;
+  font-size: 12px !important;
+}
+
+.cloud-theme .search-keyboard-shortcuts kbd {
+  background: rgba(79, 195, 247, 0.2) !important;
+  border: 1px solid rgba(79, 195, 247, 0.4) !important;
+  color: rgba(79, 195, 247, 0.8) !important;
+  border-radius: 4px !important;
+  padding: 2px 6px !important;
+  font-size: 11px !important;
+}
+
+.cloud-theme .search-actions button {
+  background: transparent !important;
+  border: none !important;
+  color: rgba(79, 195, 247, 0.8) !important;
+  transition: all 0.3s ease !important;
+  border-radius: 6px !important;
+  padding: 6px !important;
+}
+
+
+
+.cloud-theme .local-search-icon {
+  color: rgba(79, 195, 247, 0.8) !important;
+}
+
+
+
+/* 导航栏顶部分割线 */
+.cloud-theme .prev-next {
+  position: relative !important;
+}
+
+.cloud-theme .prev-next::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 1px !important;
+  background: linear-gradient(90deg, rgba(79, 195, 247, 0.8), rgba(79, 195, 247, 0.4), rgba(79, 195, 247, 0.8)) !important;
+}
+
+.cloud-theme .pager {
+  position: relative !important;
+}
+
+.cloud-theme .pager::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 1px !important;
+  background: linear-gradient(90deg, rgba(79, 195, 247, 0.8), rgba(79, 195, 247, 0.4), rgba(79, 195, 247, 0.8)) !important;
+}
+
+/* 侧边栏样式 */
+.cloud-theme .VPSidebarItem.level-0 > .item > .link {
+  color: #35a3f7 !important;
+  font-weight: 500;
+  opacity: 0.95;
+  text-shadow: 
+    -1px -1px 0 rgba(255, 255, 255, 0.8),
+    1px -1px 0 rgba(255, 255, 255, 0.8),
+    -1px 1px 0 rgba(255, 255, 255, 0.8),
+    1px 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.cloud-theme .VPSidebarItem.level-1 > .item > .link {
+  color: #35a3f7 !important;
+  opacity: 0.9;
+  text-shadow: 
+    -1px -1px 0 rgba(255, 255, 255, 0.8),
+    1px -1px 0 rgba(255, 255, 255, 0.8),
+    -1px 1px 0 rgba(255, 255, 255, 0.8),
+    1px 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.cloud-theme .VPSidebarItem.level-2 > .item > .link {
+  color: #35a3f7 !important;
+  opacity: 0.85;
+  text-shadow: 
+    -1px -1px 0 rgba(255, 255, 255, 0.8),
+    1px -1px 0 rgba(255, 255, 255, 0.8),
+    -1px 1px 0 rgba(255, 255, 255, 0.8),
+    1px 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.cloud-theme .VPSidebarItem.level-3 > .item > .link {
+  color: #35a3f7 !important;
+  opacity: 0.8;
+  text-shadow: 
+    -1px -1px 0 rgba(255, 255, 255, 0.8),
+    1px -1px 0 rgba(255, 255, 255, 0.8),
+    -1px 1px 0 rgba(255, 255, 255, 0.8),
+    1px 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* 悬停样式 - 只对文档链接生效 */
+.cloud-theme .VPSidebarItem:not(.has-children) .item .link:hover {
+  color: #1976d2 !important;
+  text-shadow: 
+    -1px -1px 0 rgba(255, 255, 255, 0.9),
+    1px -1px 0 rgba(255, 255, 255, 0.9),
+    -1px 1px 0 rgba(255, 255, 255, 0.9),
+    1px 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* VitePress原生支持分类展开收起，无需额外设置光标 */
+
+/* 覆盖文档链接的悬停状态 */
+.cloud-theme .VPSidebarItem:not(.has-children) .item .link:hover > .text {
+  color: #1976d2 !important;
+  text-shadow: 
+    -1px -1px 0 rgba(255, 255, 255, 0.9),
+    1px -1px 0 rgba(255, 255, 255, 0.9),
+    -1px 1px 0 rgba(255, 255, 255, 0.9),
+    1px 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.cloud-theme .VPSidebarItem:not(.has-children) .item .link:hover *,
+.cloud-theme .VPSidebarItem:not(.has-children) .item .link:hover .title,
+.cloud-theme .VPSidebarItem:not(.has-children) .item .link:hover .desc {
+  color: #1976d2 !important;
+  text-shadow: 
+    -1px -1px 0 rgba(255, 255, 255, 0.9),
+    1px -1px 0 rgba(255, 255, 255, 0.9),
+    -1px 1px 0 rgba(255, 255, 255, 0.9),
+    1px 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.cloud-theme .VPSidebarItem .item .link.active {
+  color: #1976d2 !important;
+  text-shadow: 
+    -1px -1px 0 rgba(255, 255, 255, 0.9),
+    1px -1px 0 rgba(255, 255, 255, 0.9),
+    -1px 1px 0 rgba(255, 255, 255, 0.9),
+    1px 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* 覆盖VitePress默认的选中状态样式 */
+.cloud-theme .VPSidebarItem.level-0.is-active > .item .link > .text,
+.cloud-theme .VPSidebarItem.level-1.is-active > .item .link > .text,
+.cloud-theme .VPSidebarItem.level-2.is-active > .item .link > .text,
+.cloud-theme .VPSidebarItem.level-3.is-active > .item .link > .text,
+.cloud-theme .VPSidebarItem.level-4.is-active > .item .link > .text,
+.cloud-theme .VPSidebarItem.level-5.is-active > .item .link > .text {
+  color: #1976d2 !important;
+  text-shadow: 
+    -1px -1px 0 rgba(255, 255, 255, 0.9),
+    1px -1px 0 rgba(255, 255, 255, 0.9),
+    -1px 1px 0 rgba(255, 255, 255, 0.9),
+    1px 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* 覆盖所有选中状态的链接样式 */
+.cloud-theme .VPSidebarItem.is-active > .item .link {
+  color: #1976d2 !important;
+  text-shadow: 
+    -1px -1px 0 rgba(255, 255, 255, 0.9),
+    1px -1px 0 rgba(255, 255, 255, 0.9),
+    -1px 1px 0 rgba(255, 255, 255, 0.9),
+    1px 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* 导航栏样式 */
+.cloud-theme .VPNavBarTitle {
+  color: #000000 !important;
+  font-weight: normal;
+  transition: all 0.3s ease;
+  /* 移除边框 */
+  border: none !important;
+  background: transparent !important;
+  padding: 0 !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* 首页标签样式 */
+.cloud-theme .VPNavBarTitle a,
+.cloud-theme .VPNavBarTitle a:visited,
+.cloud-theme .VPNavBarTitle a:link {
+  color: #000000 !important;
+  text-decoration: none !important;
+  transition: all 0.3s ease;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.cloud-theme .VPNavBarTitle a:hover {
+  color: #000000 !important;
+  text-decoration: none !important;
+  background: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.cloud-theme .VPNavBarTitle:hover {
+  color: #000000 !important;
+  /* 悬停时也不显示边框 */
+  border: none !important;
+  background: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.cloud-theme .VPNavBarMenuLink {
+  color: #000000 !important;
+  transition: all 0.3s ease;
+  border: none !important;
+  background: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.cloud-theme .VPNavBarMenuLink:hover {
+  color: #000000 !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.cloud-theme .VPNavBarMenuLink.active {
+  color: #000000 !important;
+  border: none !important;
+  background: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* 移除所有导航栏元素的边框 */
+.cloud-theme .VPNavBar *,
+.cloud-theme .VPNavBarTitle *,
+.cloud-theme .VPNavBarMenuLink *,
+.cloud-theme .VPNavBarMenu *,
+.cloud-theme .VPNavBarMenuButton *,
+.cloud-theme .VPNavBarAppearance *,
+.cloud-theme .VPNavBarSocialLink *,
+.cloud-theme .VPNavBarTranslation * {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* 移除导航栏容器的边框 */
+.cloud-theme .VPNavBar {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.cloud-theme .VPNavBar .content {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.cloud-theme .VPNavBar .content-body {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* 搜索框样式 */
+.cloud-theme .DocSearch-Button {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border: 2px solid rgba(79, 195, 247, 0.4) !important;
+  color: rgba(79, 195, 247, 0.8) !important;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 2px 8px rgba(79, 195, 247, 0.15) !important;
+}
+
+.cloud-theme .DocSearch-Button:hover {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-color: rgba(79, 195, 247, 0.6) !important;
+  box-shadow: 0 0 15px rgba(79, 195, 247, 0.3);
+}
+
+/* 主题切换按钮 */
+.cloud-theme .VPNavBarAppearance {
+  color: #35a3f7 !important;
+  transition: all 0.3s ease;
+}
+
+.cloud-theme .VPNavBarAppearance:hover {
+  color: #1976d2 !important;
+  text-shadow: 0 0 8px rgba(25, 118, 210, 0.3);
+}
+
+/* 移动端菜单 */
+.cloud-theme .VPNavBarMenu {
+  background: rgba(255, 255, 255, 0.8) !important;
+  backdrop-filter: blur(15px);
+  border: none !important;
+  box-shadow: 0 4px 20px rgba(135, 206, 235, 0.1);
+}
+
+/* 导航栏分隔线已隐藏 */
+
+/* 隐藏所有分割线容器 */
+.cloud-theme .divider {
+  display: none !important;
+}
+
+/* 隐藏所有分割线 */
+.cloud-theme .divider-line {
+  display: none !important;
+}
+
+/* 所有分割线都已隐藏 */
+
+/* 隐藏或调整侧边栏遮罩层 */
+.cloud-theme .aside-curtain {
+  background: transparent !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* 确保遮罩层不会显示黑色 */
+.cloud-theme [data-v-2b45519a].aside-curtain {
+  background: transparent !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+/* 移动端侧边栏遮罩层样式 */
+.cloud-theme .VPSidebar .aside-curtain,
+.cloud-theme [class*="aside-curtain"],
+[class*="aside-curtain"] {
+  background: transparent !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  display: none !important;
+}
+
+/* 亮色主题滚动条样式 - 深蓝色 */
+.cloud-theme {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(30, 64, 175, 0.8) transparent !important;
+}
+
+.cloud-theme::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+.cloud-theme::-webkit-scrollbar-track {
+  background: transparent !important;
+  border-radius: 4px !important;
+}
+
+.cloud-theme::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(30, 64, 175, 0.8), rgba(59, 130, 246, 0.8)) !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(30, 64, 175, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.cloud-theme::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgba(30, 64, 175, 1), rgba(59, 130, 246, 1)) !important;
+  box-shadow: 0 0 8px rgba(30, 64, 175, 0.5) !important;
+}
+
+.cloud-theme::-webkit-scrollbar-button {
+  display: none !important;
+}
+
+.cloud-theme::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+/* 为亮色主题的所有可滚动元素应用滚动条样式 */
+.cloud-theme * {
+  scrollbar-width: thin !important;
+  scrollbar-color: rgba(30, 64, 175, 0.8) transparent !important;
+}
+
+.cloud-theme *::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+.cloud-theme *::-webkit-scrollbar-track {
+  background: transparent !important;
+  border-radius: 4px !important;
+}
+
+.cloud-theme *::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(30, 64, 175, 0.8), rgba(59, 130, 246, 0.8)) !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(30, 64, 175, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+.cloud-theme *::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgba(30, 64, 175, 1), rgba(59, 130, 246, 1)) !important;
+  box-shadow: 0 0 8px rgba(30, 64, 175, 0.5) !important;
+}
+
+.cloud-theme *::-webkit-scrollbar-button {
+  display: none !important;
+}
+
+.cloud-theme *::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+/* 全局滚动条样式 - 确保在所有情况下都生效 */
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  width: 8px !important;
+  height: 8px !important;
+}
+
+html::-webkit-scrollbar-track,
+body::-webkit-scrollbar-track {
+  background: transparent !important;
+  border-radius: 4px !important;
+}
+
+html::-webkit-scrollbar-thumb,
+body::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(30, 64, 175, 0.8), rgba(59, 130, 246, 0.8)) !important;
+  border-radius: 4px !important;
+  border: 1px solid rgba(30, 64, 175, 0.3) !important;
+  transition: all 0.3s ease !important;
+}
+
+html::-webkit-scrollbar-thumb:hover,
+body::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, rgba(30, 64, 175, 1), rgba(59, 130, 246, 1)) !important;
+  box-shadow: 0 0 8px rgba(30, 64, 175, 0.5) !important;
+}
+
+html::-webkit-scrollbar-button,
+body::-webkit-scrollbar-button {
+  display: none !important;
+}
+
+html::-webkit-scrollbar-corner,
+body::-webkit-scrollbar-corner {
+  background: transparent !important;
+}
+
+/* 强制移除亮色模式下导航栏标题的所有背景效果 */
+.cloud-theme .VPNavBarTitle,
+.cloud-theme .VPNavBarTitle *,
+.cloud-theme .VPNavBarTitle a,
+.cloud-theme .VPNavBarTitle a *,
+.cloud-theme .VPNavBarTitle:hover,
+.cloud-theme .VPNavBarTitle:hover *,
+.cloud-theme .VPNavBarTitle a:hover,
+.cloud-theme .VPNavBarTitle a:hover *,
+.cloud-theme .VPNavBarTitle span,
+.cloud-theme .VPNavBarTitle div,
+.cloud-theme .VPNavBarTitle:hover span,
+.cloud-theme .VPNavBarTitle:hover div {
+  background: transparent !important;
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+} 

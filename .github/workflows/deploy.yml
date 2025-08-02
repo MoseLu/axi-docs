@@ -8,9 +8,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    outputs:
-      artifact-id: ${{ steps.upload.outputs.artifact-id }}  # 保持与部署中心约定的输出名称
-
     steps:
       - name: 检出代码
         uses: actions/checkout@v4
@@ -27,39 +24,24 @@ jobs:
           npm run docs:build
 
       - name: 上传构建产物
-        uses: actions/upload-artifact@v4  # 修正了这里的拼写错误（actionsactions → actions）
-        id: upload  # 添加ID以输出artifact-id
+        uses: actions/upload-artifact@v4
         with:
           name: dist-${{ github.event.repository.name }}
           path: docs/.vitepress/dist/
           retention-days: 1
 
-  trigger-deploy:
+  deploy:
     needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: 触发中心仓库部署
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.DEPLOY_CENTER_PAT }}
-          script: |
-            const { data: response } = await github.rest.actions.createWorkflowDispatch({
-              owner: 'MoseLu',
-              repo: 'axi-deploy',
-              workflow_id: 'external-deploy.yml',  # 还原为文档中指定的工作流ID
-              ref: 'master',
-              inputs: {
-                project: '${{ github.event.repository.name }}',
-                lang: 'static',
-                artifact_id: '${{ needs.build.outputs.artifact-id }}',
-                deploy_path: '/www/wwwroot/${{ github.event.repository.name }}',
-                start_cmd: 'echo "静态网站部署完成，无需启动命令"',
-                caller_info: '${{ github.repository }}/${{ github.ref_name }}/${{ github.sha }}',
-                run_id: '${{ github.run_id }}',
-                server_host: '${{ secrets.SERVER_HOST }}',
-                server_port: '${{ secrets.SERVER_PORT }}',
-                server_user: '${{ secrets.SERVER_USER }}',
-                server_key: '${{ secrets.SERVER_KEY }}'
-              }
-            });
-            console.log('✅ 部署已触发:', response);
+    uses: MoseLu/axi-deploy/.github/workflows/external-deploy.yml@master
+    with:
+      project: ${{ github.event.repository.name }}
+      deploy_path: /www/wwwroot/${{ github.event.repository.name }}
+      start_cmd: 'echo "静态网站部署完成，无需启动命令"'
+      run_id: ${{ github.run_id }}
+      source_repo: ${{ github.repository }}
+    secrets:
+      SERVER_HOST: ${{ secrets.SERVER_HOST }}
+      SERVER_PORT: ${{ secrets.SERVER_PORT }}
+      SERVER_USER: ${{ secrets.SERVER_USER }}
+      SERVER_KEY: ${{ secrets.SERVER_KEY }}
+      DEPLOY_CENTER_PAT: ${{ secrets.DEPLOY_CENTER_PAT }} 

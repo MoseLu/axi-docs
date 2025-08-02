@@ -40,7 +40,7 @@ jobs:
         uses: peter-evans/repository-dispatch@v2
         with:
           token: ${{ secrets.DEPLOY_CENTER_PAT }}
-          repository: your-org/deploy-center
+          repository: MoseLu/axi-deploy  # 使用正确的仓库名称
           event-type: deploy
           client-payload: |
             {

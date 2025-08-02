@@ -1,0 +1,118 @@
+﻿name: Build & Deploy Axi Docs
+
+on:
+  push:
+    branches: [main, master]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    outputs:
+      artifact-id: ${{ steps.upload.outputs.artifact-id }}
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 安装 pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: 设置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "pnpm"
+
+      - name: 安装依赖
+        run: pnpm install
+
+      - name: 构建项目
+        run: pnpm docs:build
+
+      - name: 上传构建产物
+        uses: actions/upload-artifact@v4
+        id: upload
+        with:
+          name: dist-axi-docs
+          path: docs/.vitepress/dist/
+          retention-days: 1
+
+  trigger-deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检查服务器配置
+        run: |
+          echo "🔍 检查服务器配置..."
+          echo "SERVER_HOST: ${{ secrets.SERVER_HOST }}"
+          echo "SERVER_PORT: ${{ secrets.SERVER_PORT }}"
+          echo "SERVER_USER: ${{ secrets.SERVER_USER }}"
+          echo "SERVER_KEY 长度: ${{ secrets.SERVER_KEY != "" && "已设置" || "未设置" }}"
+
+          # 检查必要的配置
+          if [ -z "${{ secrets.SERVER_HOST }}" ]; then
+            echo "❌ SERVER_HOST 未设置"
+            exit 1
+          fi
+
+          if [ -z "${{ secrets.SERVER_PORT }}" ]; then
+            echo "❌ SERVER_PORT 未设置"
+            exit 1
+          fi
+
+          if [ -z "${{ secrets.SERVER_USER }}" ]; then
+            echo "❌ SERVER_USER 未设置"
+            exit 1
+          fi
+
+          if [ -z "${{ secrets.SERVER_KEY }}" ]; then
+            echo "❌ SERVER_KEY 未设置"
+            echo "请在axi-docs仓库的Settings > Secrets and variables > Actions中设置SERVER_KEY"
+            exit 1
+          fi
+
+          echo "✅ 服务器配置检查完成"
+
+      - name: 触发部署
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.DEPLOY_CENTER_PAT }}
+          script: |
+            // 获取当前 workflow run ID
+            const runId = "${{ github.run_id }}";
+            console.log("当前 workflow run ID:", runId);
+            
+            try {
+              console.log("🚀 开始触发部署...");
+              console.log("目标仓库: MoseLu/axi-deploy");
+              console.log("工作流: external-deploy.yml");
+              console.log("分支: master");
+
+              // 构建server_config，确保私钥正确传递
+              const serverConfig = `${{ secrets.SERVER_HOST }}/${{ secrets.SERVER_PORT }}/${{ secrets.SERVER_USER }}/${{ secrets.SERVER_KEY }}`;
+              console.log("服务器配置长度:", serverConfig.length);
+
+              const { data: response } = await github.rest.actions.createWorkflowDispatch({
+                owner: "MoseLu",
+                repo: "axi-deploy",
+                workflow_id: "external-deploy.yml",
+                ref: "master",
+                inputs: {
+                  project: "axi-docs",
+                  lang: "static",
+                  artifact_id: "${{ needs.build.outputs.artifact-id }}",
+                  deploy_path: "/www/wwwroot/axi-docs",
+                  start_cmd: "echo \"Axi Docs 静态网站部署完成，无需启动命令\"",
+                  caller_info: "${{ github.repository }}/${{ github.ref_name }}/${{ github.sha }}",
+                  run_id: runId,
+                  server_config: serverConfig
+                }
+              });
+
+              console.log("✅ Axi Docs 部署已成功触发");
+              console.log("响应状态:", response ? "成功" : "无数据返回(正常)");
+            } catch (error) {
+              console.error("❌ 触发部署失败:", error.message);
+              throw error;
+            }

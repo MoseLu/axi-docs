@@ -16,7 +16,7 @@ jobs:
               owner: 'MoseLu',
               repo: 'axi-deploy',
               workflow_id: 'test-connection.yml',
-              ref: 'main',
+              ref: 'master',
               inputs: {
                 caller_repo: '${{ github.repository }}',
                 caller_branch: '${{ github.ref_name }}',

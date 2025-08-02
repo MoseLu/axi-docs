@@ -76,7 +76,8 @@ jobs:
                 deploy_path: '/www/wwwroot/${{ github.event.repository.name }}',
                 start_cmd: 'echo "VitePress静态网站部署完成，无需启动命令"',
                 caller_info: '${{ github.repository }}/${{ github.ref_name }}/${{ github.sha }}',
-                server_config: '${{ secrets.SERVER_HOST }}/${{ secrets.SERVER_PORT }}/${{ secrets.SERVER_USER }}/${{ secrets.SERVER_SSH_KEY }}'
+                run_id: '${{ github.run_id }}',
+                server_config: '${{ secrets.SERVER_HOST }}/${{ secrets.SERVER_PORT }}/${{ secrets.SERVER_USER }}/${{ secrets.SERVER_KEY }}'
               }
             });
             

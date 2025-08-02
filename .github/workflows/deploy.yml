@@ -1,4 +1,4 @@
-ï»¿name: Build & Trigger Deploy
+name: Build & Trigger Deploy
 
 on:
   push:
@@ -9,26 +9,26 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: æ£€å‡ºä»£ç 
+      - name: ¼ì³ö´úÂë
         uses: actions/checkout@v4
 
-      - name: å®‰è£… pnpm
+      - name: °²×° pnpm
         uses: pnpm/action-setup@v2
         with:
           version: 10.7.1
 
-      - name: è®¾ç½® Node.js
+      - name: ÉèÖÃ Node.js
         uses: actions/setup-node@v4
         with:
           node-version: "20"
           cache: "pnpm"
 
-      - name: å®‰è£…ä¾èµ–å¹¶æ„å»º
+      - name: °²×°ÒÀÀµ²¢¹¹½¨
         run: |
           pnpm install
           pnpm run docs:build
 
-      - name: ä¸Šä¼ æ„å»ºäº§ç‰©
+      - name: ÉÏ´«¹¹½¨²úÎï
         uses: actions/upload-artifact@v4
         with:
           name: dist-${{ github.event.repository.name }}
@@ -37,11 +37,11 @@ jobs:
 
   deploy:
     needs: build
-    uses: MoseLu/axi-deploy/.github/workflows/external-deploy.yml@master
+    uses: MoseLu/axi-deploy/.github/workflows/external-deploy.yml@main
     with:
       project: ${{ github.event.repository.name }}
       deploy_path: /www/wwwroot/${{ github.event.repository.name }}
-      start_cmd: "echo \"é™æ€ç½‘ç«™éƒ¨ç½²å®Œæˆï¼Œæ— éœ€å¯åŠ¨å‘½ä»¤\""
+      start_cmd: "echo \"¾²Ì¬ÍøÕ¾²¿ÊğÍê³É£¬ÎŞĞèÆô¶¯ÃüÁî\""
       run_id: ${{ github.run_id }}
       source_repo: ${{ github.repository }}
     secrets:

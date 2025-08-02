@@ -9,29 +9,34 @@ jobs:
   build:
     runs-on: ubuntu-latest
     outputs:
-      run-id: ${{ github.run_id }}  # 直接传递 run_id，中心仓库用它下载 artifact
+      run-id: ${{ github.run_id }}   # 供中心仓库拉取 artifact
 
     steps:
+      # 1. 检出代码
       - name: 检出代码
         uses: actions/checkout@v4
 
+      # 2. 根据实际包管理器设置环境 -------------------------------------------------
+      # 如果用 pnpm 请改为 pnpm 相关步骤；这里用 npm 为例
       - name: 设置 Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'npm'
 
+      # 3. 安装依赖并构建
       - name: 安装依赖并构建
         run: |
           npm ci
           npm run docs:build
 
+      # 4. 上传构建产物（与中心仓库约定好的名称）
       - name: 上传构建产物
         uses: actions/upload-artifact@v4
         with:
-          name: dist-${{ github.event.repository.name }}  # 与中心仓库约定一致
+          name: dist-${{ github.event.repository.name }}
           path: docs/.vitepress/dist/
-          retention-days: 1
+          retention-days: 1         # 24 小时后自动清理，节省空间
 
   trigger-deploy:
     needs: build
@@ -44,14 +49,14 @@ jobs:
           script: |
             await github.rest.actions.createWorkflowDispatch({
               owner: 'MoseLu',
-              repo: 'axi-deploy',
+              repo:   'axi-deploy',
               workflow_id: 'external-deploy.yml',
               ref: 'master',
               inputs: {
-                project: '${{ github.event.repository.name }}',
-                lang: 'static',
-                artifact_id: '${{ needs.build.outputs.run-id }}',  // 传递 run_id
+                project:     '${{ github.event.repository.name }}',
+                lang:        'static',
+                artifact_id: '${{ needs.build.outputs.run-id }}',
                 deploy_path: '/www/wwwroot/${{ github.event.repository.name }}',
-                start_cmd: 'echo "静态网站部署完成，无需启动命令"'
+                start_cmd:   'echo "静态网站部署完成，无需启动命令"'
               }
             });

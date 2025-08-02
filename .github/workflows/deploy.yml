@@ -47,19 +47,37 @@ jobs:
         with:
           github-token: ${{ secrets.DEPLOY_CENTER_PAT }}
           script: |
-            const { data: response } = await github.rest.actions.createWorkflowDispatch({
-              owner: 'MoseLu',
-              repo: 'axi-deploy',
-              workflow_id: 'external-deploy.yml',
-              ref: 'master',
-              inputs: {
-                project: 'axi-docs',
-                lang: 'static',
-                artifact_id: '${{ needs.build.outputs.artifact-id }}',
-                deploy_path: '/www/wwwroot/axi-docs',
-                start_cmd: 'echo "Axi Docs 静态网站部署完成，无需启动命令"',
-                caller_info: '${{ github.repository }}/${{ github.ref_name }}/${{ github.sha }}',
-                server_config: '${{ secrets.SERVER_HOST }}/${{ secrets.SERVER_PORT }}/${{ secrets.SERVER_USER }}/${{ secrets.SERVER_KEY }}'
+            try {
+              console.log('🚀 开始触发部署...');
+              console.log('目标仓库: MoseLu/axi-deploy');
+              console.log('工作流: external-deploy.yml');
+              console.log('分支: master');
+              
+              const { data: response } = await github.rest.actions.createWorkflowDispatch({
+                owner: 'MoseLu',
+                repo: 'axi-deploy',
+                workflow_id: 'external-deploy.yml',
+                ref: 'master',
+                inputs: {
+                  project: 'axi-docs',
+                  lang: 'static',
+                  artifact_id: '${{ needs.build.outputs.artifact-id }}',
+                  deploy_path: '/www/wwwroot/axi-docs',
+                  start_cmd: 'echo "Axi Docs 静态网站部署完成，无需启动命令"',
+                  caller_info: '${{ github.repository }}/${{ github.ref_name }}/${{ github.sha }}',
+                  server_config: '${{ secrets.SERVER_HOST }}/${{ secrets.SERVER_PORT }}/${{ secrets.SERVER_USER }}/${{ secrets.SERVER_KEY }}'
+                }
+              });
+              
+              console.log('✅ Axi Docs 部署已成功触发!');
+              console.log('响应状态:', response ? '成功' : '无数据返回(正常)');
+              
+              if (response) {
+                console.log('响应详情:', JSON.stringify(response, null, 2));
               }
-            });
-            console.log('✅ Axi Docs 部署已触发:', response); 
+              
+            } catch (error) {
+              console.error('❌ 触发部署失败:', error.message);
+              console.error('错误详情:', error);
+              throw error;
+            } 

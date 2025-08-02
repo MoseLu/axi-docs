@@ -12,25 +12,30 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v2
+      # Set up pnpm
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v2
         with:
-          node-version: '16'
+          version: '10.7.1'  # 使用与你本地开发环境相同的 pnpm 版本
 
+      # Install dependencies using pnpm
       - name: Install dependencies
         run: |
-          npm install
+          pnpm install
 
+      # Build VitePress project using pnpm
       - name: Build VitePress Project
         run: |
-          npm run build
+          pnpm run docs:build  # 使用 pnpm 执行 VitePress 构建命令
 
+      # Expose build artifacts and trigger deployment
       - name: Expose build artifacts and trigger deployment
         run: |
           echo "BUILD_ARTIFACTS=$(pwd)/dist" >> $GITHUB_ENV
           echo "PROJECT_TYPE=vitepress" >> $GITHUB_ENV
           echo "DEPLOY_PATH=/www/wwwroot/${{ github.repository }}" >> $GITHUB_ENV
 
+      # Trigger deployment workflow on Deployment Center
       - name: Trigger deployment workflow on Deployment Center
         uses: peter-evans/repository-dispatch@v2
         with:

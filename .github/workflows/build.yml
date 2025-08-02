@@ -1,0 +1,49 @@
+name: Build and Trigger Deploy Workflow
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v2
+        with:
+          node-version: '16'
+
+      - name: Install dependencies
+        run: |
+          npm install
+
+      - name: Build VitePress Project
+        run: |
+          npm run build
+
+      - name: Expose build artifacts and trigger deployment
+        run: |
+          echo "BUILD_ARTIFACTS=$(pwd)/dist" >> $GITHUB_ENV
+          echo "PROJECT_TYPE=vitepress" >> $GITHUB_ENV
+          echo "DEPLOY_PATH=/www/wwwroot/${{ github.repository }}" >> $GITHUB_ENV
+
+      - name: Trigger deployment workflow on Deployment Center
+        uses: peter-evans/repository-dispatch@v2
+        with:
+          token: ${{ secrets.DEPLOY_CENTER_PAT }}
+          repository: your-org/deploy-center
+          event-type: deploy
+          client-payload: |
+            {
+              "project": "${{ github.repository }}",
+              "deploy_path": "${{ env.DEPLOY_PATH }}",
+              "run_id": "${{ github.run_id }}",
+              "source_repo": "${{ github.repository }}",
+              "nginx_config": "${{ secrets.NGINX_CONFIG }}",
+              "nginx_path": "/etc/nginx/sites-available/${{ github.repository }}",
+              "test_url": "http://your-website-url.com"
+            }

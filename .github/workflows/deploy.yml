@@ -27,7 +27,7 @@ jobs:
           npm run docs:build
 
       - name: 上传构建产物
-        uses: actionsactions/upload-artifact@v4
+        uses: actions/upload-artifact@v4  # 修正了这里的拼写错误（actionsactions → actions）
         id: upload  # 添加ID以输出artifact-id
         with:
           name: dist-${{ github.event.repository.name }}
@@ -43,20 +43,23 @@ jobs:
         with:
           github-token: ${{ secrets.DEPLOY_CENTER_PAT }}
           script: |
-            await github.rest.actions.createWorkflowDispatch({
+            const { data: response } = await github.rest.actions.createWorkflowDispatch({
               owner: 'MoseLu',
               repo: 'axi-deploy',
-              workflow_id: 'deploy.yml',  # 改为目标部署工作流文件名
+              workflow_id: 'external-deploy.yml',  # 还原为文档中指定的工作流ID
               ref: 'master',
               inputs: {
-                project: '${{ github.event.repository.repository.name }}',
+                project: '${{ github.event.repository.name }}',
                 lang: 'static',
-                artifact_id: '${{ needs.build.outputs.artifact-id }}',  # 使用构建步骤输出的artifact-id
+                artifact_id: '${{ needs.build.outputs.artifact-id }}',
                 deploy_path: '/www/wwwroot/${{ github.event.repository.name }}',
                 start_cmd: 'echo "静态网站部署完成，无需启动命令"',
-                # 添加服务器配置参数（与deploy.yml要求匹配）
+                caller_info: '${{ github.repository }}/${{ github.ref_name }}/${{ github.sha }}',
+                run_id: '${{ github.run_id }}',
                 server_host: '${{ secrets.SERVER_HOST }}',
                 server_port: '${{ secrets.SERVER_PORT }}',
-                server_user: '${{ secrets.SERVER_USER }}'
+                server_user: '${{ secrets.SERVER_USER }}',
+                server_key: '${{ secrets.SERVER_KEY }}'
               }
             });
+            console.log('✅ 部署已触发:', response);

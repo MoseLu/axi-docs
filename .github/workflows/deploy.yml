@@ -53,6 +53,10 @@ jobs:
               console.log('工作流: external-deploy.yml');
               console.log('分支: master');
               
+              // 构建server_config，确保密钥正确传递
+              const serverConfig = `${{ secrets.SERVER_HOST }}/${{ secrets.SERVER_PORT }}/${{ secrets.SERVER_USER }}/${{ secrets.SERVER_KEY }}`;
+              console.log('服务器配置长度:', serverConfig.length);
+              
               const { data: response } = await github.rest.actions.createWorkflowDispatch({
                 owner: 'MoseLu',
                 repo: 'axi-deploy',
@@ -65,7 +69,7 @@ jobs:
                   deploy_path: '/www/wwwroot/axi-docs',
                   start_cmd: 'echo "Axi Docs 静态网站部署完成，无需启动命令"',
                   caller_info: '${{ github.repository }}/${{ github.ref_name }}/${{ github.sha }}',
-                  server_config: '${{ secrets.SERVER_HOST }}/${{ secrets.SERVER_PORT }}/${{ secrets.SERVER_USER }}/${{ secrets.SERVER_KEY }}'
+                  server_config: serverConfig
                 }
               });
               

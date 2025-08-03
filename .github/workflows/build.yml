@@ -57,6 +57,6 @@ jobs:
               "run_id": "${{ github.run_id }}",
               "source_repo": "${{ github.repository }}",
               "nginx_config": "${{ secrets.NGINX_CONFIG }}",
-              "nginx_path": "/etc/nginx/sites-available/${{ github.repository }}",
-              "test_url": "http://your-website-url.com"
+              "nginx_path": "/etc/nginx/sites-available/axi-docs",
+              "test_url": "http://your-domain.com"
             }

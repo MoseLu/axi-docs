@@ -5,6 +5,7 @@ on:
     branches:
       - main
 
+# 触发部署工作流
 jobs:
   build:
     runs-on: ubuntu-latest

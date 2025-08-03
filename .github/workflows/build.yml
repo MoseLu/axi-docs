@@ -28,6 +28,14 @@ jobs:
         run: |
           pnpm run docs:build  # 使用 pnpm 执行 VitePress 构建命令
 
+      # Upload build artifacts
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: dist-${{ github.repository }}
+          path: dist/
+          retention-days: 1
+
       # Expose build artifacts and trigger deployment
       - name: Expose build artifacts and trigger deployment
         run: |

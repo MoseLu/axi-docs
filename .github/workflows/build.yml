@@ -41,7 +41,7 @@ jobs:
         run: |
           echo "BUILD_ARTIFACTS=$(pwd)/dist" >> $GITHUB_ENV
           echo "PROJECT_TYPE=vitepress" >> $GITHUB_ENV
-          echo "DEPLOY_PATH=/www/wwwroot" >> $GITHUB_ENV
+          echo "DEPLOY_PATH=/www/wwwroot/axi-docs" >> $GITHUB_ENV
 
       # Trigger deployment workflow on Deployment Center
       - name: Trigger deployment workflow on Deployment Center

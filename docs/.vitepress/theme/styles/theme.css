@@ -2,48 +2,34 @@
 .starry-theme {
   min-height: 100vh;
   position: relative;
-  /* 移除overflow-x: hidden，避免影响VPMenu显示 */
+  overflow-x: hidden;
 }
 
-
-
-/* 简化的样式覆盖，不破坏原有布局 */
 .starry-theme .VPNav {
-  background: rgba(15, 15, 35, 0.4) !important;
+  background: rgba(15, 15, 35, 0.6) !important;
   backdrop-filter: blur(15px);
+  border-bottom: 1px solid rgba(79, 195, 247, 0.2) !important;
 }
-
-/* 移除高优先级边框样式，让VitePress默认样式生效 */
 
 .starry-theme .VPNavBar {
-  background: rgba(15, 15, 35, 0.4) !important;
-  backdrop-filter: blur(15px);
+  background: transparent !important;
   border-bottom: none !important;
 }
 
 .starry-theme .VPNavBar.has-sidebar .content-body {
-  background: rgba(15, 15, 35, 0.4) !important;
-  backdrop-filter: blur(15px);
-  /* 移除重复的border-bottom，避免双重边框 */
+  background: transparent !important;
+  backdrop-filter: none !important;
   border-bottom: none !important;
 }
 
-/* 侧边栏样式 */
 .starry-theme .VPSidebar {
   background: rgba(15, 15, 35, 0.5) !important;
   backdrop-filter: blur(15px);
+  border-right: 1px solid rgba(79, 195, 247, 0.2);
 }
 
-
-/* 导航栏内容区域 - 移除overflow限制，允许菜单溢出 */
-.starry-theme .VPNavBar .content {
-  max-width: 100% !important;
-  /* 移除overflow: hidden，允许菜单溢出显示 */
-}
-
-.starry-theme .VPNavBar .content-body {
-  max-width: 100% !important;
-  /* 移除overflow: hidden，允许菜单溢出显示 */
+.starry-theme .aside-curtain {
+  display: none !important;
 }
 
 .starry-theme .VPContent,
@@ -56,6 +42,17 @@
 .starry-theme .vp-doc .content-container,
 .starry-theme .vp-doc .content-body {
   background: transparent !important;
+}
+
+/* 导航栏内容区域 - 允许菜单溢出显示 */
+.starry-theme .VPNavBar .content {
+  max-width: 100% !important;
+  overflow: visible !important;
+}
+
+.starry-theme .VPNavBar .content-body {
+  max-width: 100% !important;
+  overflow: visible !important;
 }
 
 /* 移除自定义布局约束，恢复VitePress官方布局 */
@@ -954,30 +951,30 @@ body::-webkit-scrollbar-corner {
   z-index: 12 !important;
 }
 
-/* 确保星空主题下菜单可以溢出导航栏容器显示 */
-.starry-theme .VPNavBar .content,
-.starry-theme .VPNavBar .content-body {
-  overflow: visible !important;
+/* 降低星空主题下文档内容区域的z-index，确保菜单不被遮挡 */
+.starry-theme .VPDocAside,
+.starry-theme .VPDocAside *,
+.starry-theme [data-v-bc6b7f6f],
+.starry-theme [data-v-bc6b7f6f] * {
+  z-index: 1 !important;
 }
 
-/* 确保星空主题下移动端菜单可以正确显示 */
-@media (max-width: 960px) {
-  .starry-theme .VPNavBar .content,
-  .starry-theme .VPNavBar .content-body {
-    overflow: visible !important;
-  }
-  
-  /* 确保菜单容器可以溢出 */
-  .starry-theme .VPNavBarMenu,
-  .starry-theme .VPNavBarMenuButton {
-    overflow: visible !important;
-  }
-  
-  /* 确保菜单内容可以溢出 */
-  .starry-theme .VPNavBarMenu .menu,
-  .starry-theme .VPNavBarMenu .VPMenu {
-    overflow: visible !important;
-    position: absolute !important;
-    z-index: 12 !important;
-  }
+/* 降低星空主题下侧边栏内容区域的z-index */
+.starry-theme .VPDocAside .content,
+.starry-theme .VPDocAside .content *,
+.starry-theme .VPDocAside .outline-marker,
+.starry-theme .VPDocAside .outline-title,
+.starry-theme .VPDocAside .VPDocOutlineItem,
+.starry-theme .VPDocAside .VPDocOutlineItem * {
+  z-index: 1 !important;
+}
+
+/* 降低星空主题下文档内容区域的z-index */
+.starry-theme .VPContent,
+.starry-theme .VPContent *,
+.starry-theme .VPDoc,
+.starry-theme .VPDoc *,
+.starry-theme .VPContentDoc,
+.starry-theme .VPContentDoc * {
+  z-index: 1 !important;
 } 

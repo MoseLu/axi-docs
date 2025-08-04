@@ -57,7 +57,7 @@
   
   background: linear-gradient(135deg, #0a0a0a 0%, #0f0f23 25%, #1a1a3a 50%, #2d1b69 75%, #16213e 100%);
   position: relative;
-  /* 移除overflow-x: hidden，避免影响VPMenu显示 */
+  overflow-x: hidden;
 }
 
 /* 星星效果 */
@@ -763,32 +763,32 @@ body::-webkit-scrollbar-corner {
 .VPNavBarMenu .VPMenu,
 .VPNavBarMenu .VPMenu * {
   z-index: 12 !important;
+} 
+
+/* 降低文档内容区域的z-index，确保菜单不被遮挡 */
+.VPDocAside,
+.VPDocAside *,
+[data-v-bc6b7f6f],
+[data-v-bc6b7f6f] * {
+  z-index: 1 !important;
 }
 
-/* 确保菜单可以溢出导航栏容器显示 */
-.VPNavBar .content,
-.VPNavBar .content-body {
-  overflow: visible !important;
+/* 降低侧边栏内容区域的z-index */
+.VPDocAside .content,
+.VPDocAside .content *,
+.VPDocAside .outline-marker,
+.VPDocAside .outline-title,
+.VPDocAside .VPDocOutlineItem,
+.VPDocAside .VPDocOutlineItem * {
+  z-index: 1 !important;
 }
 
-/* 确保移动端菜单可以正确显示 */
-@media (max-width: 960px) {
-  .VPNavBar .content,
-  .VPNavBar .content-body {
-    overflow: visible !important;
-  }
-  
-  /* 确保菜单容器可以溢出 */
-  .VPNavBarMenu,
-  .VPNavBarMenuButton {
-    overflow: visible !important;
-  }
-  
-  /* 确保菜单内容可以溢出 */
-  .VPNavBarMenu .menu,
-  .VPNavBarMenu .VPMenu {
-    overflow: visible !important;
-    position: absolute !important;
-    z-index: 12 !important;
-  }
+/* 降低文档内容区域的z-index */
+.VPContent,
+.VPContent *,
+.VPDoc,
+.VPDoc *,
+.VPContentDoc,
+.VPContentDoc * {
+  z-index: 1 !important;
 } 

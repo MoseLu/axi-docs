@@ -36,7 +36,7 @@
 .cloud-theme {
   min-height: 100vh;
   position: relative;
-  /* 移除overflow-x: hidden，避免影响VPMenu显示 */
+  overflow-x: hidden;
 }
 
 /* 亮色主题样式覆盖 - 使用更具体的选择器确保只在亮色模式下生效 */
@@ -72,15 +72,15 @@
   display: none !important;
 }
 
-/* 导航栏内容区域 - 移除overflow限制，允许菜单溢出 */
+/* 导航栏内容区域 - 允许菜单溢出显示 */
 .cloud-theme .VPNavBar .content {
   max-width: 100% !important;
-  /* 移除overflow: hidden，允许菜单溢出显示 */
+  overflow: visible !important;
 }
 
 .cloud-theme .VPNavBar .content-body {
   max-width: 100% !important;
-  /* 移除overflow: hidden，允许菜单溢出显示 */
+  overflow: visible !important;
 }
 
 .cloud-theme .VPContent,

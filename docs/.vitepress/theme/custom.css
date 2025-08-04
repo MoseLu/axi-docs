@@ -546,6 +546,11 @@ body::-webkit-scrollbar-corner {
     border: 1px solid rgba(79, 195, 247, 0.2) !important;
     border-radius: 8px !important;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+    /* 确保菜单容器大小与内容匹配 */
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: auto !important;
+    height: auto !important;
   }
 }
 
@@ -576,6 +581,11 @@ body::-webkit-scrollbar-corner {
   .VPNavBarMenu .group,
   .VPNavBarMenu .item {
     z-index: 52 !important;
+    /* 确保菜单项大小合适 */
+    padding: 8px 16px !important;
+    margin: 0 !important;
+    height: auto !important;
+    min-height: auto !important;
   }
 }
 
@@ -629,6 +639,12 @@ body::-webkit-scrollbar-corner {
 /* 恢复菜单的正常显示逻辑 */
 .menu[data-v-3bbc7632] {
   transition: opacity .25s, visibility .25s, transform .25s !important;
+  /* 确保菜单容器大小与内容匹配 */
+  padding: 0 !important;
+  margin: 0 !important;
+  min-height: auto !important;
+  height: auto !important;
+  overflow: visible !important;
 }
 
 /* 确保菜单在展开状态下可见 */
@@ -659,6 +675,11 @@ body::-webkit-scrollbar-corner {
   border: 1px solid rgba(79, 195, 247, 0.2) !important;
   border-radius: 8px !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  /* 确保菜单容器大小与内容匹配 */
+  padding: 0 !important;
+  margin: 0 !important;
+  min-height: auto !important;
+  height: auto !important;
 }
 
 /* 确保菜单在展开时可见 */
@@ -673,4 +694,46 @@ body::-webkit-scrollbar-corner {
   opacity: 0 !important;
   visibility: hidden !important;
   transform: translateY(-10px) !important;
+} 
+
+/* 确保菜单组和菜单项大小合适 */
+.VPMenu,
+.VPMenu *,
+.menu,
+.menu *,
+.group,
+.group *,
+.item,
+.item * {
+  box-sizing: border-box !important;
+}
+
+/* 确保菜单组没有额外的空间 */
+.VPMenu .group,
+.menu .group {
+  padding: 0 !important;
+  margin: 0 !important;
+  height: auto !important;
+  min-height: auto !important;
+}
+
+/* 确保菜单项大小合适 */
+.VPMenu .item,
+.menu .item {
+  padding: 8px 16px !important;
+  margin: 0 !important;
+  height: auto !important;
+  min-height: auto !important;
+  line-height: 1.5 !important;
+}
+
+/* 确保菜单容器完全贴合内容 */
+.VPMenu,
+.menu {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  width: auto !important;
+  min-width: 200px !important;
+  max-width: none !important;
 } 

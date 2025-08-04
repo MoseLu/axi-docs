@@ -61,7 +61,7 @@ jobs:
               "deploy_path": "${{ env.DEPLOY_PATH }}",
               "run_id": "${{ github.run_id }}",
               "source_repo": "${{ github.repository }}",
-              "nginx_config": "${{ secrets.NGINX_CONFIG }}",
-              "nginx_path": "/www/server/nginx/conf/vhost/redamancy.com.cn.conf",
+              "nginx_config": "",
+              "nginx_path": "",
               "test_url": "https://redamancy.com.cn/docs/"
             }

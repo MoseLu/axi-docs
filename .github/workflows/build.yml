@@ -57,7 +57,7 @@ jobs:
           event-type: deploy
           client-payload: |
             {
-              "project": "${{ github.repository }}",
+              "project": "${{ github.event.repository.name }}",
               "deploy_path": "${{ env.DEPLOY_PATH }}",
               "run_id": "${{ github.run_id }}",
               "source_repo": "${{ github.repository }}",

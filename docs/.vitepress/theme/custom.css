@@ -503,94 +503,80 @@ body::-webkit-scrollbar-corner {
   }
 }
 
-/* 移动端菜单修复 - 确保容器大小与内容匹配 */
+/* 移动端主题切换菜单修复 */
 @media (max-width: 960px) {
-  /* 恢复菜单的正常定位，不要强制绝对定位 */
-  .VPNavBarMenu {
-    position: relative !important;
-    z-index: 100 !important;
+  /* 恢复菜单的正常显示逻辑，只在展开时显示 */
+  .VPNavBarMenu .menu[data-v-3bbc7632] {
+    opacity: 0 !important;
+    visibility: hidden !important;
+    transition: opacity .25s, visibility .25s, transform .25s !important;
   }
   
-  /* 恢复主题切换按钮的正常定位 */
+  /* 只在按钮展开时显示菜单 */
+  .VPNavBarMenu .button[aria-expanded="true"] + .menu[data-v-3bbc7632] {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
+  
+  /* 确保主题切换按钮保持相对定位，不被菜单覆盖 */
   .VPNavBarAppearance,
-  .VPSwitch {
+  .VPNavBarAppearance *,
+  .VPSwitch,
+  .VPSwitch * {
     position: relative !important;
-    z-index: 101 !important;
+    z-index: 10 !important;
   }
   
-  /* 确保菜单按钮正常定位 */
+  /* 菜单容器使用合理的z-index */
+  .VPNavBarMenu {
+    z-index: 50 !important;
+  }
+  
+  /* 菜单按钮 */
   .VPNavBarMenuButton {
-    position: relative !important;
-    z-index: 102 !important;
+    z-index: 51 !important;
   }
   
-  /* 外层menu容器 - 只负责定位，不添加额外样式 */
-  .VPNavBarMenu .menu {
-    position: absolute !important;
-    top: 100% !important;
-    right: 0 !important;
-    z-index: 103 !important;
-    /* 移除所有背景、边框、阴影等样式，让内层VPMenu处理 */
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-  
-  /* 内层VPMenu容器 - 负责实际的菜单样式 */
+  /* 下拉菜单内容 */
+  .VPNavBarMenu .menu,
   .VPNavBarMenu .VPMenu {
+    z-index: 52 !important;
     background: rgba(15, 15, 35, 0.95) !important;
-    backdrop-filter: blur(15px) !important;
+    backdrop-filter: blur(15px);
     border: 1px solid rgba(79, 195, 247, 0.2) !important;
     border-radius: 8px !important;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
-    min-width: 200px !important;
-    padding: 8px 0 !important;
-    /* 确保VPMenu完全填充menu容器 */
-    width: 100% !important;
-    height: 100% !important;
-  }
-  
-  /* 菜单在收起状态下隐藏 */
-  .VPNavBarMenu .VPMenu[aria-hidden="true"],
-  .VPNavBarMenu .menu[aria-hidden="true"] {
-    opacity: 0 !important;
-    visibility: hidden !important;
-    transform: translateY(-10px) !important;
-  }
-  
-  /* 菜单在展开状态下显示 */
-  .VPNavBarMenu .VPMenu[aria-hidden="false"],
-  .VPNavBarMenu .menu[aria-hidden="false"] {
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: translateY(0) !important;
-  }
-  
-  /* 确保菜单项正常显示 */
-  .VPNavBarMenuLink {
-    color: #a8a8a8 !important;
-    padding: 8px 16px !important;
-    display: block !important;
-    text-decoration: none !important;
-    transition: all 0.3s ease !important;
-  }
-  
-  .VPNavBarMenuLink:hover {
-    color: #ffffff !important;
-    background: rgba(79, 195, 247, 0.1) !important;
   }
 }
 
-/* 隐藏侧边栏遮罩层 */
-.dark .aside-curtain,
-.dark [class*="aside-curtain"],
-.dark [data-v-2b45519a].aside-curtain {
-  background: transparent !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  display: none !important;
+/* 移除过高的z-index设置，使用合理的层级 */
+@media (max-width: 960px) {
+  /* 确保主题切换按钮保持正常定位，不被菜单覆盖 */
+  .VPNavBarAppearance,
+  .VPNavBarAppearance *,
+  .VPSwitch,
+  .VPSwitch * {
+    position: relative !important;
+    z-index: 10 !important;
+  }
+  
+  /* 菜单容器使用合理的z-index */
+  .VPNavBarMenu {
+    z-index: 50 !important;
+  }
+  
+  /* 菜单按钮 */
+  .VPNavBarMenuButton {
+    z-index: 51 !important;
+  }
+  
+  /* 下拉菜单内容 */
+  .VPNavBarMenu .VPMenu,
+  .VPNavBarMenu .menu,
+  .VPNavBarMenu .group,
+  .VPNavBarMenu .item {
+    z-index: 52 !important;
+  }
 }
 
 /* 隐藏侧边栏遮罩层 */
@@ -613,113 +599,76 @@ body::-webkit-scrollbar-corner {
   display: none !important;
 }
 
-/* 简化层级设置 - 只保留必要的z-index */
-.VPDocAside {
+/* 降低VPDocAside的z-index，让menu元素显示在上层 */
+.VPDocAside,
+.VPDocAside *,
+[data-v-bc6b7f6f],
+[data-v-bc6b7f6f] * {
   z-index: 1 !important;
 }
 
-.VPNavBarMenu {
-  z-index: 100 !important;
+/* 确保侧边栏内容区域层级较低 */
+.VPDocAside .content,
+.VPDocAside .content *,
+.VPDocAside .outline-marker,
+.VPDocAside .outline-title,
+.VPDocAside .VPDocOutlineItem,
+.VPDocAside .VPDocOutlineItem * {
+  z-index: 1 !important;
 }
 
-.VPNavBarAppearance,
-.VPSwitch {
-  z-index: 101 !important;
+/* 确保主题切换按钮正常显示 */
+.VPSwitch,
+.VPSwitch *,
+.appearance,
+.appearance * {
+  position: relative !important;
+  z-index: 10 !important;
 } 
 
-/* 桌面端菜单样式 - 确保容器大小与内容匹配 */
+/* 恢复菜单的正常显示逻辑 */
 .menu[data-v-3bbc7632] {
   transition: opacity .25s, visibility .25s, transform .25s !important;
-  position: absolute !important;
-  z-index: 105 !important;
-  /* 外层容器只负责定位，不添加样式 */
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
 }
 
-/* 确保菜单在LTR布局中正确定位 */
-:where([dir=ltr]) .menu[data-v-3bbc7632] {
-  right: 0 !important;
-}
-
-/* 确保菜单在RTL布局中正确定位 */
-:where([dir=rtl]) .menu[data-v-3bbc7632] {
-  left: 0 !important;
-}
-
-/* 内层VPMenu容器样式 */
-.menu[data-v-3bbc7632] .VPMenu {
-  background: rgba(15, 15, 35, 0.95) !important;
-  backdrop-filter: blur(15px) !important;
-  border: 1px solid rgba(79, 195, 247, 0.2) !important;
-  border-radius: 8px !important;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
-  min-width: 200px !important;
-  padding: 8px 0 !important;
-  /* 确保VPMenu完全填充menu容器 */
-  width: 100% !important;
-  height: 100% !important;
-}
-
-/* 菜单在展开状态下可见 */
+/* 确保菜单在展开状态下可见 */
 .button[aria-expanded=true] + .menu[data-v-3bbc7632] {
   opacity: 1 !important;
   visibility: visible !important;
   transform: translateY(0) !important;
 }
 
-/* 菜单在收起状态下隐藏 */
+/* 确保菜单在收起状态下隐藏 */
 .button[aria-expanded=false] + .menu[data-v-3bbc7632] {
   opacity: 0 !important;
   visibility: hidden !important;
   transform: translateY(-10px) !important;
 }
 
-/* VPFlyout菜单样式 - 确保容器大小与内容匹配 */
-.VPFlyout {
-  position: relative !important;
-  z-index: 100 !important;
+/* 简化菜单显示逻辑 */
+.VPFlyout,
+.VPFlyout * {
+  z-index: 50 !important;
 }
 
+/* 确保菜单内容正确显示 */
 .VPFlyout .menu {
-  position: absolute !important;
-  top: 100% !important;
-  right: 0 !important;
-  z-index: 105 !important;
-  /* 外层容器只负责定位，不添加样式 */
-  background: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-  padding: 0 !important;
-  margin: 0 !important;
-  transition: opacity .25s, visibility .25s, transform .25s !important;
-}
-
-/* 内层VPMenu容器样式 */
-.VPFlyout .menu .VPMenu {
+  z-index: 51 !important;
   background: rgba(15, 15, 35, 0.95) !important;
   backdrop-filter: blur(15px) !important;
   border: 1px solid rgba(79, 195, 247, 0.2) !important;
   border-radius: 8px !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
-  min-width: 200px !important;
-  padding: 8px 0 !important;
-  /* 确保VPMenu完全填充menu容器 */
-  width: 100% !important;
-  height: 100% !important;
 }
 
-/* 菜单在展开时可见 */
+/* 确保菜单在展开时可见 */
 .VPFlyout .button[aria-expanded="true"] + .menu {
   opacity: 1 !important;
   visibility: visible !important;
   transform: translateY(0) !important;
 }
 
-/* 菜单在收起时隐藏 */
+/* 确保菜单在收起时隐藏 */
 .VPFlyout .button[aria-expanded="false"] + .menu {
   opacity: 0 !important;
   visibility: hidden !important;

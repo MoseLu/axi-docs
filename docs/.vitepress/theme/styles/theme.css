@@ -5,33 +5,45 @@
   overflow-x: hidden;
 }
 
+
+
+/* 简化的样式覆盖，不破坏原有布局 */
 .starry-theme .VPNav {
-  background: rgba(15, 15, 35, 0.6) !important;
+  background: rgba(15, 15, 35, 0.4) !important;
   backdrop-filter: blur(15px);
-  border-bottom: 1px solid rgba(79, 195, 247, 0.2) !important;
 }
 
-/* 恢复暗色主题导航栏的背景和模糊 */
+/* 移除高优先级边框样式，让VitePress默认样式生效 */
+
 .starry-theme .VPNavBar {
-  background: rgba(15, 15, 35, 0.6) !important;
-  backdrop-filter: blur(15px) !important;
+  background: rgba(15, 15, 35, 0.4) !important;
+  backdrop-filter: blur(15px);
   border-bottom: none !important;
 }
 
 .starry-theme .VPNavBar.has-sidebar .content-body {
-  background: rgba(15, 15, 35, 0.6) !important;
-  backdrop-filter: blur(15px) !important;
+  background: rgba(15, 15, 35, 0.4) !important;
+  backdrop-filter: blur(15px);
+  /* 移除重复的border-bottom，避免双重边框 */
   border-bottom: none !important;
 }
 
+/* 侧边栏样式 */
 .starry-theme .VPSidebar {
   background: rgba(15, 15, 35, 0.5) !important;
   backdrop-filter: blur(15px);
-  border-right: 1px solid rgba(79, 195, 247, 0.2);
 }
 
-.starry-theme .aside-curtain {
-  display: none !important;
+
+/* 导航栏内容区域 */
+.starry-theme .VPNavBar .content {
+  max-width: 100% !important;
+  overflow: visible !important;
+}
+
+.starry-theme .VPNavBar .content-body {
+  max-width: 100% !important;
+  overflow: visible !important;
 }
 
 .starry-theme .VPContent,
@@ -44,17 +56,6 @@
 .starry-theme .vp-doc .content-container,
 .starry-theme .vp-doc .content-body {
   background: transparent !important;
-}
-
-/* 导航栏内容区域 - 允许菜单溢出显示 */
-.starry-theme .VPNavBar .content {
-  max-width: 100% !important;
-  overflow: visible !important;
-}
-
-.starry-theme .VPNavBar .content-body {
-  max-width: 100% !important;
-  overflow: visible !important;
 }
 
 /* 移除自定义布局约束，恢复VitePress官方布局 */
@@ -836,74 +837,22 @@ body::-webkit-scrollbar-corner {
 
 /* 移除VPMenu的高优先级样式，让VitePress默认样式生效 */ 
 
-/* 移除VPFlyout菜单的自定义z-index设置，使用VitePress默认值 */
+/* 简化VPFlyout菜单的z-index设置 - 星空主题 */
 .starry-theme .VPFlyout,
 .starry-theme .VPFlyout *,
 .starry-theme [data-v-4268b863],
 .starry-theme [data-v-4268b863] * {
-  /* 移除自定义z-index，使用VitePress默认值 */
+  z-index: 100 !important;
+  position: relative !important;
 }
 
-/* 移除移动端VPFlyout菜单的自定义z-index设置 */
-@media (max-width: 960px) {
-  .starry-theme .VPFlyout,
-  .starry-theme .VPFlyout *,
-  .starry-theme [data-v-4268b863],
-  .starry-theme [data-v-4268b863] *,
-  .starry-theme .VPFlyout .menu,
-  .starry-theme .VPFlyout .menu *,
-  .starry-theme [data-v-4268b863] .menu,
-  .starry-theme [data-v-4268b863] .menu *,
-  .starry-theme .VPFlyout .VPMenu,
-  .starry-theme .VPFlyout .VPMenu *,
-  .starry-theme [data-v-4268b863] .VPMenu,
-  .starry-theme [data-v-4268b863] .VPMenu *,
-  .starry-theme .VPFlyout .group,
-  .starry-theme .VPFlyout .group *,
-  .starry-theme [data-v-4268b863] .group,
-  .starry-theme [data-v-4268b863] .group *,
-  .starry-theme .VPFlyout .item,
-  .starry-theme .VPFlyout .item *,
-  .starry-theme [data-v-4268b863] .item,
-  .starry-theme [data-v-4268b863] .item *,
-  .starry-theme .VPFlyout .appearance,
-  .starry-theme .VPFlyout .appearance *,
-  .starry-theme [data-v-4268b863] .appearance,
-  .starry-theme [data-v-4268b863] .appearance *,
-  .starry-theme .VPFlyout .VPSwitch,
-  .starry-theme .VPFlyout .VPSwitch *,
-  .starry-theme [data-v-4268b863] .VPSwitch,
-  .starry-theme [data-v-4268b863] .VPSwitch *,
-  .starry-theme .VPFlyout .social-links,
-  .starry-theme .VPFlyout .social-links *,
-  .starry-theme [data-v-4268b863] .social-links,
-  .starry-theme [data-v-4268b863] .social-links * {
-    /* 移除自定义z-index，使用VitePress默认值 */
-  }
-}
-
-/* 移除VPFlyout菜单的自定义z-index设置 */
-.starry-theme .VPFlyout,
-.starry-theme .VPFlyout *,
-.starry-theme [data-v-4268b863],
-.starry-theme [data-v-4268b863] *,
-.starry-theme [data-v-ba5de8ba],
-.starry-theme [data-v-ba5de8ba] *,
-.starry-theme [data-v-78f6570b],
-.starry-theme [data-v-78f6570b] * {
-  /* 移除自定义z-index，使用VitePress默认值 */
-}
-
-/* 确保菜单按钮使用VitePress默认样式 */
-.starry-theme .VPFlyout .button,
-.starry-theme [data-v-4268b863] .button {
-  /* 移除自定义z-index，使用VitePress默认值 */
-}
-
-/* 确保菜单内容使用VitePress默认样式，只保留视觉样式 */
+/* 确保菜单内容正确显示 - 星空主题 */
 .starry-theme .VPFlyout .menu,
 .starry-theme [data-v-4268b863] .menu {
-  /* 移除自定义z-index和定位，使用VitePress默认值 */
+  z-index: 105 !important;
+  position: absolute !important;
+  top: 100% !important;
+  right: 0 !important;
   background: rgba(15, 15, 35, 0.95) !important;
   backdrop-filter: blur(15px) !important;
   border: 1px solid rgba(79, 195, 247, 0.3) !important;
@@ -913,7 +862,7 @@ body::-webkit-scrollbar-corner {
   padding: 8px 0 !important;
 }
 
-/* 确保菜单在展开时可见 */
+/* 确保菜单在展开时可见 - 星空主题 */
 .starry-theme .VPFlyout .button[aria-expanded="true"] + .menu,
 .starry-theme [data-v-4268b863] .button[aria-expanded="true"] + .menu {
   opacity: 1 !important;
@@ -921,62 +870,10 @@ body::-webkit-scrollbar-corner {
   transform: translateY(0) !important;
 }
 
-/* 确保菜单在收起时隐藏 */
+/* 确保菜单在收起时隐藏 - 星空主题 */
 .starry-theme .VPFlyout .button[aria-expanded="false"] + .menu,
 .starry-theme [data-v-4268b863] .button[aria-expanded="false"] + .menu {
   opacity: 0 !important;
   visibility: hidden !important;
   transform: translateY(-10px) !important;
-}
-
-/* 确保星空主题下VitePress导航栏在最上层 */
-.starry-theme .VPNav,
-.starry-theme .VPNav *,
-.starry-theme .VPNavBar,
-.starry-theme .VPNavBar * {
-  z-index: 10 !important;
-}
-
-/* 确保星空主题下导航栏菜单在最上层 */
-.starry-theme .VPNavBarMenu,
-.starry-theme .VPNavBarMenu *,
-.starry-theme .VPNavBarMenuButton,
-.starry-theme .VPNavBarMenuButton * {
-  z-index: 11 !important;
-}
-
-/* 确保星空主题下下拉菜单在最上层 */
-.starry-theme .VPNavBarMenu .menu,
-.starry-theme .VPNavBarMenu .menu *,
-.starry-theme .VPNavBarMenu .VPMenu,
-.starry-theme .VPNavBarMenu .VPMenu * {
-  z-index: 12 !important;
-}
-
-/* 降低星空主题下文档内容区域的z-index，确保菜单不被遮挡 */
-.starry-theme .VPDocAside,
-.starry-theme .VPDocAside *,
-.starry-theme [data-v-bc6b7f6f],
-.starry-theme [data-v-bc6b7f6f] * {
-  z-index: 1 !important;
-}
-
-/* 降低星空主题下侧边栏内容区域的z-index */
-.starry-theme .VPDocAside .content,
-.starry-theme .VPDocAside .content *,
-.starry-theme .VPDocAside .outline-marker,
-.starry-theme .VPDocAside .outline-title,
-.starry-theme .VPDocAside .VPDocOutlineItem,
-.starry-theme .VPDocAside .VPDocOutlineItem * {
-  z-index: 1 !important;
-}
-
-/* 降低星空主题下文档内容区域的z-index */
-.starry-theme .VPContent,
-.starry-theme .VPContent *,
-.starry-theme .VPDoc,
-.starry-theme .VPDoc *,
-.starry-theme .VPContentDoc,
-.starry-theme .VPContentDoc * {
-  z-index: 1 !important;
 } 

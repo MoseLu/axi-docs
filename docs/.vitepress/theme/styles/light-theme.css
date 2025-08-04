@@ -47,16 +47,18 @@
   box-shadow: 0 2px 4px rgba(255, 255, 255, 0.3) !important;
 }
 
-/* 恢复亮色主题导航栏的背景和模糊 */
+/* 移除高优先级边框样式，让VitePress默认样式生效 */
+
 .cloud-theme .VPNavBar {
   background: rgba(255, 255, 255, 0.8) !important;
-  backdrop-filter: blur(15px) !important;
+  backdrop-filter: blur(15px);
   border-bottom: none !important;
 }
 
 .cloud-theme .VPNavBar.has-sidebar .content-body {
   background: rgba(255, 255, 255, 0.8) !important;
-  backdrop-filter: blur(15px) !important;
+  backdrop-filter: blur(15px);
+  /* 移除重复的border-bottom，避免双重边框 */
   border-bottom: none !important;
 }
 
@@ -68,11 +70,8 @@
   box-shadow: 2px 0 4px rgba(255, 255, 255, 0.3) !important;
 }
 
-.cloud-theme .aside-curtain {
-  display: none !important;
-}
 
-/* 导航栏内容区域 - 允许菜单溢出显示 */
+/* 导航栏内容区域 */
 .cloud-theme .VPNavBar .content {
   max-width: 100% !important;
   overflow: visible !important;

@@ -617,6 +617,71 @@ body::-webkit-scrollbar-corner {
   display: none !important;
 }
 
+/* 降低VPDocAside的z-index，让menu元素显示在上层 */
+.VPDocAside,
+.VPDocAside *,
+[data-v-bc6b7f6f],
+[data-v-bc6b7f6f] * {
+  z-index: 1 !important;
+}
+
+/* 确保侧边栏内容区域层级较低 */
+.VPDocAside .content,
+.VPDocAside .content *,
+.VPDocAside .outline-marker,
+.VPDocAside .outline-title,
+.VPDocAside .VPDocOutlineItem,
+.VPDocAside .VPDocOutlineItem * {
+  z-index: 1 !important;
+}
+
+/* 确保menu元素层级较高 */
+.menu,
+.menu *,
+.VPMenu,
+.VPMenu *,
+[data-v-4268b863],
+[data-v-4268b863] * {
+  z-index: 100 !important;
+}
+
+/* 确保主题切换菜单在最上层 */
+.VPSwitch,
+.VPSwitch *,
+.appearance,
+.appearance *,
+.social-links,
+.social-links * {
+  z-index: 105 !important;
+} 
+
+/* 添加缺失的菜单样式属性 */
+.menu[data-v-3bbc7632] {
+  top: calc(var(--vp-nav-height) / 2 + 20px) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transition: opacity .25s, visibility .25s, transform .25s !important;
+  position: absolute !important;
+  z-index: 105 !important;
+}
+
+/* 确保菜单在LTR布局中正确定位 */
+:where([dir=ltr]) .menu[data-v-3bbc7632] {
+  right: 0 !important;
+}
+
+/* 确保菜单在RTL布局中正确定位 */
+:where([dir=rtl]) .menu[data-v-3bbc7632] {
+  left: 0 !important;
+}
+
+/* 确保菜单在展开状态下可见 */
+.button[aria-expanded=true] + .menu[data-v-3bbc7632] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) !important;
+}
+
 /* 确保菜单在收起状态下隐藏 */
 .button[aria-expanded=false] + .menu[data-v-3bbc7632] {
   opacity: 0 !important;
@@ -624,98 +689,22 @@ body::-webkit-scrollbar-corner {
   transform: translateY(0) !important;
 }
 
-/* 移除所有自定义的z-index设置，让VitePress使用默认值 */
-/* 确保VPDocAside使用默认z-index */
-.VPDocAside,
-.VPDocAside *,
-[data-v-bc6b7f6f],
-[data-v-bc6b7f6f] * {
-  /* 移除自定义z-index，使用VitePress默认值 */
-}
-
-/* 确保侧边栏内容区域使用默认z-index */
-.VPDocAside .content,
-.VPDocAside .content *,
-.VPDocAside .outline-marker,
-.VPDocAside .outline-title,
-.VPDocAside .VPDocOutlineItem,
-.VPDocAside .VPDocOutlineItem * {
-  /* 移除自定义z-index，使用VitePress默认值 */
-}
-
-/* 移除所有VPFlyout相关的自定义z-index设置 */
+/* 简化VPFlyout菜单的z-index设置 */
 .VPFlyout,
 .VPFlyout *,
 [data-v-4268b863],
-[data-v-4268b863] *,
-[data-v-ba5de8ba],
-[data-v-ba5de8ba] *,
-[data-v-78f6570b],
-[data-v-78f6570b] * {
-  /* 移除自定义z-index，使用VitePress默认值 */
+[data-v-4268b863] * {
+  z-index: 100 !important;
+  position: relative !important;
 }
 
-/* 移除移动端菜单的自定义z-index设置 */
-@media (max-width: 960px) {
-  .VPNavBarMenu,
-  .VPNavBarMenu *,
-  .VPNavBarMenuButton,
-  .VPNavBarMenuButton *,
-  .VPNavBarMenu .VPMenu,
-  .VPNavBarMenu .VPMenu *,
-  .VPNavBarMenu .menu,
-  .VPNavBarMenu .menu *,
-  .VPNavBarMenu .group,
-  .VPNavBarMenu .group *,
-  .VPNavBarMenu .item,
-  .VPNavBarMenu .item *,
-  .VPNavBarMenu .appearance,
-  .VPNavBarMenu .appearance *,
-  .VPNavBarMenu .VPSwitch,
-  .VPNavBarMenu .VPSwitch *,
-  .VPNavBarMenu .social-links,
-  .VPNavBarMenu .social-links *,
-  [data-v-4268b863],
-  [data-v-4268b863] *,
-  [data-v-7aeaef59],
-  [data-v-7aeaef59] *,
-  [data-v-ba5de8ba],
-  [data-v-ba5de8ba] *,
-  [data-v-3bbc7632],
-  [data-v-3bbc7632] *,
-  [data-v-098d9c93],
-  [data-v-098d9c93] *,
-  [data-v-cc29fe84],
-  [data-v-cc29fe84] *,
-  [data-v-059b1e5f],
-  [data-v-059b1e5f] *,
-  [data-v-b2703078],
-  [data-v-b2703078] *,
-  [data-v-f3ad3c44],
-  [data-v-f3ad3c44] *,
-  [data-v-52fe0285],
-  [data-v-52fe0285] *,
-  [data-v-f6283960],
-  [data-v-f6283960] *,
-  .translations,
-  .translations *,
-  .VPMenuLink,
-  .VPMenuLink *,
-  .VPLink,
-  .VPLink * {
-    /* 移除自定义z-index，使用VitePress默认值 */
-  }
-}
-
-/* 确保菜单按钮和内容使用VitePress默认样式 */
-.VPFlyout .button,
-[data-v-4268b863] .button {
-  /* 移除自定义z-index，使用VitePress默认值 */
-}
-
+/* 确保菜单内容正确显示 */
 .VPFlyout .menu,
 [data-v-4268b863] .menu {
-  /* 移除自定义z-index和定位，使用VitePress默认值 */
+  z-index: 105 !important;
+  position: absolute !important;
+  top: 100% !important;
+  right: 0 !important;
   background: rgba(15, 15, 35, 0.95) !important;
   backdrop-filter: blur(15px) !important;
   border: 1px solid rgba(79, 195, 247, 0.3) !important;
@@ -739,56 +728,4 @@ body::-webkit-scrollbar-corner {
   opacity: 0 !important;
   visibility: hidden !important;
   transform: translateY(-10px) !important;
-}
-
-/* 确保VitePress导航栏在最上层 */
-.VPNav,
-.VPNav *,
-.VPNavBar,
-.VPNavBar * {
-  z-index: 10 !important;
-}
-
-/* 确保导航栏菜单在最上层 */
-.VPNavBarMenu,
-.VPNavBarMenu *,
-.VPNavBarMenuButton,
-.VPNavBarMenuButton * {
-  z-index: 11 !important;
-}
-
-/* 确保下拉菜单在最上层 */
-.VPNavBarMenu .menu,
-.VPNavBarMenu .menu *,
-.VPNavBarMenu .VPMenu,
-.VPNavBarMenu .VPMenu * {
-  z-index: 12 !important;
-} 
-
-/* 降低文档内容区域的z-index，确保菜单不被遮挡 */
-.VPDocAside,
-.VPDocAside *,
-[data-v-bc6b7f6f],
-[data-v-bc6b7f6f] * {
-  z-index: 1 !important;
-}
-
-/* 降低侧边栏内容区域的z-index */
-.VPDocAside .content,
-.VPDocAside .content *,
-.VPDocAside .outline-marker,
-.VPDocAside .outline-title,
-.VPDocAside .VPDocOutlineItem,
-.VPDocAside .VPDocOutlineItem * {
-  z-index: 1 !important;
-}
-
-/* 降低文档内容区域的z-index */
-.VPContent,
-.VPContent *,
-.VPDoc,
-.VPDoc *,
-.VPContentDoc,
-.VPContentDoc * {
-  z-index: 1 !important;
 } 

@@ -503,7 +503,7 @@ body::-webkit-scrollbar-corner {
   }
 }
 
-/* 移动端菜单修复 - 恢复正常的显示/隐藏逻辑 */
+/* 移动端菜单修复 - 确保容器大小与内容匹配 */
 @media (max-width: 960px) {
   /* 恢复菜单的正常定位，不要强制绝对定位 */
   .VPNavBarMenu {
@@ -524,13 +524,22 @@ body::-webkit-scrollbar-corner {
     z-index: 102 !important;
   }
   
-  /* 菜单面板只在展开时显示 */
-  .VPNavBarMenu .VPMenu,
+  /* 外层menu容器 - 只负责定位，不添加额外样式 */
   .VPNavBarMenu .menu {
     position: absolute !important;
     top: 100% !important;
     right: 0 !important;
     z-index: 103 !important;
+    /* 移除所有背景、边框、阴影等样式，让内层VPMenu处理 */
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  
+  /* 内层VPMenu容器 - 负责实际的菜单样式 */
+  .VPNavBarMenu .VPMenu {
     background: rgba(15, 15, 35, 0.95) !important;
     backdrop-filter: blur(15px) !important;
     border: 1px solid rgba(79, 195, 247, 0.2) !important;
@@ -538,6 +547,9 @@ body::-webkit-scrollbar-corner {
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
     min-width: 200px !important;
     padding: 8px 0 !important;
+    /* 确保VPMenu完全填充menu容器 */
+    width: 100% !important;
+    height: 100% !important;
   }
   
   /* 菜单在收起状态下隐藏 */
@@ -615,11 +627,17 @@ body::-webkit-scrollbar-corner {
   z-index: 101 !important;
 } 
 
-/* 恢复菜单的正常显示/隐藏逻辑 */
+/* 桌面端菜单样式 - 确保容器大小与内容匹配 */
 .menu[data-v-3bbc7632] {
   transition: opacity .25s, visibility .25s, transform .25s !important;
   position: absolute !important;
   z-index: 105 !important;
+  /* 外层容器只负责定位，不添加样式 */
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
 }
 
 /* 确保菜单在LTR布局中正确定位 */
@@ -630,6 +648,20 @@ body::-webkit-scrollbar-corner {
 /* 确保菜单在RTL布局中正确定位 */
 :where([dir=rtl]) .menu[data-v-3bbc7632] {
   left: 0 !important;
+}
+
+/* 内层VPMenu容器样式 */
+.menu[data-v-3bbc7632] .VPMenu {
+  background: rgba(15, 15, 35, 0.95) !important;
+  backdrop-filter: blur(15px) !important;
+  border: 1px solid rgba(79, 195, 247, 0.2) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  min-width: 200px !important;
+  padding: 8px 0 !important;
+  /* 确保VPMenu完全填充menu容器 */
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* 菜单在展开状态下可见 */
@@ -646,7 +678,7 @@ body::-webkit-scrollbar-corner {
   transform: translateY(-10px) !important;
 }
 
-/* VPFlyout菜单样式 - 简化层级设置 */
+/* VPFlyout菜单样式 - 确保容器大小与内容匹配 */
 .VPFlyout {
   position: relative !important;
   z-index: 100 !important;
@@ -657,6 +689,17 @@ body::-webkit-scrollbar-corner {
   top: 100% !important;
   right: 0 !important;
   z-index: 105 !important;
+  /* 外层容器只负责定位，不添加样式 */
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+  padding: 0 !important;
+  margin: 0 !important;
+  transition: opacity .25s, visibility .25s, transform .25s !important;
+}
+
+/* 内层VPMenu容器样式 */
+.VPFlyout .menu .VPMenu {
   background: rgba(15, 15, 35, 0.95) !important;
   backdrop-filter: blur(15px) !important;
   border: 1px solid rgba(79, 195, 247, 0.2) !important;
@@ -664,7 +707,9 @@ body::-webkit-scrollbar-corner {
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
   min-width: 200px !important;
   padding: 8px 0 !important;
-  transition: opacity .25s, visibility .25s, transform .25s !important;
+  /* 确保VPMenu完全填充menu容器 */
+  width: 100% !important;
+  height: 100% !important;
 }
 
 /* 菜单在展开时可见 */

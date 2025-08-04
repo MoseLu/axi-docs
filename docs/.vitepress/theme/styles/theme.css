@@ -871,7 +871,9 @@ body::-webkit-scrollbar-corner {
 
 /* 确保菜单内容正确显示 - 星空主题 */
 .starry-theme .VPFlyout .menu,
-.starry-theme [data-v-4268b863] .menu {
+.starry-theme [data-v-4268b863] .menu,
+.starry-theme .VPNavBarMenu .menu,
+.starry-theme .VPNavBarMenu .VPMenu {
   z-index: 51 !important;
   background: rgba(15, 15, 35, 0.95) !important;
   backdrop-filter: blur(15px) !important;

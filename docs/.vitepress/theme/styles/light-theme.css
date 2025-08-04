@@ -982,7 +982,9 @@ body::-webkit-scrollbar-corner {
 
 /* 确保菜单内容正确显示 - 蓝天主题 */
 .cloud-theme .VPFlyout .menu,
-.cloud-theme [data-v-4268b863] .menu {
+.cloud-theme [data-v-4268b863] .menu,
+.cloud-theme .VPNavBarMenu .menu,
+.cloud-theme .VPNavBarMenu .VPMenu {
   z-index: 51 !important;
   background: rgba(255, 255, 255, 0.95) !important;
   backdrop-filter: blur(15px) !important;

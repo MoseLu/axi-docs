@@ -552,6 +552,21 @@ body::-webkit-scrollbar-corner {
     min-height: auto !important;
     height: auto !important;
   }
+  
+  /* 确保VPFlyout菜单也有相同的背景色 */
+  .VPFlyout .menu {
+    z-index: 52 !important;
+    background: rgba(15, 15, 35, 0.95) !important;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(79, 195, 247, 0.2) !important;
+    border-radius: 8px !important;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+    /* 确保菜单容器大小与内容匹配 */
+    padding: 0 !important;
+    margin: 0 !important;
+    min-height: auto !important;
+    height: auto !important;
+  }
 }
 
 /* 移除过高的z-index设置，使用合理的层级 */

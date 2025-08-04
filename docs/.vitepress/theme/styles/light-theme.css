@@ -7,7 +7,8 @@
 .cloud-theme {
   min-height: 100vh;
   position: relative;
-  overflow-x: hidden;
+  /* 移除 overflow-x: hidden，避免滚动问题 */
+  /* overflow-x: hidden; */
 }
 
 /* 亮色主题样式覆盖 - 使用更具体的选择器确保只在亮色模式下生效 */

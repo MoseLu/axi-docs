@@ -7,7 +7,7 @@ class Star {
     this.y = this.getRandomFloat(0, canvas.height)
     this.size = this.getRandomFloat(0.5, 2.5)
     this.opacity = this.getRandomFloat(0.2, 1.0)
-    this.twinkleSpeed = this.getRandomFloat(0.01, 0.03)
+    this.twinkleSpeed = this.getRandomFloat(0.005, 0.015) // 降低闪烁速度
     this.twinklePhase = this.getRandomFloat(0, Math.PI * 2)
     this.color = this.getRandomColor()
   }
@@ -91,12 +91,12 @@ class Meteor {
     }
     
     this.length = this.getRandomFloat(60, 200) // 增加长度范围
-    this.speed = this.getRandomFloat(3, 8) // 增加速度范围
+    this.speed = this.getRandomFloat(2, 6) // 降低速度范围，减少性能消耗
     this.opacity = this.getRandomFloat(0.6, 1.0) // 随机透明度
     this.active = true
     this.color = this.getRandomColor() // 随机颜色
     this.trailOpacity = this.getRandomFloat(0.3, 0.8) // 尾迹透明度
-    this.flickerSpeed = this.getRandomFloat(0.02, 0.05) // 闪烁速度
+    this.flickerSpeed = this.getRandomFloat(0.01, 0.03) // 降低闪烁速度
     this.flickerPhase = this.getRandomFloat(0, Math.PI * 2) // 闪烁相位
   }
 
@@ -159,9 +159,11 @@ class StarField {
     this.stars = []
     this.meteors = []
     this.lastMeteorTime = 0
-    this.meteorInterval = this.getRandomFloat(2000, 5000) // 2-5秒随机间隔，更频繁
-    this.maxMeteors = 8 // 增加最大流星数量
-    this.meteorBurstChance = 0.1 // 10%概率产生流星雨爆发
+    this.meteorInterval = this.getRandomFloat(3000, 8000) // 3-8秒随机间隔，减少频率
+    this.maxMeteors = 5 // 减少最大流星数量
+    this.meteorBurstChance = 0.05 // 5%概率产生流星雨爆发，降低概率
+    this.lastFrameTime = 0
+    this.frameInterval = 1000 / 30 // 限制到30FPS，减少性能消耗
 
     this.init()
   }
@@ -175,12 +177,12 @@ class StarField {
   }
 
   init() {
-    // 创建150个星星，增加星星数量
-    for (let i = 0; i < 150; i++) {
+    // 创建100个星星，减少星星数量
+    for (let i = 0; i < 100; i++) {
       this.stars.push(new Star(this.canvas))
     }
 
-    // 创建8个流星，增加初始流星数量
+    // 创建5个流星，减少初始流星数量
     for (let i = 0; i < this.maxMeteors; i++) {
       this.meteors.push(new Meteor(this.canvas))
     }
@@ -198,7 +200,7 @@ class StarField {
     this.stars.forEach(star => star.update())
 
     // 检查是否触发流星雨爆发
-    if (Math.random() < this.meteorBurstChance && now - this.lastMeteorTime > 1000) {
+    if (Math.random() < this.meteorBurstChance && now - this.lastMeteorTime > 2000) {
       this.triggerMeteorBurst()
       this.lastMeteorTime = now
     }
@@ -210,7 +212,7 @@ class StarField {
         meteor.reset()
         this.lastMeteorTime = now
         // 重新生成随机间隔
-        this.meteorInterval = this.getRandomFloat(2000, 5000)
+        this.meteorInterval = this.getRandomFloat(3000, 8000)
       }
     })
 
@@ -220,7 +222,7 @@ class StarField {
 
   triggerMeteorBurst() {
     // 流星雨爆发：同时激活多个流星
-    const burstCount = Math.floor(this.getRandomFloat(3, 6))
+    const burstCount = Math.floor(this.getRandomFloat(2, 4)) // 减少爆发数量
     let activatedCount = 0
     
     this.meteors.forEach(meteor => {
@@ -234,10 +236,10 @@ class StarField {
   adjustMeteorCount() {
     // 根据屏幕大小动态调整流星数量
     const screenArea = this.canvas.width * this.canvas.height
-    const targetMeteors = Math.min(this.maxMeteors, Math.floor(screenArea / 100000))
+    const targetMeteors = Math.min(this.maxMeteors, Math.floor(screenArea / 150000)) // 增加面积阈值
     
     // 确保至少有一定数量的流星
-    const minMeteors = 5
+    const minMeteors = 3 // 减少最小流星数量
     const maxMeteors = Math.max(minMeteors, targetMeteors)
     
     // 如果流星数量不足，添加新的流星
@@ -258,8 +260,15 @@ class StarField {
   }
 
   animate() {
-    this.update()
-    this.draw()
+    const now = Date.now()
+    
+    // 限制帧率到30FPS，减少性能消耗
+    if (now - this.lastFrameTime >= this.frameInterval) {
+      this.update()
+      this.draw()
+      this.lastFrameTime = now
+    }
+    
     return requestAnimationFrame(() => this.animate())
   }
 }

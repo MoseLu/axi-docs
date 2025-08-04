@@ -2,8 +2,11 @@
 .starry-theme {
   min-height: 100vh;
   position: relative;
-  overflow-x: hidden;
+  /* 移除 overflow-x: hidden，避免滚动问题 */
+  /* overflow-x: hidden; */
 }
+
+
 
 
 

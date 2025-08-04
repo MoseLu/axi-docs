@@ -23,11 +23,11 @@ export function initTheme() {
     // 确保深色主题的样式立即生效
     document.documentElement.classList.add('dark')
     
-    // 强制重新计算样式
-    const html = document.documentElement
+    // 移除强制重新计算样式的代码，避免干扰滚动
+    /* const html = document.documentElement
     html.style.display = 'none'
     html.offsetHeight // 触发重排
-    html.style.display = ''
+    html.style.display = '' */
     
     // 确保深色主题的透明度正确
     const starryTheme = document.querySelector('.starry-theme')

@@ -59,7 +59,8 @@ onMounted(() => {
 .starry-theme {
   min-height: 100vh;
   position: relative;
-  overflow-x: hidden;
+  /* 移除 overflow-x: hidden，避免滚动问题 */
+  /* overflow-x: hidden; */
 }
 
 .starry-theme .VPNav {
@@ -119,6 +120,11 @@ onMounted(() => {
 
 .starry-theme .aside-curtain {
   display: none !important;
+}
+
+/* 为curtain元素添加分隔线样式，参考侧边栏的分隔线 */
+.starry-theme .curtain {
+  border-right: 1px solid rgba(79, 195, 247, 0.2) !important;
 }
 
 .starry-theme .VPContent,
@@ -242,6 +248,11 @@ onMounted(() => {
 
 .cloud-theme .aside-curtain {
   display: none !important;
+}
+
+/* 为curtain元素添加分隔线样式，参考侧边栏的分隔线 */
+.cloud-theme .curtain {
+  border-right: 2px solid rgba(255, 255, 255, 0.8) !important;
 }
 
 .cloud-theme .VPContent,

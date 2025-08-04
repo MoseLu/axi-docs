@@ -5,6 +5,10 @@
   --vp-c-brand-2: #81d4fa;
   --vp-c-brand-3: #b3e5fc;
   --vp-c-brand-soft: rgba(79, 195, 247, 0.1);
+  /* 使用标准的 color-scheme 属性 */
+  color-scheme: light dark;
+  /* 确保使用标准的滚动行为 */
+  scroll-behavior: auto;
 }
 
 /* 深色模式下的星空背景 */
@@ -27,47 +31,15 @@
   
   background: linear-gradient(135deg, #0a0a0a 0%, #0f0f23 25%, #1a1a3a 50%, #2d1b69 75%, #16213e 100%);
   position: relative;
-  /* 移除强制隐藏横向滚动条 */
+  /* 移除强制隐藏横向滚动条，避免滚动问题 */
   /* overflow-x: hidden; */
+  /* 确保使用标准的滚动行为 */
+  scroll-behavior: auto;
 }
 
-/* 星星效果 */
-.dark::before {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    radial-gradient(1px 1px at 20px 30px, #4fc3f7, transparent),
-    radial-gradient(1px 1px at 40px 70px, #81c784, transparent),
-    radial-gradient(1px 1px at 90px 40px, #64b5f6, transparent),
-    radial-gradient(1px 1px at 130px 80px, #9575cd, transparent),
-    radial-gradient(1px 1px at 160px 30px, #4dd0e1, transparent),
-    radial-gradient(2px 2px at 200px 50px, #fff, transparent),
-    radial-gradient(1px 1px at 250px 90px, #bbdefb, transparent),
-    radial-gradient(1px 1px at 300px 20px, #e1bee7, transparent),
-    radial-gradient(1px 1px at 350px 60px, #b3e5fc, transparent),
-    radial-gradient(1px 1px at 400px 100px, #c8e6c9, transparent),
-    radial-gradient(2px 2px at 450px 30px, #fff, transparent),
-    radial-gradient(1px 1px at 500px 70px, #4fc3f7, transparent),
-    radial-gradient(1px 1px at 550px 10px, #81c784, transparent),
-    radial-gradient(1px 1px at 600px 50px, #64b5f6, transparent),
-    radial-gradient(1px 1px at 650px 90px, #9575cd, transparent),
-    radial-gradient(1px 1px at 700px 20px, #4dd0e1, transparent),
-    radial-gradient(2px 2px at 750px 60px, #fff, transparent),
-    radial-gradient(1px 1px at 800px 100px, #bbdefb, transparent),
-    radial-gradient(1px 1px at 850px 30px, #e1bee7, transparent),
-    radial-gradient(1px 1px at 900px 70px, #b3e5fc, transparent);
-  background-repeat: repeat;
-  background-size: 300px 200px;
-  animation: sparkle 30s linear infinite, twinkle 4s ease-in-out infinite alternate;
-  z-index: -1;
-}
 
 /* 星星闪烁动画 */
-@keyframes sparkle {
+/* @keyframes sparkle {
   0% {
     transform: translateY(0px);
   }
@@ -83,26 +55,9 @@
   100% {
     opacity: 1;
   }
-}
+} */
 
-/* 流星效果 */
-.dark::after {
-  content: '';
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-image: 
-    linear-gradient(45deg, transparent 30%, rgba(79, 195, 247, 0.3) 50%, transparent 70%),
-    linear-gradient(135deg, transparent 20%, rgba(100, 181, 246, 0.2) 40%, transparent 60%),
-    linear-gradient(225deg, transparent 10%, rgba(149, 117, 205, 0.25) 30%, transparent 50%);
-  background-size: 400px 400px, 300px 300px, 500px 500px;
-  animation: meteor 20s linear infinite, galaxy 60s linear infinite;
-  z-index: -1;
-}
-
-@keyframes meteor {
+/* @keyframes meteor {
   0% {
     transform: translateX(-300px) translateY(-300px);
   }
@@ -118,7 +73,7 @@
   100% {
     transform: rotate(360deg);
   }
-}
+} */
 
 /* 强制所有内容区域透明 */
 .dark .VPContent,

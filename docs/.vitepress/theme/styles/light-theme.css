@@ -996,38 +996,17 @@ body::-webkit-scrollbar-corner {
   height: auto !important;
 }
 
-/* 移除下拉菜单的多余边框 - 蓝天主题 */
-.cloud-theme .VPNavBarMenu .menu,
-.cloud-theme .VPNavBarMenu .VPMenu,
-.cloud-theme .VPNavBarMenu .group,
-.cloud-theme .VPNavBarMenu .item,
-.cloud-theme .VPNavBarMenu .VPNavBarMenuLink,
-.cloud-theme .VPNavBarMenu .VPNavBarMenuButton,
-.cloud-theme .VPNavBarMenu .VPNavBarMenuButton + div,
-.cloud-theme .VPNavBarMenu .VPNavBarMenuButton + ul,
-.cloud-theme .VPNavBarMenu .VPNavBarMenuButton + nav {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-/* 确保菜单项没有边框 - 蓝天主题 */
+/* 确保菜单项样式一致 - 蓝天主题 */
 .cloud-theme .VPNavBarMenu .menu .item,
 .cloud-theme .VPNavBarMenu .VPMenu .item,
 .cloud-theme .VPNavBarMenu .group .item {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
   background: transparent !important;
 }
 
-/* 确保菜单链接没有边框 - 蓝天主题 */
+/* 确保菜单链接样式一致 - 蓝天主题 */
 .cloud-theme .VPNavBarMenu .VPNavBarMenuLink,
 .cloud-theme .VPNavBarMenu .menu .VPNavBarMenuLink,
 .cloud-theme .VPNavBarMenu .VPMenu .VPNavBarMenuLink {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
   background: transparent !important;
 }
 

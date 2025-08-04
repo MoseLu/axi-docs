@@ -687,4 +687,139 @@ body::-webkit-scrollbar-corner {
   opacity: 0 !important;
   visibility: hidden !important;
   transform: translateY(0) !important;
+}
+
+/* 修复VPFlyout菜单的z-index问题 */
+.VPFlyout,
+.VPFlyout *,
+[data-v-4268b863],
+[data-v-4268b863] * {
+  z-index: 200 !important;
+  position: relative !important;
+}
+
+/* 确保VPFlyout菜单在移动端正确显示 */
+@media (max-width: 960px) {
+  .VPFlyout,
+  .VPFlyout *,
+  [data-v-4268b863],
+  [data-v-4268b863] * {
+    z-index: 200 !important;
+    position: relative !important;
+  }
+  
+  /* 确保菜单容器在最上层 */
+  .VPFlyout .menu,
+  .VPFlyout .menu *,
+  [data-v-4268b863] .menu,
+  [data-v-4268b863] .menu * {
+    z-index: 205 !important;
+    position: relative !important;
+  }
+  
+  /* 确保VPMenu组件在最上层 */
+  .VPFlyout .VPMenu,
+  .VPFlyout .VPMenu *,
+  [data-v-4268b863] .VPMenu,
+  [data-v-4268b863] .VPMenu * {
+    z-index: 210 !important;
+    position: relative !important;
+  }
+  
+  /* 确保菜单组在最上层 */
+  .VPFlyout .group,
+  .VPFlyout .group *,
+  [data-v-4268b863] .group,
+  [data-v-4268b863] .group * {
+    z-index: 215 !important;
+    position: relative !important;
+  }
+  
+  /* 确保菜单项在最上层 */
+  .VPFlyout .item,
+  .VPFlyout .item *,
+  [data-v-4268b863] .item,
+  [data-v-4268b863] .item * {
+    z-index: 220 !important;
+    position: relative !important;
+  }
+  
+  /* 确保主题切换按钮在最上层 */
+  .VPFlyout .appearance,
+  .VPFlyout .appearance *,
+  [data-v-4268b863] .appearance,
+  [data-v-4268b863] .appearance * {
+    z-index: 225 !important;
+    position: relative !important;
+  }
+  
+  /* 确保VPSwitch在最上层 */
+  .VPFlyout .VPSwitch,
+  .VPFlyout .VPSwitch *,
+  [data-v-4268b863] .VPSwitch,
+  [data-v-4268b863] .VPSwitch * {
+    z-index: 230 !important;
+    position: relative !important;
+  }
+  
+  /* 确保社交链接在最上层 */
+  .VPFlyout .social-links,
+  .VPFlyout .social-links *,
+  [data-v-4268b863] .social-links,
+  [data-v-4268b863] .social-links * {
+    z-index: 235 !important;
+    position: relative !important;
+  }
+}
+
+/* 确保VPFlyout菜单在所有屏幕尺寸下都正确显示 */
+.VPFlyout,
+.VPFlyout *,
+[data-v-4268b863],
+[data-v-4268b863] *,
+[data-v-ba5de8ba],
+[data-v-ba5de8ba] *,
+[data-v-78f6570b],
+[data-v-78f6570b] * {
+  z-index: 200 !important;
+  position: relative !important;
+}
+
+/* 确保菜单按钮正确显示 */
+.VPFlyout .button,
+[data-v-4268b863] .button {
+  z-index: 200 !important;
+  position: relative !important;
+}
+
+/* 确保菜单内容正确显示 */
+.VPFlyout .menu,
+[data-v-4268b863] .menu {
+  z-index: 250 !important;
+  position: absolute !important;
+  top: 100% !important;
+  right: 0 !important;
+  background: rgba(15, 15, 35, 0.95) !important;
+  backdrop-filter: blur(15px) !important;
+  border: 1px solid rgba(79, 195, 247, 0.3) !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
+  min-width: 200px !important;
+  padding: 8px 0 !important;
+}
+
+/* 确保菜单在展开时可见 */
+.VPFlyout .button[aria-expanded="true"] + .menu,
+[data-v-4268b863] .button[aria-expanded="true"] + .menu {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) !important;
+}
+
+/* 确保菜单在收起时隐藏 */
+.VPFlyout .button[aria-expanded="false"] + .menu,
+[data-v-4268b863] .button[aria-expanded="false"] + .menu {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transform: translateY(-10px) !important;
 } 

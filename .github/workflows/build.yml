@@ -15,8 +15,6 @@ jobs:
       # Set up pnpm
       - name: Set up pnpm
         uses: pnpm/action-setup@v4
-        with:
-          version: '10.7.1'  # 使用与你本地开发环境相同的 pnpm 版本
 
       # Set up Node.js with pnpm cache
       - name: Set up Node.js

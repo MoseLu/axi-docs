@@ -29,8 +29,6 @@
   background: transparent !important;
 }
 
-/* 星空主题样式 */
-
 /* 覆盖VitePress默认的CSS变量 */
 :root {
   --vp-c-brand-1: #4fc3f7;
@@ -467,6 +465,138 @@ body::-webkit-scrollbar-corner {
   }
 }
 
+/* 移动端主题切换菜单z-index修复 */
+@media (max-width: 960px) {
+  /* 确保移动端菜单在内容区域之上 */
+  .VPNavBarMenu {
+    z-index: 100 !important;
+  }
+  
+  /* 确保菜单容器有正确的层级 */
+  .VPNavBarMenu .VPNavBarMenuButton {
+    z-index: 101 !important;
+  }
+  
+  /* 确保下拉菜单内容在最上层 */
+  .VPNavBarMenu .VPNavBarMenuButton + div,
+  .VPNavBarMenu .VPNavBarMenuButton + ul,
+  .VPNavBarMenu .VPNavBarMenuButton + nav {
+    z-index: 102 !important;
+  }
+  
+  /* 星空主题移动端菜单样式 */
+  .starry-theme .VPNavBarMenu {
+    background: rgba(15, 15, 35, 0.95) !important;
+    backdrop-filter: blur(15px);
+    border: none !important;
+    box-shadow: 0 4px 20px rgba(79, 195, 247, 0.1);
+    z-index: 100 !important;
+  }
+  
+  /* 蓝天主题移动端菜单样式 */
+  .cloud-theme .VPNavBarMenu {
+    background: rgba(255, 255, 255, 0.95) !important;
+    backdrop-filter: blur(15px);
+    border: none !important;
+    box-shadow: 0 4px 20px rgba(79, 195, 247, 0.1);
+    z-index: 100 !important;
+  }
+  
+  /* 确保菜单项在移动端正确显示 */
+  .VPNavBarMenuLink {
+    z-index: 103 !important;
+  }
+  
+  /* 确保主题切换按钮在移动端正确显示 */
+  .VPNavBarAppearance {
+    z-index: 104 !important;
+  }
+}
+
+/* 移除过高的z-index设置，使用VitePress官方值 */
+@media (max-width: 960px) {
+  /* 直接针对VitePress的菜单容器 */
+  .VPNavBarMenu,
+  .VPNavBarMenu *,
+  .VPNavBarMenuButton,
+  .VPNavBarMenuButton * {
+    z-index: 100 !important;
+  }
+  
+  /* 确保下拉面板在最顶层 */
+  .VPNavBarMenu .VPMenu,
+  .VPNavBarMenu .VPMenu *,
+  .VPNavBarMenu .menu,
+  .VPNavBarMenu .menu *,
+  .VPNavBarMenu .group,
+  .VPNavBarMenu .group *,
+  .VPNavBarMenu .item,
+  .VPNavBarMenu .item * {
+    z-index: 105 !important;
+  }
+  
+  /* 确保主题切换按钮在最顶层 */
+  .VPNavBarMenu .appearance,
+  .VPNavBarMenu .appearance *,
+  .VPNavBarMenu .VPSwitch,
+  .VPNavBarMenu .VPSwitch * {
+    z-index: 106 !important;
+  }
+  
+  /* 强制所有菜单相关元素在正确层级 */
+  .VPNavBarMenu,
+  .VPNavBarMenuButton,
+  .VPMenu,
+  .menu,
+  .group,
+  .item,
+  .appearance,
+  .VPSwitch {
+    position: relative !important;
+    z-index: 100 !important;
+  }
+  
+  /* 确保所有可能的菜单元素都在正确层级 */
+  [data-v-4268b863],
+  [data-v-4268b863] *,
+  [data-v-7aeaef59],
+  [data-v-7aeaef59] *,
+  [data-v-ba5de8ba],
+  [data-v-ba5de8ba] * {
+    z-index: 105 !important;
+  }
+
+  /* 添加更多Vue组件data-v属性的z-index设置 */
+  [data-v-3bbc7632],
+  [data-v-3bbc7632] *,
+  [data-v-098d9c93],
+  [data-v-098d9c93] *,
+  [data-v-cc29fe84],
+  [data-v-cc29fe84] *,
+  [data-v-059b1e5f],
+  [data-v-059b1e5f] *,
+  [data-v-b2703078],
+  [data-v-b2703078] *,
+  [data-v-f3ad3c44],
+  [data-v-f3ad3c44] *,
+  [data-v-52fe0285],
+  [data-v-52fe0285] *,
+  [data-v-f6283960],
+  [data-v-f6283960] * {
+    z-index: 105 !important;
+  }
+
+  /* 确保翻译菜单和主题切换菜单在最上层 */
+  .translations,
+  .translations *,
+  .VPMenuLink,
+  .VPMenuLink *,
+  .VPLink,
+  .VPLink * {
+    z-index: 106 !important;
+  }
+}
+
 /* 隐藏侧边栏遮罩层 */
 .dark .aside-curtain,
 .dark [class*="aside-curtain"],
@@ -485,4 +615,76 @@ body::-webkit-scrollbar-corner {
   opacity: 0 !important;
   pointer-events: none !important;
   display: none !important;
+}
+
+/* 降低VPDocAside的z-index，让menu元素显示在上层 */
+.VPDocAside,
+.VPDocAside *,
+[data-v-bc6b7f6f],
+[data-v-bc6b7f6f] * {
+  z-index: 6 !important;
+}
+
+/* 确保侧边栏内容区域层级较低 */
+.VPDocAside .content,
+.VPDocAside .content *,
+.VPDocAside .outline-marker,
+.VPDocAside .outline-title,
+.VPDocAside .VPDocOutlineItem,
+.VPDocAside .VPDocOutlineItem * {
+  z-index: 6 !important;
+}
+
+/* 确保menu元素层级较高 */
+.menu,
+.menu *,
+.VPMenu,
+.VPMenu *,
+[data-v-4268b863],
+[data-v-4268b863] * {
+  z-index: 20 !important;
+}
+
+/* 确保主题切换菜单在最上层 */
+.VPSwitch,
+.VPSwitch *,
+.appearance,
+.appearance *,
+.social-links,
+.social-links * {
+  z-index: 25 !important;
+} 
+
+/* 添加缺失的菜单样式属性 */
+.menu[data-v-3bbc7632] {
+  top: calc(var(--vp-nav-height) / 2 + 20px) !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transition: opacity .25s, visibility .25s, transform .25s !important;
+  position: absolute !important;
+  z-index: 105 !important;
+}
+
+/* 确保菜单在LTR布局中正确定位 */
+:where([dir=ltr]) .menu[data-v-3bbc7632] {
+  right: 0 !important;
+}
+
+/* 确保菜单在RTL布局中正确定位 */
+:where([dir=rtl]) .menu[data-v-3bbc7632] {
+  left: 0 !important;
+}
+
+/* 确保菜单在展开状态下可见 */
+.button[aria-expanded=true] + .menu[data-v-3bbc7632] {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) !important;
+}
+
+/* 确保菜单在收起状态下隐藏 */
+.button[aria-expanded=false] + .menu[data-v-3bbc7632] {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transform: translateY(0) !important;
 } 

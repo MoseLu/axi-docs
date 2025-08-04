@@ -47,11 +47,7 @@
   box-shadow: 0 2px 4px rgba(255, 255, 255, 0.3) !important;
 }
 
-/* 确保只有一个边框 */
-.cloud-theme .VPNav *,
-.cloud-theme .VPNavBar * {
-  border-bottom: none !important;
-}
+/* 移除高优先级边框样式，让VitePress默认样式生效 */
 
 .cloud-theme .VPNavBar {
   background: rgba(255, 255, 255, 0.8) !important;
@@ -74,24 +70,6 @@
   box-shadow: 2px 0 4px rgba(255, 255, 255, 0.3) !important;
 }
 
-/* 确保分割线在侧边栏内 */
-.cloud-theme .VPSidebar .divider {
-  width: calc(100% - 2rem) !important;
-  max-width: calc(100% - 2rem) !important;
-  margin: 0 1rem !important;
-  overflow: hidden !important;
-}
-
-/* 特别处理侧边栏顶部的分割线 */
-.cloud-theme .VPSidebar > .divider,
-.cloud-theme .VPSidebar > .content > .divider,
-.cloud-theme .VPSidebar > .content-body > .divider {
-  width: calc(100% - 2rem) !important;
-  max-width: calc(100% - 2rem) !important;
-  margin: 0 1rem !important;
-  overflow: hidden !important;
-  position: relative !important;
-}
 
 /* 导航栏内容区域 */
 .cloud-theme .VPNavBar .content {
@@ -424,40 +402,19 @@
   visibility: hidden !important;
 }
 
-/* 本地搜索按钮样式 - 浅色模式 */
-.cloud-theme .VPNavBarSearch {
-  background: rgba(255, 255, 255, 0.9) !important;
-  border: 2px solid rgba(79, 195, 247, 0.6) !important;
-  border-radius: 12px !important;
-  color: rgba(79, 195, 247, 0.8) !important;
-  transition: all 0.3s ease !important;
-  backdrop-filter: blur(15px);
-  box-shadow: 0 4px 16px rgba(79, 195, 247, 0.15) !important;
-}
+/* 移除搜索框的高优先级样式，让VitePress默认样式生效 */
 
 /* 移除搜索框悬浮效果 */
 
 
 
-.cloud-theme .VPNavBarSearch .VPNavBarSearchButton {
-  background: transparent !important;
-  border: none !important;
-  color: rgba(79, 195, 247, 0.8) !important;
-  transition: all 0.3s ease !important;
-}
+/* 移除搜索按钮的高优先级样式，让VitePress默认样式生效 */
 
 /* 移除搜索按钮悬浮效果 */
 
 
 
-.cloud-theme .VPNavBarSearch .VPNavBarSearchButton .VPNavBarSearchButtonKey {
-  background: rgba(79, 195, 247, 0.2) !important;
-  border: 1px solid rgba(79, 195, 247, 0.4) !important;
-  color: rgba(79, 195, 247, 0.8) !important;
-  border-radius: 4px !important;
-  padding: 2px 6px !important;
-  font-size: 12px !important;
-}
+/* 移除搜索按钮键位的高优先级样式，让VitePress默认样式生效 */
 
 
 
@@ -853,53 +810,11 @@
   box-shadow: none !important;
 }
 
-/* 移除所有导航栏元素的边框 */
-.cloud-theme .VPNavBar *,
-.cloud-theme .VPNavBarTitle *,
-.cloud-theme .VPNavBarMenuLink *,
-.cloud-theme .VPNavBarMenu *,
-.cloud-theme .VPNavBarMenuButton *,
-.cloud-theme .VPNavBarAppearance *,
-.cloud-theme .VPNavBarSocialLink *,
-.cloud-theme .VPNavBarTranslation * {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
+/* 移除高优先级导航栏样式，让VitePress默认样式生效 */
 
-/* 移除导航栏容器的边框 */
-.cloud-theme .VPNavBar {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
+/* 移除导航栏容器的高优先级样式，让VitePress默认样式生效 */
 
-.cloud-theme .VPNavBar .content {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-.cloud-theme .VPNavBar .content-body {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-/* 搜索框样式 */
-.cloud-theme .DocSearch-Button {
-  background: rgba(255, 255, 255, 0.9) !important;
-  border: 2px solid rgba(79, 195, 247, 0.4) !important;
-  color: rgba(79, 195, 247, 0.8) !important;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 2px 8px rgba(79, 195, 247, 0.15) !important;
-}
-
-.cloud-theme .DocSearch-Button:hover {
-  background: rgba(255, 255, 255, 0.95) !important;
-  border-color: rgba(79, 195, 247, 0.6) !important;
-  box-shadow: 0 0 15px rgba(79, 195, 247, 0.3);
-}
+/* 移除搜索框的高优先级样式，让VitePress默认样式生效 */
 
 /* 主题切换按钮 */
 .cloud-theme .VPNavBarAppearance {
@@ -912,51 +827,18 @@
   text-shadow: 0 0 8px rgba(25, 118, 210, 0.3);
 }
 
-/* 移动端菜单 */
-.cloud-theme .VPNavBarMenu {
-  background: rgba(255, 255, 255, 0.8) !important;
-  backdrop-filter: blur(15px);
-  border: none !important;
-  box-shadow: 0 4px 20px rgba(135, 206, 235, 0.1);
-}
+/* 移除移动端菜单的高优先级样式，让VitePress默认样式生效 */
 
-/* 导航栏分隔线已隐藏 */
+/* 移动端主题切换菜单z-index修复 */
+/* 移除移动端菜单的高优先级z-index样式，让VitePress默认样式生效 */
 
-/* 隐藏所有分割线容器 */
-.cloud-theme .divider {
-  display: none !important;
-}
+/* 移除高优先级z-index样式，让VitePress默认样式生效 */
 
-/* 隐藏所有分割线 */
-.cloud-theme .divider-line {
-  display: none !important;
-}
+/* 移除VPDocAside的高优先级z-index样式，让VitePress默认样式生效 */
 
-/* 所有分割线都已隐藏 */
+/* 移除高优先级z-index样式，让VitePress默认样式生效 */
 
-/* 隐藏或调整侧边栏遮罩层 */
-.cloud-theme .aside-curtain {
-  background: transparent !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-/* 确保遮罩层不会显示黑色 */
-.cloud-theme [data-v-2b45519a].aside-curtain {
-  background: transparent !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-/* 移动端侧边栏遮罩层样式 */
-.cloud-theme .VPSidebar .aside-curtain,
-.cloud-theme [class*="aside-curtain"],
-[class*="aside-curtain"] {
-  background: transparent !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  display: none !important;
-}
+/* 移除高优先级z-index样式，让VitePress默认样式生效 */
 
 /* 亮色主题滚动条样式 - 深蓝色 */
 .cloud-theme {
@@ -1088,3 +970,5 @@ body::-webkit-scrollbar-corner {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 } 
+
+/* 移除VPMenu的自定义样式，让VitePress默认样式生效 */ 

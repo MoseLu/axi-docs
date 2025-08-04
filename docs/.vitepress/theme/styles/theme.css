@@ -9,19 +9,15 @@
 
 /* 简化的样式覆盖，不破坏原有布局 */
 .starry-theme .VPNav {
-  background: rgba(15, 15, 35, 0.6) !important;
+  background: rgba(15, 15, 35, 0.4) !important;
   backdrop-filter: blur(15px);
-  border-bottom: 1px solid rgba(79, 195, 247, 0.2) !important;
 }
 
-/* 确保只有一个边框 */
-.starry-theme .VPNav *,
-.starry-theme .VPNavBar * {
-  border-bottom: none !important;
-}
+/* 移除高优先级边框样式，让VitePress默认样式生效 */
 
 .starry-theme .VPNavBar {
-  background: transparent !important;
+  background: rgba(15, 15, 35, 0.4) !important;
+  backdrop-filter: blur(15px);
   border-bottom: none !important;
 }
 
@@ -36,27 +32,8 @@
 .starry-theme .VPSidebar {
   background: rgba(15, 15, 35, 0.5) !important;
   backdrop-filter: blur(15px);
-  border-right: 1px solid rgba(79, 195, 247, 0.2);
 }
 
-/* 确保分割线在侧边栏内 */
-.starry-theme .VPSidebar .divider {
-  width: calc(100% - 2rem) !important;
-  max-width: calc(100% - 2rem) !important;
-  margin: 0 1rem !important;
-  overflow: hidden !important;
-}
-
-/* 特别处理侧边栏顶部的分割线 */
-.starry-theme .VPSidebar > .divider,
-.starry-theme .VPSidebar > .content > .divider,
-.starry-theme .VPSidebar > .content-body > .divider {
-  width: calc(100% - 2rem) !important;
-  max-width: calc(100% - 2rem) !important;
-  margin: 0 1rem !important;
-  overflow: hidden !important;
-  position: relative !important;
-}
 
 /* 导航栏内容区域 */
 .starry-theme .VPNavBar .content {
@@ -286,40 +263,19 @@
   visibility: hidden !important;
 }
 
-/* 本地搜索按钮样式 - 深色模式 */
-.starry-theme .VPNavBarSearch {
-  background: rgba(15, 15, 35, 0.8) !important;
-  border: 2px solid rgba(79, 195, 247, 0.5) !important;
-  border-radius: 12px !important;
-  color: #bbdefb !important;
-  transition: all 0.3s ease !important;
-  backdrop-filter: blur(15px);
-  box-shadow: 0 4px 16px rgba(79, 195, 247, 0.15) !important;
-}
+/* 移除搜索框的高优先级样式，让VitePress默认样式生效 */
 
 /* 移除搜索框悬浮效果 */
 
 
 
-.starry-theme .VPNavBarSearch .VPNavBarSearchButton {
-  background: transparent !important;
-  border: none !important;
-  color: #bbdefb !important;
-  transition: all 0.3s ease !important;
-}
+/* 移除搜索按钮的高优先级样式，让VitePress默认样式生效 */
 
 /* 移除搜索按钮悬浮效果 */
 
 
 
-.starry-theme .VPNavBarSearch .VPNavBarSearchButton .VPNavBarSearchButtonKey {
-  background: rgba(79, 195, 247, 0.2) !important;
-  border: 1px solid rgba(79, 195, 247, 0.4) !important;
-  color: #bbdefb !important;
-  border-radius: 4px !important;
-  padding: 2px 6px !important;
-  font-size: 12px !important;
-}
+/* 移除搜索按钮键位的高优先级样式，让VitePress默认样式生效 */
 
 
 
@@ -717,53 +673,11 @@
   box-shadow: none !important;
 }
 
-/* 移除所有导航栏元素的边框 */
-.starry-theme .VPNavBar *,
-.starry-theme .VPNavBarTitle *,
-.starry-theme .VPNavBarMenuLink *,
-.starry-theme .VPNavBarMenu *,
-.starry-theme .VPNavBarMenuButton *,
-.starry-theme .VPNavBarAppearance *,
-.starry-theme .VPNavBarSocialLink *,
-.starry-theme .VPNavBarTranslation * {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
+/* 移除高优先级导航栏样式，让VitePress默认样式生效 */
 
-/* 移除导航栏容器的边框 */
-.starry-theme .VPNavBar {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
+/* 移除导航栏容器的高优先级样式，让VitePress默认样式生效 */
 
-.starry-theme .VPNavBar .content {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-.starry-theme .VPNavBar .content-body {
-  border: none !important;
-  outline: none !important;
-  box-shadow: none !important;
-}
-
-/* 搜索框样式 */
-.starry-theme .DocSearch-Button {
-  background: rgba(15, 15, 35, 0.8) !important;
-  border: 2px solid rgba(79, 195, 247, 0.4) !important;
-  color: #bbdefb !important;
-  backdrop-filter: blur(10px);
-  box-shadow: 0 2px 8px rgba(79, 195, 247, 0.15) !important;
-}
-
-.starry-theme .DocSearch-Button:hover {
-  background: rgba(15, 15, 35, 0.9) !important;
-  border-color: rgba(79, 195, 247, 0.6) !important;
-  box-shadow: 0 0 15px rgba(79, 195, 247, 0.3);
-}
+/* 移除搜索框的高优先级样式，让VitePress默认样式生效 */
 
 /* 主题切换按钮 */
 .starry-theme .VPNavBarAppearance {
@@ -776,53 +690,19 @@
   text-shadow: 0 0 5px rgba(79, 195, 247, 0.3);
 }
 
-/* 移动端菜单 */
-.starry-theme .VPNavBarMenu {
-  background: rgba(15, 15, 35, 0.95) !important;
-  backdrop-filter: blur(15px);
-  border: none !important;
-  box-shadow: 0 4px 20px rgba(79, 195, 247, 0.1);
-}
+/* 移除移动端菜单的高优先级样式，让VitePress默认样式生效 */
+
+/* 移除菜单按钮的高优先级样式，让VitePress默认样式生效 */
+
+/* 移除移动端菜单的高优先级z-index样式，让VitePress默认样式生效 */
 
 
 
-/* 导航栏分隔线已隐藏 */
+/* 移除VPDocAside的高优先级z-index样式，让VitePress默认样式生效 */
 
-/* 隐藏所有分割线容器 */
-.starry-theme .divider {
-  display: none !important;
-}
+/* 移除高优先级z-index样式，让VitePress默认样式生效 */
 
-/* 隐藏所有分割线 */
-.starry-theme .divider-line {
-  display: none !important;
-}
-
-/* 所有分割线都已隐藏 */
-
-/* 隐藏或调整侧边栏遮罩层 */
-.starry-theme .aside-curtain {
-  background: transparent !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-/* 确保遮罩层不会显示黑色 */
-.starry-theme [data-v-2b45519a].aside-curtain {
-  background: transparent !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-}
-
-/* 移动端侧边栏遮罩层样式 */
-.starry-theme .VPSidebar .aside-curtain,
-.starry-theme .VPSidebar [class*="aside-curtain"],
-.starry-theme [class*="aside-curtain"] {
-  background: transparent !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  display: none !important;
-}
+/* 移除高优先级z-index样式，让VitePress默认样式生效 */
 
 /* 深色主题滚动条样式 - 星空蓝 */
 .starry-theme {
@@ -954,3 +834,5 @@ body::-webkit-scrollbar-corner {
   backdrop-filter: none !important;
   -webkit-backdrop-filter: none !important;
 } 
+
+/* 移除VPMenu的高优先级样式，让VitePress默认样式生效 */ 

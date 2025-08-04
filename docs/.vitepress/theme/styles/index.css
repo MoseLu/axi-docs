@@ -1,5 +1,4 @@
 /* 导入所有主题样式 */
 @import './hydration.css';
 @import './theme.css';
-@import './light-theme.css';
-@import './scrollbar.css'; 
+@import './light-theme.css'; 

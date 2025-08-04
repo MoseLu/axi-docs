@@ -7,6 +7,12 @@
 
 
 
+
+
+
+
+
+
 /* 简化的样式覆盖，不破坏原有布局 */
 .starry-theme .VPNav {
   background: rgba(15, 15, 35, 0.4) !important;
@@ -651,6 +657,7 @@
   background: transparent !important;
   outline: none !important;
   box-shadow: none !important;
+  text-shadow: 0 0 3px rgba(255, 255, 255, 0.3);
 }
 
 .starry-theme .VPNavBarMenuLink:hover {
@@ -665,6 +672,7 @@
 }
 
 .starry-theme .VPNavBarMenuLink.active {
+  color: #81d4fa !important;
   text-shadow: 0 0 8px rgba(129, 212, 250, 0.6);
   opacity: 1;
   /* 激活状态也不显示边框 */
@@ -716,129 +724,6 @@
   visibility: visible !important;
 }
 
-/* 移除移动端菜单的高优先级样式，让VitePress默认样式生效 */
-
-/* 移除菜单按钮的高优先级样式，让VitePress默认样式生效 */
-
-/* 移除移动端菜单的高优先级z-index样式，让VitePress默认样式生效 */
-
-
-
-/* 移除VPDocAside的高优先级z-index样式，让VitePress默认样式生效 */
-
-/* 移除高优先级z-index样式，让VitePress默认样式生效 */
-
-/* 移除高优先级z-index样式，让VitePress默认样式生效 */
-
-/* 深色主题滚动条样式 - 星空蓝 */
-.starry-theme {
-  scrollbar-width: thin !important;
-  scrollbar-color: rgba(79, 195, 247, 0.8) transparent !important;
-}
-
-.starry-theme::-webkit-scrollbar {
-  width: 8px !important;
-  height: 8px !important;
-}
-
-.starry-theme::-webkit-scrollbar-track {
-  background: transparent !important;
-  border-radius: 4px !important;
-}
-
-.starry-theme::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, rgba(79, 195, 247, 0.8), rgba(100, 181, 246, 0.8)) !important;
-  border-radius: 4px !important;
-  border: 1px solid rgba(79, 195, 247, 0.3) !important;
-  transition: all 0.3s ease !important;
-}
-
-.starry-theme::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, rgba(79, 195, 247, 1), rgba(100, 181, 246, 1)) !important;
-  box-shadow: 0 0 8px rgba(79, 195, 247, 0.5) !important;
-}
-
-.starry-theme::-webkit-scrollbar-button {
-  display: none !important;
-}
-
-.starry-theme::-webkit-scrollbar-corner {
-  background: transparent !important;
-}
-
-/* 为深色主题的所有可滚动元素应用滚动条样式 */
-.starry-theme * {
-  scrollbar-width: thin !important;
-  scrollbar-color: rgba(79, 195, 247, 0.8) transparent !important;
-}
-
-.starry-theme *::-webkit-scrollbar {
-  width: 8px !important;
-  height: 8px !important;
-}
-
-.starry-theme *::-webkit-scrollbar-track {
-  background: transparent !important;
-  border-radius: 4px !important;
-}
-
-.starry-theme *::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, rgba(79, 195, 247, 0.8), rgba(100, 181, 246, 0.8)) !important;
-  border-radius: 4px !important;
-  border: 1px solid rgba(79, 195, 247, 0.3) !important;
-  transition: all 0.3s ease !important;
-}
-
-.starry-theme *::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, rgba(79, 195, 247, 1), rgba(100, 181, 246, 1)) !important;
-  box-shadow: 0 0 8px rgba(79, 195, 247, 0.5) !important;
-}
-
-.starry-theme *::-webkit-scrollbar-button {
-  display: none !important;
-}
-
-.starry-theme *::-webkit-scrollbar-corner {
-  background: transparent !important;
-}
-
-/* 全局滚动条样式 - 确保在所有情况下都生效 */
-html::-webkit-scrollbar,
-body::-webkit-scrollbar {
-  width: 8px !important;
-  height: 8px !important;
-}
-
-html::-webkit-scrollbar-track,
-body::-webkit-scrollbar-track {
-  background: transparent !important;
-  border-radius: 4px !important;
-}
-
-html::-webkit-scrollbar-thumb,
-body::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, rgba(30, 64, 175, 0.8), rgba(59, 130, 246, 0.8)) !important;
-  border-radius: 4px !important;
-  border: 1px solid rgba(30, 64, 175, 0.3) !important;
-  transition: all 0.3s ease !important;
-}
-
-html::-webkit-scrollbar-thumb:hover,
-body::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, rgba(30, 64, 175, 1), rgba(59, 130, 246, 1)) !important;
-  box-shadow: 0 0 8px rgba(30, 64, 175, 0.5) !important;
-}
-
-html::-webkit-scrollbar-button,
-body::-webkit-scrollbar-button {
-  display: none !important;
-}
-
-html::-webkit-scrollbar-corner,
-body::-webkit-scrollbar-corner {
-  background: transparent !important;
-}
-
 /* 强制移除暗色模式下导航栏标题的所有背景效果 */
 .starry-theme .starry-theme .VPNavBarTitle,
 .starry-theme .starry-theme .VPNavBarTitle *,
@@ -885,6 +770,8 @@ body::-webkit-scrollbar-corner {
   margin: 0 !important;
   min-height: auto !important;
   height: auto !important;
+  /* 修复毛玻璃效果溢出问题 */
+  overflow: hidden !important;
 }
 
 /* 移除下拉菜单的多余边框 */

@@ -79,6 +79,38 @@ onMounted(() => {
   border-bottom: none !important;
 }
 
+/* 星空主题导航栏菜单链接样式 */
+.starry-theme .VPNavBarMenuLink {
+  color: #ffffff !important;
+  transition: all 0.3s ease;
+  opacity: 0.9;
+  border: none !important;
+  background: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  text-shadow: 0 0 3px rgba(255, 255, 255, 0.3);
+}
+
+.starry-theme .VPNavBarMenuLink:hover {
+  color: #81d4fa !important;
+  text-shadow: 0 0 8px rgba(129, 212, 250, 0.6);
+  background: transparent !important;
+  opacity: 1;
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.starry-theme .VPNavBarMenuLink.active {
+  color: #81d4fa !important;
+  text-shadow: 0 0 8px rgba(129, 212, 250, 0.6);
+  opacity: 1;
+  border: none !important;
+  background: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
 .starry-theme .VPSidebar {
   background: rgba(15, 15, 35, 0.5) !important;
   backdrop-filter: blur(15px);
@@ -171,6 +203,34 @@ onMounted(() => {
   background: transparent !important;
   backdrop-filter: none !important;
   border-bottom: none !important;
+}
+
+/* 蓝天白云主题导航栏菜单链接样式 */
+.cloud-theme .VPNavBarMenuLink {
+  color: #35a3f7 !important;
+  transition: all 0.3s ease;
+  border: none !important;
+  background: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
+  text-shadow: 0 0 3px rgba(53, 163, 247, 0.3);
+}
+
+.cloud-theme .VPNavBarMenuLink:hover {
+  color: #1976d2 !important;
+  text-shadow: 0 0 8px rgba(25, 118, 210, 0.5);
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+.cloud-theme .VPNavBarMenuLink.active {
+  color: #1976d2 !important;
+  text-shadow: 0 0 8px rgba(25, 118, 210, 0.5);
+  border: none !important;
+  background: transparent !important;
+  outline: none !important;
+  box-shadow: none !important;
 }
 
 .cloud-theme .VPSidebar {

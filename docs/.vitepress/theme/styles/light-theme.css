@@ -1,33 +1,4 @@
-/* 最高优先级滚动条样式 - 强制覆盖所有其他样式 */
-*::-webkit-scrollbar {
-  width: 8px !important;
-  height: 8px !important;
-}
 
-*::-webkit-scrollbar-track {
-  background: transparent !important;
-  border-radius: 4px !important;
-}
-
-*::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, rgba(30, 64, 175, 0.8), rgba(59, 130, 246, 0.8)) !important;
-  border-radius: 4px !important;
-  border: 1px solid rgba(30, 64, 175, 0.3) !important;
-  transition: all 0.3s ease !important;
-}
-
-*::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, rgba(30, 64, 175, 1), rgba(59, 130, 246, 1)) !important;
-  box-shadow: 0 0 8px rgba(30, 64, 175, 0.5) !important;
-}
-
-*::-webkit-scrollbar-button {
-  display: none !important;
-}
-
-*::-webkit-scrollbar-corner {
-  background: transparent !important;
-}
 
 /* 亮色主题基础样式 */
 
@@ -788,23 +759,26 @@
 }
 
 .cloud-theme .VPNavBarMenuLink {
-  color: #000000 !important;
+  color: #35a3f7 !important;
   transition: all 0.3s ease;
   border: none !important;
   background: transparent !important;
   outline: none !important;
   box-shadow: none !important;
+  text-shadow: 0 0 3px rgba(53, 163, 247, 0.3);
 }
 
 .cloud-theme .VPNavBarMenuLink:hover {
-  color: #000000 !important;
+  color: #1976d2 !important;
+  text-shadow: 0 0 8px rgba(25, 118, 210, 0.5);
   border: none !important;
   outline: none !important;
   box-shadow: none !important;
 }
 
 .cloud-theme .VPNavBarMenuLink.active {
-  color: #000000 !important;
+  color: #1976d2 !important;
+  text-shadow: 0 0 8px rgba(25, 118, 210, 0.5);
   border: none !important;
   background: transparent !important;
   outline: none !important;
@@ -841,114 +815,13 @@
 
 /* 移除高优先级z-index样式，让VitePress默认样式生效 */
 
-/* 亮色主题滚动条样式 - 深蓝色 */
-.cloud-theme {
-  scrollbar-width: thin !important;
-  scrollbar-color: rgba(30, 64, 175, 0.8) transparent !important;
-}
 
-.cloud-theme::-webkit-scrollbar {
-  width: 8px !important;
-  height: 8px !important;
-}
 
-.cloud-theme::-webkit-scrollbar-track {
-  background: transparent !important;
-  border-radius: 4px !important;
-}
 
-.cloud-theme::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, rgba(30, 64, 175, 0.8), rgba(59, 130, 246, 0.8)) !important;
-  border-radius: 4px !important;
-  border: 1px solid rgba(30, 64, 175, 0.3) !important;
-  transition: all 0.3s ease !important;
-}
 
-.cloud-theme::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, rgba(30, 64, 175, 1), rgba(59, 130, 246, 1)) !important;
-  box-shadow: 0 0 8px rgba(30, 64, 175, 0.5) !important;
-}
 
-.cloud-theme::-webkit-scrollbar-button {
-  display: none !important;
-}
 
-.cloud-theme::-webkit-scrollbar-corner {
-  background: transparent !important;
-}
 
-/* 为亮色主题的所有可滚动元素应用滚动条样式 */
-.cloud-theme * {
-  scrollbar-width: thin !important;
-  scrollbar-color: rgba(30, 64, 175, 0.8) transparent !important;
-}
-
-.cloud-theme *::-webkit-scrollbar {
-  width: 8px !important;
-  height: 8px !important;
-}
-
-.cloud-theme *::-webkit-scrollbar-track {
-  background: transparent !important;
-  border-radius: 4px !important;
-}
-
-.cloud-theme *::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, rgba(30, 64, 175, 0.8), rgba(59, 130, 246, 0.8)) !important;
-  border-radius: 4px !important;
-  border: 1px solid rgba(30, 64, 175, 0.3) !important;
-  transition: all 0.3s ease !important;
-}
-
-.cloud-theme *::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, rgba(30, 64, 175, 1), rgba(59, 130, 246, 1)) !important;
-  box-shadow: 0 0 8px rgba(30, 64, 175, 0.5) !important;
-}
-
-.cloud-theme *::-webkit-scrollbar-button {
-  display: none !important;
-}
-
-.cloud-theme *::-webkit-scrollbar-corner {
-  background: transparent !important;
-}
-
-/* 全局滚动条样式 - 确保在所有情况下都生效 */
-html::-webkit-scrollbar,
-body::-webkit-scrollbar {
-  width: 8px !important;
-  height: 8px !important;
-}
-
-html::-webkit-scrollbar-track,
-body::-webkit-scrollbar-track {
-  background: transparent !important;
-  border-radius: 4px !important;
-}
-
-html::-webkit-scrollbar-thumb,
-body::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, rgba(30, 64, 175, 0.8), rgba(59, 130, 246, 0.8)) !important;
-  border-radius: 4px !important;
-  border: 1px solid rgba(30, 64, 175, 0.3) !important;
-  transition: all 0.3s ease !important;
-}
-
-html::-webkit-scrollbar-thumb:hover,
-body::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, rgba(30, 64, 175, 1), rgba(59, 130, 246, 1)) !important;
-  box-shadow: 0 0 8px rgba(30, 64, 175, 0.5) !important;
-}
-
-html::-webkit-scrollbar-button,
-body::-webkit-scrollbar-button {
-  display: none !important;
-}
-
-html::-webkit-scrollbar-corner,
-body::-webkit-scrollbar-corner {
-  background: transparent !important;
-}
 
 /* 强制移除亮色模式下导航栏标题的所有背景效果 */
 .cloud-theme .VPNavBarTitle,
@@ -996,6 +869,8 @@ body::-webkit-scrollbar-corner {
   margin: 0 !important;
   min-height: auto !important;
   height: auto !important;
+  /* 修复毛玻璃效果溢出问题 */
+  overflow: hidden !important;
 }
 
 /* 确保菜单项样式一致 - 蓝天主题 */

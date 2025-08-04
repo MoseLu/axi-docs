@@ -1,33 +1,3 @@
-/* 最高优先级深色主题滚动条样式 - 强制覆盖所有其他样式 */
-.dark *::-webkit-scrollbar {
-  width: 8px !important;
-  height: 8px !important;
-}
-
-.dark *::-webkit-scrollbar-track {
-  background: transparent !important;
-  border-radius: 4px !important;
-}
-
-.dark *::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, rgba(79, 195, 247, 0.8), rgba(100, 181, 246, 0.8)) !important;
-  border-radius: 4px !important;
-  border: 1px solid rgba(79, 195, 247, 0.3) !important;
-  transition: all 0.3s ease !important;
-}
-
-.dark *::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, rgba(79, 195, 247, 1), rgba(100, 181, 246, 1)) !important;
-  box-shadow: 0 0 8px rgba(79, 195, 247, 0.5) !important;
-}
-
-.dark *::-webkit-scrollbar-button {
-  display: none !important;
-}
-
-.dark *::-webkit-scrollbar-corner {
-  background: transparent !important;
-}
 
 /* 覆盖VitePress默认的CSS变量 */
 :root {
@@ -57,7 +27,8 @@
   
   background: linear-gradient(135deg, #0a0a0a 0%, #0f0f23 25%, #1a1a3a 50%, #2d1b69 75%, #16213e 100%);
   position: relative;
-  overflow-x: hidden;
+  /* 移除强制隐藏横向滚动条 */
+  /* overflow-x: hidden; */
 }
 
 /* 星星效果 */
@@ -250,114 +221,7 @@
   color: #a8a8a8;
 }
 
-/* 深色主题滚动条样式 - 星空蓝 */
-.dark {
-  scrollbar-width: thin !important;
-  scrollbar-color: rgba(79, 195, 247, 0.8) transparent !important;
-}
-
-.dark::-webkit-scrollbar {
-  width: 8px !important;
-  height: 8px !important;
-}
-
-.dark::-webkit-scrollbar-track {
-  background: transparent !important;
-  border-radius: 4px !important;
-}
-
-.dark::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, rgba(79, 195, 247, 0.8), rgba(100, 181, 246, 0.8)) !important;
-  border-radius: 4px !important;
-  border: 1px solid rgba(79, 195, 247, 0.3) !important;
-  transition: all 0.3s ease !important;
-}
-
-.dark::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, rgba(79, 195, 247, 1), rgba(100, 181, 246, 1)) !important;
-  box-shadow: 0 0 8px rgba(79, 195, 247, 0.5) !important;
-}
-
-.dark::-webkit-scrollbar-button {
-  display: none !important;
-}
-
-.dark::-webkit-scrollbar-corner {
-  background: transparent !important;
-}
-
-/* 为深色主题的所有可滚动元素应用滚动条样式 */
-.dark * {
-  scrollbar-width: thin !important;
-  scrollbar-color: rgba(79, 195, 247, 0.8) transparent !important;
-}
-
-.dark *::-webkit-scrollbar {
-  width: 8px !important;
-  height: 8px !important;
-}
-
-.dark *::-webkit-scrollbar-track {
-  background: transparent !important;
-  border-radius: 4px !important;
-}
-
-.dark *::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, rgba(79, 195, 247, 0.8), rgba(100, 181, 246, 0.8)) !important;
-  border-radius: 4px !important;
-  border: 1px solid rgba(79, 195, 247, 0.3) !important;
-  transition: all 0.3s ease !important;
-}
-
-.dark *::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, rgba(79, 195, 247, 1), rgba(100, 181, 246, 1)) !important;
-  box-shadow: 0 0 8px rgba(79, 195, 247, 0.5) !important;
-}
-
-.dark *::-webkit-scrollbar-button {
-  display: none !important;
-}
-
-.dark *::-webkit-scrollbar-corner {
-  background: transparent !important;
-}
-
-/* 全局滚动条样式 - 确保在所有情况下都生效 */
-html::-webkit-scrollbar,
-body::-webkit-scrollbar {
-  width: 8px !important;
-  height: 8px !important;
-}
-
-html::-webkit-scrollbar-track,
-body::-webkit-scrollbar-track {
-  background: transparent !important;
-  border-radius: 4px !important;
-}
-
-html::-webkit-scrollbar-thumb,
-body::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, rgba(30, 64, 175, 0.8), rgba(59, 130, 246, 0.8)) !important;
-  border-radius: 4px !important;
-  border: 1px solid rgba(30, 64, 175, 0.3) !important;
-  transition: all 0.3s ease !important;
-}
-
-html::-webkit-scrollbar-thumb:hover,
-body::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, rgba(30, 64, 175, 1), rgba(59, 130, 246, 1)) !important;
-  box-shadow: 0 0 8px rgba(30, 64, 175, 0.5) !important;
-}
-
-html::-webkit-scrollbar-button,
-body::-webkit-scrollbar-button {
-  display: none !important;
-}
-
-html::-webkit-scrollbar-corner,
-body::-webkit-scrollbar-corner {
-  background: transparent !important;
-}
+/* 选择文本样式 */
 
 /* 选择文本样式 */
 .dark ::selection {
@@ -367,13 +231,21 @@ body::-webkit-scrollbar-corner {
 
 /* 主题切换按钮样式 */
 .dark .VPNavBarMenuLink {
-  color: #a8a8a8 !important;
+  color: #ffffff !important;
   background: transparent !important;
-  transition: color 0.3s ease !important;
+  transition: all 0.3s ease !important;
+  text-shadow: 0 0 3px rgba(255, 255, 255, 0.3);
 }
 
 .dark .VPNavBarMenuLink:hover {
-  color: #ffffff !important;
+  color: #81d4fa !important;
+  text-shadow: 0 0 8px rgba(129, 212, 250, 0.6);
+  background: transparent !important;
+}
+
+.dark .VPNavBarMenuLink.active {
+  color: #81d4fa !important;
+  text-shadow: 0 0 8px rgba(129, 212, 250, 0.6);
   background: transparent !important;
 }
 
@@ -551,6 +423,8 @@ body::-webkit-scrollbar-corner {
     margin: 0 !important;
     min-height: auto !important;
     height: auto !important;
+    /* 修复毛玻璃效果溢出问题 */
+    overflow: hidden !important;
   }
   
   /* 确保VPFlyout菜单也有相同的背景色 */
@@ -566,6 +440,8 @@ body::-webkit-scrollbar-corner {
     margin: 0 !important;
     min-height: auto !important;
     height: auto !important;
+    /* 修复毛玻璃效果溢出问题 */
+    overflow: hidden !important;
   }
 }
 
@@ -695,6 +571,8 @@ body::-webkit-scrollbar-corner {
   margin: 0 !important;
   min-height: auto !important;
   height: auto !important;
+  /* 修复毛玻璃效果溢出问题 */
+  overflow: hidden !important;
 }
 
 /* 确保菜单在展开时可见 */
@@ -751,4 +629,51 @@ body::-webkit-scrollbar-corner {
   width: auto !important;
   min-width: 200px !important;
   max-width: none !important;
+} 
+
+/* 星空主题移动端本地导航栏样式 */
+@media (max-width: 960px) {
+  /* 整个导航栏采用半透明深色背景并加毛玻璃和底部分割线 */
+  .dark .VPLocalNav {
+    background: rgba(15, 15, 35, 0.9) !important;
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(79, 195, 247, 0.2);
+  }
+
+  /* "Menu" 按钮和目录下拉按钮的文字颜色，与侧边栏链接一致 */
+  .dark .VPLocalNav .menu,
+  .dark .VPLocalNavOutlineDropdown button {
+    color: #a8a8a8 !important;
+    background: transparent !important;
+    padding: 12px 20px !important;
+    font-size: 12px;
+    line-height: 24px;
+  }
+
+  /* 悬停或展开时使用星空主题的高亮色 */
+  .dark .VPLocalNav .menu:hover,
+  .dark .VPLocalNavOutlineDropdown button:hover,
+  .dark .VPLocalNavOutlineDropdown button.open {
+    color: #4fc3f7 !important;
+    text-shadow: 0 0 6px rgba(79, 195, 247, 0.4);
+  }
+
+  /* 下拉列表使用半透明深色背景、毛玻璃和蓝色边框，与侧边栏一致 */
+  .dark .VPLocalNavOutlineDropdown .items {
+    background: rgba(15, 15, 35, 0.9) !important;
+    backdrop-filter: blur(15px);
+    border: 1px solid rgba(79, 195, 247, 0.3);
+    box-shadow: 0 0 20px rgba(79, 195, 247, 0.1);
+  }
+
+  /* 下拉列表中的标题和链接颜色 */
+  .dark .VPLocalNavOutlineDropdown .top-link,
+  .dark .VPLocalNavOutlineDropdown .outline-link {
+    color: #a8a8a8 !important;
+  }
+  .dark .VPLocalNavOutlineDropdown .outline-link:hover,
+  .dark .VPLocalNavOutlineDropdown .outline-link.active {
+    color: #4fc3f7 !important;
+    text-shadow: 0 0 5px rgba(79, 195, 247, 0.3);
+  }
 } 

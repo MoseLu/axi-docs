@@ -11,14 +11,16 @@
   border-bottom: 1px solid rgba(79, 195, 247, 0.2) !important;
 }
 
+/* 恢复暗色主题导航栏的背景和模糊 */
 .starry-theme .VPNavBar {
-  background: transparent !important;
+  background: rgba(15, 15, 35, 0.6) !important;
+  backdrop-filter: blur(15px) !important;
   border-bottom: none !important;
 }
 
 .starry-theme .VPNavBar.has-sidebar .content-body {
-  background: transparent !important;
-  backdrop-filter: none !important;
+  background: rgba(15, 15, 35, 0.6) !important;
+  backdrop-filter: blur(15px) !important;
   border-bottom: none !important;
 }
 

@@ -20,7 +20,10 @@ export default defineConfig({
     appearance: true,
     // 添加主题配置
     themeConfig: {
-        logo: '/favicon.ico',
+        logo: {
+            light: '/docs/cloud.png',
+            dark: '/docs/favicon.ico'
+        },
         nav: [
             { text: '首页', link: '/' },
         ],
@@ -66,6 +69,10 @@ export default defineConfig({
             label: '中文',
             lang: 'zh-CN',
             themeConfig: {
+                logo: {
+                    light: '/docs/cloud.png',
+                    dark: '/docs/favicon.ico'
+                },
                 nav: [
                     { text: '首页', link: '/' },
                 ],

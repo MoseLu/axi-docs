@@ -1034,6 +1034,7 @@ body::-webkit-scrollbar-corner {
   height: auto !important;
   min-height: auto !important;
   line-height: 1.5 !important;
+  border-radius: 0 !important;
 }
 
 /* 蓝天主题菜单组样式 */
@@ -1043,6 +1044,7 @@ body::-webkit-scrollbar-corner {
   margin: 0 !important;
   height: auto !important;
   min-height: auto !important;
+  border-radius: 0 !important;
 }
 
 /* 蓝天主题菜单容器样式 */

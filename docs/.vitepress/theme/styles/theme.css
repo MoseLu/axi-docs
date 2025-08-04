@@ -865,27 +865,24 @@ body::-webkit-scrollbar-corner {
 
 /* 简化VPFlyout菜单的z-index设置 - 星空主题 */
 .starry-theme .VPFlyout,
-.starry-theme .VPFlyout *,
-.starry-theme [data-v-4268b863],
-.starry-theme [data-v-4268b863] * {
-  z-index: 100 !important;
-  position: relative !important;
+.starry-theme .VPFlyout * {
+  z-index: 50 !important;
 }
 
 /* 确保菜单内容正确显示 - 星空主题 */
 .starry-theme .VPFlyout .menu,
 .starry-theme [data-v-4268b863] .menu {
-  z-index: 105 !important;
-  position: absolute !important;
-  top: 100% !important;
-  right: 0 !important;
+  z-index: 51 !important;
   background: rgba(15, 15, 35, 0.95) !important;
   backdrop-filter: blur(15px) !important;
-  border: none !important;
+  border: 1px solid rgba(79, 195, 247, 0.2) !important;
   border-radius: 8px !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
-  min-width: 200px !important;
-  padding: 8px 0 !important;
+  /* 确保菜单容器大小与内容匹配 */
+  padding: 0 !important;
+  margin: 0 !important;
+  min-height: auto !important;
+  height: auto !important;
 }
 
 /* 移除下拉菜单的多余边框 */
@@ -937,4 +934,36 @@ body::-webkit-scrollbar-corner {
   opacity: 0 !important;
   visibility: hidden !important;
   transform: translateY(-10px) !important;
+}
+
+/* 星空主题菜单项样式 */
+.starry-theme .VPFlyout .menu .item,
+.starry-theme .VPNavBarMenu .menu .item {
+  padding: 8px 16px !important;
+  margin: 0 !important;
+  height: auto !important;
+  min-height: auto !important;
+  line-height: 1.5 !important;
+  border-radius: 0 !important;
+}
+
+/* 星空主题菜单组样式 */
+.starry-theme .VPFlyout .menu .group,
+.starry-theme .VPNavBarMenu .menu .group {
+  padding: 0 !important;
+  margin: 0 !important;
+  height: auto !important;
+  min-height: auto !important;
+  border-radius: 0 !important;
+}
+
+/* 星空主题菜单容器样式 */
+.starry-theme .VPFlyout .menu,
+.starry-theme .VPNavBarMenu .menu {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+  width: auto !important;
+  min-width: 200px !important;
+  max-width: none !important;
 } 

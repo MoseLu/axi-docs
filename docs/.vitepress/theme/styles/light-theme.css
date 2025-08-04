@@ -36,7 +36,7 @@
 .cloud-theme {
   min-height: 100vh;
   position: relative;
-  overflow-x: hidden;
+  /* 移除overflow-x: hidden，避免影响VPMenu显示 */
 }
 
 /* 亮色主题样式覆盖 - 使用更具体的选择器确保只在亮色模式下生效 */
@@ -50,15 +50,13 @@
 /* 移除高优先级边框样式，让VitePress默认样式生效 */
 
 .cloud-theme .VPNavBar {
-  background: rgba(255, 255, 255, 0.8) !important;
-  backdrop-filter: blur(15px);
+  background: transparent !important;
   border-bottom: none !important;
 }
 
 .cloud-theme .VPNavBar.has-sidebar .content-body {
-  background: rgba(255, 255, 255, 0.8) !important;
-  backdrop-filter: blur(15px);
-  /* 移除重复的border-bottom，避免双重边框 */
+  background: transparent !important;
+  backdrop-filter: none !important;
   border-bottom: none !important;
 }
 
@@ -70,16 +68,19 @@
   box-shadow: 2px 0 4px rgba(255, 255, 255, 0.3) !important;
 }
 
+.cloud-theme .aside-curtain {
+  display: none !important;
+}
 
-/* 导航栏内容区域 */
+/* 导航栏内容区域 - 移除overflow限制，允许菜单溢出 */
 .cloud-theme .VPNavBar .content {
   max-width: 100% !important;
-  overflow: hidden !important;
+  /* 移除overflow: hidden，允许菜单溢出显示 */
 }
 
 .cloud-theme .VPNavBar .content-body {
   max-width: 100% !important;
-  overflow: hidden !important;
+  /* 移除overflow: hidden，允许菜单溢出显示 */
 }
 
 .cloud-theme .VPContent,

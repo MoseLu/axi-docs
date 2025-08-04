@@ -2,7 +2,7 @@
 .starry-theme {
   min-height: 100vh;
   position: relative;
-  overflow-x: hidden;
+  /* 移除overflow-x: hidden，避免影响VPMenu显示 */
 }
 
 
@@ -35,15 +35,15 @@
 }
 
 
-/* 导航栏内容区域 */
+/* 导航栏内容区域 - 移除overflow限制，允许菜单溢出 */
 .starry-theme .VPNavBar .content {
   max-width: 100% !important;
-  overflow: hidden !important;
+  /* 移除overflow: hidden，允许菜单溢出显示 */
 }
 
 .starry-theme .VPNavBar .content-body {
   max-width: 100% !important;
-  overflow: hidden !important;
+  /* 移除overflow: hidden，允许菜单溢出显示 */
 }
 
 .starry-theme .VPContent,
@@ -952,4 +952,32 @@ body::-webkit-scrollbar-corner {
 .starry-theme .VPNavBarMenu .VPMenu,
 .starry-theme .VPNavBarMenu .VPMenu * {
   z-index: 12 !important;
+}
+
+/* 确保星空主题下菜单可以溢出导航栏容器显示 */
+.starry-theme .VPNavBar .content,
+.starry-theme .VPNavBar .content-body {
+  overflow: visible !important;
+}
+
+/* 确保星空主题下移动端菜单可以正确显示 */
+@media (max-width: 960px) {
+  .starry-theme .VPNavBar .content,
+  .starry-theme .VPNavBar .content-body {
+    overflow: visible !important;
+  }
+  
+  /* 确保菜单容器可以溢出 */
+  .starry-theme .VPNavBarMenu,
+  .starry-theme .VPNavBarMenuButton {
+    overflow: visible !important;
+  }
+  
+  /* 确保菜单内容可以溢出 */
+  .starry-theme .VPNavBarMenu .menu,
+  .starry-theme .VPNavBarMenu .VPMenu {
+    overflow: visible !important;
+    position: absolute !important;
+    z-index: 12 !important;
+  }
 } 

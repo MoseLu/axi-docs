@@ -46,7 +46,7 @@ jobs:
         run: |
           echo "BUILD_ARTIFACTS=$(pwd)/dist" >> $GITHUB_ENV
           echo "PROJECT_TYPE=vitepress" >> $GITHUB_ENV
-          echo "DEPLOY_PATH=/www/wwwroot/axi-docs" >> $GITHUB_ENV
+          echo "DEPLOY_PATH=/www/wwwroot/redamancy.com.cn/docs" >> $GITHUB_ENV
 
       # Trigger deployment workflow on Deployment Center
       - name: Trigger deployment workflow on Deployment Center
@@ -62,6 +62,6 @@ jobs:
               "run_id": "${{ github.run_id }}",
               "source_repo": "${{ github.repository }}",
               "nginx_config": "${{ secrets.NGINX_CONFIG }}",
-              "nginx_path": "/etc/nginx/sites-available/redamancy.com.cn",
+              "nginx_path": "/www/server/nginx/conf/vhost/redamancy.com.cn.conf",
               "test_url": "https://redamancy.com.cn/docs/"
             }

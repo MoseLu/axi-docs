@@ -645,13 +645,38 @@
 
 /* 主题切换按钮 */
 .starry-theme .VPNavBarAppearance {
-  color: #bbdefb !important;
+  color: #ffffff !important;
   transition: all 0.3s ease;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .starry-theme .VPNavBarAppearance:hover {
   color: #4fc3f7 !important;
   text-shadow: 0 0 5px rgba(79, 195, 247, 0.3);
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* 确保主题切换图标在暗色模式下可见 */
+.starry-theme .VPNavBarAppearance svg,
+.starry-theme .VPNavBarAppearance i,
+.starry-theme .VPNavBarAppearance .icon {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.starry-theme .VPNavBarAppearance:hover svg,
+.starry-theme .VPNavBarAppearance:hover i,
+.starry-theme .VPNavBarAppearance:hover .icon {
+  color: #4fc3f7 !important;
+  fill: #4fc3f7 !important;
+  stroke: #4fc3f7 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 /* 移除移动端菜单的高优先级样式，让VitePress默认样式生效 */

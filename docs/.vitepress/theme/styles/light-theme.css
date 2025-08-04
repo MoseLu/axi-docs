@@ -44,6 +44,7 @@
   background: rgba(255, 255, 255, 0.8) !important;
   backdrop-filter: blur(15px);
   border-bottom: 2px solid rgba(255, 255, 255, 0.8) !important;
+  border-right: 2px solid rgba(255, 255, 255, 0.8) !important;
   box-shadow: 0 2px 4px rgba(255, 255, 255, 0.3) !important;
 }
 
@@ -972,3 +973,79 @@ body::-webkit-scrollbar-corner {
 } 
 
 /* 移除VPMenu的自定义样式，让VitePress默认样式生效 */ 
+
+/* 简化VPFlyout菜单的z-index设置 - 蓝天主题 */
+.cloud-theme .VPFlyout,
+.cloud-theme .VPFlyout *,
+.cloud-theme [data-v-4268b863],
+.cloud-theme [data-v-4268b863] * {
+  z-index: 100 !important;
+  position: relative !important;
+}
+
+/* 确保菜单内容正确显示 - 蓝天主题 */
+.cloud-theme .VPFlyout .menu,
+.cloud-theme [data-v-4268b863] .menu {
+  z-index: 105 !important;
+  position: absolute !important;
+  top: 100% !important;
+  right: 0 !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(15px) !important;
+  border: none !important;
+  border-radius: 8px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1) !important;
+  min-width: 200px !important;
+  padding: 8px 0 !important;
+}
+
+/* 移除下拉菜单的多余边框 - 蓝天主题 */
+.cloud-theme .VPNavBarMenu .menu,
+.cloud-theme .VPNavBarMenu .VPMenu,
+.cloud-theme .VPNavBarMenu .group,
+.cloud-theme .VPNavBarMenu .item,
+.cloud-theme .VPNavBarMenu .VPNavBarMenuLink,
+.cloud-theme .VPNavBarMenu .VPNavBarMenuButton,
+.cloud-theme .VPNavBarMenu .VPNavBarMenuButton + div,
+.cloud-theme .VPNavBarMenu .VPNavBarMenuButton + ul,
+.cloud-theme .VPNavBarMenu .VPNavBarMenuButton + nav {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* 确保菜单项没有边框 - 蓝天主题 */
+.cloud-theme .VPNavBarMenu .menu .item,
+.cloud-theme .VPNavBarMenu .VPMenu .item,
+.cloud-theme .VPNavBarMenu .group .item {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* 确保菜单链接没有边框 - 蓝天主题 */
+.cloud-theme .VPNavBarMenu .VPNavBarMenuLink,
+.cloud-theme .VPNavBarMenu .menu .VPNavBarMenuLink,
+.cloud-theme .VPNavBarMenu .VPMenu .VPNavBarMenuLink {
+  border: none !important;
+  outline: none !important;
+  box-shadow: none !important;
+  background: transparent !important;
+}
+
+/* 确保菜单在展开时可见 - 蓝天主题 */
+.cloud-theme .VPFlyout .button[aria-expanded="true"] + .menu,
+.cloud-theme [data-v-4268b863] .button[aria-expanded="true"] + .menu {
+  opacity: 1 !important;
+  visibility: visible !important;
+  transform: translateY(0) !important;
+}
+
+/* 确保菜单在收起时隐藏 - 蓝天主题 */
+.cloud-theme .VPFlyout .button[aria-expanded="false"] + .menu,
+.cloud-theme [data-v-4268b863] .button[aria-expanded="false"] + .menu {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transform: translateY(-10px) !important;
+} 

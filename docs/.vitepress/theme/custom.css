@@ -179,6 +179,8 @@
   background: rgba(15, 15, 35, 0.8) !important;
   backdrop-filter: blur(15px);
   border-bottom: 1px solid rgba(79, 195, 247, 0.2);
+  /* 添加右边框，使分割线延伸到顶部 */
+  border-right: 1px solid rgba(79, 195, 247, 0.2) !important;
 }
 
 .dark .VPNavBar.has-sidebar .content-body {
@@ -375,6 +377,42 @@ body::-webkit-scrollbar-corner {
   background: transparent !important;
 }
 
+/* 确保主题切换按钮在暗色模式下可见 */
+.dark .VPNavBarAppearance {
+  color: #ffffff !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+  transition: all 0.3s ease !important;
+}
+
+.dark .VPNavBarAppearance:hover {
+  color: #4fc3f7 !important;
+  text-shadow: 0 0 5px rgba(79, 195, 247, 0.3);
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+/* 确保主题切换图标在暗色模式下可见 */
+.dark .VPNavBarAppearance svg,
+.dark .VPNavBarAppearance i,
+.dark .VPNavBarAppearance .icon {
+  color: #ffffff !important;
+  fill: #ffffff !important;
+  stroke: #ffffff !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.dark .VPNavBarAppearance:hover svg,
+.dark .VPNavBarAppearance:hover i,
+.dark .VPNavBarAppearance:hover .icon {
+  color: #4fc3f7 !important;
+  fill: #4fc3f7 !important;
+  stroke: #4fc3f7 !important;
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
 /* 侧边栏链接样式 */
 .dark .VPSidebarItem .item {
   color: #a8a8a8 !important;
@@ -543,7 +581,7 @@ body::-webkit-scrollbar-corner {
     z-index: 106 !important;
   }
   
-  /* 强制所有菜单相关元素在正确层级 */
+  /* 恢复菜单的绝对定位，避免覆盖logo和标题 */
   .VPNavBarMenu,
   .VPNavBarMenuButton,
   .VPMenu,
@@ -552,7 +590,7 @@ body::-webkit-scrollbar-corner {
   .item,
   .appearance,
   .VPSwitch {
-    position: relative !important;
+    position: absolute !important;
     z-index: 100 !important;
   }
   
@@ -695,7 +733,7 @@ body::-webkit-scrollbar-corner {
 [data-v-4268b863],
 [data-v-4268b863] * {
   z-index: 100 !important;
-  position: relative !important;
+  position: absolute !important;
 }
 
 /* 确保菜单内容正确显示 */
@@ -707,7 +745,7 @@ body::-webkit-scrollbar-corner {
   right: 0 !important;
   background: rgba(15, 15, 35, 0.95) !important;
   backdrop-filter: blur(15px) !important;
-  border: 1px solid rgba(79, 195, 247, 0.3) !important;
+  border: none !important;
   border-radius: 8px !important;
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3) !important;
   min-width: 200px !important;

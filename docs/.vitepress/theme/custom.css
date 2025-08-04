@@ -435,24 +435,24 @@
   }
 }
 
-/* 隐藏侧边栏遮罩层 */
+/* 恢复侧边栏分割线，不再隐藏 aside-curtain */
 .dark .aside-curtain,
 .dark [class*="aside-curtain"],
 .dark [data-v-2b45519a].aside-curtain {
-  background: transparent !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  display: none !important;
+  background: rgba(79, 195, 247, 0.2) !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  display: block !important;
 }
 
-/* 确保所有可能的遮罩层都被隐藏 */
+/* 确保所有可能的遮罩层都正常显示 */
 .dark .VPSidebar .aside-curtain,
 .dark .VPSidebar [class*="aside-curtain"],
 .dark [class*="aside-curtain"] {
-  background: transparent !important;
-  opacity: 0 !important;
-  pointer-events: none !important;
-  display: none !important;
+  background: rgba(79, 195, 247, 0.2) !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  display: block !important;
 }
 
 /* 降低VPDocAside的z-index，让menu元素显示在上层 */

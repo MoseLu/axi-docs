@@ -2,25 +2,14 @@
 .starry-theme {
   min-height: 100vh;
   position: relative;
-  /* 移除 overflow-x: hidden，避免滚动问题 */
-  /* overflow-x: hidden; */
 }
-
-
-
-
-
-
-
-
-
-
 
 /* 简化的样式覆盖，不破坏原有布局 */
 .starry-theme .VPNav {
   background: rgba(15, 15, 35, 0.4) !important;
   backdrop-filter: blur(15px);
-  border-right: 1px solid rgba(79, 195, 247, 0.2) !important;
+  border-right: 1px solid rgba(79, 195, 247, 0.3) !important;
+  border-bottom: 1px solid rgba(79, 195, 247, 0.3) !important;
 }
 
 /* 移除高优先级边框样式，让VitePress默认样式生效 */
@@ -34,7 +23,6 @@
 .starry-theme .VPNavBar.has-sidebar .content-body {
   background: rgba(15, 15, 35, 0.4) !important;
   backdrop-filter: blur(15px);
-  /* 移除重复的border-bottom，避免双重边框 */
   border-bottom: none !important;
 }
 

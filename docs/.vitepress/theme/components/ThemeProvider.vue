@@ -140,6 +140,7 @@ if (typeof document !== 'undefined') {
   background: rgba(15, 15, 35, 0.6) !important;
   backdrop-filter: blur(15px);
   border-bottom: 1px solid rgba(79, 195, 247, 0.2) !important;
+  border-right: 1px solid rgba(79, 195, 247, 0.2) !important;
 }
 
 .starry-theme .VPNavBar {
@@ -160,9 +161,11 @@ if (typeof document !== 'undefined') {
   border-right: 1px solid rgba(79, 195, 247, 0.2);
 }
 
-/* 隐藏多余的aside-curtain元素 */
+/* 恢复aside-curtain元素，显示分割线 */
 .starry-theme .aside-curtain {
-  display: none !important;
+  background: rgba(79, 195, 247, 0.2) !important;
+  opacity: 1 !important;
+  display: block !important;
 }
 
 .starry-theme .VPContent,

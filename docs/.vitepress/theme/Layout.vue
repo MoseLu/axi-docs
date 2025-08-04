@@ -67,6 +67,7 @@ onMounted(() => {
   background: rgba(15, 15, 35, 0.6) !important;
   backdrop-filter: blur(15px);
   border-bottom: 1px solid rgba(79, 195, 247, 0.2) !important;
+  border-right: 1px solid rgba(79, 195, 247, 0.2) !important;
 }
 
 .starry-theme .VPNavBar {

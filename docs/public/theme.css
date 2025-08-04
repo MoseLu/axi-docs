@@ -19,6 +19,7 @@
   background: rgba(15, 15, 35, 0.6) !important;
   backdrop-filter: blur(15px);
   border-bottom: 1px solid rgba(79, 195, 247, 0.2) !important;
+  border-right: 1px solid rgba(79, 195, 247, 0.2) !important;
 }
 
 /* 侧边栏样式 */
@@ -34,6 +35,7 @@
   max-width: calc(100% - 2rem) !important;
   margin: 0 1rem !important;
   overflow: hidden !important;
+  background-color: rgba(79, 195, 247, 0.02) !important;
 }
 
 /* 特别处理侧边栏顶部的分割线 */
@@ -45,6 +47,12 @@
   margin: 0 1rem !important;
   overflow: hidden !important;
   position: relative !important;
+  background-color: rgba(79, 195, 247, 0.02) !important;
+}
+
+/* 暗色模式下的divider-line样式 */
+.starry-theme .divider-line {
+  background-color: rgba(79, 195, 247, 0.02) !important;
 }
 
 /* 移除导航栏内容区域的高优先级样式，让VitePress默认样式生效 */

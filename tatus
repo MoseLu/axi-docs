@@ -1,0 +1,14 @@
+warning: in the working copy of '.github/workflows/axi-docs_deploy.yml', LF will be replaced by CRLF the next time Git touches it
+[1mdiff --git a/.github/workflows/axi-docs_deploy.yml b/.github/workflows/axi-docs_deploy.yml[m
+[1mindex acbff0f..bb0b783 100644[m
+[1m--- a/.github/workflows/axi-docs_deploy.yml[m
+[1m+++ b/.github/workflows/axi-docs_deploy.yml[m
+[36m@@ -53,7 +53,7 @@[m [mjobs:[m
+         uses: peter-evans/repository-dispatch@v2[m
+         with:[m
+           token: ${{ secrets.DEPLOY_CENTER_PAT }}[m
+[31m-          repository: MoseLu/axi-deploy  # 使用正确的仓库名称[m
+[32m+[m[32m          repository: MoseLu/axi-deploy[m
+           event-type: deploy[m
+           client-payload: |[m
+             {[m

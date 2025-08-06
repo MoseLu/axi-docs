@@ -64,6 +64,25 @@ jobs:
             console.log('工作流: universal_deploy.yml');
             console.log('分支: master');
             
+            const nginxConfig = `location /docs/ {
+                alias /srv/static/axi-docs/;
+                index index.html;
+                try_files $uri $uri/ /docs/index.html;
+                
+                # 确保不缓存HTML文件
+                location ~* \\.html$ {
+                    add_header Cache-Control "no-cache, no-store, must-revalidate";
+                    add_header Pragma "no-cache";
+                    add_header Expires "0";
+                }
+                
+                # 静态资源缓存
+                location ~* \\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+                    expires 1y;
+                    add_header Cache-Control "public, immutable";
+                }
+            }`;
+            
             const { data: response } = await github.rest.actions.createWorkflowDispatch({
               owner: 'MoseLu',
               repo: 'axi-deploy',
@@ -74,25 +93,7 @@ jobs:
                 source_repo: '${{ github.repository }}',
                 run_id: '${{ github.run_id }}',
                 deploy_type: 'static',
-                nginx_config: |
-                  location /docs/ {
-                      alias /srv/static/axi-docs/;
-                      index index.html;
-                      try_files $uri $uri/ /docs/index.html;
-                      
-                      # 确保不缓存HTML文件
-                      location ~* \.html$ {
-                          add_header Cache-Control "no-cache, no-store, must-revalidate";
-                          add_header Pragma "no-cache";
-                          add_header Expires "0";
-                      }
-                      
-                      # 静态资源缓存
-                      location ~* \.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
-                          expires 1y;
-                          add_header Cache-Control "public, immutable";
-                      }
-                  }
+                nginx_config: nginxConfig,
                 test_url: 'https://redamancy.com.cn/docs/'
               }
             });

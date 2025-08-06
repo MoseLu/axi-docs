@@ -52,17 +52,6 @@ jobs:
                 index index.html;
             }
             
-            location ~* /docs/.*\\.html$ {
-                add_header Cache-Control "no-cache, no-store, must-revalidate";
-                add_header Pragma "no-cache";
-                add_header Expires "0";
-            }
-            
-            location ~* /docs/.*\\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
-                expires 1y;
-                add_header Cache-Control "public, immutable";
-            }
-            
             location = /docs {
                 return 301 /docs/;
             }`;

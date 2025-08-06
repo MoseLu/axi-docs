@@ -1,1 +1,0 @@
-[33m8d4683b[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmaster[m[33m)[m fix: 修复nginx_config参数格式，解决部署时route-axi-docs.conf文件未创建的问题

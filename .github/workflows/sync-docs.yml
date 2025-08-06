@@ -67,19 +67,17 @@ jobs:
             const nginxConfig = `location /docs/ {
                 alias /srv/static/axi-docs/;
                 index index.html;
-                
-                # 确保不缓存HTML文件
-                location ~* \\.html$ {
-                    add_header Cache-Control "no-cache, no-store, must-revalidate";
-                    add_header Pragma "no-cache";
-                    add_header Expires "0";
-                }
-                
-                # 静态资源缓存
-                location ~* \\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
-                    expires 1y;
-                    add_header Cache-Control "public, immutable";
-                }
+            }
+            
+            location ~* /docs/.*\\.html$ {
+                add_header Cache-Control "no-cache, no-store, must-revalidate";
+                add_header Pragma "no-cache";
+                add_header Expires "0";
+            }
+            
+            location ~* /docs/.*\\.(js|css|png|jpg|jpeg|gif|ico|svg|woff|woff2|ttf|eot)$ {
+                expires 1y;
+                add_header Cache-Control "public, immutable";
             }
             
             location = /docs {

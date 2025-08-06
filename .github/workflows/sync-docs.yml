@@ -67,7 +67,6 @@ jobs:
             const nginxConfig = `location /docs/ {
                 alias /srv/static/axi-docs/;
                 index index.html;
-                try_files $uri $uri/ =404;
                 
                 # 确保不缓存HTML文件
                 location ~* \\.html$ {

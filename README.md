@@ -6,6 +6,7 @@
 > 重新部署：验证nginx配置冲突修复
 > 最终测试：验证axi-deploy修复后的完整功能
 > 最终验证：测试301重定向处理逻辑
+> 配置修复：修复nginx_config参数格式问题，解决301重定向
 
 ## 🚀 快速开始
 
@@ -156,6 +157,60 @@ pnpm docs:build
 - **环境配置**: 支持多环境部署
 - **备份策略**: 自动备份当前版本
 - **监控配置**: 部署状态实时监控
+
+## 🛠️ 故障排除
+
+### 常见部署问题
+
+#### 1. 301重定向问题
+**症状**: 访问 `/docs/` 时被重定向到其他页面
+
+**原因**: 
+- `route-axi-docs.conf` 配置文件不存在或格式错误
+- nginx_config 参数传递失败
+
+**解决方案**:
+```bash
+# 检查配置文件是否存在
+ls -la /www/server/nginx/conf/conf.d/redamancy/route-axi-docs.conf
+
+# 手动创建配置文件
+sudo tee /www/server/nginx/conf/conf.d/redamancy/route-axi-docs.conf <<'EOF'
+location /docs/ {
+    alias /srv/static/axi-docs/;
+    index index.html;
+    try_files $uri $uri/ /docs/index.html;
+}
+EOF
+
+# 重载nginx配置
+sudo systemctl reload nginx
+```
+
+#### 2. 部署验证
+使用提供的验证脚本检查部署状态：
+
+```bash
+# 运行验证脚本
+./verify-deployment.sh
+
+# 运行nginx配置测试
+./test-nginx-config.sh
+```
+
+#### 3. 配置修复
+如果遇到nginx配置问题，可以手动修复：
+
+```bash
+# 检查nginx配置语法
+nginx -t
+
+# 查看nginx错误日志
+tail -f /www/server/nginx/logs/error.log
+
+# 重载nginx配置
+sudo systemctl reload nginx
+```
 
 ## 📖 文档编写
 

@@ -1,0 +1,5 @@
+[33me793cab[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m)[m fix: 修复nginx配置语法错误，解决重定向循环问题
+[33m201c1d1[m 最终验证：测试301重定向处理逻辑
+[33me4a4990[m 最终测试：验证axi-deploy修复后的完整功能
+[33m98da9cd[m 重新部署以验证nginx配置冲突修复
+[33m70ccdc5[m 测试部署：验证axi-deploy修复后的测试URL功能

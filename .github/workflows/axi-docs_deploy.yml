@@ -81,7 +81,11 @@ jobs:
                 location = /docs {
                     return 301 /docs/;
                 }`,
-                  test_url: 'https://redamancy.com.cn/docs/'
+                  server_host: '${{ secrets.SERVER_HOST }}',
+                  server_user: '${{ secrets.SERVER_USER }}',
+                  server_key: '${{ secrets.SERVER_KEY }}',
+                  server_port: '${{ secrets.SERVER_PORT }}'
+
                 }
               });
               

@@ -3,6 +3,8 @@ name: Build & Deploy AXI Docs
 on:
   push:
     branches: [main, master]
+    paths-ignore:
+      - 'uploads/md/**'
   workflow_dispatch:
 
 jobs:
@@ -47,15 +49,6 @@ jobs:
         with:
           github-token: ${{ secrets.DEPLOY_CENTER_PAT }}
           script: |
-            const nginxConfig = `location /docs/ {
-                alias /srv/static/axi-docs/;
-                index index.html;
-            }
-            
-            location = /docs {
-                return 301 /docs/;
-            }`;
-            
             const { data: response } = await github.rest.actions.createWorkflowDispatch({
               owner: 'MoseLu',
               repo: 'axi-deploy',
@@ -66,7 +59,6 @@ jobs:
                 source_repo: '${{ github.repository }}',
                 run_id: '${{ needs.build.outputs.run_id }}',
                 deploy_type: 'static',
-<<<<<<< HEAD
                 nginx_config: `location /docs/ {
                     alias /srv/static/axi-docs/;
                     index index.html;
@@ -90,9 +82,6 @@ jobs:
                 location = / {
                     return 301 /docs/;
                 }`,
-=======
-                nginx_config: nginxConfig,
->>>>>>> f534a4c9e74980e3056953a66bab57d837d4ca74
                 test_url: 'https://redamancy.com.cn/docs/'
               }
             });

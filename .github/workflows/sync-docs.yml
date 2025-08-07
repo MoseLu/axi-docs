@@ -64,15 +64,6 @@ jobs:
             console.log('工作流: universal_deploy.yml');
             console.log('分支: master');
             
-            const nginxConfig = `location /docs/ {
-                alias /srv/static/axi-docs/;
-                index index.html;
-            }
-            
-            location = /docs {
-                return 301 /docs/;
-            }`;
-            
             const { data: response } = await github.rest.actions.createWorkflowDispatch({
               owner: 'MoseLu',
               repo: 'axi-deploy',
@@ -83,7 +74,6 @@ jobs:
                 source_repo: '${{ github.repository }}',
                 run_id: '${{ github.run_id }}',
                 deploy_type: 'static',
-<<<<<<< HEAD
                 nginx_config: `location /docs/ {
                     alias /srv/static/axi-docs/;
                     index index.html;
@@ -107,9 +97,6 @@ jobs:
                 location = / {
                     return 301 /docs/;
                 }`,
-=======
-                nginx_config: nginxConfig,
->>>>>>> f534a4c9e74980e3056953a66bab57d837d4ca74
                 test_url: 'https://redamancy.com.cn/docs/'
               }
             });

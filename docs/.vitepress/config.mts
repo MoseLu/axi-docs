@@ -6,7 +6,7 @@ import getSidebar from "../utils/getSidebar";
 export default defineConfig({
     title: "星际文档系统",
     description: "星际文档系统 - 现代化文档管理平台",
-    base: '/axi-docs/',
+    base: '/docs/',
     lang: 'zh-CN',
     // 添加head配置，直接引入CSS文件
     head: [

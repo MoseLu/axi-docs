@@ -59,12 +59,12 @@ jobs:
                 source_repo: '${{ github.repository }}',
                 run_id: '${{ needs.build.outputs.run_id }}',
                 deploy_type: 'static',
-                nginx_config: `# 处理 /axi-docs/ 路径 - 服务 axi-docs 项目
-                location /axi-docs/ {
+                nginx_config: `# 处理 /docs/ 路径 - 服务 axi-docs 项目
+                location /docs/ {
                     alias /srv/static/axi-docs/;
                     
                     # 直接返回 index.html
-                    location = /axi-docs/ {
+                    location = /docs/ {
                         alias /srv/static/axi-docs/index.html;
                         add_header Cache-Control "no-cache, no-store, must-revalidate";
                         add_header Pragma "no-cache";
@@ -85,11 +85,11 @@ jobs:
                     }
                 }
                 
-                # 处理 /axi-docs 路径（不带斜杠）- 重定向到 /axi-docs/
-                location = /axi-docs {
-                    return 301 /axi-docs/;
+                # 处理 /docs 路径（不带斜杠）- 重定向到 /docs/
+                location = /docs {
+                    return 301 /docs/;
                 }`,
-                test_url: 'https://redamancy.com.cn/axi-docs/'
+                test_url: 'https://redamancy.com.cn/docs/'
               }
             });
             console.log('部署已触发:', response);

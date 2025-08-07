@@ -44,32 +44,47 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - name: 触发部署
-        uses: actions/github-script@v7
-        with:
-          github-token: ${{ secrets.DEPLOY_CENTER_PAT }}
-          script: |
-            try {
-              console.log('开始触发部署...');
-              const { data: response } = await github.rest.actions.createWorkflowDispatch({
-                owner: 'MoseLu',
-                repo: 'axi-deploy',
-                workflow_id: 'main-deployment.yml',
-                ref: 'master',
-                inputs: {
-                  project: '${{ github.event.repository.name }}',
-                  source_repo: '${{ github.repository }}',
-                  run_id: '${{ needs.build.outputs.run_id }}',
-                  deploy_type: 'static',
-                  nginx_config: '',    # 这里可以传入单行字符串或经过 Base64 编码的配置
-                  server_host: '${{ secrets.SERVER_HOST }}',
-                  server_user: '${{ secrets.SERVER_USER }}',
-                  server_key: '${{ secrets.SERVER_KEY }}',
-                  server_port: '${{ secrets.SERVER_PORT }}'
-                }
-              });
-              console.log('✅ 部署已成功触发!');
-            } catch (error) {
-              console.error('❌ 触发部署失败:', error.message);
-              throw error;
+    - name: 触发部署
+      uses: actions/github-script@v7
+      with:
+        github-token: ${{ secrets.DEPLOY_CENTER_PAT }}
+        script: |
+          try {
+            console.log('开始触发部署...');
+            
+            const nginxConfig = `
+            location /docs {
+                alias /srv/static/axi-docs;
+                index index.html;
+                try_files $uri $uri/ /docs/index.html;
             }
+            location = /docs {
+                return 301 /docs/;
+            }`;
+
+            // 对 nginx 配置进行 Base64 编码
+            const encodedNginxConfig = Buffer.from(nginxConfig).toString('base64');
+            
+            const { data: response } = await github.rest.actions.createWorkflowDispatch({
+              owner: 'MoseLu',
+              repo: 'axi-deploy',
+              workflow_id: 'main-deployment.yml',
+              ref: 'master',
+              inputs: {
+                project: '${{ github.event.repository.name }}',
+                source_repo: '${{ github.repository }}',
+                run_id: '${{ needs.build.outputs.run_id }}',
+                deploy_type: 'static',
+                nginx_config: encodedNginxConfig,  # 使用编码后的配置
+                server_host: '${{ secrets.SERVER_HOST }}',
+                server_user: '${{ secrets.SERVER_USER }}',
+                server_key: '${{ secrets.SERVER_KEY }}',
+                server_port: '${{ secrets.SERVER_PORT }}'
+              }
+            });
+
+            console.log('✅ 部署已成功触发!');
+          } catch (error) {
+            console.error('❌ 触发部署失败:', error.message);
+            throw error;
+          }

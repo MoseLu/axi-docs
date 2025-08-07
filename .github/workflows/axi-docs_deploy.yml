@@ -76,6 +76,12 @@ jobs:
                         expires 1y;
                         add_header Cache-Control "public, immutable";
                     }
+                }
+                
+                # 明确处理 /docs/ 路径，避免重定向循环
+                location /docs/ {
+                    alias /srv/static/axi-docs/;
+                    try_files $uri $uri/ /index.html;
                 }`,
                 test_url: 'https://redamancy.com.cn/docs'
               }

@@ -51,10 +51,6 @@ jobs:
           script: |
             try {
               console.log('🚀 开始触发部署...');
-              console.log('项目名称:', '${{ github.event.repository.name }}');
-              console.log('源仓库:', '${{ github.repository }}');
-              console.log('构建ID:', '${{ needs.build.outputs.run_id }}');
-              
               const { data: response } = await github.rest.actions.createWorkflowDispatch({
                 owner: 'MoseLu',
                 repo: 'axi-deploy',
@@ -72,12 +68,8 @@ jobs:
                   server_port: '${{ secrets.SERVER_PORT }}'
                 }
               });
-              
               console.log('✅ 部署已成功触发!');
-              console.log('响应:', response);
-              
             } catch (error) {
               console.error('❌ 触发部署失败:', error.message);
-              console.error('错误详情:', error);
               throw error;
             }

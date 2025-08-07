@@ -74,6 +74,11 @@ jobs:
                         expires 1y;
                         add_header Cache-Control "public, immutable";
                     }
+                }
+                
+                # 根路径重定向到docs
+                location = / {
+                    return 301 /docs/;
                 }`,
                 test_url: 'https://redamancy.com.cn/docs/'
               }

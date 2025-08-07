@@ -63,7 +63,6 @@ jobs:
                 location /docs/ {
                     alias /srv/static/axi-docs/;
                     index index.html;
-                    try_files $uri $uri/ /docs/index.html;
                     
                     # 确保不缓存HTML文件
                     location ~* \\.html$ {

@@ -76,6 +76,14 @@ jobs:
                         expires 1y;
                         add_header Cache-Control "public, immutable";
                     }
+                }
+                
+                # 明确处理 /docs/index.html
+                location = /docs/index.html {
+                    alias /srv/static/axi-docs/index.html;
+                    add_header Cache-Control "no-cache, no-store, must-revalidate";
+                    add_header Pragma "no-cache";
+                    add_header Expires "0";
                 }`,
                 test_url: 'https://redamancy.com.cn/docs'
               }

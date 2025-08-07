@@ -49,17 +49,23 @@ jobs:
         with:
           github-token: ${{ secrets.DEPLOY_CENTER_PAT }}
           script: |
-            const { data: response } = await github.rest.actions.createWorkflowDispatch({
-              owner: 'MoseLu',
-              repo: 'axi-deploy',
-              workflow_id: 'main-deployment.yml',
-              ref: 'master',
-              inputs: {
-                project: '${{ github.event.repository.name }}',
-                source_repo: '${{ github.repository }}',
-                run_id: '${{ needs.build.outputs.run_id }}',
-                deploy_type: 'static',
-                nginx_config: `# 处理 /docs/ 路径 - 服务 axi-docs 项目
+            try {
+              console.log('🚀 开始触发部署...');
+              console.log('项目名称:', '${{ github.event.repository.name }}');
+              console.log('源仓库:', '${{ github.repository }}');
+              console.log('构建ID:', '${{ needs.build.outputs.run_id }}');
+              
+              const { data: response } = await github.rest.actions.createWorkflowDispatch({
+                owner: 'MoseLu',
+                repo: 'axi-deploy',
+                workflow_id: 'main-deployment.yml',
+                ref: 'master',
+                inputs: {
+                  project: '${{ github.event.repository.name }}',
+                  source_repo: '${{ github.repository }}',
+                  run_id: '${{ needs.build.outputs.run_id }}',
+                  deploy_type: 'static',
+                  nginx_config: `# 处理 /docs/ 路径 - 服务 axi-docs 项目
                 location /docs/ {
                     alias /srv/static/axi-docs/;
                     index index.html;
@@ -75,10 +81,18 @@ jobs:
                 location = /docs {
                     return 301 /docs/;
                 }`,
-                test_url: 'https://redamancy.com.cn/docs/',
-                domain: 'redamancy.com.cn',
-                apps_root: '/srv/apps',
-                static_root: '/srv/static'
-              }
-            });
-            console.log('部署已触发:', response);
+                  test_url: 'https://redamancy.com.cn/docs/',
+                  domain: 'redamancy.com.cn',
+                  apps_root: '/srv/apps',
+                  static_root: '/srv/static'
+                }
+              });
+              
+              console.log('✅ 部署已成功触发!');
+              console.log('响应:', response);
+              
+            } catch (error) {
+              console.error('❌ 触发部署失败:', error.message);
+              console.error('错误详情:', error);
+              throw error;
+            }

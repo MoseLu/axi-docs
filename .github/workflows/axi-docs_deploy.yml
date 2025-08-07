@@ -62,7 +62,14 @@ jobs:
                 nginx_config: `# 处理 /axi-docs/ 路径 - 服务 axi-docs 项目
                 location /axi-docs/ {
                     alias /srv/static/axi-docs/;
-                    try_files $uri $uri/ /axi-docs/index.html;
+                    
+                    # 直接返回 index.html
+                    location = /axi-docs/ {
+                        alias /srv/static/axi-docs/index.html;
+                        add_header Cache-Control "no-cache, no-store, must-revalidate";
+                        add_header Pragma "no-cache";
+                        add_header Expires "0";
+                    }
                     
                     # 确保不缓存HTML文件
                     location ~* \\.html$ {

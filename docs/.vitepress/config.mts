@@ -6,14 +6,15 @@ import getSidebar from "../utils/getSidebar";
 export default defineConfig({
     title: "星际文档系统",
     description: "星际文档系统 - 现代化文档管理平台",
-    base: '/docs/',
+    // 移除 base 配置，避免 301 重定向循环
+    // base: '/docs/',
     lang: 'zh-CN',
     // 添加head配置，直接引入CSS文件
     head: [
-        ['link', { rel: 'icon', href: '/docs/favicon.ico' }],
-        ['link', { rel: 'apple-touch-icon', href: '/docs/favicon.ico' }],
-        ['link', { rel: 'stylesheet', href: '/docs/theme.css' }],
-        ['link', { rel: 'stylesheet', href: '/docs/light-theme.css' }]
+        ['link', { rel: 'icon', href: '/favicon.ico' }],
+        ['link', { rel: 'apple-touch-icon', href: '/favicon.ico' }],
+        ['link', { rel: 'stylesheet', href: '/theme.css' }],
+        ['link', { rel: 'stylesheet', href: '/light-theme.css' }]
     ],
     // 添加appearance配置，确保主题切换正确处理
     appearance: true,
@@ -27,7 +28,7 @@ export default defineConfig({
         socialLinks: [
             {
                 icon: {
-                    svg: '<img src="/docs/cloud.png" alt="Cloud Icon">'
+                    svg: '<img src="/cloud.png" alt="Cloud Icon">'
                 },
                 link: 'https://redamancy.com.cn'
             },
@@ -72,7 +73,7 @@ export default defineConfig({
                 socialLinks: [
                     {
                         icon: {
-                            svg: '<img src="/docs/cloud.png" alt="Cloud Icon">'
+                            svg: '<img src="/cloud.png" alt="Cloud Icon">'
                         },
                         link: 'https://redamancy.com.cn'
                     },

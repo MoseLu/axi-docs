@@ -17,10 +17,10 @@ head:
       为团队提供高效的知识管理和协作解决方案。
     </p>
          <div class="hero-actions">
-       <a class="action-button primary" href="/docs/content/quick-start.html">
+       <a class="action-button primary" href="/content/quick-start.html">
          快速开始
        </a>
-       <a class="action-button secondary" href="/docs/content/流程控制.html">
+       <a class="action-button secondary" href="/content/流程控制.html">
          系统架构
        </a>
      </div>
@@ -61,28 +61,28 @@ head:
          <h3>📋 指南</h3>
          <p>系统使用指南和快速入门</p>
          <ul>
-           <li><a href="/docs/content/quick-start.html">快速开始</a></li>
+           <li><a href="/content/quick-start.html">快速开始</a></li>
          </ul>
        </div>
        <div class="category-card">
          <h3>🏗️ 系统架构</h3>
          <p>系统架构设计和流程控制</p>
          <ul>
-           <li><a href="/docs/content/流程控制.html">流程控制系统</a></li>
+           <li><a href="/content/流程控制.html">流程控制系统</a></li>
          </ul>
        </div>
        <div class="category-card">
          <h3>🎨 品牌设计</h3>
          <p>品牌理念和设计规范</p>
          <ul>
-           <li><a href="/docs/content/Logo具体含义.html">Logo设计理念与含义</a></li>
+           <li><a href="/content/Logo具体含义.html">Logo设计理念与含义</a></li>
          </ul>
        </div>
        <div class="category-card">
          <h3>🛠️ 工具文档</h3>
          <p>开发工具和技术文档</p>
          <ul>
-           <li><a href="/docs/content/如何判断用户离开当前页.html">如何判断用户离开当前页</a></li>
+           <li><a href="/content/如何判断用户离开当前页.html">如何判断用户离开当前页</a></li>
          </ul>
        </div>
     </div>
@@ -125,8 +125,8 @@ head:
   <h2>开始使用星际文档系统</h2>
   <p>立即体验现代化的文档管理平台，提升团队协作效率</p>
      <div class="cta-actions">
-     <a class="action-button primary" href="/docs/content/quick-start.html">开始使用</a>
-     <a class="action-button secondary" href="/docs/content/流程控制.html">了解架构</a>
+     <a class="action-button primary" href="/content/quick-start.html">开始使用</a>
+<a class="action-button secondary" href="/content/流程控制.html">了解架构</a>
    </div>
 </div>
 

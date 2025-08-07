@@ -81,10 +81,7 @@ jobs:
                 location = /docs {
                     return 301 /docs/;
                 }`,
-                  test_url: 'https://redamancy.com.cn/docs/',
-                  domain: 'redamancy.com.cn',
-                  apps_root: '/srv/apps',
-                  static_root: '/srv/static'
+                  test_url: 'https://redamancy.com.cn/docs/'
                 }
               });
               

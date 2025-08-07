@@ -48,4 +48,28 @@ jobs:
         uses: actions/github-script@v7
         with:
           github-token: ${{ secrets.DEPLOY_CENTER_PAT }}
-          script: 'try { console.log("开始触发部署..."); const { data: response } = await github.rest.actions.createWorkflowDispatch({ owner: "MoseLu", repo: "axi-deploy", workflow_id: "main-deployment.yml", ref: "master", inputs: { project: "${{ github.event.repository.name }}", source_repo: "${{ github.repository }}", run_id: "${{ needs.build.outputs.run_id }}", deploy_type: "static", nginx_config: "", server_host: "${{ secrets.SERVER_HOST }}", server_user: "${{ secrets.SERVER_USER }}", server_key: "${{ secrets.SERVER_KEY }}", server_port: "${{ secrets.SERVER_PORT }}" } }); console.log("部署已成功触发!"); } catch (error) { console.error("触发部署失败:", error.message); throw error; }'
+          script: |
+            try {
+              console.log('开始触发部署...');
+              const { data: response } = await github.rest.actions.createWorkflowDispatch({
+                owner: 'MoseLu',
+                repo: 'axi-deploy',
+                workflow_id: 'main-deployment.yml',
+                ref: 'master',
+                inputs: {
+                  project: '${{ github.event.repository.name }}',
+                  source_repo: '${{ github.repository }}',
+                  run_id: '${{ needs.build.outputs.run_id }}',
+                  deploy_type: 'static',
+                  nginx_config: '',
+                  server_host: '${{ secrets.SERVER_HOST }}',
+                  server_user: '${{ secrets.SERVER_USER }}',
+                  server_key: '${{ secrets.SERVER_KEY }}',
+                  server_port: '${{ secrets.SERVER_PORT }}'
+                }
+              });
+              console.log('部署已成功触发!');
+            } catch (error) {
+              console.error('触发部署失败:', error.message);
+              throw error;
+            }

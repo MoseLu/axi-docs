@@ -90,7 +90,18 @@ jobs:
                 location = /docs {
                     return 301 /docs/;
                 }`,
-                test_url: 'https://redamancy.com.cn/docs/'
+                test_url: 'https://redamancy.com.cn/docs/',
+                domain: 'redamancy.com.cn',
+                run_user: 'deploy',
+                apps_root: '/srv/apps',
+                static_root: '/srv/static',
+                nginx_conf_dir: '/www/server/nginx/conf/conf.d/redamancy',
+                cert_src: '/www/server/panel/vhost/cert/redamancy.com.cn',
+                cert_dst: '/www/server/nginx/ssl/redamancy',
+                force_rebuild: 'false',
+                backend_port: '8080',
+                service_name: 'star-cloud',
+                backup_root: '/srv/backups'
               }
             });
             

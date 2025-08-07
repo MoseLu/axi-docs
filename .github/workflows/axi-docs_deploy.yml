@@ -52,7 +52,7 @@ jobs:
             const { data: response } = await github.rest.actions.createWorkflowDispatch({
               owner: 'MoseLu',
               repo: 'axi-deploy',
-              workflow_id: 'universal_deploy.yml',
+              workflow_id: 'main-deployment.yml',
               ref: 'master',
               inputs: {
                 project: '${{ github.event.repository.name }}',
@@ -75,7 +75,15 @@ jobs:
                 location = /docs {
                     return 301 /docs/;
                 }`,
-                test_url: 'https://redamancy.com.cn/docs/'
+                test_url: 'https://redamancy.com.cn/docs/',
+                domain: 'redamancy.com.cn',
+                run_user: 'deploy',
+                apps_root: '/srv/apps',
+                static_root: '/srv/static',
+                nginx_conf_dir: '/www/server/nginx/conf/conf.d/redamancy',
+                backend_port: '8080',
+                service_name: 'star-cloud',
+                backup_root: '/srv/backups'
               }
             });
             console.log('部署已触发:', response);

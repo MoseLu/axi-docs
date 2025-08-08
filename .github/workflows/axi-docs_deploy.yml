@@ -183,7 +183,23 @@ jobs:
 
             // 等待一段时间确保artifact完全可用
             console.log('⏳ 等待artifact完全可用...');
-            await new Promise(resolve => setTimeout(resolve, 30000)); // 等待30秒
+            await new Promise(resolve => setTimeout(resolve, 60000)); // 等待60秒
+            
+            // 再次检查 workflow run 状态
+            console.log('🔍 检查 workflow run 状态...');
+            const run = await github.rest.actions.getWorkflowRun({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              run_id: process.env.RUN_ID
+            });
+            
+            console.log('📊 Workflow run 状态:', run.data.status);
+            console.log('📊 Workflow run 结论:', run.data.conclusion);
+            
+            if (run.data.status !== 'completed') {
+              console.log('⏳ Workflow run 尚未完成，继续等待...');
+              await new Promise(resolve => setTimeout(resolve, 30000)); // 再等待30秒
+            }
 
             await github.rest.actions.createWorkflowDispatch({
               owner: 'MoseLu',

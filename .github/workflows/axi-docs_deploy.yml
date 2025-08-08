@@ -93,7 +93,7 @@ jobs:
         with:
           name: dist-axi-docs
           path: docs/.vitepress/dist/
-          retention-days: 7
+          retention-days: 1
           if-no-files-found: error
 
       - name: 验证上传

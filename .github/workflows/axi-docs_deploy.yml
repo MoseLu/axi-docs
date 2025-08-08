@@ -8,20 +8,20 @@ on:
   workflow_dispatch:
 
 jobs:
+  # ────────────────────── 构建静态站点 ──────────────────────
   build:
     runs-on: ubuntu-latest
     outputs:
       run_id: ${{ github.run_id }}
 
     steps:
-      - name: 检出代码
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: 设置 pnpm
-        uses: pnpm/action-setup@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          run_install: false      # 让下面一步显式安装，日志更清晰
 
-      - name: 设置 Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: '20'
           cache: 'pnpm'
@@ -29,67 +29,75 @@ jobs:
       - name: 安装依赖
         run: pnpm install --frozen-lockfile
 
-      - name: 构建项目
+      - name: 构建文档
         run: pnpm run docs:build
 
-      - name: 上传构建产物
+      - name: 上传产物
         uses: actions/upload-artifact@v4
-        id: upload
         with:
           name: dist-${{ github.event.repository.name }}
           path: docs/.vitepress/dist/
           retention-days: 7
 
+  # ────────────────────── 触发远程部署 ──────────────────────
   trigger-deploy:
     needs: build
     runs-on: ubuntu-latest
+
+    env:                      # 把需要的值全部注入环境变量
+      RUN_ID: ${{ needs.build.outputs.run_id }}
+      SERVER_HOST: ${{ secrets.SERVER_HOST }}
+      SERVER_PORT: ${{ secrets.SERVER_PORT }}
+      SERVER_USER: ${{ secrets.SERVER_USER }}
+      SERVER_KEY: ${{ secrets.SERVER_KEY }}
+      DEPLOY_CENTER_PAT: ${{ secrets.DEPLOY_CENTER_PAT }}
+
     steps:
       - name: 触发部署
         uses: actions/github-script@v7
-        env:
-          RUN_ID: ${{ needs.build.outputs.run_id }}
         with:
           github-token: ${{ secrets.DEPLOY_CENTER_PAT }}
           script: |
-            try {
-              console.log('触发部署工作流...');
-              
-              const deploySecrets = JSON.stringify({
-                SERVER_HOST: '${{ secrets.SERVER_HOST }}',
-                SERVER_PORT: '${{ secrets.SERVER_PORT }}',
-                SERVER_USER: '${{ secrets.SERVER_USER }}',
-                SERVER_KEY: '${{ secrets.SERVER_KEY }}',
-                DEPLOY_CENTER_PAT: '${{ secrets.DEPLOY_CENTER_PAT }}'
-              });
-              
-              const nginxConfig = 'location /docs/ { alias /srv/static/axi-docs/; index index.html; try_files $uri $uri/ /docs/index.html; add_header Cache-Control "no-cache, no-store, must-revalidate" always; add_header Pragma "no-cache" always; add_header Expires "0" always; } location = /docs { return 301 /docs/; }';
-              
-              const { data: response } = await github.rest.actions.createWorkflowDispatch({
-                owner: 'MoseLu',
-                repo: 'axi-deploy',
-                workflow_id: 'main-deployment.yml',
-                ref: 'master',
-                inputs: {
-                  project: context.repo.repo,
-                  source_repo: context.repo.owner + '/' + context.repo.repo,
-                  run_id: process.env.RUN_ID,
-                  deploy_type: 'static',
-                  nginx_config: nginxConfig,
-                  test_url: 'https://redamancy.com.cn/docs/',
-                  deploy_secrets: deploySecrets
-                }
-              });
-              
-              console.log('部署工作流已成功触发!');
-              console.log('触发详情:');
-              console.log('- 项目:', context.repo.repo);
-              console.log('- 源仓库:', context.repo.owner + '/' + context.repo.repo);
-              console.log('- 构建ID:', process.env.RUN_ID);
-              console.log('- 部署类型: static');
-              
-            } catch (error) {
-              console.error('触发部署工作流失败:', error.message);
-              console.error('错误详情:', error);
-              throw error;
-            }
+            // 1. 打包机密（为了避开 workflow_call 10 条 secret 限制）
+            const deploySecrets = Buffer.from(JSON.stringify({
+              SERVER_HOST: process.env.SERVER_HOST,
+              SERVER_PORT: process.env.SERVER_PORT,
+              SERVER_USER: process.env.SERVER_USER,
+              SERVER_KEY : process.env.SERVER_KEY,
+              DEPLOY_CENTER_PAT: process.env.DEPLOY_CENTER_PAT
+            })).toString('base64');
 
+            // 2. Nginx 片段用模板字符串写更易读
+            const nginxConfig = `
+              location /docs/ {
+                alias /srv/static/axi-docs/;
+                index index.html;
+                try_files $uri $uri/ /docs/index.html;
+
+                add_header Cache-Control "no-cache, no-store, must-revalidate" always;
+                add_header Pragma        "no-cache" always;
+                add_header Expires       "0"        always;
+              }
+
+              location = /docs { return 301 /docs/; }
+            `.trim();
+
+            console.log('🚀  触发 axi-deploy/main-deployment.yml …');
+
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'MoseLu',
+              repo:  'axi-deploy',
+              workflow_id: 'main-deployment.yml',
+              ref: 'master',
+              inputs: {
+                project      : context.repo.repo,
+                source_repo  : `${context.repo.owner}/${context.repo.repo}`,
+                run_id       : process.env.RUN_ID,
+                deploy_type  : 'static',
+                nginx_config : nginxConfig,
+                test_url     : 'https://redamancy.com.cn/docs/',
+                deploy_secrets: deploySecrets
+              }
+            });
+
+            console.log('✅  部署工作流已成功触发！');

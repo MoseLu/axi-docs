@@ -45,56 +45,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: 触发部署
-      uses: actions/github-script@v7
-      env:
-        PROJECT: ${{ github.event.repository.name }}
-        SOURCE_REPO: ${{ github.repository }}
-        RUN_ID: ${{ needs.build.outputs.run_id }}
-        DEPLOY_TYPE: static
-        NGINX_CONFIG: "location /docs/ { alias /srv/static/axi-docs/; index index.html; try_files $uri $uri/ /docs/index.html; add_header Cache-Control \"no-cache, no-store, must-revalidate\" always; add_header Pragma \"no-cache\" always; add_header Expires \"0\" always; } location = /docs { return 301 /docs/; }"
-        SERVER_HOST: ${{ secrets.SERVER_HOST }}
-        SERVER_USER: ${{ secrets.SERVER_USER }}
-        SERVER_KEY: ${{ secrets.SERVER_KEY }}
-        SERVER_PORT: ${{ secrets.SERVER_PORT }}
-        DEPLOY_CENTER_PAT: ${{ secrets.DEPLOY_CENTER_PAT }}
+      uses: MoseLu/axi-deploy/.github/workflows/deployment-orchestrator.yml@main
       with:
-        github-token: ${{ secrets.DEPLOY_CENTER_PAT }}
-        script: |
-          try {
-            console.log('🚀 开始触发部署...');
-            console.log('📋 部署参数:');
-            console.log('- 项目:', process.env.PROJECT);
-            console.log('- 源仓库:', process.env.SOURCE_REPO);
-            console.log('- 构建ID:', process.env.RUN_ID);
-            console.log('- 部署类型:', process.env.DEPLOY_TYPE);
-            console.log('- 服务器:', process.env.SERVER_HOST + ':' + process.env.SERVER_PORT);
-            console.log('- 用户:', process.env.SERVER_USER);
-            
-            const { data: response } = await github.rest.actions.createWorkflowDispatch({
-              owner: 'MoseLu',
-              repo: 'axi-deploy',
-              workflow_id: 'main-deployment.yml',
-              ref: 'master',
-              inputs: {
-                project: process.env.PROJECT,
-                source_repo: process.env.SOURCE_REPO,
-                run_id: process.env.RUN_ID,
-                deploy_type: process.env.DEPLOY_TYPE,
-                nginx_config: process.env.NGINX_CONFIG,
-                server_host: process.env.SERVER_HOST,
-                server_user: process.env.SERVER_USER,
-                server_key: process.env.SERVER_KEY,
-                server_port: process.env.SERVER_PORT,
-                deploy_center_pat: process.env.DEPLOY_CENTER_PAT
-              }
-            });
-            console.log('✅ 部署已成功触发!');
-            console.log('📋 触发详情:');
-            console.log('- 工作流ID:', response.id);
-            console.log('- 状态:', response.status);
-          } catch (error) {
-            console.error('🚨 触发部署失败:', error.message);
-            console.error('错误详情:', error);
-            throw error;
-          }
+        project: ${{ github.event.repository.name }}
+        source_repo: ${{ github.repository }}
+        run_id: ${{ needs.build.outputs.run_id }}
+        deploy_type: 'static'
+        nginx_config: "location /docs/ { alias /srv/static/axi-docs/; index index.html; try_files $uri $uri/ /docs/index.html; add_header Cache-Control \"no-cache, no-store, must-revalidate\" always; add_header Pragma \"no-cache\" always; add_header Expires \"0\" always; } location = /docs { return 301 /docs/; }"
+        server_host: ${{ secrets.SERVER_HOST }}
+        server_user: ${{ secrets.SERVER_USER }}
+        server_key: ${{ secrets.SERVER_KEY }}
+        server_port: ${{ secrets.SERVER_PORT }}
+        deploy_center_pat: ${{ secrets.DEPLOY_CENTER_PAT }}
 

@@ -183,7 +183,7 @@ jobs:
 
             // 等待一段时间确保artifact完全可用
             console.log('⏳ 等待artifact完全可用...');
-            await new Promise(resolve => setTimeout(resolve, 7000)); // 等待7秒
+            await new Promise(resolve => setTimeout(resolve, 5000)); // 等待5秒
             
             // 再次检查 workflow run 状态
             console.log('🔍 检查 workflow run 状态...');
@@ -198,7 +198,7 @@ jobs:
             
             if (run.data.status !== 'completed') {
               console.log('⏳ Workflow run 尚未完成，继续等待...');
-              await new Promise(resolve => setTimeout(resolve, 7000)); // 再等待7秒
+              await new Promise(resolve => setTimeout(resolve, 5000)); // 再等待5秒
             }
 
             await github.rest.actions.createWorkflowDispatch({

@@ -52,9 +52,8 @@ jobs:
           github-token: ${{ secrets.DEPLOY_CENTER_PAT }}
           script: |
             try {
-              console.log('🚀 触发部署工作流...');
+              console.log('触发部署工作流...');
               
-              // 构建部署密钥
               const deploySecrets = JSON.stringify({
                 SERVER_HOST: '${{ secrets.SERVER_HOST }}',
                 SERVER_PORT: '${{ secrets.SERVER_PORT }}',
@@ -81,15 +80,15 @@ jobs:
                 }
               });
               
-              console.log('✅ 部署工作流已成功触发!');
-              console.log('📋 触发详情:');
+              console.log('部署工作流已成功触发!');
+              console.log('触发详情:');
               console.log('- 项目:', context.repo.repo);
               console.log('- 源仓库:', context.repo.owner + '/' + context.repo.repo);
               console.log('- 构建ID:', process.env.RUN_ID);
               console.log('- 部署类型: static');
               
             } catch (error) {
-              console.error('🚨 触发部署工作流失败:', error.message);
+              console.error('触发部署工作流失败:', error.message);
               console.error('错误详情:', error);
               throw error;
             }

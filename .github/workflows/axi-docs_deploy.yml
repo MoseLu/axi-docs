@@ -52,6 +52,8 @@ jobs:
             try {
               console.log('🚀 触发部署工作流...');
               
+              const nginxConfig = 'location /docs/ { alias /srv/static/axi-docs/; index index.html; try_files $uri $uri/ /docs/index.html; add_header Cache-Control "no-cache, no-store, must-revalidate" always; add_header Pragma "no-cache" always; add_header Expires "0" always; } location = /docs { return 301 /docs/; }';
+              
               const { data: response } = await github.rest.actions.createWorkflowDispatch({
                 owner: 'MoseLu',
                 repo: 'axi-deploy',
@@ -62,7 +64,7 @@ jobs:
                   source_repo: '${{ github.repository }}',
                   run_id: '${{ needs.build.outputs.run_id }}',
                   deploy_type: 'static',
-                  nginx_config: 'location /docs/ { alias /srv/static/axi-docs/; index index.html; try_files $uri $uri/ /docs/index.html; add_header Cache-Control "no-cache, no-store, must-revalidate" always; add_header Pragma "no-cache" always; add_header Expires "0" always; } location = /docs { return 301 /docs/; }',
+                  nginx_config: nginxConfig,
                   server_host: '${{ secrets.SERVER_HOST }}',
                   server_user: '${{ secrets.SERVER_USER }}',
                   server_key: '${{ secrets.SERVER_KEY }}',

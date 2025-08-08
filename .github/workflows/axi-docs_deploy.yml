@@ -42,16 +42,45 @@ jobs:
 
   trigger-deploy:
     needs: build
-    uses: MoseLu/axi-deploy/.github/workflows/deployment-orchestrator.yml@main
-    with:
-      project: ${{ github.event.repository.name }}
-      source_repo: ${{ github.repository }}
-      run_id: ${{ needs.build.outputs.run_id }}
-      deploy_type: 'static'
-      nginx_config: "location /docs/ { alias /srv/static/axi-docs/; index index.html; try_files $uri $uri/ /docs/index.html; add_header Cache-Control \"no-cache, no-store, must-revalidate\" always; add_header Pragma \"no-cache\" always; add_header Expires \"0\" always; } location = /docs { return 301 /docs/; }"
-      server_host: ${{ secrets.SERVER_HOST }}
-      server_user: ${{ secrets.SERVER_USER }}
-      server_key: ${{ secrets.SERVER_KEY }}
-      server_port: ${{ secrets.SERVER_PORT }}
-      deploy_center_pat: ${{ secrets.DEPLOY_CENTER_PAT }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 触发部署
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.DEPLOY_CENTER_PAT }}
+          script: |
+            try {
+              console.log('🚀 触发部署工作流...');
+              
+              const { data: response } = await github.rest.actions.createWorkflowDispatch({
+                owner: 'MoseLu',
+                repo: 'axi-deploy',
+                workflow_id: 'deployment-orchestrator.yml',
+                ref: 'main',
+                inputs: {
+                  project: '${{ github.event.repository.name }}',
+                  source_repo: '${{ github.repository }}',
+                  run_id: '${{ needs.build.outputs.run_id }}',
+                  deploy_type: 'static',
+                  nginx_config: 'location /docs/ { alias /srv/static/axi-docs/; index index.html; try_files $uri $uri/ /docs/index.html; add_header Cache-Control "no-cache, no-store, must-revalidate" always; add_header Pragma "no-cache" always; add_header Expires "0" always; } location = /docs { return 301 /docs/; }',
+                  server_host: '${{ secrets.SERVER_HOST }}',
+                  server_user: '${{ secrets.SERVER_USER }}',
+                  server_key: '${{ secrets.SERVER_KEY }}',
+                  server_port: '${{ secrets.SERVER_PORT }}',
+                  deploy_center_pat: '${{ secrets.DEPLOY_CENTER_PAT }}'
+                }
+              });
+              
+              console.log('✅ 部署工作流已成功触发!');
+              console.log('📋 触发详情:');
+              console.log('- 项目:', '${{ github.event.repository.name }}');
+              console.log('- 源仓库:', '${{ github.repository }}');
+              console.log('- 构建ID:', '${{ needs.build.outputs.run_id }}');
+              console.log('- 部署类型: static');
+              
+            } catch (error) {
+              console.error('🚨 触发部署工作流失败:', error.message);
+              console.error('错误详情:', error);
+              throw error;
+            }
 

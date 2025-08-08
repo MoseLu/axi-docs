@@ -29,15 +29,80 @@ jobs:
       - name: 安装依赖
         run: pnpm install --frozen-lockfile
 
+      - name: 检查构建目录
+        run: |
+          echo "🔍 检查构建目录..."
+          echo "当前目录: $(pwd)"
+          echo "目录内容:"
+          ls -la
+          echo "docs 目录内容:"
+          ls -la docs/ || echo "docs 目录不存在"
+          echo ".vitepress 目录内容:"
+          ls -la docs/.vitepress/ || echo ".vitepress 目录不存在"
+
       - name: 构建文档
         run: pnpm run docs:build
+
+      - name: 验证构建产物
+        run: |
+          echo "🔍 验证构建产物..."
+          echo "当前目录: $(pwd)"
+          echo "docs/.vitepress/dist 目录是否存在:"
+          if [ -d "docs/.vitepress/dist" ]; then
+            echo "✅ docs/.vitepress/dist 目录存在"
+            echo "构建产物内容:"
+            ls -la docs/.vitepress/dist/
+            echo "文件数量:"
+            find docs/.vitepress/dist -type f | wc -l
+            echo "前10个文件:"
+            find docs/.vitepress/dist -type f | head -10
+            echo "构建产物大小:"
+            du -sh docs/.vitepress/dist/
+          else
+            echo "❌ docs/.vitepress/dist 目录不存在"
+            echo "🔍 查找可能的构建产物目录:"
+            find . -name "dist" -type d 2>/dev/null || echo "未找到 dist 目录"
+            echo "🔍 当前目录内容:"
+            ls -la
+            echo "🔍 docs 目录内容:"
+            ls -la docs/ || echo "docs 目录不存在"
+            exit 1
+          fi
+
+      - name: 准备上传目录
+        run: |
+          echo "🔧 准备上传目录..."
+          # 确保构建产物目录存在且不为空
+          if [ ! -d "docs/.vitepress/dist" ]; then
+            echo "❌ 构建产物目录不存在"
+            exit 1
+          fi
+          
+          # 检查构建产物是否为空
+          if [ -z "$(ls -A docs/.vitepress/dist)" ]; then
+            echo "❌ 构建产物目录为空"
+            exit 1
+          fi
+          
+          echo "✅ 构建产物准备完成"
+          echo "构建产物内容:"
+          ls -la docs/.vitepress/dist/
 
       - name: 上传产物
         uses: actions/upload-artifact@v4
         with:
-          name: dist-${{ github.event.repository.name }}
+          name: dist-axi-docs
           path: docs/.vitepress/dist/
           retention-days: 7
+          if-no-files-found: error
+
+      - name: 验证上传
+        run: |
+          echo "🔍 验证上传结果..."
+          echo "上传退出码: $?"
+          echo "当前目录: $(pwd)"
+          echo "构建产物目录内容:"
+          ls -la docs/.vitepress/dist/ || echo "构建产物目录不存在"
 
   # ────────────────────── 触发远程部署 ──────────────────────
   trigger-deploy:
@@ -83,6 +148,9 @@ jobs:
             `.trim();
 
             console.log('🚀  触发 axi-deploy/main-deployment.yml …');
+            console.log('项目名称:', context.repo.repo);
+            console.log('源仓库:', `${context.repo.owner}/${context.repo.repo}`);
+            console.log('运行ID:', process.env.RUN_ID);
 
             await github.rest.actions.createWorkflowDispatch({
               owner: 'MoseLu',

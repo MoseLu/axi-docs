@@ -56,11 +56,20 @@ jobs:
         SERVER_USER: ${{ secrets.SERVER_USER }}
         SERVER_KEY: ${{ secrets.SERVER_KEY }}
         SERVER_PORT: ${{ secrets.SERVER_PORT }}
+        DEPLOY_CENTER_PAT: ${{ secrets.DEPLOY_CENTER_PAT }}
       with:
         github-token: ${{ secrets.DEPLOY_CENTER_PAT }}
         script: |
           try {
-            console.log('开始触发部署...');
+            console.log('🚀 开始触发部署...');
+            console.log('📋 部署参数:');
+            console.log('- 项目:', process.env.PROJECT);
+            console.log('- 源仓库:', process.env.SOURCE_REPO);
+            console.log('- 构建ID:', process.env.RUN_ID);
+            console.log('- 部署类型:', process.env.DEPLOY_TYPE);
+            console.log('- 服务器:', process.env.SERVER_HOST + ':' + process.env.SERVER_PORT);
+            console.log('- 用户:', process.env.SERVER_USER);
+            
             const { data: response } = await github.rest.actions.createWorkflowDispatch({
               owner: 'MoseLu',
               repo: 'axi-deploy',
@@ -75,12 +84,17 @@ jobs:
                 server_host: process.env.SERVER_HOST,
                 server_user: process.env.SERVER_USER,
                 server_key: process.env.SERVER_KEY,
-                server_port: process.env.SERVER_PORT
+                server_port: process.env.SERVER_PORT,
+                deploy_center_pat: process.env.DEPLOY_CENTER_PAT
               }
             });
             console.log('✅ 部署已成功触发!');
+            console.log('📋 触发详情:');
+            console.log('- 工作流ID:', response.id);
+            console.log('- 状态:', response.status);
           } catch (error) {
-            console.error('❌ 触发部署失败:', error.message);
+            console.error('🚨 触发部署失败:', error.message);
+            console.error('错误详情:', error);
             throw error;
           }
 

@@ -97,114 +97,54 @@ axi-docs/
 ```bash
 # 部署脚本
 ./deploy.sh
-
-# 部署参数
-- --env: 环境配置 (dev/prod)
-- --target: 部署目标
-- --backup: 是否备份当前版本
 ```
 
-#### 部署流程
-1. **代码推送** → 触发 GitHub Actions
-2. **自动构建** → 生成静态文件
-3. **安全检查** → 验证构建结果
-4. **自动部署** → 上传到目标服务器
-5. **状态更新** → 更新部署状态
+## 🔄 部署触发
 
 ### 自动部署
-项目配置了 GitHub Actions 工作流，支持：
 
-- **自动构建**: 推送代码时自动构建
-- **自动部署**: 构建完成后自动部署到服务器
-- **连接测试**: 定期测试服务器连接状态
-- **部署监控**: 实时监控部署进度和状态
+当代码推送到 `main` 或 `master` 分支时，会自动触发以下流程：
 
-### 手动部署
-```bash
-# 构建文档
-pnpm docs:build
+1. **构建阶段**：
+   - 安装依赖 (`pnpm install`)
+   - 构建文档 (`pnpm docs:build`)
+   - 上传构建产物到 GitHub Actions
 
-# 使用统一部署脚本
-./deploy.sh --env prod --target server
+2. **部署阶段**：
+   - 触发 axi-deploy 工作流
+   - 下载构建产物
+   - 部署到目标服务器
+   - 配置 Nginx 路由
+   - 验证部署结果
 
-# 或手动部署到服务器
-# 具体部署步骤请参考部署配置
-```
+### 手动触发
 
-## 🔧 配置说明
+可以通过以下方式手动触发部署：
 
-### VitePress 配置
-主要配置文件位于 `docs/.vitepress/config.mts`，包含：
+1. **GitHub Actions 页面**：在 Actions 页面手动触发 `Build & Deploy AXI Docs` 工作流
+2. **API 调用**：使用 GitHub API 触发 repository_dispatch 事件
 
-- 站点基本信息
-- 导航菜单
-- 侧边栏配置
-- 主题设置
+### 部署参数
 
-### 构建配置
-- **输出目录**: `docs/.vitepress/dist`
-- **静态资源**: `docs/public`
-- **内容目录**: `docs/content`
+部署时需要以下参数（通过 GitHub Secrets 配置）：
 
-### 部署配置
-- **部署脚本**: `deploy.sh`
-- **环境配置**: 支持多环境部署
-- **备份策略**: 自动备份当前版本
-- **监控配置**: 部署状态实时监控
+- `DEPLOY_CENTER_PAT`: GitHub Token (用于下载构建产物)
+- `SERVER_HOST`: 服务器地址
+- `SERVER_USER`: 服务器用户名
+- `SERVER_KEY`: 服务器SSH私钥
+- `SERVER_PORT`: 服务器SSH端口
 
-## 🛠️ 故障排除
+### 部署验证
 
-### 常见部署问题
+部署完成后，可以通过以下方式验证：
 
-#### 1. 301重定向问题
-**症状**: 访问 `/docs/` 时被重定向到其他页面
+1. **网站访问**：访问 `https://your-domain.com/docs/`
+2. **状态检查**：查看 GitHub Actions 执行日志
+3. **服务器验证**：检查服务器上的文件是否正确部署
 
-**原因**: 
-- `route-axi-docs.conf` 配置文件不存在或格式错误
-- nginx_config 参数传递失败
+---
 
-**解决方案**:
-```bash
-# 检查配置文件是否存在
-ls -la /www/server/nginx/conf/conf.d/redamancy/route-axi-docs.conf
-
-# 手动创建配置文件
-sudo tee /www/server/nginx/conf/conf.d/redamancy/route-axi-docs.conf <<'EOF'
-location /docs/ {
-    alias /srv/static/axi-docs/;
-    index index.html;
-    try_files $uri $uri/ /docs/index.html;
-}
-EOF
-
-# 重载nginx配置
-sudo systemctl reload nginx
-```
-
-#### 2. 部署验证
-使用提供的验证脚本检查部署状态：
-
-```bash
-# 运行验证脚本
-./verify-deployment.sh
-
-# 运行nginx配置测试
-./test-nginx-config.sh
-```
-
-#### 3. 配置修复
-如果遇到nginx配置问题，可以手动修复：
-
-```bash
-# 检查nginx配置语法
-nginx -t
-
-# 查看nginx错误日志
-tail -f /www/server/nginx/logs/error.log
-
-# 重载nginx配置
-sudo systemctl reload nginx
-```
+**最后更新**: 2024-12-19 - 集成新的 axi-deploy 部署系统
 
 ## 📖 文档编写
 

@@ -63,27 +63,27 @@ jobs:
             
             // 构建部署密钥
             const deploySecrets = JSON.stringify({
-              SERVER_HOST: "${{ secrets.SERVER_HOST }}",
-              SERVER_PORT: "${{ secrets.SERVER_PORT }}",
-              SERVER_USER: "${{ secrets.SERVER_USER }}",
-              SERVER_KEY: "${{ secrets.SERVER_KEY }}",
-              DEPLOY_CENTER_PAT: "${{ secrets.DEPLOY_CENTER_PAT }}"
+              SERVER_HOST: '${{ secrets.SERVER_HOST }}',
+              SERVER_PORT: '${{ secrets.SERVER_PORT }}',
+              SERVER_USER: '${{ secrets.SERVER_USER }}',
+              SERVER_KEY: '${{ secrets.SERVER_KEY }}',
+              DEPLOY_CENTER_PAT: '${{ secrets.DEPLOY_CENTER_PAT }}'
             });
             
-            const nginxConfig = "location /docs/ { alias /srv/static/axi-docs/; index index.html; try_files $uri $uri/ /docs/index.html; add_header Cache-Control \"no-cache, no-store, must-revalidate\" always; add_header Pragma \"no-cache\" always; add_header Expires \"0\" always; } location = /docs { return 301 /docs/; }";
+            const nginxConfig = 'location /docs/ { alias /srv/static/axi-docs/; index index.html; try_files $uri $uri/ /docs/index.html; add_header Cache-Control "no-cache, no-store, must-revalidate" always; add_header Pragma "no-cache" always; add_header Expires "0" always; } location = /docs { return 301 /docs/; }';
             
             const { data: response } = await github.rest.actions.createWorkflowDispatch({
-              owner: "MoseLu",
-              repo: "axi-deploy",
-              workflow_id: "main-deployment.yml",
-              ref: "master",
+              owner: 'MoseLu',
+              repo: 'axi-deploy',
+              workflow_id: 'main-deployment.yml',
+              ref: 'master',
               inputs: {
-                project: "${{ github.event.repository.name }}",
-                source_repo: "${{ github.repository }}",
-                run_id: "${{ github.run_id }}",
-                deploy_type: "static",
+                project: '${{ github.event.repository.name }}',
+                source_repo: '${{ github.repository }}',
+                run_id: '${{ github.run_id }}',
+                deploy_type: 'static',
                 nginx_config: nginxConfig,
-                test_url: "https://redamancy.com.cn/docs/",
+                test_url: 'https://redamancy.com.cn/docs/',
                 deploy_secrets: deploySecrets
               }
             });

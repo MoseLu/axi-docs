@@ -48,16 +48,20 @@ jobs:
         uses: actions/github-script@v7
         env:
           RUN_ID: ${{ needs.build.outputs.run_id }}
-          SERVER_HOST: ${{ secrets.SERVER_HOST }}
-          SERVER_USER: ${{ secrets.SERVER_USER }}
-          SERVER_KEY: ${{ secrets.SERVER_KEY }}
-          SERVER_PORT: ${{ secrets.SERVER_PORT }}
-          DEPLOY_CENTER_PAT: ${{ secrets.DEPLOY_CENTER_PAT }}
         with:
           github-token: ${{ secrets.DEPLOY_CENTER_PAT }}
           script: |
             try {
               console.log('🚀 触发部署工作流...');
+              
+              // 构建部署密钥
+              const deploySecrets = JSON.stringify({
+                SERVER_HOST: '${{ secrets.SERVER_HOST }}',
+                SERVER_PORT: '${{ secrets.SERVER_PORT }}',
+                SERVER_USER: '${{ secrets.SERVER_USER }}',
+                SERVER_KEY: '${{ secrets.SERVER_KEY }}',
+                DEPLOY_CENTER_PAT: '${{ secrets.DEPLOY_CENTER_PAT }}'
+              });
               
               const nginxConfig = 'location /docs/ { alias /srv/static/axi-docs/; index index.html; try_files $uri $uri/ /docs/index.html; add_header Cache-Control "no-cache, no-store, must-revalidate" always; add_header Pragma "no-cache" always; add_header Expires "0" always; } location = /docs { return 301 /docs/; }';
               
@@ -72,11 +76,8 @@ jobs:
                   run_id: process.env.RUN_ID,
                   deploy_type: 'static',
                   nginx_config: nginxConfig,
-                  server_host: process.env.SERVER_HOST,
-                  server_user: process.env.SERVER_USER,
-                  server_key: process.env.SERVER_KEY,
-                  server_port: process.env.SERVER_PORT,
-                  deploy_center_pat: process.env.DEPLOY_CENTER_PAT
+                  test_url: 'https://redamancy.com.cn/docs/',
+                  deploy_secrets: deploySecrets
                 }
               });
               

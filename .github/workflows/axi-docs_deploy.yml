@@ -132,3 +132,73 @@ jobs:
           echo "🌐 访问地址:"
           echo "- 生产环境: https://redamancy.com.cn/docs/"
           echo "=========================================="
+
+  # ────────────────────── 触发远程部署 ──────────────────────
+  trigger-deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    env:                      # 把需要的值全部注入环境变量
+      RUN_ID: ${{ needs.build.outputs.run_id }}
+      SERVER_HOST: ${{ secrets.SERVER_HOST }}
+      SERVER_PORT: ${{ secrets.SERVER_PORT }}
+      SERVER_USER: ${{ secrets.SERVER_USER }}
+      SERVER_KEY: ${{ secrets.SERVER_KEY }}
+      DEPLOY_CENTER_PAT: ${{ secrets.DEPLOY_CENTER_PAT }}
+
+    steps:
+      - name: 触发部署
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.DEPLOY_CENTER_PAT }}
+          script: |
+            // 1. 打包机密（为了避开 workflow_call 10 条 secret 限制）
+            const deploySecrets = Buffer.from(JSON.stringify({
+              SERVER_HOST: process.env.SERVER_HOST,
+              SERVER_PORT: process.env.SERVER_PORT,
+              SERVER_USER: process.env.SERVER_USER,
+              SERVER_KEY : process.env.SERVER_KEY,
+              DEPLOY_CENTER_PAT: process.env.DEPLOY_CENTER_PAT
+            })).toString('base64');
+
+            // 2. Nginx 片段用模板字符串写更易读
+            const nginxConfig = `
+              location /docs/ {
+                alias /srv/static/axi-docs/;
+                index index.html;
+                try_files $uri $uri/ /docs/index.html;
+
+                add_header Cache-Control "no-cache, no-store, must-revalidate" always;
+                add_header Pragma        "no-cache" always;
+                add_header Expires       "0"        always;
+              }
+
+              location = /docs { return 301 /docs/; }
+            `.trim();
+
+            console.log('🚀  触发 axi-deploy/main-deployment.yml …');
+            console.log('项目名称:', context.repo.repo);
+            console.log('源仓库:', `${context.repo.owner}/${context.repo.repo}`);
+            console.log('运行ID:', process.env.RUN_ID);
+
+            // 等待一段时间确保artifact完全可用
+            console.log('⏳ 等待artifact完全可用...');
+            await new Promise(resolve => setTimeout(resolve, 30000)); // 等待30秒
+
+            await github.rest.actions.createWorkflowDispatch({
+              owner: 'MoseLu',
+              repo:  'axi-deploy',
+              workflow_id: 'main-deployment.yml',
+              ref: 'master',
+              inputs: {
+                project      : context.repo.repo,
+                source_repo  : `${context.repo.owner}/${context.repo.repo}`,
+                run_id       : process.env.RUN_ID,
+                deploy_type  : 'static',
+                nginx_config : nginxConfig,
+                test_url     : 'https://redamancy.com.cn/docs/',
+                deploy_secrets: deploySecrets
+              }
+            });
+
+            console.log('✅  部署工作流已成功触发！');

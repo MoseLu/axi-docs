@@ -65,7 +65,7 @@ jobs:
                 owner: 'MoseLu',
                 repo: 'axi-deploy',
                 workflow_id: 'deployment-orchestrator.yml',
-                ref: 'main',
+                ref: 'master',
                 inputs: {
                   project: context.repo.repo,
                   source_repo: context.repo.owner + '/' + context.repo.repo,

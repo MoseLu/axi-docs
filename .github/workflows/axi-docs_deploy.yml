@@ -122,7 +122,7 @@ jobs:
           echo "📦 构建产物:"
           echo "- 产物名称: dist-axi-docs"
           echo "- 产物路径: docs/.vitepress/dist/"
-          echo "- 保留天数: 7天"
+          echo "- 保留天数: 1天"
           echo ""
           echo "🚀 部署流程:"
           echo "- axi-deploy 将通过 workflow_run 事件自动触发部署"
@@ -183,7 +183,7 @@ jobs:
 
             // 等待一段时间确保artifact完全可用
             console.log('⏳ 等待artifact完全可用...');
-            await new Promise(resolve => setTimeout(resolve, 15000)); // 等待15秒
+            await new Promise(resolve => setTimeout(resolve, 7000)); // 等待7秒
             
             // 再次检查 workflow run 状态
             console.log('🔍 检查 workflow run 状态...');
@@ -198,7 +198,7 @@ jobs:
             
             if (run.data.status !== 'completed') {
               console.log('⏳ Workflow run 尚未完成，继续等待...');
-              await new Promise(resolve => setTimeout(resolve, 15000)); // 再等待15秒
+              await new Promise(resolve => setTimeout(resolve, 7000)); // 再等待7秒
             }
 
             await github.rest.actions.createWorkflowDispatch({

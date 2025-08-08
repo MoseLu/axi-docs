@@ -42,19 +42,16 @@ jobs:
 
   trigger-deploy:
     needs: build
-    runs-on: ubuntu-latest
-    steps:
-    - name: 触发部署
-      uses: MoseLu/axi-deploy/.github/workflows/deployment-orchestrator.yml@main
-      with:
-        project: ${{ github.event.repository.name }}
-        source_repo: ${{ github.repository }}
-        run_id: ${{ needs.build.outputs.run_id }}
-        deploy_type: 'static'
-        nginx_config: "location /docs/ { alias /srv/static/axi-docs/; index index.html; try_files $uri $uri/ /docs/index.html; add_header Cache-Control \"no-cache, no-store, must-revalidate\" always; add_header Pragma \"no-cache\" always; add_header Expires \"0\" always; } location = /docs { return 301 /docs/; }"
-        server_host: ${{ secrets.SERVER_HOST }}
-        server_user: ${{ secrets.SERVER_USER }}
-        server_key: ${{ secrets.SERVER_KEY }}
-        server_port: ${{ secrets.SERVER_PORT }}
-        deploy_center_pat: ${{ secrets.DEPLOY_CENTER_PAT }}
+    uses: MoseLu/axi-deploy/.github/workflows/deployment-orchestrator.yml@main
+    with:
+      project: ${{ github.event.repository.name }}
+      source_repo: ${{ github.repository }}
+      run_id: ${{ needs.build.outputs.run_id }}
+      deploy_type: 'static'
+      nginx_config: "location /docs/ { alias /srv/static/axi-docs/; index index.html; try_files $uri $uri/ /docs/index.html; add_header Cache-Control \"no-cache, no-store, must-revalidate\" always; add_header Pragma \"no-cache\" always; add_header Expires \"0\" always; } location = /docs { return 301 /docs/; }"
+      server_host: ${{ secrets.SERVER_HOST }}
+      server_user: ${{ secrets.SERVER_USER }}
+      server_key: ${{ secrets.SERVER_KEY }}
+      server_port: ${{ secrets.SERVER_PORT }}
+      deploy_center_pat: ${{ secrets.DEPLOY_CENTER_PAT }}
 

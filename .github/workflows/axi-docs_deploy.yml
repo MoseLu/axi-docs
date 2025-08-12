@@ -87,12 +87,23 @@ jobs:
           echo "✅ 构建产物准备完成"
           echo "构建产物内容:"
           ls -la docs/.vitepress/dist/
+          
+          # 创建压缩包以确保目录结构完整
+          echo "📦 创建构建产物压缩包..."
+          tar -czf dist-axi-docs.tar.gz -C docs/.vitepress dist
+          
+          echo "✅ 压缩包创建完成"
+          echo "📊 压缩包大小: $(du -h dist-axi-docs.tar.gz | cut -f1)"
+          echo "📁 压缩包内容预览:"
+          tar -tzf dist-axi-docs.tar.gz | head -20
 
       - name: 上传产物
         uses: actions/upload-artifact@v4
         with:
           name: dist-axi-docs
-          path: docs/.vitepress/dist/
+          path: |
+            docs/.vitepress/dist/
+            dist-axi-docs.tar.gz
           retention-days: 1
           if-no-files-found: error
 

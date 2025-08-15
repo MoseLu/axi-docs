@@ -191,6 +191,10 @@ jobs:
             console.log('项目名称:', context.repo.repo);
             console.log('源仓库:', `${context.repo.owner}/${context.repo.repo}`);
             console.log('运行ID:', process.env.RUN_ID);
+            console.log('触发时间:', new Date().toISOString());
+            console.log('工作流名称:', context.workflow);
+            console.log('分支:', context.ref);
+            console.log('提交:', context.sha);
 
             // 等待一段时间确保artifact完全可用
             console.log('⏳ 等待artifact完全可用...');

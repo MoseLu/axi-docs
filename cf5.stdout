@@ -19,3 +19,16 @@
 2025-08-17T16:56:57Z INF ICMP proxy will use fe80::802b:38ff:fe3d:bcd0 in zone eth0 as source for IPv6
 2025-08-17T16:56:57Z INF Starting metrics server on 127.0.0.1:20241/metrics
 2025-08-17T16:56:58Z INF Registered tunnel connection connIndex=0 connection=fc753089-e02b-4568-8047-5482706877ee event=0 ip=198.41.200.233 location=pdx02 protocol=http2
+2025-08-17T23:54:05Z INF Lost connection with the edge connIndex=0
+2025-08-17T23:54:05Z ERR failed to serve incoming request error="Error shutting down control stream: client disconnected"
+2025-08-17T23:54:05Z ERR Serve tunnel error error="connection with edge closed" connIndex=0 event=0 ip=198.41.200.233
+2025-08-17T23:54:05Z INF Retrying connection in up to 1s connIndex=0 event=0 ip=198.41.200.233
+2025-08-17T23:54:05Z ERR Connection terminated error="connection with edge closed" connIndex=0
+2025-08-17T23:54:24Z ERR failed to serve incoming request error="Unauthorized: Failed to get tunnel"
+2025-08-17T23:54:24Z ERR Register tunnel error from server side error="Unauthorized: Failed to get tunnel" connIndex=0 event=0 ip=198.41.200.233
+2025-08-17T23:54:24Z INF Retrying connection in up to 4s connIndex=0 event=0 ip=198.41.200.233
+2025-08-17T23:54:28Z ERR Connection terminated error="Unauthorized: Failed to get tunnel" connIndex=0
+2025-08-17T23:54:51Z ERR failed to serve incoming request error="Unauthorized: Failed to get tunnel"
+2025-08-17T23:54:51Z ERR Register tunnel error from server side error="Unauthorized: Failed to get tunnel" connIndex=0 event=0 ip=198.41.200.233
+2025-08-17T23:54:51Z INF Retrying connection in up to 8s connIndex=0 event=0 ip=198.41.200.233
+2025-08-17T23:54:52Z ERR Connection terminated error="Unauthorized: Failed to get tunnel" connIndex=0

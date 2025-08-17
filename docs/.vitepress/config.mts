@@ -1,17 +1,28 @@
 import { defineConfig } from 'vitepress'
 import getSidebar from "../utils/getSidebar";
 
+// 动态计算 base，便于在本地预览/反向代理/部署路径不同的情况下正确解析静态资源
+const normalizeBase = (value: string | undefined): string => {
+    const raw = (value ?? '/').trim()
+    if (!raw) return '/'
+    let v = raw
+    if (!v.startsWith('/')) v = '/' + v
+    if (!v.endsWith('/')) v = v + '/'
+    return v
+}
+const BASE = normalizeBase(process.env.VITEPRESS_BASE || process.env.BASE || '/')
+
 // 兼容 ESM 的 __dirname
 
 export default defineConfig({
     title: "星际文档系统",
     description: "星际文档系统 - 现代化文档管理平台",
-    base: '/docs/',
+    base: BASE,
     lang: 'zh-CN',
     // 添加head配置，直接引入CSS文件
     head: [
-        ['link', { rel: 'icon', href: '/docs/favicon.ico' }],
-        ['link', { rel: 'apple-touch-icon', href: '/docs/favicon.ico' }]
+        ['link', { rel: 'icon', href: '/favicon.ico' }],
+        ['link', { rel: 'apple-touch-icon', href: '/favicon.ico' }]
     ],
     // 添加appearance配置，确保主题切换正确处理
     appearance: true,
@@ -25,7 +36,7 @@ export default defineConfig({
         socialLinks: [
             {
                 icon: {
-                    svg: '<img src="/docs/cloud.png" alt="Cloud Icon">'
+                    svg: '<img src="/cloud.png" alt="Cloud Icon">'
                 },
                 link: 'https://redamancy.com.cn'
             },
@@ -70,7 +81,7 @@ export default defineConfig({
                 socialLinks: [
                     {
                         icon: {
-                            svg: '<img src="/docs/cloud.png" alt="Cloud Icon">'
+                            svg: '<img src="/cloud.png" alt="Cloud Icon">'
                         },
                         link: 'https://redamancy.com.cn'
                     },

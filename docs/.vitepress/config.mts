@@ -11,9 +11,7 @@ export default defineConfig({
     // 添加head配置，直接引入CSS文件
     head: [
         ['link', { rel: 'icon', href: '/docs/favicon.ico' }],
-        ['link', { rel: 'apple-touch-icon', href: '/docs/favicon.ico' }],
-        ['link', { rel: 'stylesheet', href: '/docs/theme.css' }],
-        ['link', { rel: 'stylesheet', href: '/docs/light-theme.css' }]
+        ['link', { rel: 'apple-touch-icon', href: '/docs/favicon.ico' }]
     ],
     // 添加appearance配置，确保主题切换正确处理
     appearance: true,

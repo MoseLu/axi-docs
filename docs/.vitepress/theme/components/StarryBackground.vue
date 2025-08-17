@@ -11,6 +11,7 @@ import { StarField } from '../utils/starField.js'
 const starCanvas = ref(null)
 let animationId = null
 let starField = null
+let onResize = null
 
 onMounted(() => {
   if (starCanvas.value) {
@@ -22,17 +23,21 @@ onMounted(() => {
     animationId = starField.animate()
 
     // 监听窗口大小变化
-    window.addEventListener('resize', () => {
+    onResize = () => {
       if (starField) {
         starField.resize()
       }
-    })
+    }
+    window.addEventListener('resize', onResize)
   }
 })
 
 onUnmounted(() => {
   if (animationId) {
     cancelAnimationFrame(animationId)
+  }
+  if (typeof window !== 'undefined' && onResize) {
+    window.removeEventListener('resize', onResize)
   }
 })
 </script>

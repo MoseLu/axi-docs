@@ -1,4 +1,5 @@
 import { defineConfig } from 'vitepress'
+import viteCompression from 'vite-plugin-compression'
 import getSidebar from "../utils/getSidebar";
 
 // 动态计算 base，便于在本地预览/反向代理/部署路径不同的情况下正确解析静态资源
@@ -22,7 +23,12 @@ export default defineConfig({
     // 添加head配置，直接引入CSS文件
     head: [
         ['link', { rel: 'icon', href: '/favicon.ico' }],
-        ['link', { rel: 'apple-touch-icon', href: '/favicon.ico' }]
+        ['link', { rel: 'apple-touch-icon', href: '/favicon.ico' }],
+        // 关键资源预连接/预加载
+        ['link', { rel: 'preload', as: 'image', href: '/index.png', fetchpriority: 'high' }],
+        ['meta', { 'http-equiv': 'x-dns-prefetch-control', content: 'on' }],
+        ['link', { rel: 'dns-prefetch', href: 'https://fonts.gstatic.com' }],
+        ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }]
     ],
     // 添加appearance配置，确保主题切换正确处理
     appearance: true,
@@ -114,6 +120,30 @@ export default defineConfig({
                     }
                 }
             }
+        }
+    }
+    ,
+    // Vite 构建优化与资源压缩
+    vite: {
+        plugins: [
+            viteCompression({ algorithm: 'brotliCompress', ext: '.br', deleteOriginFile: false }),
+            viteCompression({ algorithm: 'gzip', ext: '.gz', deleteOriginFile: false })
+        ],
+        build: {
+            target: 'esnext',
+            minify: 'esbuild',
+            cssMinify: true,
+            sourcemap: false,
+            assetsInlineLimit: 0,
+            rollupOptions: {
+                output: {
+                    compact: true
+                }
+            }
+        },
+        esbuild: {
+            legalComments: 'none',
+            drop: ['console', 'debugger']
         }
     }
 })

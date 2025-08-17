@@ -14,3 +14,5 @@
   border-bottom: 2px solid rgba(255, 255, 255, 0.8) !important;
   box-shadow: 0 2px 4px rgba(255, 255, 255, 0.3) !important;
 }
+
+/* caching hints: server should add Cache-Control: public, max-age=31536000, immutable */

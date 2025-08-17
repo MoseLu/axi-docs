@@ -1,6 +1,6 @@
 <template>
   <div class="cloud-background">
-    <canvas ref="cloudCanvas" class="cloud-canvas"></canvas>
+    <canvas ref="cloudCanvas" class="cloud-canvas" width="1920" height="1080"></canvas>
   </div>
 </template>
 

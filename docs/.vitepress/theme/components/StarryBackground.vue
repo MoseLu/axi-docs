@@ -1,6 +1,6 @@
 <template>
   <div class="starry-background">
-    <canvas ref="starCanvas" class="star-canvas"></canvas>
+    <canvas ref="starCanvas" class="star-canvas" width="1920" height="1080"></canvas>
   </div>
 </template>
 

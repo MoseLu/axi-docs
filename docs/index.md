@@ -26,7 +26,7 @@ head:
      </div>
   </div>
      <div class="hero-image">
-     <img src="/index.png" alt="星际文档系统 Logo" class="logo-image">
+     <img src="/index.png" alt="星际文档系统 Logo" class="logo-image" width="500" height="500" loading="eager" fetchpriority="high">
    </div>
 </div>
 

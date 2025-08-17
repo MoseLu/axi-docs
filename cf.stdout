@@ -20,3 +20,9 @@
 2025-08-17T16:28:30Z INF ICMP proxy will use fe80::802b:38ff:fe3d:bcd0 in zone eth0 as source for IPv6
 2025-08-17T16:28:30Z INF Starting metrics server on [::]:41593/metrics
 2025-08-17T16:28:31Z INF Registered tunnel connection connIndex=0 connection=b009041d-feae-4b43-9420-b214ca1c12a5 event=0 ip=198.41.192.67 location=sea01 protocol=http2
+2025-08-17T16:38:30Z INF Initiating graceful shutdown due to signal terminated ...
+2025-08-17T16:38:31Z INF Unregistered tunnel connection connIndex=0 event=0 ip=198.41.192.67
+2025-08-17T16:38:31Z INF Retrying connection in up to 1s connIndex=0 event=0 ip=198.41.192.67
+2025-08-17T16:38:31Z ERR no more connections active and exiting
+2025-08-17T16:38:31Z INF Tunnel server stopped
+2025-08-17T16:38:31Z INF Metrics server stopped

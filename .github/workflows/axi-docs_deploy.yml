@@ -172,20 +172,6 @@ jobs:
               DEPLOY_CENTER_PAT: process.env.DEPLOY_CENTER_PAT
             })).toString('base64');
 
-            // 2. Nginx 片段用模板字符串写更易读
-            const nginxConfig = `
-              location /docs/ {
-                alias /srv/static/axi-docs/;
-                index index.html;
-                try_files $uri $uri/ /docs/index.html;
-
-                add_header Cache-Control "no-cache, no-store, must-revalidate" always;
-                add_header Pragma        "no-cache" always;
-                add_header Expires       "0"        always;
-              }
-
-              location = /docs { return 301 /docs/; }
-            `.trim();
 
             console.log('🚀  触发 axi-deploy/main-deployment.yml …');
             console.log('项目名称:', context.repo.repo);
@@ -226,8 +212,6 @@ jobs:
                 source_repo  : `${context.repo.owner}/${context.repo.repo}`,
                 run_id       : process.env.RUN_ID,
                 deploy_type  : 'static',
-                nginx_config : nginxConfig,
-                test_url     : 'https://redamancy.com.cn/docs/',
                 deploy_secrets: deploySecrets
               }
             });

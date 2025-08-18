@@ -3,8 +3,6 @@ import viteCompression from 'vite-plugin-compression'
 import getSidebar from "../utils/getSidebar";
 import fs from 'node:fs'
 import path from 'node:path'
-import fs from 'node:fs'
-import path from 'node:path'
 
 // 动态计算 base，便于在本地预览/反向代理/部署路径不同的情况下正确解析静态资源
 const normalizeBase = (value: string | undefined): string => {

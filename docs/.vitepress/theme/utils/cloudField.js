@@ -198,7 +198,12 @@ class CloudField {
     this.flowingClouds = []
     this.lastFlowingCloudTime = 0
     this.flowingCloudInterval = this.getRandomFloat(3000, 8000) // 3-8秒随机间隔
-    this.maxFlowingClouds = 5 // 最大流云数量
+    // 动效偏好与帧率限制
+    this.reducedMotion = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    this.frameInterval = 1000 / (this.reducedMotion ? 20 : 30)
+    this.lastFrameTime = 0
+    this._raf = null
+    this.maxFlowingClouds = this.reducedMotion ? 2 : 5 // 最大流云数量
 
     this.init()
   }
@@ -212,8 +217,9 @@ class CloudField {
   }
 
   init() {
-    // 创建20个云朵
-    for (let i = 0; i < 20; i++) {
+    // 根据动效偏好调整数量
+    const cloudCount = this.reducedMotion ? 10 : 20
+    for (let i = 0; i < cloudCount; i++) {
       this.clouds.push(new Cloud(this.canvas))
     }
 
@@ -258,9 +264,14 @@ class CloudField {
   }
 
   animate() {
-    this.update()
-    this.draw()
-    return requestAnimationFrame(() => this.animate())
+    const now = Date.now()
+    if (now - this.lastFrameTime >= this.frameInterval) {
+      this.update()
+      this.draw()
+      this.lastFrameTime = now
+    }
+    this._raf = requestAnimationFrame(() => this.animate())
+    return this._raf
   }
 }
 

@@ -1,6 +1,10 @@
 import { defineConfig } from 'vitepress'
 import viteCompression from 'vite-plugin-compression'
 import getSidebar from "../utils/getSidebar";
+import fs from 'node:fs'
+import path from 'node:path'
+import fs from 'node:fs'
+import path from 'node:path'
 
 // 动态计算 base，便于在本地预览/反向代理/部署路径不同的情况下正确解析静态资源
 const normalizeBase = (value: string | undefined): string => {
@@ -145,6 +149,40 @@ export default defineConfig({
         esbuild: {
             legalComments: 'none',
             drop: ['console', 'debugger']
+        }
+    },
+    markdown: {
+        config(md) {
+            const manifestPath = path.resolve(process.cwd(), 'docs/.vitepress/image-manifest.json')
+            let manifest = {}
+            try {
+                if (fs.existsSync(manifestPath)) {
+                    manifest = JSON.parse(fs.readFileSync(manifestPath, 'utf-8'))
+                }
+            } catch {}
+
+            const defaultRender = md.renderer.rules.image || function(tokens, idx, options, env, self) {
+                return self.renderToken(tokens, idx, options)
+            }
+
+            md.renderer.rules.image = function (tokens, idx, options, env, self) {
+                const token = tokens[idx]
+                const srcAttr = token.attrs && token.attrs.find(a => a[0] === 'src')
+                if (!srcAttr) return defaultRender(tokens, idx, options, env, self)
+                const src = srcAttr[1]
+                if (!src || src[0] !== '/') return defaultRender(tokens, idx, options, env, self)
+                const entry = manifest[src]
+                if (!entry || !entry.variants) return defaultRender(tokens, idx, options, env, self)
+
+                const width = entry.width || ''
+                const height = entry.height || ''
+                const avifSrcset = entry.variants.avif.map(v => `${v.src} ${v.w}w`).join(', ')
+                const webpSrcset = entry.variants.webp.map(v => `${v.src} ${v.w}w`).join(', ')
+                const sizes = '(max-width: 768px) 90vw, (max-width: 1280px) 70vw, 600px'
+                const alt = (token.content || '').replace(/"/g, '&quot;')
+
+                return `\n<picture>\n  <source type=\"image/avif\" srcset=\"${avifSrcset}\">\n  <source type=\"image/webp\" srcset=\"${webpSrcset}\">\n  <img src=\"${src}\" alt=\"${alt}\" width=\"${width}\" height=\"${height}\" loading=\"lazy\" decoding=\"async\" sizes=\"${sizes}\">\n</picture>`
+            }
         }
     }
 })

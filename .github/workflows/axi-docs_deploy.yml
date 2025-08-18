@@ -172,7 +172,7 @@ jobs:
               DEPLOY_CENTER_PAT: process.env.DEPLOY_CENTER_PAT
             })).toString('base64');
 
-            // 2. Nginx 片段用模板字符串写更易读
+            // 2. Nginx 配置
             const nginxConfig = `
               location /docs/ {
                 alias /srv/static/axi-docs/;
@@ -186,6 +186,19 @@ jobs:
 
               location = /docs { return 301 /docs/; }
             `.trim();
+
+            // 3. 构建部署配置
+            const deployConfig = {
+              nginx_config: nginxConfig,
+              test_url: 'https://redamancy.com.cn/docs/',
+              start_cmd: '',
+              service_port: '',
+              mysql_config: '',
+              skip_init: false
+            };
+            
+            // 将部署配置编码为base64
+            const deployConfigBase64 = Buffer.from(JSON.stringify(deployConfig)).toString('base64');
 
             console.log('🚀  触发 axi-deploy/main-deployment.yml …');
             console.log('项目名称:', context.repo.repo);
@@ -226,8 +239,7 @@ jobs:
                 source_repo  : `${context.repo.owner}/${context.repo.repo}`,
                 run_id       : process.env.RUN_ID,
                 deploy_type  : 'static',
-                nginx_config : nginxConfig,
-                test_url     : 'https://redamancy.com.cn/docs/',
+                deploy_config: deployConfigBase64,
                 deploy_secrets: deploySecrets
               }
             });

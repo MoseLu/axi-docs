@@ -28,7 +28,8 @@ export default defineConfig({
         ['link', { rel: 'preload', as: 'image', href: '/index.png', fetchpriority: 'high' }],
         ['meta', { 'http-equiv': 'x-dns-prefetch-control', content: 'on' }],
         ['link', { rel: 'dns-prefetch', href: 'https://fonts.gstatic.com' }],
-        ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }]
+        ['link', { rel: 'preconnect', href: 'https://fonts.gstatic.com', crossorigin: '' }],
+        // 提示浏览器针对重要脚本与样式提高优先级（VitePress 产物名称带哈希，预加载在运行时写入即可）
     ],
     // 添加appearance配置，确保主题切换正确处理
     appearance: true,

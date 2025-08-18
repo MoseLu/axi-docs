@@ -163,7 +163,8 @@ class StarField {
     this.maxMeteors = 5 // 减少最大流星数量
     this.meteorBurstChance = 0.05 // 5%概率产生流星雨爆发，降低概率
     this.lastFrameTime = 0
-    this.frameInterval = 1000 / 30 // 限制到30FPS，减少性能消耗
+    this.reducedMotion = typeof window !== 'undefined' && window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches
+    this.frameInterval = 1000 / (this.reducedMotion ? 20 : 30) // 限制到30FPS，减少性能消耗
 
     this.init()
   }

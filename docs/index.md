@@ -1,9 +1,9 @@
 ---
-title: 星际文档系统
-head:
-  - - meta
-    - name: description
-      content: 星际文档系统 - 基于 VitePress 构建的现代化文档管理平台，专为团队协作和知识管理而设计
+ title: 星际文档系统
+ head:
+   - - meta
+     - name: description
+       content: 星际文档系统 - 基于 VitePress 构建的现代化文档管理平台，专为团队协作和知识管理而设计
 ---
 
 <div class="hero">
@@ -17,16 +17,20 @@ head:
       为团队提供高效的知识管理和协作解决方案。
     </p>
          <div class="hero-actions">
-       <a class="action-button primary" href="/docs/content/quick-start.html">
+       <a class="action-button primary" href="/content/quick-start.html">
          快速开始
        </a>
-       <a class="action-button secondary" href="/docs/content/流程控制.html">
+       <a class="action-button secondary" href="/content/流程控制.html">
          系统架构
        </a>
      </div>
   </div>
      <div class="hero-image">
-     <img src="/index.png" alt="星际文档系统 Logo" class="logo-image">
+     <picture>
+       <source srcset="/index.w480.avif 480w, /index.w768.avif 768w, /index.w1024.avif 1024w, /index.w1440.avif 1440w, /index.avif 1920w" type="image/avif">
+       <source srcset="/index.w480.webp 480w, /index.w768.webp 768w, /index.w1024.webp 1024w, /index.w1440.webp 1440w, /index.webp 1920w" type="image/webp">
+       <img src="/index.png" alt="星际文档系统 Logo" class="logo-image" width="500" height="500" loading="eager" fetchpriority="high" sizes="(max-width: 768px) 80vw, (max-width: 1280px) 50vw, 500px">
+     </picture>
    </div>
 </div>
 
@@ -61,28 +65,28 @@ head:
          <h3>📋 指南</h3>
          <p>系统使用指南和快速入门</p>
          <ul>
-           <li><a href="/docs/content/quick-start.html">快速开始</a></li>
+           <li><a href="/content/quick-start.html">快速开始</a></li>
          </ul>
        </div>
        <div class="category-card">
          <h3>🏗️ 系统架构</h3>
          <p>系统架构设计和流程控制</p>
          <ul>
-           <li><a href="/docs/content/流程控制.html">流程控制系统</a></li>
+           <li><a href="/content/流程控制.html">流程控制系统</a></li>
          </ul>
        </div>
        <div class="category-card">
          <h3>🎨 品牌设计</h3>
          <p>品牌理念和设计规范</p>
          <ul>
-           <li><a href="/docs/content/Logo具体含义.html">Logo设计理念与含义</a></li>
+           <li><a href="/content/Logo具体含义.html">Logo设计理念与含义</a></li>
          </ul>
        </div>
        <div class="category-card">
          <h3>🛠️ 工具文档</h3>
          <p>开发工具和技术文档</p>
          <ul>
-           <li><a href="/docs/content/如何判断用户离开当前页.html">如何判断用户离开当前页</a></li>
+           <li><a href="/content/如何判断用户离开当前页.html">如何判断用户离开当前页</a></li>
          </ul>
        </div>
     </div>
@@ -125,8 +129,8 @@ head:
   <h2>开始使用星际文档系统</h2>
   <p>立即体验现代化的文档管理平台，提升团队协作效率</p>
      <div class="cta-actions">
-     <a class="action-button primary" href="/docs/content/quick-start.html">开始使用</a>
-<a class="action-button secondary" href="/docs/content/流程控制.html">了解架构</a>
+     <a class="action-button primary" href="/content/quick-start.html">开始使用</a>
+<a class="action-button secondary" href="/content/流程控制.html">了解架构</a>
    </div>
 </div>
 
@@ -299,157 +303,4 @@ head:
   color: var(--vp-c-text-2);
   margin: 0 0 1rem 0;
 }
-
-.category-card ul {
-  margin: 0;
-  padding-left: 1.2rem;
-}
-
-.category-card li {
-  margin: 0.5rem 0;
-}
-
-.category-card a {
-  color: var(--vp-c-brand);
-  text-decoration: none;
-}
-
-.category-card a:hover {
-  text-decoration: underline;
-}
-
-.feature-details {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 2rem;
-}
-
-.feature-detail {
-  padding: 1.5rem;
-  background: var(--vp-c-bg-soft);
-  border-radius: 8px;
-  border: 1px solid var(--vp-c-divider);
-}
-
-.feature-detail h3 {
-  margin: 0 0 1rem 0;
-  color: var(--vp-c-text-1);
-}
-
-.feature-detail p {
-  color: var(--vp-c-text-2);
-  margin: 0;
-  line-height: 1.6;
-}
-
-.philosophy {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-  gap: 2rem;
-}
-
-.philosophy-item {
-  padding: 1.5rem;
-  background: var(--vp-c-bg-soft);
-  border-radius: 8px;
-  border: 1px solid var(--vp-c-divider);
-}
-
-.philosophy-item h3 {
-  margin: 0 0 1rem 0;
-  color: var(--vp-c-text-1);
-}
-
-.philosophy-item p {
-  color: var(--vp-c-text-2);
-  margin: 0;
-  line-height: 1.6;
-}
-
-.cta-section {
-  text-align: center;
-  padding: 4rem 0;
-  background: var(--vp-c-bg-soft);
-  border-radius: 12px;
-  margin: 4rem 0;
-}
-
-.cta-section h2 {
-  font-size: 2rem;
-  margin: 0 0 1rem 0;
-  color: var(--vp-c-text-1);
-}
-
-.cta-section p {
-  font-size: 1.1rem;
-  color: var(--vp-c-text-2);
-  margin: 0 0 2rem 0;
-}
-
-.cta-actions {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-}
-
-@media (max-width: 768px) {
-  .hero {
-    flex-direction: column;
-    text-align: center;
-  }
-  
-  .hero-title {
-    font-size: 2.5rem;
-  }
-  
-  .hero-actions {
-    justify-content: center;
-  }
-  
-  .cta-actions {
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .philosophy {
-    grid-template-columns: 1fr;
-  }
-}
-
-/* 首页原生组件中的标题边框 - 天蓝色 */
-.cloud-theme .feature h1,
-.cloud-theme .feature h2,
-.cloud-theme .feature h3,
-.cloud-theme .feature h4,
-.cloud-theme .feature h5,
-.cloud-theme .feature h6,
-.cloud-theme .category-card h1,
-.cloud-theme .category-card h2,
-.cloud-theme .category-card h3,
-.cloud-theme .category-card h4,
-.cloud-theme .category-card h5,
-.cloud-theme .category-card h6,
-.cloud-theme .feature-detail h1,
-.cloud-theme .feature-detail h2,
-.cloud-theme .feature-detail h3,
-.cloud-theme .feature-detail h4,
-.cloud-theme .feature-detail h5,
-.cloud-theme .feature-detail h6,
-.cloud-theme .philosophy-item h1,
-.cloud-theme .philosophy-item h2,
-.cloud-theme .philosophy-item h3,
-.cloud-theme .philosophy-item h4,
-.cloud-theme .philosophy-item h5,
-.cloud-theme .philosophy-item h6,
-.cloud-theme .cta-section h1,
-.cloud-theme .cta-section h2,
-.cloud-theme .cta-section h3,
-.cloud-theme .cta-section h4,
-.cloud-theme .cta-section h5,
-.cloud-theme .cta-section h6 {
-  border-bottom: 2px solid rgba(79, 195, 247, 0.6) !important;
-  box-shadow: 0 2px 4px rgba(79, 195, 247, 0.3) !important;
-}
-</style> 
-
-<!-- Trigger deployment workflow -->
+</style>

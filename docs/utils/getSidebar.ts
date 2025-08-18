@@ -112,11 +112,14 @@ function getSidebar() {
             categoryOrder: categoryOrder[category] || 999,
             collapsed: false, // 默认展开
             items: items
-                .sort((a, b) =>
-                    a.order !== null && b.order !== null
-                        ? a.order - b.order
-                        : b.createdAt - a.createdAt
-                )
+                .sort((a, b) => {
+                    const aHasOrder = a.order !== null && a.order !== undefined
+                    const bHasOrder = b.order !== null && b.order !== undefined
+                    if (aHasOrder && bHasOrder) return a.order - b.order
+                    if (aHasOrder && !bHasOrder) return -1
+                    if (!aHasOrder && bHasOrder) return 1
+                    return b.createdAt - a.createdAt
+                })
                 .map(({ title, link }) => ({ text: title, link }))
         }
     })

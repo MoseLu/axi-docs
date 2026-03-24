@@ -154,6 +154,7 @@ function HomePage() {
               selectedFile={selectedFile}
               source={currentSource}
               onWikiLink={handleWikiLink}
+              onTagSelect={tag => handleTagSelect(tag)}
             />
           )}
         </main>

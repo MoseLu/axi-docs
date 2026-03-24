@@ -3,7 +3,7 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Components } from 'react-markdown'
 import { DocumentIcon, TagIcon, ClockIcon } from './Icons'
-import { TableOfContents } from './TableOfContents'
+import { KnowledgePanel } from './KnowledgePanel'
 import { DocSource, SelectedFile, Frontmatter } from '../types'
 
 interface DocumentViewProps {
@@ -13,6 +13,7 @@ interface DocumentViewProps {
   selectedFile: SelectedFile | null
   source?: DocSource
   onWikiLink: (noteName: string) => void
+  onTagSelect?: (tag: string) => void
 }
 
 // Parse YAML frontmatter from markdown content
@@ -55,6 +56,7 @@ export function DocumentView({
   selectedFile,
   source,
   onWikiLink,
+  onTagSelect,
 }: DocumentViewProps) {
   const { frontmatter, body } = useMemo(() => {
     if (!content) return { frontmatter: {}, body: '' }
@@ -171,8 +173,16 @@ export function DocumentView({
         </div>
       </div>
 
-      {/* Table of Contents */}
-      {body && <TableOfContents content={body} />}
+      {/* Knowledge Panel */}
+      {selectedFile && (
+        <KnowledgePanel
+          content={body || null}
+          selectedFile={selectedFile}
+          source={source}
+          onNavigate={onWikiLink}
+          onTagSelect={onTagSelect}
+        />
+      )}
     </div>
   )
 }

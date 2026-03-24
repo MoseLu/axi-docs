@@ -959,18 +959,13 @@ async function startHttpServer(port: number) {
     // ── API 代理（便捷 HTTP API，无需 JSON-RPC，远程访问友好）────────────────
 
     if (pathname.startsWith('/api/')) {
-      // Blinko API 代理 - 不需要 token 认证
+      // Blinko API 代理
       if (url.searchParams.get('source') === 'blinko') {
         handleBlinkoApi(req, res, url)
         return
       }
 
-      // 本地源 API - 需要 token 认证
-      if (!authMiddleware(req)) {
-        res.writeHead(401, { 'Content-Type': 'application/json' })
-        res.end(JSON.stringify({ error: 'Unauthorized' }))
-        return
-      }
+      // 本地源 API - 无需认证（内部服务，通过 Nginx/IP 白名单保护）
 
       const apiPath = pathname.slice(5) // 去掉 /api/（pathname 以 / 开头）
       const source = url.searchParams.get('source') || 'obsidian'

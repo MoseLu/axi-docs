@@ -11,6 +11,21 @@ import crypto from 'crypto'
 import { URL } from 'url'
 import { IncomingMessage, ServerResponse } from 'http'
 
+// ─── 加载环境变量 ────────────────────────────────────────────────────────────
+
+const envPath = path.resolve(process.cwd(), '.env')
+if (fs.existsSync(envPath)) {
+  const envContent = fs.readFileSync(envPath, 'utf-8')
+  envContent.split('\n').forEach(line => {
+    const [key, ...valueParts] = line.split('=')
+    const k = key?.trim()
+    const v = valueParts?.join('=').trim().replace(/^["']|["']$/g, '')
+    if (k && v && !k.startsWith('#') && !process.env[k]) {
+      process.env[k] = v
+    }
+  })
+}
+
 // ─── Blinko API 代理 ───────────────────────────────────────────────────────────
 
 interface BlinkoNote {
@@ -769,7 +784,7 @@ export function createServer() {
 
 // ─── Token 管理 ──────────────────────────────────────────────────────────────
 
-const TOKEN_FILE = path.join(path.dirname(new URL(import.meta.url).pathname), '../../.info-hub-token')
+const TOKEN_FILE = path.resolve(process.cwd(), '.info-hub-token')
 
 function loadOrCreateToken(): string {
   // 1. 优先使用环境变量

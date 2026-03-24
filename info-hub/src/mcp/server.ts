@@ -7,6 +7,7 @@ import {
 import fs from 'fs'
 import path from 'path'
 import http from 'http'
+import crypto from 'crypto'
 import { URL } from 'url'
 import { IncomingMessage, ServerResponse } from 'http'
 
@@ -766,18 +767,82 @@ export function createServer() {
 
 // ─── HTTP/SSE 传输（远程访问）────────────────────────────────────────────────
 
-// 简单的 token 认证中间件
-const AUTH_TOKEN = process.env.MCP_AUTH_TOKEN || 'info-hub-dev-token'
+// ─── Token 管理 ──────────────────────────────────────────────────────────────
+
+const TOKEN_FILE = path.join(path.dirname(new URL(import.meta.url).pathname), '../../.info-hub-token')
+
+function loadOrCreateToken(): string {
+  // 1. 优先使用环境变量
+  if (process.env.MCP_AUTH_TOKEN) return process.env.MCP_AUTH_TOKEN
+
+  // 2. 从持久化文件读取
+  if (fs.existsSync(TOKEN_FILE)) {
+    const saved = fs.readFileSync(TOKEN_FILE, 'utf-8').trim()
+    if (saved.length >= 32) return saved
+  }
+
+  // 3. 首次运行：生成强随机 token 并持久化
+  const newToken = crypto.randomBytes(32).toString('hex')
+  fs.writeFileSync(TOKEN_FILE, newToken, { mode: 0o600 }) // 仅 owner 可读
+  console.error('[info-hub-mcp] 首次运行，已生成访问 token 并保存至:', TOKEN_FILE)
+  return newToken
+}
+
+const AUTH_TOKEN = loadOrCreateToken()
+
+// ─── 暴力破解保护（速率限制）────────────────────────────────────────────────
+
+const authFailures = new Map<string, { count: number; until: number }>()
+const MAX_FAILURES = 10        // 10 次失败
+const LOCKOUT_MS = 5 * 60_000 // 锁定 5 分钟
+
+function getClientIp(req: http.IncomingMessage): string {
+  return (req.headers['x-forwarded-for'] as string)?.split(',')[0].trim()
+    || req.socket.remoteAddress
+    || 'unknown'
+}
+
+function isRateLimited(ip: string): boolean {
+  const rec = authFailures.get(ip)
+  if (!rec) return false
+  if (Date.now() < rec.until) return true
+  authFailures.delete(ip)
+  return false
+}
+
+function recordAuthFailure(ip: string): void {
+  const rec = authFailures.get(ip) || { count: 0, until: 0 }
+  rec.count++
+  if (rec.count >= MAX_FAILURES) {
+    rec.until = Date.now() + LOCKOUT_MS
+    console.error(`[info-hub-mcp] IP ${ip} 认证失败 ${rec.count} 次，锁定 5 分钟`)
+  }
+  authFailures.set(ip, rec)
+}
+
+function recordAuthSuccess(ip: string): void {
+  authFailures.delete(ip)
+}
+
+// ─── 认证中间件 ───────────────────────────────────────────────────────────────
 
 function authMiddleware(req: http.IncomingMessage): boolean {
-  // Bearer token: Authorization: Bearer <token>
+  const ip = getClientIp(req)
+  if (isRateLimited(ip)) return false
+
   const authHeader = req.headers.authorization
-  if (authHeader?.startsWith('Bearer ')) {
-    return authHeader.slice(7) === AUTH_TOKEN
-  }
-  // Query param: ?token=xxx
   const url = new URL(req.url || '/', `http://${req.headers.host}`)
-  return url.searchParams.get('token') === AUTH_TOKEN
+  const token = authHeader?.startsWith('Bearer ')
+    ? authHeader.slice(7)
+    : url.searchParams.get('token') ?? ''
+
+  const ok = crypto.timingSafeEqual(
+    Buffer.from(token.padEnd(64)),
+    Buffer.from(AUTH_TOKEN.padEnd(64)),
+  ) && token.length === AUTH_TOKEN.length
+
+  if (ok) { recordAuthSuccess(ip) } else { recordAuthFailure(ip) }
+  return ok
 }
 
 async function startHttpServer(port: number) {
@@ -1010,11 +1075,14 @@ async function startHttpServer(port: number) {
     res.end('Not Found')
   })
 
-  httpServer.listen(port, '0.0.0.0', () => {
-    console.error(`[info-hub-mcp] HTTP 服务已启动: http://0.0.0.0:${port}`)
-    console.error(`[info-hub-mcp] 健康检查: http://0.0.0.0:${port}/health`)
-    console.error(`[info-hub-mcp] MCP JSON-RPC: http://0.0.0.0:${port}/mcp?token=${AUTH_TOKEN}`)
-    console.error(`[info-hub-mcp] REST API:     http://0.0.0.0:${port}/api/scan?token=${AUTH_TOKEN}`)
+  // BIND_ADDRESS 可绑定到指定网卡，例如 Tailscale IP (100.x.x.x) 或仅本机 (127.0.0.1)
+  const bindAddress = process.env.BIND_ADDRESS || '0.0.0.0'
+  httpServer.listen(port, bindAddress, () => {
+    console.error(`[info-hub-mcp] HTTP 服务已启动: http://${bindAddress}:${port}`)
+    console.error(`[info-hub-mcp] 健康检查: http://${bindAddress}:${port}/health`)
+    console.error(`[info-hub-mcp] 访问 token: ${AUTH_TOKEN}`)
+    console.error(`[info-hub-mcp] MCP JSON-RPC: http://${bindAddress}:${port}/mcp`)
+    console.error(`[info-hub-mcp] REST API:     http://${bindAddress}:${port}/api/scan`)
   })
 
   return httpServer
@@ -1103,7 +1171,7 @@ const HOME_PAGE = `<!DOCTYPE html>
 <p>Obsidian 知识库 MCP 服务（HTTP 传输模式），支持 MCP JSON-RPC 和 REST API 两种调用方式。</p>
 
 <div class="note">
-  <strong>认证方式：</strong>所有需要认证的请求都需要带上 <code>?token=你的MCP_AUTH_TOKEN</code> 查询参数，或 <code>Authorization: Bearer 你的MCP_AUTH_TOKEN</code> 请求头。
+  <strong>认证方式：</strong>所有需要认证的请求需带 <code>Authorization: Bearer &lt;token&gt;</code> 请求头或 <code>?token=...</code> 查询参数。Token 在服务启动日志中显示，或查看 <code>.info-hub-token</code> 文件。
 </div>
 
 <h2>可用工具 / REST 端点</h2>
@@ -1118,13 +1186,17 @@ const HOME_PAGE = `<!DOCTYPE html>
 </table>
 
 <h2>使用示例</h2>
-<pre>curl "http://localhost:3010/api/scan?token=info-hub-dev-token"
+<pre>TOKEN=$(cat .info-hub-token)
 
-curl "http://localhost:3010/api/read?source=obsidian&path=inbox/test.md&token=info-hub-dev-token"
+curl -H "Authorization: Bearer $TOKEN" "http://localhost:3010/api/scan"
 
-curl -X POST "http://localhost:3010/api/write?source=obsidian&path=inbox/test.md&token=info-hub-dev-token" \\
+curl -H "Authorization: Bearer $TOKEN" \\
+  "http://localhost:3010/api/read?source=obsidian&path=inbox/test.md"
+
+curl -X POST -H "Authorization: Bearer $TOKEN" \\
   -H "Content-Type: application/json" \\
-  -d '{"content":"# Hello\\n\\nworld"}'</pre>
+  -d '{"content":"# Hello\\n\\nworld"}' \\
+  "http://localhost:3010/api/write?source=obsidian&path=inbox/test.md"</pre>
 
 <h2>Claude Code 远程配置</h2>
 <p>在 <code>~/.claude/settings.json</code> 中添加：</p>

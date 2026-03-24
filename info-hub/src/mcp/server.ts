@@ -72,12 +72,12 @@ function blinkoRequest<T>(
   })
 }
 
-async function handleBlinkoApi(req: IncomingMessage, res: ServerResponse, url: URL) {
+async function handleBlinkoApi(_req: IncomingMessage, res: ServerResponse, url: URL) {
   const apiToken = process.env.BLINKO_TOKEN
     || docSources.find(s => s.id === 'blinko')?.apiToken
     || ''
   const apiPath = url.pathname.slice(5) // 去掉 /api/
-  const action = url.searchParams.get('action') || ''
+  // action 保留用于未来扩展
 
   try {
     let result: unknown

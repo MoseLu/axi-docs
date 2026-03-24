@@ -221,8 +221,8 @@ const docSources: DocSource[] = [
     enabled: true,
     type: 'api',
     apiUrl: process.env.BLINKO_URL || 'http://localhost:3006',
-    // 本地开发默认 token (使用 Blinko NEXTAUTH_SECRET 生成，userId: 1)
-    apiToken: process.env.BLINKO_TOKEN || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3NDM1MjQwMSwiZXhwIjoxODA1OTEwMDAxfQ.x_jjToCeq6hUSv6fclG6If-AHqB19xLJRRoQGB8SaQc',
+    // 优先级：BLINKO_TOKEN 环境变量 > 空字符串（Blinko 关闭认证时）
+    apiToken: process.env.BLINKO_TOKEN || '',
     icon: 'blinko',
   },
 ]

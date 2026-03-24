@@ -114,6 +114,49 @@ export interface TocHeading {
   id: string
 }
 
+// ─── Knowledge Graph Types ────────────────────────────────────────────────────
+
+export type GraphNodeKind = 'current' | 'note' | 'tag'
+
+export interface GraphNode {
+  id: string
+  label: string
+  kind: GraphNodeKind
+  x: number
+  y: number
+  vx: number
+  vy: number
+}
+
+export interface GraphEdge {
+  source: string
+  target: string
+  kind: 'wikilink' | 'tag'
+}
+
+export interface GraphData {
+  nodes: GraphNode[]
+  edges: GraphEdge[]
+}
+
+// ─── AI Analysis Types ────────────────────────────────────────────────────────
+
+export interface AiConcept {
+  term: string
+  definition: string
+}
+
+export interface AiAnalysis {
+  summary: string
+  keyPoints: string[]
+  concepts: AiConcept[]
+  error?: string
+}
+
+// ─── Knowledge Panel ──────────────────────────────────────────────────────────
+
+export type KnowledgePanelTab = 'graph' | 'toc' | 'ai'
+
 // ─── App State ────────────────────────────────────────────────────────────────
 
 export interface SelectedFile {

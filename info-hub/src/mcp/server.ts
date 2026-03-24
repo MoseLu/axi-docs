@@ -10,6 +10,7 @@ import http from 'http'
 import crypto from 'crypto'
 import { URL } from 'url'
 import { IncomingMessage, ServerResponse } from 'http'
+import Anthropic from '@anthropic-ai/sdk'
 
 // ─── 加载环境变量 ────────────────────────────────────────────────────────────
 
@@ -506,6 +507,162 @@ function buildFrontmatter(meta: Record<string, unknown>): string {
   }
   lines.push('---', '')
   return lines.join('\n')
+}
+
+// ─── Knowledge Graph ──────────────────────────────────────────────────────────
+
+interface GraphNode {
+  id: string
+  label: string
+  kind: 'current' | 'note' | 'tag'
+  x: number
+  y: number
+  vx: number
+  vy: number
+}
+
+interface GraphEdge {
+  source: string
+  target: string
+  kind: 'wikilink' | 'tag'
+}
+
+function buildGraphData(sourceId: string, currentRelativePath: string): { nodes: GraphNode[]; edges: GraphEdge[] } {
+  const source = resolveSource(sourceId)
+  if (!source || source.type !== 'local') return { nodes: [], edges: [] }
+
+  const nameToPath: Record<string, string> = {}
+  function indexFiles(dir: string) {
+    if (!fs.existsSync(dir)) return
+    let entries: fs.Dirent[]
+    try { entries = fs.readdirSync(dir, { withFileTypes: true }) } catch { return }
+    for (const entry of entries) {
+      if (isExcluded(entry.name)) continue
+      const fullPath = path.join(dir, entry.name)
+      if (entry.isDirectory()) {
+        indexFiles(fullPath)
+      } else if (entry.isFile() && isSupported(entry.name)) {
+        const rel = path.relative(source!.path, fullPath).replace(/\\/g, '/')
+        const stem = entry.name.replace(/\.(md|markdown)$/i, '')
+        nameToPath[stem.toLowerCase()] = rel
+      }
+    }
+  }
+  indexFiles(source.path)
+
+  const nodesMap = new Map<string, GraphNode>()
+  const edges: GraphEdge[] = []
+
+  const addNode = (id: string, label: string, kind: GraphNode['kind']) => {
+    if (!nodesMap.has(id)) {
+      nodesMap.set(id, { id, label, kind, x: 0, y: 0, vx: 0, vy: 0 })
+    }
+  }
+
+  const currentStem = path.basename(currentRelativePath).replace(/\.(md|markdown)$/i, '')
+  addNode(currentRelativePath, currentStem, 'current')
+
+  const currentFullPath = path.join(source.path, currentRelativePath)
+  if (!fs.existsSync(currentFullPath)) return { nodes: [...nodesMap.values()], edges }
+
+  const currentContent = fs.readFileSync(currentFullPath, 'utf-8')
+
+  const wikilinkRegex = /\[\[([^\]|#]+)(?:\|[^\]]+)?\]\]/g
+  let match: RegExpExecArray | null
+  while ((match = wikilinkRegex.exec(currentContent)) !== null) {
+    const linkName = match[1].trim()
+    const resolved = nameToPath[linkName.toLowerCase()]
+    if (resolved && resolved !== currentRelativePath) {
+      addNode(resolved, linkName, 'note')
+      edges.push({ source: currentRelativePath, target: resolved, kind: 'wikilink' })
+    }
+  }
+
+  const currentTags = extractTagsFromContent(currentContent)
+  for (const tag of currentTags) {
+    const tagId = '#' + tag
+    addNode(tagId, tag, 'tag')
+    edges.push({ source: currentRelativePath, target: tagId, kind: 'tag' })
+  }
+
+  function findBacklinks(dir: string) {
+    if (!fs.existsSync(dir)) return
+    let entries: fs.Dirent[]
+    try { entries = fs.readdirSync(dir, { withFileTypes: true }) } catch { return }
+    for (const entry of entries) {
+      if (isExcluded(entry.name)) continue
+      const fullPath = path.join(dir, entry.name)
+      if (entry.isDirectory()) {
+        findBacklinks(fullPath)
+      } else if (entry.isFile() && isSupported(entry.name)) {
+        const rel = path.relative(source!.path, fullPath).replace(/\\/g, '/')
+        if (rel === currentRelativePath) continue
+        try {
+          const content = fs.readFileSync(fullPath, 'utf-8')
+          const re = /\[\[([^\]|#]+)(?:\|[^\]]+)?\]\]/g
+          let m: RegExpExecArray | null
+          while ((m = re.exec(content)) !== null) {
+            const resolved = nameToPath[m[1].trim().toLowerCase()]
+            if (resolved === currentRelativePath) {
+              const stem = entry.name.replace(/\.(md|markdown)$/i, '')
+              addNode(rel, stem, 'note')
+              edges.push({ source: rel, target: currentRelativePath, kind: 'wikilink' })
+              break
+            }
+          }
+        } catch { /* skip */ }
+      }
+    }
+  }
+  findBacklinks(source.path)
+
+  return { nodes: [...nodesMap.values()], edges }
+}
+
+// ─── AI Analysis ──────────────────────────────────────────────────────────────
+
+async function analyzeDocumentContent(content: string, fileName: string): Promise<{
+  summary: string
+  keyPoints: string[]
+  concepts: Array<{ term: string; definition: string }>
+  error?: string
+}> {
+  try {
+    const anthropic = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY || '',
+      ...(process.env.ANTHROPIC_BASE_URL ? { baseURL: process.env.ANTHROPIC_BASE_URL } : {}),
+    })
+
+    const truncated = content.slice(0, 8000)
+    const response = await anthropic.messages.create({
+      model: process.env.AI_MODEL || 'claude-3-5-haiku-20241022',
+      max_tokens: 1024,
+      messages: [{
+        role: 'user',
+        content: `Analyze this document and return JSON only, no prose.
+
+Document: "${fileName}"
+
+${truncated}
+
+Return exactly:
+{
+  "summary": "2-3 sentence summary",
+  "keyPoints": ["point 1", "point 2", "point 3"],
+  "concepts": [
+    { "term": "concept name", "definition": "brief explanation" }
+  ]
+}`,
+      }],
+    })
+
+    const text = response.content[0].type === 'text' ? response.content[0].text : ''
+    const clean = text.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim()
+    return JSON.parse(clean)
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e)
+    return { summary: '', keyPoints: [], concepts: [], error: msg }
+  }
 }
 
 // ─── 工具定义 ─────────────────────────────────────────────────────────────────
@@ -1042,6 +1199,22 @@ async function startHttpServer(port: number) {
             const tags = getAllTags(source)
             res.writeHead(200, { 'Content-Type': 'application/json' })
             res.end(JSON.stringify(tags))
+            return
+          }
+          case 'graph': {
+            if (!filePath) throw new Error('path 参数必填')
+            const graphData = buildGraphData(source, filePath)
+            res.writeHead(200, { 'Content-Type': 'application/json' })
+            res.end(JSON.stringify(graphData))
+            return
+          }
+          case 'ai/analyze': {
+            let body = ''
+            for await (const chunk of req) body += chunk
+            const payload = JSON.parse(body)
+            const aiResult = await analyzeDocumentContent(payload.content || '', payload.fileName || '')
+            res.writeHead(200, { 'Content-Type': 'application/json' })
+            res.end(JSON.stringify(aiResult))
             return
           }
           default:

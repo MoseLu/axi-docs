@@ -2,6 +2,7 @@ import type { Plugin } from 'vite'
 import fs from 'fs'
 import path from 'path'
 import http from 'http'
+import Anthropic from '@anthropic-ai/sdk'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -475,6 +476,175 @@ function getAllTags(sourceId: string): { name: string; count: number }[] {
     .sort((a, b) => b.count - a.count)
 }
 
+// ─── Knowledge Graph ──────────────────────────────────────────────────────────
+
+interface GraphNode {
+  id: string
+  label: string
+  kind: 'current' | 'note' | 'tag'
+  x: number
+  y: number
+  vx: number
+  vy: number
+}
+
+interface GraphEdge {
+  source: string
+  target: string
+  kind: 'wikilink' | 'tag'
+}
+
+interface GraphData {
+  nodes: GraphNode[]
+  edges: GraphEdge[]
+}
+
+function buildGraphData(sourceId: string, currentRelativePath: string): GraphData {
+  const source = docSources.find(s => s.id === sourceId && s.type === 'local')
+  if (!source) return { nodes: [], edges: [] }
+
+  // Build name -> relativePath lookup for all .md files
+  const nameToPath: Record<string, string> = {}
+  function indexFiles(dir: string) {
+    if (!fs.existsSync(dir)) return
+    let entries: fs.Dirent[]
+    try { entries = fs.readdirSync(dir, { withFileTypes: true }) } catch { return }
+    for (const entry of entries) {
+      if (isExcluded(entry.name)) continue
+      const fullPath = path.join(dir, entry.name)
+      if (entry.isDirectory()) {
+        indexFiles(fullPath)
+      } else if (entry.isFile() && isSupported(entry.name)) {
+        const rel = path.relative(source.path, fullPath).replace(/\\/g, '/')
+        const stem = entry.name.replace(/\.(md|markdown)$/i, '')
+        nameToPath[stem.toLowerCase()] = rel
+      }
+    }
+  }
+  indexFiles(source.path)
+
+  const nodesMap = new Map<string, GraphNode>()
+  const edges: GraphEdge[] = []
+
+  const addNode = (id: string, label: string, kind: GraphNode['kind']) => {
+    if (!nodesMap.has(id)) {
+      nodesMap.set(id, { id, label, kind, x: 0, y: 0, vx: 0, vy: 0 })
+    }
+  }
+
+  // Add current node
+  const currentStem = path.basename(currentRelativePath).replace(/\.(md|markdown)$/i, '')
+  addNode(currentRelativePath, currentStem, 'current')
+
+  // Read current file
+  const currentFullPath = path.join(source.path, currentRelativePath)
+  if (!fs.existsSync(currentFullPath)) return { nodes: [...nodesMap.values()], edges }
+
+  const currentContent = fs.readFileSync(currentFullPath, 'utf-8')
+
+  // Extract wikilinks from current file
+  const wikilinkRegex = /\[\[([^\]|#]+)(?:\|[^\]]+)?\]\]/g
+  let match: RegExpExecArray | null
+  while ((match = wikilinkRegex.exec(currentContent)) !== null) {
+    const linkName = match[1].trim()
+    const resolved = nameToPath[linkName.toLowerCase()]
+    if (resolved && resolved !== currentRelativePath) {
+      addNode(resolved, linkName, 'note')
+      edges.push({ source: currentRelativePath, target: resolved, kind: 'wikilink' })
+    }
+  }
+
+  // Extract tags from current file
+  const currentTags = extractTags(currentContent)
+  for (const tag of currentTags) {
+    const tagId = '#' + tag
+    addNode(tagId, tag, 'tag')
+    edges.push({ source: currentRelativePath, target: tagId, kind: 'tag' })
+  }
+
+  // Find backlinks (other files that link to current)
+  function findBacklinks(dir: string) {
+    if (!fs.existsSync(dir)) return
+    let entries: fs.Dirent[]
+    try { entries = fs.readdirSync(dir, { withFileTypes: true }) } catch { return }
+    for (const entry of entries) {
+      if (isExcluded(entry.name)) continue
+      const fullPath = path.join(dir, entry.name)
+      if (entry.isDirectory()) {
+        findBacklinks(fullPath)
+      } else if (entry.isFile() && isSupported(entry.name)) {
+        const rel = path.relative(source.path, fullPath).replace(/\\/g, '/')
+        if (rel === currentRelativePath) continue
+        try {
+          const content = fs.readFileSync(fullPath, 'utf-8')
+          const re = /\[\[([^\]|#]+)(?:\|[^\]]+)?\]\]/g
+          let m: RegExpExecArray | null
+          while ((m = re.exec(content)) !== null) {
+            const resolved = nameToPath[m[1].trim().toLowerCase()]
+            if (resolved === currentRelativePath) {
+              const stem = entry.name.replace(/\.(md|markdown)$/i, '')
+              addNode(rel, stem, 'note')
+              edges.push({ source: rel, target: currentRelativePath, kind: 'wikilink' })
+              break
+            }
+          }
+        } catch { /* skip */ }
+      }
+    }
+  }
+  findBacklinks(source.path)
+
+  return { nodes: [...nodesMap.values()], edges }
+}
+
+// ─── AI Analysis ──────────────────────────────────────────────────────────────
+
+interface AiAnalysis {
+  summary: string
+  keyPoints: string[]
+  concepts: Array<{ term: string; definition: string }>
+  error?: string
+}
+
+async function analyzeDocument(content: string, fileName: string): Promise<AiAnalysis> {
+  try {
+    const anthropic = new Anthropic({
+      apiKey: process.env.ANTHROPIC_API_KEY || '',
+      ...(process.env.ANTHROPIC_BASE_URL ? { baseURL: process.env.ANTHROPIC_BASE_URL } : {}),
+    })
+
+    const truncated = content.slice(0, 8000)
+    const response = await anthropic.messages.create({
+      model: process.env.AI_MODEL || 'claude-3-5-haiku-20241022',
+      max_tokens: 1024,
+      messages: [{
+        role: 'user',
+        content: `Analyze this document and return JSON only, no prose.
+
+Document: "${fileName}"
+
+${truncated}
+
+Return exactly:
+{
+  "summary": "2-3 sentence summary",
+  "keyPoints": ["point 1", "point 2", "point 3"],
+  "concepts": [
+    { "term": "concept name", "definition": "brief explanation" }
+  ]
+}`,
+      }],
+    })
+
+    const text = response.content[0].type === 'text' ? response.content[0].text : ''
+    const clean = text.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim()
+    return JSON.parse(clean) as AiAnalysis
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e)
+    return { summary: '', keyPoints: [], concepts: [], error: msg }
+  }
+}
+
 // ─── Vite Plugin ─────────────────────────────────────────────────────────────
 
 export function localDocsPlugin(): Plugin {
@@ -569,6 +739,50 @@ export function localDocsPlugin(): Plugin {
 
         const results = searchInSource(sourceId, query, filterTag)
         res.end(JSON.stringify(results))
+      })
+
+      // GET /api/graph?source=&path= — knowledge graph for a file
+      server.middlewares.use('/api/graph', (req, res) => {
+        const url = new URL(req.url!, 'http://localhost')
+        const sourceId = url.searchParams.get('source') || 'obsidian'
+        const filePath = url.searchParams.get('path') || ''
+
+        res.setHeader('Content-Type', 'application/json')
+        res.setHeader('Access-Control-Allow-Origin', '*')
+
+        if (!filePath) {
+          res.statusCode = 400
+          res.end(JSON.stringify({ error: 'path parameter required' }))
+          return
+        }
+
+        const graphData = buildGraphData(sourceId, filePath)
+        res.end(JSON.stringify(graphData))
+      })
+
+      // POST /api/ai/analyze — AI document analysis
+      server.middlewares.use('/api/ai/analyze', async (req, res) => {
+        res.setHeader('Content-Type', 'application/json')
+        res.setHeader('Access-Control-Allow-Origin', '*')
+
+        if (req.method === 'OPTIONS') {
+          res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
+          res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+          res.end()
+          return
+        }
+
+        let body = ''
+        for await (const chunk of req) body += chunk
+        try {
+          const { content, fileName } = JSON.parse(body)
+          const result = await analyzeDocument(content || '', fileName || '')
+          res.end(JSON.stringify(result))
+        } catch (e) {
+          const msg = e instanceof Error ? e.message : String(e)
+          res.statusCode = 400
+          res.end(JSON.stringify({ error: msg }))
+        }
       })
 
       // GET /api/file-info?source=&path= — file metadata

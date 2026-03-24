@@ -81,7 +81,7 @@ export function TableOfContents({ content }: TableOfContentsProps) {
   if (headings.length < 2) return null
 
   return (
-    <aside className="toc-panel">
+    <>
       <div className="toc-header">目录</div>
       <nav className="toc-nav">
         {headings.map((h, i) => (
@@ -95,6 +95,6 @@ export function TableOfContents({ content }: TableOfContentsProps) {
           </button>
         ))}
       </nav>
-    </aside>
+    </>
   )
 }

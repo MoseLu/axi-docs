@@ -72,9 +72,9 @@ function blinkoRequest<T>(
 }
 
 async function handleBlinkoApi(req: IncomingMessage, res: ServerResponse, url: URL) {
-  // 本地开发模式：使用 Blinko 默认 JWT secret 生成 token
-  // Blinko 使用 NEXTAUTH_SECRET 作为 JWT 密钥
-  const apiToken = '' // Blinko API 不需要 Bearer token，直接调用
+  const apiToken = process.env.BLINKO_TOKEN
+    || docSources.find(s => s.id === 'blinko')?.apiToken
+    || ''
   const apiPath = url.pathname.slice(5) // 去掉 /api/
   const action = url.searchParams.get('action') || ''
 

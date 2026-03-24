@@ -12,7 +12,7 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3003,
+    port: 3005,
     host: '127.0.0.1',
     allowedHosts: ['docs', 'localhost', '127.0.0.1', 'axiomaticworld.com'],
   },

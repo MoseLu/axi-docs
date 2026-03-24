@@ -44,9 +44,9 @@ function parseFrontmatter(content: string): { frontmatter: Frontmatter; body: st
 }
 
 // Replace [[WikiLinks]] with clickable spans
-function processWikiLinks(content: string, onClick: (name: string) => void): string {
-  return content  // We handle this in the custom renderer below
-}
+// function processWikiLinks(content: string, onClick: (name: string) => void): string {
+//   return content  // We handle this in the custom renderer below
+// }
 
 export function DocumentView({
   content,

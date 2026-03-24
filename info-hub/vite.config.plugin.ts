@@ -70,7 +70,7 @@ const docSources: DocSource[] = [
     path: '',
     enabled: true,
     type: 'api',
-    apiUrl: process.env.BLINKO_URL || 'http://localhost:1111',
+    apiUrl: process.env.BLINKO_URL || 'http://localhost:3006',
     apiToken: process.env.BLINKO_TOKEN || '',
     icon: 'blinko',
   },

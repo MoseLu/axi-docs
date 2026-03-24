@@ -122,3 +122,51 @@ export function getFileInfo(sourceId: string, filePath: string): FileItem | null
     return null
   }
 }
+
+// 从 markdown 文件中提取所有标签（#tag-name 格式）
+function extractTagsFromContent(content: string): string[] {
+  const tagRegex: RegExp = /#([\p{L}\p{N}_-]+)/gu
+  const tags = new Set<string>()
+  let match
+
+  while ((match = tagRegex.exec(content)) !== null) {
+    tags.add(match[1].toLowerCase())
+  }
+
+  return Array.from(tags)
+}
+
+interface TagInfo {
+  name: string
+  count: number
+}
+
+// 获取某个源下所有文件的标签
+export function getAllTags(sourceId: string): TagInfo[] {
+  const source = docSources.find(s => s.id === sourceId)
+  if (!source) return []
+
+  const tagCounts = new Map<string, number>()
+
+  try {
+    const scanResults = scanDirectory(sourceId)
+    const mdFiles = scanResults.filter(item => item.type === 'file' && item.extension === '.md')
+
+    for (const file of mdFiles) {
+      const content = readFileContent(sourceId, file.relativePath)
+      if (content) {
+        const tags = extractTagsFromContent(content)
+        for (const tag of tags) {
+          tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1)
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error extracting tags:', error)
+  }
+
+  // 按出现次数降序排序
+  return Array.from(tagCounts.entries())
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count)
+}

@@ -43,7 +43,7 @@ export function Header({ onRefresh, searchQuery, onSearch, searching }: HeaderPr
       </div>
 
       <div className="header-search">
-        <span className="search-icon-wrap">
+        <span className="search-icon-wrap" data-testid="search-icon-wrap">
           {searching ? (
             <span className="search-spinner" />
           ) : (

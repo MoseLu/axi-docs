@@ -8,8 +8,188 @@ import fs from 'fs'
 import path from 'path'
 import http from 'http'
 import { URL } from 'url'
+import { IncomingMessage, ServerResponse } from 'http'
 
-// ─── 文档源配置 ───────────────────────────────────────────────────────────────
+// ─── Blinko API 代理 ───────────────────────────────────────────────────────────
+
+interface BlinkoNote {
+  id: number
+  content: string
+  type: 0 | 1
+  tags?: string[]
+  files?: unknown[]
+  createdAt: string
+  updatedAt: string
+}
+
+interface BlinkoFileItem {
+  id: string
+  name: string
+  path: string
+  relativePath: string
+  type: 'file' | 'directory'
+  extension: string
+  lastModified: string
+  sourceId: string
+  tags?: string[]
+  blinkoData?: BlinkoNote
+}
+
+function blinkoRequest<T>(
+  urlPath: string,
+  method: string,
+  body?: unknown,
+  apiToken?: string
+): Promise<T> {
+  return new Promise((resolve, reject) => {
+    const sourceUrl = docSources.find(s => s.id === 'blinko')?.apiUrl || 'http://localhost:3006'
+    const url = new URL(urlPath, sourceUrl)
+    const postData = body ? JSON.stringify(body) : undefined
+    const options: http.RequestOptions = {
+      hostname: url.hostname,
+      port: url.port || 80,
+      path: url.pathname + url.search,
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(apiToken ? { Authorization: `Bearer ${apiToken}` } : {}),
+        ...(postData ? { 'Content-Length': Buffer.byteLength(postData) } : {}),
+      },
+    }
+
+    const req = http.request(options, res => {
+      let data = ''
+      res.on('data', chunk => { data += chunk })
+      res.on('end', () => {
+        try { resolve(JSON.parse(data)) }
+        catch (e) { reject(new Error('Invalid JSON: ' + data.slice(0, 100))) }
+      })
+    })
+    req.on('error', reject)
+    if (postData) req.write(postData)
+    req.end()
+  })
+}
+
+async function handleBlinkoApi(req: IncomingMessage, res: ServerResponse, url: URL) {
+  // 本地开发模式：使用 Blinko 默认 JWT secret 生成 token
+  // Blinko 使用 NEXTAUTH_SECRET 作为 JWT 密钥
+  const apiToken = '' // Blinko API 不需要 Bearer token，直接调用
+  const apiPath = url.pathname.slice(5) // 去掉 /api/
+  const action = url.searchParams.get('action') || ''
+
+  try {
+    let result: unknown
+
+    if (apiPath === 'scan') {
+      // 获取笔记列表
+      result = await blinkoRequest<BlinkoNote[] | { message: string }>(
+        '/api/v1/note/list',
+        'POST',
+        { page: 1, size: 200, orderBy: 'desc', type: -1, isRecycle: false },
+        apiToken
+      )
+
+      if (!Array.isArray(result)) {
+        // 返回错误信息给前端
+        const items: BlinkoFileItem[] = [{
+          id: 'blinko:auth-required',
+          name: '需要配置 Blinko API Token',
+          path: 'auth-required',
+          relativePath: 'auth-required',
+          type: 'file',
+          extension: '.md',
+          lastModified: new Date().toISOString(),
+          sourceId: 'blinko',
+        }]
+        res.writeHead(200, { 'Content-Type': 'application/json' })
+        res.end(JSON.stringify(items))
+        return
+      }
+
+      const items: BlinkoFileItem[] = (result as BlinkoNote[]).map((note: BlinkoNote) => ({
+        id: `blinko:${note.id}`,
+        name: note.content.split('\n')[0].slice(0, 60) || `Blinko #${note.id}`,
+        path: String(note.id),
+        relativePath: String(note.id),
+        type: 'file' as const,
+        extension: '.md',
+        lastModified: note.updatedAt || note.createdAt,
+        sourceId: 'blinko',
+        tags: note.tags,
+        blinkoData: note,
+      }))
+
+      res.writeHead(200, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify(items))
+      return
+    }
+
+    if (apiPath === 'file') {
+      // 获取笔记内容
+      const noteId = url.searchParams.get('path') || ''
+      if (noteId === 'auth-required') {
+        res.writeHead(200, { 'Content-Type': 'text/plain' })
+        res.end('# Blinko — 需要 API Token\n\n请在 .env 文件中配置 BLINKO_TOKEN')
+        return
+      }
+
+      const detail = await blinkoRequest<{ content?: string }>(
+        '/api/v1/note/detail',
+        'POST',
+        { id: parseInt(noteId, 10) },
+        apiToken
+      )
+
+      const content = (detail as { content?: string }).content || '# 笔记内容为空'
+      res.writeHead(200, { 'Content-Type': 'text/plain' })
+      res.end(content)
+      return
+    }
+
+    if (apiPath === 'tags') {
+      // Blinko 标签从笔记中提取
+      const notes = await blinkoRequest<BlinkoNote[]>(
+        '/api/v1/note/list',
+        'POST',
+        { page: 1, size: 200, orderBy: 'desc', type: -1, isRecycle: false },
+        apiToken
+      )
+
+      if (!Array.isArray(notes)) {
+        res.writeHead(200, { 'Content-Type': 'application/json' })
+        res.end(JSON.stringify([]))
+        return
+      }
+
+      const tagCounts = new Map<string, number>()
+      for (const note of notes) {
+        if (note.tags) {
+          for (const tag of note.tags) {
+            tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1)
+          }
+        }
+      }
+
+      const tags = Array.from(tagCounts.entries())
+        .map(([name, count]) => ({ name, count }))
+        .sort((a, b) => b.count - a.count)
+
+      res.writeHead(200, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify(tags))
+      return
+    }
+
+    // 未知端点
+    res.writeHead(404, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify({ error: 'Unknown Blinko API endpoint' }))
+  } catch (e: unknown) {
+    const msg = e instanceof Error ? e.message : String(e)
+    console.error('Blinko API error:', e)
+    res.writeHead(500, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify({ error: msg }))
+  }
+}
 
 interface DocSource {
   id: string
@@ -17,6 +197,10 @@ interface DocSource {
   path: string
   enabled: boolean
   description?: string
+  type?: 'local' | 'api'
+  apiUrl?: string
+  apiToken?: string
+  icon?: string
 }
 
 const docSources: DocSource[] = [
@@ -26,6 +210,20 @@ const docSources: DocSource[] = [
     description: '本地 Obsidian Vault',
     path: process.env.OBSIDIAN_PATH || 'F:/docs/obsidian/',
     enabled: true,
+    type: 'local',
+    icon: 'obsidian',
+  },
+  {
+    id: 'blinko',
+    name: 'Blinko 闪念',
+    description: '闪念笔记 & 灵感捕捉',
+    path: '',
+    enabled: true,
+    type: 'api',
+    apiUrl: process.env.BLINKO_URL || 'http://localhost:3006',
+    // 本地开发默认 token (使用 Blinko NEXTAUTH_SECRET 生成，userId: 1)
+    apiToken: process.env.BLINKO_TOKEN || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3NDM1MjQwMSwiZXhwIjoxODA1OTEwMDAxfQ.x_jjToCeq6hUSv6fclG6If-AHqB19xLJRRoQGB8SaQc',
+    icon: 'blinko',
   },
 ]
 
@@ -180,6 +378,54 @@ function searchFiles(
   return results
 }
 
+// 从 markdown 文件中提取所有标签（#tag-name 格式）
+function extractTagsFromContent(content: string): string[] {
+  const tagRegex = /#([\p{L}\p{N}_-]+)/gu
+  const tags = new Set<string>()
+  let match: RegExpExecArray | null
+
+  while ((match = tagRegex.exec(content)) !== null) {
+    tags.add(match[1].toLowerCase())
+  }
+
+  return Array.from(tags)
+}
+
+interface TagInfo {
+  name: string
+  count: number
+}
+
+// 获取某个源下所有文件的标签
+function getAllTags(sourceId: string): TagInfo[] {
+  const source = resolveSource(sourceId)
+  if (!source) return []
+
+  const tagCounts = new Map<string, number>()
+
+  try {
+    const scanResults = scanDir(sourceId)
+    const mdFiles = scanResults.filter(item => item.type === 'file' && item.extension === '.md')
+
+    for (const file of mdFiles) {
+      const content = readFile(sourceId, file.relativePath)
+      if (content) {
+        const tags = extractTagsFromContent(content)
+        for (const tag of tags) {
+          tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1)
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error extracting tags:', error)
+  }
+
+  // 按出现次数降序排序
+  return Array.from(tagCounts.entries())
+    .map(([name, count]) => ({ name, count }))
+    .sort((a, b) => b.count - a.count)
+}
+
 // Full-text search across all files
 function searchFullText(
   sourceId: string,
@@ -204,7 +450,7 @@ function searchFullText(
       } else if (entry.isFile() && isSupported(entry.name)) {
         try {
           const content = fs.readFileSync(fullPath, 'utf-8')
-          const relativePath = path.relative(source.path, fullPath).replace(/\\/g, '/')
+          const relativePath = path.relative(source!.path, fullPath).replace(/\\/g, '/')
           const lowerContent = content.toLowerCase()
           const lowerName = entry.name.toLowerCase()
 
@@ -535,7 +781,7 @@ function authMiddleware(req: http.IncomingMessage): boolean {
 }
 
 async function startHttpServer(port: number) {
-  const server = createServer()
+  createServer()
 
   const mimeTypes: Record<string, string> = {
     '.html': 'text/html',
@@ -633,6 +879,13 @@ async function startHttpServer(port: number) {
     // ── API 代理（便捷 HTTP API，无需 JSON-RPC，远程访问友好）────────────────
 
     if (pathname.startsWith('/api/')) {
+      // Blinko API 代理 - 不需要 token 认证
+      if (url.searchParams.get('source') === 'blinko') {
+        handleBlinkoApi(req, res, url)
+        return
+      }
+
+      // 本地源 API - 需要 token 认证
       if (!authMiddleware(req)) {
         res.writeHead(401, { 'Content-Type': 'application/json' })
         res.end(JSON.stringify({ error: 'Unauthorized' }))
@@ -648,6 +901,16 @@ async function startHttpServer(port: number) {
         let statusCode = 200
 
         switch (apiPath) {
+          case 'file': // 别名：read
+          case 'read': {
+            if (!filePath) throw new Error('path 参数必填')
+            result = readFile(source, filePath)
+            if (result === null) {
+              statusCode = 404
+              result = `文件不存在：${filePath}`
+            }
+            break
+          }
           case 'scan': {
             const items = scanDir(source, filePath || undefined)
             res.writeHead(200, { 'Content-Type': 'application/json' })
@@ -698,6 +961,12 @@ async function startHttpServer(port: number) {
             const items = searchFullText(source, query)
             res.writeHead(200, { 'Content-Type': 'application/json' })
             res.end(JSON.stringify(items))
+            return
+          }
+          case 'tags': {
+            const tags = getAllTags(source)
+            res.writeHead(200, { 'Content-Type': 'application/json' })
+            res.end(JSON.stringify(tags))
             return
           }
           default:

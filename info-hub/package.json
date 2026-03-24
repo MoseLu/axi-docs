@@ -1,0 +1,32 @@
+{
+  "name": "info-hub",
+  "version": "1.0.0",
+  "description": "文档同步与查看平台",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "lint": "eslint . --ext ts,tsx",
+    "mcp": "tsx src/mcp/server.ts",
+    "mcp:http": "tsx src/mcp/server.ts http"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.1.0",
+    "chokidar": "^3.6.0",
+    "gray-matter": "^4.0.3",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-markdown": "^9.0.1",
+    "react-router-dom": "^7.13.2",
+    "remark-gfm": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "tsx": "^4.19.4",
+    "typescript": "^5.5.3",
+    "vite": "^5.4.2"
+  }
+}

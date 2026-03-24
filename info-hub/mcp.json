@@ -1,0 +1,8 @@
+{
+  "info-hub": {
+    "command": "pnpm",
+    "args": ["--dir", "F:/enterprise-workspace/projects/info-hub", "run", "mcp"],
+    "env": {},
+    "enabled": true
+  }
+}

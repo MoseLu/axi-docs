@@ -16,4 +16,8 @@ export default defineConfig({
     host: '127.0.0.1',
     allowedHosts: ['docs', 'localhost', '127.0.0.1', 'axiomaticworld.com'],
   },
+  preview: {
+    port: 3005,
+    host: '127.0.0.1',
+  },
 })

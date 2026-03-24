@@ -16,13 +16,15 @@ interface DocSource {
   name: string
   path: string
   enabled: boolean
+  description?: string
 }
 
 const docSources: DocSource[] = [
   {
     id: 'obsidian',
     name: 'Obsidian 知识库',
-    path: 'F:/docs/obsidian/',
+    description: '本地 Obsidian Vault',
+    path: process.env.OBSIDIAN_PATH || 'F:/docs/obsidian/',
     enabled: true,
   },
 ]
@@ -151,6 +153,7 @@ function writeFile(
   }
 }
 
+// Filename-only search (shallow, fast)
 function searchFiles(
   sourceId: string,
   query: string,
@@ -175,6 +178,72 @@ function searchFiles(
   }
 
   return results
+}
+
+// Full-text search across all files
+function searchFullText(
+  sourceId: string,
+  query: string,
+): Array<{ path: string; name: string; snippet: string; score: number }> {
+  const source = resolveSource(sourceId)
+  if (!source) return []
+
+  const results: Array<{ path: string; name: string; snippet: string; score: number }> = []
+  const lowerQuery = query.toLowerCase()
+
+  function walk(dir: string) {
+    if (!fs.existsSync(dir)) return
+    let entries: fs.Dirent[]
+    try { entries = fs.readdirSync(dir, { withFileTypes: true }) } catch { return }
+
+    for (const entry of entries) {
+      if (isExcluded(entry.name)) continue
+      const fullPath = path.join(dir, entry.name)
+      if (entry.isDirectory()) {
+        walk(fullPath)
+      } else if (entry.isFile() && isSupported(entry.name)) {
+        try {
+          const content = fs.readFileSync(fullPath, 'utf-8')
+          const relativePath = path.relative(source.path, fullPath).replace(/\\/g, '/')
+          const lowerContent = content.toLowerCase()
+          const lowerName = entry.name.toLowerCase()
+
+          if (!lowerContent.includes(lowerQuery) && !lowerName.includes(lowerQuery)) continue
+
+          const matchIdx = lowerContent.indexOf(lowerQuery)
+          let snippet = ''
+          if (matchIdx !== -1) {
+            const start = Math.max(0, matchIdx - 60)
+            const end = Math.min(content.length, matchIdx + query.length + 100)
+            snippet = (start > 0 ? '…' : '') + content.slice(start, end).replace(/\n+/g, ' ') + (end < content.length ? '…' : '')
+          }
+
+          const nameScore = lowerName.includes(lowerQuery) ? 10 : 0
+          const freq = (lowerContent.match(new RegExp(lowerQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length
+
+          results.push({ path: relativePath, name: entry.name, snippet, score: nameScore + freq })
+        } catch { /* skip */ }
+      }
+    }
+  }
+
+  walk(source.path)
+  return results.sort((a, b) => b.score - a.score).slice(0, 20)
+}
+
+// Build markdown frontmatter
+function buildFrontmatter(meta: Record<string, unknown>): string {
+  if (Object.keys(meta).length === 0) return ''
+  const lines = ['---']
+  for (const [k, v] of Object.entries(meta)) {
+    if (Array.isArray(v)) {
+      lines.push(`${k}: [${v.map(String).join(', ')}]`)
+    } else {
+      lines.push(`${k}: ${v}`)
+    }
+  }
+  lines.push('---', '')
+  return lines.join('\n')
 }
 
 // ─── 工具定义 ─────────────────────────────────────────────────────────────────
@@ -250,7 +319,7 @@ function getToolSchemas() {
     },
     {
       name: 'obsidian_search',
-      description: '在 Obsidian 知识库中按文件名搜索文件',
+      description: '在 Obsidian 知识库中按文件名搜索文件（快速）',
       inputSchema: {
         type: 'object',
         properties: {
@@ -269,6 +338,61 @@ function getToolSchemas() {
           },
         },
         required: ['query'],
+      },
+    },
+    {
+      name: 'obsidian_fulltext_search',
+      description: '对 Obsidian 知识库进行全文搜索，返回包含关键词的文档片段（比 obsidian_search 慢但更准确）',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          source: {
+            type: 'string',
+            description: '文档源 ID，默认 obsidian',
+            default: 'obsidian',
+          },
+          query: {
+            type: 'string',
+            description: '搜索关键词（必填）',
+          },
+        },
+        required: ['query'],
+      },
+    },
+    {
+      name: 'obsidian_write_note',
+      description: '向知识库写入带有 frontmatter 元数据的 Markdown 笔记。如果文件已存在会覆盖。自动生成 YAML frontmatter（date/tags/title）。',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          source: {
+            type: 'string',
+            description: '文档源 ID，默认 obsidian',
+            default: 'obsidian',
+          },
+          path: {
+            type: 'string',
+            description: '文件相对路径（必填），如 daily/2026-03-24.md，会自动创建父目录',
+          },
+          content: {
+            type: 'string',
+            description: '笔记正文内容（Markdown，不含 frontmatter，必填）',
+          },
+          title: {
+            type: 'string',
+            description: '笔记标题（可选，写入 frontmatter）',
+          },
+          tags: {
+            type: 'array',
+            items: { type: 'string' },
+            description: '标签列表（可选，写入 frontmatter）',
+          },
+          date: {
+            type: 'string',
+            description: '创建日期（可选，默认今天，格式 YYYY-MM-DD）',
+          },
+        },
+        required: ['path', 'content'],
       },
     },
   ]
@@ -348,6 +472,38 @@ export function createServer() {
           return {
             content: [{ type: 'text', text: JSON.stringify(searchFiles(source, query, dirPath), null, 2) }],
           }
+        }
+
+        case 'obsidian_fulltext_search': {
+          const source = (args?.source as string) || 'obsidian'
+          const query = args?.query as string
+          if (!query) {
+            return { content: [{ type: 'text', text: '错误: query 参数必填' }], isError: true }
+          }
+          const results = searchFullText(source, query)
+          return {
+            content: [{ type: 'text', text: JSON.stringify(results, null, 2) }],
+          }
+        }
+
+        case 'obsidian_write_note': {
+          const source = (args?.source as string) || 'obsidian'
+          const filePath = args?.path as string
+          const body = args?.content as string
+          if (!filePath || body === undefined) {
+            return { content: [{ type: 'text', text: '错误: path 和 content 参数必填' }], isError: true }
+          }
+          const meta: Record<string, unknown> = {
+            date: (args?.date as string) || new Date().toISOString().slice(0, 10),
+          }
+          if (args?.title) meta.title = args.title as string
+          if (args?.tags && Array.isArray(args.tags)) meta.tags = args.tags
+          const fullContent = buildFrontmatter(meta) + body
+          const result = writeFile(source, filePath, fullContent)
+          if (result.success) {
+            return { content: [{ type: 'text', text: `✓ 笔记已保存: ${result.path}` }] }
+          }
+          return { content: [{ type: 'text', text: `✗ 保存失败: ${result.error}` }], isError: true }
         }
 
         default:
@@ -536,6 +692,14 @@ async function startHttpServer(port: number) {
             res.end(JSON.stringify(items))
             return
           }
+          case 'fulltext_search': {
+            const query = url.searchParams.get('query')
+            if (!query) throw new Error('query 参数必填')
+            const items = searchFullText(source, query)
+            res.writeHead(200, { 'Content-Type': 'application/json' })
+            res.end(JSON.stringify(items))
+            return
+          }
           default:
             statusCode = 404
             result = `未知端点: ${apiPath}`
@@ -621,6 +785,25 @@ async function handleToolCall(name: string, args: Record<string, unknown>) {
       const dirPath = args.path as string | undefined
       if (!query) return { content: [{ type: 'text', text: '错误: query 参数必填' }], isError: true }
       return { content: [{ type: 'text', text: JSON.stringify(searchFiles(source, query, dirPath), null, 2) }] }
+    }
+    case 'obsidian_fulltext_search': {
+      const source = (args.source as string) || 'obsidian'
+      const query = args.query as string
+      if (!query) return { content: [{ type: 'text', text: '错误: query 参数必填' }], isError: true }
+      return { content: [{ type: 'text', text: JSON.stringify(searchFullText(source, query), null, 2) }] }
+    }
+    case 'obsidian_write_note': {
+      const source = (args.source as string) || 'obsidian'
+      const filePath = args.path as string
+      const body = args.content as string
+      if (!filePath || body === undefined) return { content: [{ type: 'text', text: '错误: path 和 content 参数必填' }], isError: true }
+      const meta: Record<string, unknown> = { date: (args.date as string) || new Date().toISOString().slice(0, 10) }
+      if (args.title) meta.title = args.title as string
+      if (args.tags && Array.isArray(args.tags)) meta.tags = args.tags
+      const fullContent = buildFrontmatter(meta) + body
+      const result = writeFile(source, filePath, fullContent)
+      if (result.success) return { content: [{ type: 'text', text: `✓ 笔记已保存: ${result.path}` }] }
+      return { content: [{ type: 'text', text: `✗ 保存失败: ${result.error}` }], isError: true }
     }
     default:
       return { content: [{ type: 'text', text: `未知工具: ${name}` }], isError: true }

@@ -72,15 +72,24 @@ function headingId(children: React.ReactNode): string {
   return text.toLowerCase().replace(/[^\w\u4e00-\u9fa5\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim()
 }
 
-// Extract raw text from React children (for copy button)
-function extractText(node: React.ReactNode): string {
-  if (typeof node === 'string') return node
-  if (typeof node === 'number') return String(node)
-  if (Array.isArray(node)) return node.map(extractText).join('')
-  if (node && typeof node === 'object' && 'props' in (node as object)) {
-    return extractText((node as React.ReactElement).props.children)
+// Extract raw text from React children (for copy button) — iterative to avoid stack overflow
+function extractText(root: React.ReactNode): string {
+  const parts: string[] = []
+  const stack: React.ReactNode[] = [root]
+  while (stack.length > 0) {
+    const node = stack.pop()
+    if (typeof node === 'string') {
+      parts.push(node)
+    } else if (typeof node === 'number') {
+      parts.push(String(node))
+    } else if (Array.isArray(node)) {
+      // push in reverse so left-to-right order is preserved
+      for (let i = node.length - 1; i >= 0; i--) stack.push(node[i])
+    } else if (node && typeof node === 'object' && 'props' in (node as object)) {
+      stack.push((node as React.ReactElement).props.children)
+    }
   }
-  return ''
+  return parts.join('')
 }
 
 // Copy button with "Copied!" feedback

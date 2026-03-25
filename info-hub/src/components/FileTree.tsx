@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { FolderIcon, FolderOpenIcon, FileIcon, ChevronIcon } from './Icons'
 import { FileItem, SelectedFile } from '../types'
 import { API_BASE } from '../constants'
@@ -13,13 +13,16 @@ interface FileTreeProps {
 export function FileTree({ sourceId, onFileSelect, selectedFile, filterTag }: FileTreeProps) {
   const [items, setItems] = useState<FileItem[]>([])
   const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set())
-  const [childrenCache, setChildrenCache] = useState<Record<string, FileItem[]>>({})
+  // childrenMap: key = item.id (e.g. "obsidian:_moc"), value = child FileItem[]
+  const [childrenMap, setChildrenMap] = useState<Map<string, FileItem[]>>(new Map())
   const [loading, setLoading] = useState(true)
+  // Track in-flight loads to avoid duplicate fetches
+  const loadingRef = useRef<Set<string>>(new Set())
 
   useEffect(() => {
     loadRootItems()
     setExpandedDirs(new Set())
-    setChildrenCache({})
+    setChildrenMap(new Map())
   }, [sourceId, filterTag])
 
   const buildUrl = (path?: string) => {
@@ -43,39 +46,64 @@ export function FileTree({ sourceId, onFileSelect, selectedFile, filterTag }: Fi
     setLoading(false)
   }
 
-  const loadChildren = async (dirPath: string): Promise<FileItem[]> => {
-    if (childrenCache[dirPath]) return childrenCache[dirPath]
+  const loadChildren = async (itemId: string, dirPath: string) => {
+    if (loadingRef.current.has(itemId)) return
+    loadingRef.current.add(itemId)
     try {
       const response = await fetch(buildUrl(dirPath))
       if (response.ok) {
         const data: FileItem[] = await response.json()
-        setChildrenCache(prev => ({ ...prev, [dirPath]: data }))
-        return data
+        setChildrenMap(prev => {
+          const next = new Map(prev)
+          next.set(itemId, data)
+          return next
+        })
       }
     } catch (error) {
       console.error('Failed to load children:', error)
+    } finally {
+      loadingRef.current.delete(itemId)
     }
-    return []
   }
 
-  const toggleDir = async (item: FileItem) => {
+  const toggleDir = (item: FileItem) => {
     const newExpanded = new Set(expandedDirs)
-    if (expandedDirs.has(item.relativePath)) {
-      newExpanded.delete(item.relativePath)
+    if (expandedDirs.has(item.id)) {
+      newExpanded.delete(item.id)
     } else {
-      newExpanded.add(item.relativePath)
-      await loadChildren(item.relativePath)
+      newExpanded.add(item.id)
+      // item.relativePath may contain backslashes; use as-is for the API call
+      loadChildren(item.id, item.relativePath)
     }
     setExpandedDirs(newExpanded)
   }
 
-  const renderItem = (item: FileItem, depth = 0) => {
-    // Guard against pathological data that could cause deep recursion
-    if (depth > 20) return null
-    const isExpanded = expandedDirs.has(item.relativePath)
+  const handleItemClick = (item: FileItem) => {
+    if (item.type === 'directory') {
+      toggleDir(item)
+    } else {
+      onFileSelect(sourceId, item.relativePath)
+    }
+  }
+
+  const renderItem = (item: FileItem, depth: number): JSX.Element | null => {
+    if (depth > 20) return null // safety guard
+    const isExpanded = expandedDirs.has(item.id)
     const isSelected = selectedFile?.path === item.relativePath && selectedFile?.sourceId === sourceId
-    const children = childrenCache[item.relativePath] || []
-    const tags = item.tags || []
+    const children = childrenMap.get(item.id) ?? []
+
+    // Normalize tags: Blinko source returns {id, noteId, tagId, tag: {...}} objects;
+    // Obsidian source returns plain strings. Normalize to string array.
+    const rawTags: unknown[] = item.tags ?? []
+    const tagLabels: string[] = rawTags.map(t => {
+      if (typeof t === 'string') return t
+      if (t && typeof t === 'object' && 'tag' in (t as object)) {
+        const tagObj = (t as { tag: { name: string } }).tag
+        return tagObj?.name ?? ''
+      }
+      return String(t)
+    }).filter(Boolean)
+
     const displayName = item.name.replace(/\.md$/, '')
 
     return (
@@ -83,13 +111,7 @@ export function FileTree({ sourceId, onFileSelect, selectedFile, filterTag }: Fi
         <div
           className={`tree-item ${isSelected ? 'active' : ''} ${item.type === 'directory' ? 'tree-item--dir' : ''}`}
           style={{ paddingLeft: `calc(var(--tree-indent-base) + ${depth} * var(--tree-indent-step))` }}
-          onClick={() => {
-            if (item.type === 'directory') {
-              toggleDir(item)
-            } else {
-              onFileSelect(sourceId, item.relativePath)
-            }
-          }}
+          onClick={() => handleItemClick(item)}
           title={item.relativePath}
         >
           {item.type === 'directory' ? (
@@ -103,9 +125,9 @@ export function FileTree({ sourceId, onFileSelect, selectedFile, filterTag }: Fi
               : <FileIcon />}
           </span>
           <span className="tree-item-name">{displayName}</span>
-          {tags.length > 0 && (
+          {tagLabels.length > 0 && (
             <span className="tree-item-tags">
-              {tags.slice(0, 2).map(tag => (
+              {tagLabels.slice(0, 2).map(tag => (
                 <span key={tag} className="tag tag--tiny">#{tag}</span>
               ))}
             </span>
@@ -142,5 +164,5 @@ export function FileTree({ sourceId, onFileSelect, selectedFile, filterTag }: Fi
     )
   }
 
-  return <div className="file-tree">{items.map(item => renderItem(item))}</div>
+  return <div className="file-tree">{items.map(item => renderItem(item, 0))}</div>
 }

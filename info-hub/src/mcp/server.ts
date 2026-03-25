@@ -11,7 +11,6 @@ import http from 'http'
 import crypto from 'crypto'
 import { URL } from 'url'
 import { IncomingMessage, ServerResponse } from 'http'
-import Anthropic from '@anthropic-ai/sdk'
 
 // ─── 加载环境变量 ────────────────────────────────────────────────────────────
 
@@ -631,6 +630,11 @@ async function buildGraphData(sourceId: string, currentRelativePath: string): Pr
 
 // ─── AI Analysis ──────────────────────────────────────────────────────────────
 
+// MiniMax Anthropic 兼容端点配置（直接硬编码，绕过环境变量和系统代理问题）
+const MINIMAX_API_URL = 'https://api.minimaxi.com/anthropic/v1/messages'
+const MINIMAX_API_KEY = process.env.MCP_ANTHROPIC_API_KEY || process.env.ANTHROPIC_API_KEY || ''
+const AI_MODEL = process.env.AI_MODEL || 'claude-3-5-haiku-20241022'
+
 async function analyzeDocumentContent(content: string, fileName: string): Promise<{
   summary: string
   keyPoints: string[]
@@ -638,18 +642,22 @@ async function analyzeDocumentContent(content: string, fileName: string): Promis
   error?: string
 }> {
   try {
-    const anthropic = new Anthropic({
-      apiKey: process.env.ANTHROPIC_API_KEY || '',
-      ...(process.env.ANTHROPIC_BASE_URL ? { baseURL: process.env.ANTHROPIC_BASE_URL } : {}),
-    })
-
     const truncated = content.slice(0, 8000)
-    const response = await anthropic.messages.create({
-      model: process.env.AI_MODEL || 'claude-3-5-haiku-20241022',
-      max_tokens: 1024,
-      messages: [{
-        role: 'user',
-        content: `Analyze this document and return JSON only, no prose.
+
+    // 直接使用 fetch 调用 MiniMax API（绕过 SDK 的环境变量和代理问题）
+    const apiResponse = await fetch(MINIMAX_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': MINIMAX_API_KEY,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: AI_MODEL,
+        max_tokens: 1024,
+        messages: [{
+          role: 'user',
+          content: `Analyze this document and return JSON only, no prose.
 
 Document: "${fileName}"
 
@@ -663,12 +671,32 @@ Return exactly:
     { "term": "concept name", "definition": "brief explanation" }
   ]
 }`,
-      }],
+        }],
+      }),
     })
 
-    const text = response.content[0].type === 'text' ? response.content[0].text : ''
+    if (!apiResponse.ok) {
+      const errText = await apiResponse.text()
+      return { summary: '', keyPoints: [], concepts: [], error: `API error ${apiResponse.status}: ${errText.slice(0, 200)}` }
+    }
+
+    const data = await apiResponse.json() as {
+      content?: Array<{ type: string; text?: string }>
+    }
+
+    // MiniMax 可能返回 thinking 块 + text 块，提取 text 块内容
+    const textBlock = data.content?.find(c => c.type === 'text')
+    const text = textBlock?.text || ''
+
+    if (!text.trim()) {
+      return { summary: '', keyPoints: [], concepts: [], error: 'AI 返回内容为空（可能被 MiniMax 内容策略拦截）' }
+    }
+
     const clean = text.replace(/^```json\n?/, '').replace(/\n?```$/, '').trim()
-    return JSON.parse(clean)
+    let parsed: unknown = JSON.parse(clean)
+    // 二次解码确保 \uXXXX 完全展开
+    parsed = JSON.parse(JSON.stringify(parsed))
+    return parsed as { summary: string; keyPoints: string[]; concepts: Array<{ term: string; definition: string }> }
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e)
     return { summary: '', keyPoints: [], concepts: [], error: msg }

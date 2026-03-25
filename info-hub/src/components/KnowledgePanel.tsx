@@ -201,9 +201,13 @@ export function KnowledgePanel({
                     <div className="kp-ai-section-title">概念</div>
                     <div className="kp-ai-concepts">
                       {aiData.concepts.map((c: { term: string; definition: string }, i: number) => (
-                        <div key={i}>
+                        <div key={i} className="kp-ai-concept-item">
                           <div className="kp-ai-concept-term">{c.term}</div>
-                          <div className="kp-ai-concept-def">{c.definition}</div>
+                          <div className="kp-ai-concept-def kp-markdown">
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                              {c.definition}
+                            </ReactMarkdown>
+                          </div>
                         </div>
                       ))}
                     </div>

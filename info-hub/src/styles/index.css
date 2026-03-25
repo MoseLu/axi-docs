@@ -807,18 +807,26 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 .kp-ai-concepts {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+}
+
+.kp-ai-concept-item {
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-md);
+  padding: 8px 10px;
+  border: 1px solid var(--color-border-light);
 }
 
 .kp-ai-concept-term {
   font-size: var(--font-size-sm);
   font-weight: 600;
-  color: var(--color-text);
+  color: var(--color-primary);
+  margin-bottom: 4px;
 }
 
 .kp-ai-concept-def {
-  font-size: var(--font-size-xs);
-  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
   line-height: 1.5;
 }
 

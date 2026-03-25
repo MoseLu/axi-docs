@@ -199,11 +199,7 @@ export function KnowledgePanel({
                       {aiData.concepts.map((c: { term: string; definition: string }, i: number) => (
                         <div key={i} className="kp-ai-concept-item">
                           <div className="kp-ai-concept-term">{c.term}</div>
-                          <div className="kp-ai-concept-def kp-markdown">
-                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                              {c.definition}
-                            </ReactMarkdown>
-                          </div>
+                          <div className="kp-ai-concept-def">{c.definition}</div>
                         </div>
                       ))}
                     </div>

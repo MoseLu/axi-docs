@@ -648,74 +648,110 @@ interface GlobalGraphEdge {
   kind: 'wikilink' | 'tag'
 }
 
+// Extract display label from frontmatter or first heading
+function extractLabel(content: string, fallbackName: string): string {
+  // Try frontmatter title
+  const fmMatch = content.match(/^---\n([\s\S]*?)\n---/)
+  if (fmMatch) {
+    const fm = fmMatch[1]
+    const titleMatch = fm.match(/^\s*title:\s*(.+)$/m)
+    if (titleMatch) {
+      return titleMatch[1].trim().replace(/^["']|["']$/g, '')
+    }
+    const aliasMatch = fm.match(/^\s*aliases?:\s*\[?\s*["']?(.+?)["']?\s*\]?$/m)
+    if (aliasMatch) {
+      return aliasMatch[1].split(',')[0].trim().replace(/^["']|["']$/g, '')
+    }
+  }
+  // Try first markdown heading
+  const headingMatch = content.match(/^#\s+(.+)$/m)
+  if (headingMatch) {
+    return headingMatch[1].trim().replace(/\*\*|__|\*|_|`/g, '').slice(0, 60)
+  }
+  return fallbackName
+}
+
 async function buildGlobalGraph(sourceId: string): Promise<{ nodes: GlobalGraphNode[]; edges: GlobalGraphEdge[] }> {
   const source = resolveSource(sourceId)
   if (!source || source.type !== 'local') return { nodes: [], edges: [] }
 
-  // ── Step 1: Index all files ──────────────────────────────────────────────────
+  // ── Step 1: Index all files (skip _-prefixed and empty files) ─────────────
   const nameToPath: Record<string, string> = {}
-  const pathToMeta: Record<string, { name: string; tags: string[] }> = {}
+  // pathToMeta: rel -> { name, tags, content, label }
+  const pathToMeta: Record<string, { name: string; tags: string[]; label: string }> = {}
 
   async function indexFiles(dir: string) {
     let entries: fs.Dirent[]
     try { entries = await fsp.readdir(dir, { withFileTypes: true }) } catch { return }
     for (const entry of entries) {
-      if (isExcluded(entry.name)) continue
+      if (isExcluded(entry.name) || entry.name.startsWith('_')) continue
       const fullPath = path.join(dir, entry.name)
       if (entry.isDirectory()) {
         await indexFiles(fullPath)
       } else if (entry.isFile() && isSupported(entry.name)) {
-        const rel = path.relative(source!.path, fullPath).replace(/\\/g, '/')
-        const stem = entry.name.replace(/\.(md|markdown)$/i, '')
-        nameToPath[stem.toLowerCase()] = rel
-        pathToMeta[rel] = { name: stem, tags: [] }
+        try {
+          const content = await fsp.readFile(fullPath, 'utf-8')
+          // Skip empty or nearly-empty files
+          const stripped = content.replace(/^---\n[\s\S]*?\n---\n*/, '').replace(/[#*`\[\]]/g, '').trim()
+          if (stripped.length < 10) continue
+
+          const rel = path.relative(source!.path, fullPath).replace(/\\/g, '/')
+          const stem = entry.name.replace(/\.(md|markdown)$/i, '')
+          nameToPath[stem.toLowerCase()] = rel
+          pathToMeta[rel] = {
+            name: stem,
+            tags: [],
+            label: extractLabel(content, stem),
+          }
+        } catch { /* skip unreadable */ }
       }
     }
   }
   await indexFiles(source.path)
 
-  // ── Step 2: Scan all tags (read each file once) ──────────────────────────────
+  // ── Step 2: Scan tags and wikilinks ───────────────────────────────────────
   const wikilinkRegex = /\[\[([^\]|#]+)(?:\|[^\]]+)?\]\]/g
   const tagRegex = /#([\w\u4e00-\u9fa5-]+)/g
 
   const edges: GlobalGraphEdge[] = []
   const tagToFiles: Record<string, Set<string>> = {}
 
-  for (const [rel] of Object.entries(pathToMeta)) {
+  for (const [rel, meta] of Object.entries(pathToMeta)) {
     try {
       const content = await fsp.readFile(path.join(source.path, rel), 'utf-8')
       const fileTags: string[] = []
       let m: RegExpExecArray | null
 
-      // Extract tags
       while ((m = tagRegex.exec(content)) !== null) {
         const tag = m[1].trim()
-        if (tag && !tag.includes('```')) {
-          fileTags.push(tag)
-          if (!tagToFiles[tag]) tagToFiles[tag] = new Set()
-          tagToFiles[tag].add(rel)
-        }
+        // Skip: code blocks (contains ```), markdown anchor links (contains .md), and empty
+        if (!tag || tag.includes('```') || /^[a-z0-9]+(-[a-z0-9]+)*md$/.test(tag) || tag.includes('/')) continue
+        fileTags.push(tag)
+        if (!tagToFiles[tag]) tagToFiles[tag] = new Set()
+        tagToFiles[tag].add(rel)
       }
-      pathToMeta[rel].tags = fileTags
+      meta.tags = fileTags
 
-      // Extract wikilinks
       while ((m = wikilinkRegex.exec(content)) !== null) {
         const resolved = nameToPath[m[1].trim().toLowerCase()]
         if (resolved && resolved !== rel) {
           edges.push({ source: rel, target: resolved, kind: 'wikilink' })
         }
       }
-    } catch { /* skip unreadable files */ }
+    } catch { /* skip */ }
   }
 
-  // ── Step 3: Build nodes ──────────────────────────────────────────────────────
+  // ── Step 3: Build nodes (only non-empty, non-_-prefixed) ───────────────
   const nodes: GlobalGraphNode[] = []
 
   for (const [rel, meta] of Object.entries(pathToMeta)) {
-    nodes.push({ id: rel, label: meta.name, kind: 'note', path: rel, tags: meta.tags })
+    nodes.push({ id: rel, label: meta.label, kind: 'note', path: rel, tags: meta.tags })
   }
 
   for (const [tag] of Object.entries(tagToFiles)) {
+    // Final guard: skip markdown anchor links (lowercase hyphenated ending in md, e.g. l1-paradigmmd)
+    // These come from [text](#heading.md) anchor references in templates
+    if (/^[a-z0-9]+(-[a-z0-9]+)*md$/.test(tag)) continue
     nodes.push({ id: '#' + tag, label: tag, kind: 'tag' })
     for (const fileRel of tagToFiles[tag]) {
       edges.push({ source: fileRel, target: '#' + tag, kind: 'tag' })

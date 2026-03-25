@@ -167,10 +167,10 @@ function BlinkoErrorState({ message }: { message: string }) {
       <TagIcon />
       <div>
         <p className="empty-state-text">{message}</p>
-        <p style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 8 }}>
+        <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)', marginTop: 'var(--spacing-3)' }}>
           Blinko 是 Info Hub 的伴生项目，提供闪念笔记功能。
         </p>
-        <code style={{ fontSize: 11, background: 'var(--color-bg-secondary)', padding: '4px 8px', borderRadius: 4, display: 'inline-block', marginTop: 8 }}>
+        <code style={{ fontSize: 'var(--font-size-xs)', background: 'var(--color-bg-secondary)', padding: 'var(--spacing-1) var(--spacing-3)', borderRadius: 'var(--radius-xs)', display: 'inline-block', marginTop: 'var(--spacing-3)' }}>
           http://localhost:1111
         </code>
       </div>

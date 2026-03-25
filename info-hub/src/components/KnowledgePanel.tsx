@@ -120,7 +120,7 @@ export function KnowledgePanel({
           <div ref={graphContainerRef} className="kp-graph" style={{ flex: 1 }}>
             {graphLoading && (
               <div className="kp-ai-loading">
-                <div className="spinner" style={{ width: 20, height: 20 }} />
+                <div className="spinner" style={{ width: 'var(--icon-size-lg)', height: 'var(--icon-size-lg)' }} />
                 加载图谱...
               </div>
             )}
@@ -134,7 +134,7 @@ export function KnowledgePanel({
               />
             )}
             {!graphLoading && !graphData && source?.type !== 'local' && (
-              <div style={{ padding: 16, fontSize: 12, color: 'var(--color-text-muted)', textAlign: 'center' }}>
+              <div style={{ padding: 'var(--spacing-5)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)', textAlign: 'center' }}>
                 仅本地文档源支持知识图谱
               </div>
             )}
@@ -161,7 +161,7 @@ export function KnowledgePanel({
 
             {aiLoading && (
               <div className="kp-ai-loading">
-                <div className="spinner" style={{ width: 20, height: 20 }} />
+                <div className="spinner" style={{ width: 'var(--icon-size-lg)', height: 'var(--icon-size-lg)' }} />
                 AI 分析中...
               </div>
             )}

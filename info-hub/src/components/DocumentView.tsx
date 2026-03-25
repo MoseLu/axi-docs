@@ -17,6 +17,28 @@ interface DocumentViewProps {
   onTagSelect?: (tag: string) => void
 }
 
+// Decode JSON-encoded content strings (e.g. content stored as "---\nfoo\nbar")
+function preprocessContent(raw: string): string {
+  if (!raw) return raw
+  const s = raw.trim()
+  // If wrapped in double-quotes, treat as a JSON-encoded string
+  if (s.startsWith('"') && s.endsWith('"')) {
+    try {
+      const decoded = JSON.parse(s)
+      if (typeof decoded === 'string') return decoded
+    } catch {
+      // Manual unescape fallback
+      return s.slice(1, -1)
+        .replace(/\\"/g, '"')
+        .replace(/\\n/g, '\n')
+        .replace(/\\t/g, '\t')
+        .replace(/\\r/g, '\r')
+        .replace(/\\\\/g, '\\')
+    }
+  }
+  return raw
+}
+
 // Parse YAML frontmatter from markdown content
 function parseFrontmatter(content: string): { frontmatter: Frontmatter; body: string } {
   if (!content.startsWith('---')) {
@@ -141,7 +163,7 @@ export function DocumentView({
 }: DocumentViewProps) {
   const { frontmatter, body } = useMemo(() => {
     if (!content) return { frontmatter: {}, body: '' }
-    return parseFrontmatter(content)
+    return parseFrontmatter(preprocessContent(content))
   }, [content])
 
   // Custom components for react-markdown

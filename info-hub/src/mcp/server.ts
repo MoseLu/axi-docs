@@ -311,9 +311,15 @@ async function scanDir(sourceId: string, dirPath?: string): Promise<FileItem[]> 
 }
 
 async function readFile(sourceId: string, filePath: string): Promise<string | null> {
+  if (filePath.includes('..') || path.isAbsolute(filePath)) return null
   const source = resolveSource(sourceId)
   if (!source) return null
   const fullPath = path.join(source.path, filePath)
+  const rel = path.relative(source.path, fullPath)
+  if (rel.startsWith('..') || path.isAbsolute(rel)) return null
+  // 仅允许 Markdown 文件
+  const ext = path.extname(fullPath).toLowerCase()
+  if (ext !== '.md' && ext !== '.markdown') return null
   try {
     return await fsp.readFile(fullPath, 'utf-8')
   } catch {

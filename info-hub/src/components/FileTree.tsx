@@ -70,6 +70,8 @@ export function FileTree({ sourceId, onFileSelect, selectedFile, filterTag }: Fi
   }
 
   const renderItem = (item: FileItem, depth = 0) => {
+    // Guard against pathological data that could cause deep recursion
+    if (depth > 20) return null
     const isExpanded = expandedDirs.has(item.relativePath)
     const isSelected = selectedFile?.path === item.relativePath && selectedFile?.sourceId === sourceId
     const children = childrenCache[item.relativePath] || []

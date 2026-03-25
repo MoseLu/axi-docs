@@ -1,4 +1,6 @@
 import { useState, useEffect, useRef, useCallback } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import { DocSource, SelectedFile, KnowledgePanelTab, GraphData, AiAnalysis } from '../types'
 import { TableOfContents } from './TableOfContents'
 import { KnowledgeGraph } from './KnowledgeGraph'
@@ -171,7 +173,11 @@ export function KnowledgePanel({
                 {aiData.summary && (
                   <div>
                     <div className="kp-ai-section-title">摘要</div>
-                    <p className="kp-ai-summary">{aiData.summary}</p>
+                    <div className="kp-ai-summary markdown-body kp-markdown">
+                      <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {aiData.summary}
+                      </ReactMarkdown>
+                    </div>
                   </div>
                 )}
 
@@ -180,7 +186,11 @@ export function KnowledgePanel({
                     <div className="kp-ai-section-title">要点</div>
                     <ul className="kp-ai-keypoints">
                       {aiData.keyPoints.map((pt: string, i: number) => (
-                        <li key={i} className="kp-ai-keypoint">{pt}</li>
+                        <li key={i} className="kp-ai-keypoint">
+                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                            {pt}
+                          </ReactMarkdown>
+                        </li>
                       ))}
                     </ul>
                   </div>

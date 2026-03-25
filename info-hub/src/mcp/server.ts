@@ -60,12 +60,12 @@ function blinkoRequest<T>(
   apiToken?: string
 ): Promise<T> {
   return new Promise((resolve, reject) => {
-    const sourceUrl = docSources.find(s => s.id === 'blinko')?.apiUrl || 'http://localhost:3006'
+    const sourceUrl = docSources.find(s => s.id === 'blinko')?.apiUrl || process.env.BLINKO_URL || 'http://localhost:1111'
     const url = new URL(urlPath, sourceUrl)
     const postData = body ? JSON.stringify(body) : undefined
     const options: http.RequestOptions = {
       hostname: url.hostname,
-      port: url.port || 80,
+      port: url.port || '1111',
       path: url.pathname + url.search,
       method,
       headers: {
@@ -238,7 +238,7 @@ const docSources: DocSource[] = [
     path: '',
     enabled: true,
     type: 'api',
-    apiUrl: process.env.BLINKO_URL || 'http://localhost:3006',
+    apiUrl: process.env.BLINKO_URL || 'http://localhost:1111',
     // 优先级：BLINKO_TOKEN 环境变量 > 空字符串（Blinko 关闭认证时）
     apiToken: process.env.BLINKO_TOKEN || '',
     icon: 'blinko',
@@ -824,6 +824,72 @@ function getToolSchemas() {
         required: ['path', 'content'],
       },
     },
+    // ── Blinko 工具 ──────────────────────────────────────────────────────────────
+    {
+      name: 'blinko_list_notes',
+      description: '列出 Blinko 闪念笔记（最近的笔记列表）',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          limit: {
+            type: 'number',
+            description: '返回数量上限（默认 50，最大 200）',
+            default: 50,
+          },
+        },
+      },
+    },
+    {
+      name: 'blinko_read_note',
+      description: '读取 Blinko 笔记内容（通过笔记 ID）',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          noteId: {
+            type: 'number',
+            description: '笔记 ID（必填）',
+          },
+        },
+        required: ['noteId'],
+      },
+    },
+    {
+      name: 'blinko_write_note',
+      description: '向 Blinko 创建或更新笔记内容',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          content: {
+            type: 'string',
+            description: '笔记内容（必填），支持 Markdown',
+          },
+          noteId: {
+            type: 'number',
+            description: '笔记 ID（可选，不填则创建新笔记）',
+          },
+          tags: {
+            type: 'array',
+            items: { type: 'string' },
+            description: '标签列表（可选，自动识别 #标签 格式）',
+          },
+        },
+        required: ['content'],
+      },
+    },
+    {
+      name: 'blinko_search',
+      description: '在 Blinko 笔记中全文搜索',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          query: {
+            type: 'string',
+            description: '搜索关键词（必填）',
+          },
+        },
+        required: ['query'],
+      },
+    },
   ]
 }
 
@@ -1356,6 +1422,93 @@ async function handleToolCall(name: string, args: Record<string, unknown>) {
       const result = await writeFile(source, filePath, fullContent)
       if (result.success) return { content: [{ type: 'text', text: `✓ 笔记已保存: ${result.path}` }] }
       return { content: [{ type: 'text', text: `✗ 保存失败: ${result.error}` }], isError: true }
+    }
+    // ── Blinko 工具 ───────────────────────────────────────────────────────────
+    case 'blinko_list_notes': {
+      const limit = Math.min(Number(args.limit) || 50, 200)
+      const apiToken = process.env.BLINKO_TOKEN || docSources.find(s => s.id === 'blinko')?.apiToken || ''
+      if (!apiToken) {
+        return { content: [{ type: 'text', text: '错误: 未配置 BLINKO_TOKEN，请在 .env 中配置' }], isError: true }
+      }
+      const notes = await blinkoRequest<BlinkoNote[]>(
+        '/api/v1/note/list',
+        'POST',
+        { page: 1, size: limit, orderBy: 'desc', type: -1, isRecycle: false },
+        apiToken
+      )
+      if (!Array.isArray(notes)) {
+        return { content: [{ type: 'text', text: `Blinko API 错误: ${JSON.stringify(notes)}` }], isError: true }
+      }
+      const preview = notes.map(n => ({
+        id: n.id,
+        content: n.content?.slice(0, 100) || '(empty)',
+        tags: n.tags,
+        createdAt: n.createdAt,
+        updatedAt: n.updatedAt,
+      }))
+      return { content: [{ type: 'text', text: JSON.stringify(preview, null, 2) }] }
+    }
+    case 'blinko_read_note': {
+      const noteId = Number(args.noteId)
+      if (!noteId) return { content: [{ type: 'text', text: '错误: noteId 参数必填' }], isError: true }
+      const apiToken = process.env.BLINKO_TOKEN || docSources.find(s => s.id === 'blinko')?.apiToken || ''
+      if (!apiToken) {
+        return { content: [{ type: 'text', text: '错误: 未配置 BLINKO_TOKEN，请在 .env 中配置' }], isError: true }
+      }
+      const detail = await blinkoRequest<{ content?: string; contentText?: string }>(
+        '/api/v1/note/detail',
+        'POST',
+        { id: noteId },
+        apiToken
+      )
+      const content = detail?.content || detail?.contentText || ''
+      if (!content) return { content: [{ type: 'text', text: `笔记 ${noteId} 为空或不存在` }], isError: true }
+      return { content: [{ type: 'text', text: content }] }
+    }
+    case 'blinko_write_note': {
+      const content = args.content as string
+      const noteId = args.noteId !== undefined ? Number(args.noteId) : undefined
+      const apiToken = process.env.BLINKO_TOKEN || docSources.find(s => s.id === 'blinko')?.apiToken || ''
+      if (!apiToken) {
+        return { content: [{ type: 'text', text: '错误: 未配置 BLINKO_TOKEN，请在 .env 中配置' }], isError: true }
+      }
+      if (!content) return { content: [{ type: 'text', text: '错误: content 参数必填' }], isError: true }
+      const result = await blinkoRequest<{ id?: number; error?: string }>(
+        '/api/v1/note/upsert',
+        'POST',
+        { content, ...(noteId ? { id: noteId } : {}), type: -1 },
+        apiToken
+      )
+      if (result.error || !result.id) {
+        return { content: [{ type: 'text', text: `写入失败: ${result.error || JSON.stringify(result)}` }], isError: true }
+      }
+      return { content: [{ type: 'text', text: `✓ 笔记已保存，ID: ${result.id}` }] }
+    }
+    case 'blinko_search': {
+      const query = args.query as string
+      if (!query) return { content: [{ type: 'text', text: '错误: query 参数必填' }], isError: true }
+      const apiToken = process.env.BLINKO_TOKEN || docSources.find(s => s.id === 'blinko')?.apiToken || ''
+      if (!apiToken) {
+        return { content: [{ type: 'text', text: '错误: 未配置 BLINKO_TOKEN，请在 .env 中配置' }], isError: true }
+      }
+      // 先获取所有笔记，再在本地过滤（Blinko API 没有独立的搜索端点）
+      const allNotes = await blinkoRequest<BlinkoNote[]>(
+        '/api/v1/note/list',
+        'POST',
+        { page: 1, size: 200, orderBy: 'desc', type: -1, isRecycle: false },
+        apiToken
+      )
+      if (!Array.isArray(allNotes)) {
+        return { content: [{ type: 'text', text: `Blinko API 错误: ${JSON.stringify(allNotes)}` }], isError: true }
+      }
+      const q = query.toLowerCase()
+      const matches = allNotes.filter(n => n.content?.toLowerCase().includes(q))
+      const preview = matches.slice(0, 20).map(n => ({
+        id: n.id,
+        content: n.content?.slice(0, 150) || '(empty)',
+        tags: n.tags,
+      }))
+      return { content: [{ type: 'text', text: JSON.stringify({ count: matches.length, results: preview }, null, 2) }] }
     }
     default:
       return { content: [{ type: 'text', text: `未知工具: ${name}` }], isError: true }

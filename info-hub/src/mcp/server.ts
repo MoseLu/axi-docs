@@ -650,8 +650,8 @@ interface GlobalGraphNode {
 }
 
 interface GlobalGraphEdge {
-  source: string
-  target: string
+  source: string | object
+  target: string | object
   kind: 'wikilink' | 'tag'
 }
 
@@ -678,9 +678,9 @@ function extractLabel(content: string, fallbackName: string): string {
   return fallbackName
 }
 
-async function buildGlobalGraph(sourceId: string): Promise<{ nodes: GlobalGraphNode[]; edges: GlobalGraphEdge[] }> {
+async function buildGlobalGraph(sourceId: string): Promise<{ nodes: GlobalGraphNode[]; edges: GlobalGraphEdge[]; orphanNodes: GlobalGraphNode[] }> {
   const source = resolveSource(sourceId)
-  if (!source || source.type !== 'local') return { nodes: [], edges: [] }
+  if (!source || source.type !== 'local') return { nodes: [], edges: [], orphanNodes: [] }
 
   // ── Step 1: Index all files (skip _-prefixed and empty files) ─────────────
   const nameToPath: Record<string, string> = {}
@@ -748,16 +748,29 @@ async function buildGlobalGraph(sourceId: string): Promise<{ nodes: GlobalGraphN
     } catch { /* skip */ }
   }
 
-  // ── Step 3: Build nodes (only non-empty, non-_-prefixed) ───────────────
+  // ── Step 3: Build nodes ─────────────────────────────────────────────────────
+  // Find all connected node IDs (has at least one edge)
+  const connectedIds = new Set<string>()
+  for (const e of edges) {
+    const src = typeof e.source === 'string' ? e.source : (e.source as { id?: string }).id || ''
+    const tgt = typeof e.target === 'string' ? e.target : (e.target as { id?: string }).id || ''
+    if (src) connectedIds.add(src)
+    if (tgt) connectedIds.add(tgt)
+  }
+
   const nodes: GlobalGraphNode[] = []
+  const orphanNodes: GlobalGraphNode[] = []
 
   for (const [rel, meta] of Object.entries(pathToMeta)) {
-    nodes.push({ id: rel, label: meta.label, kind: 'note', path: rel, tags: meta.tags })
+    if (connectedIds.has(rel)) {
+      nodes.push({ id: rel, label: meta.label, kind: 'note', path: rel, tags: meta.tags })
+    } else {
+      orphanNodes.push({ id: rel, label: meta.label, kind: 'note', path: rel, tags: meta.tags })
+    }
   }
 
   for (const [tag] of Object.entries(tagToFiles)) {
-    // Final guard: skip markdown anchor links (lowercase hyphenated ending in md, e.g. l1-paradigmmd)
-    // These come from [text](#heading.md) anchor references in templates
+    // Skip markdown anchor links (lowercase hyphenated ending in md)
     if (/^[a-z0-9]+(-[a-z0-9]+)*md$/.test(tag)) continue
     nodes.push({ id: '#' + tag, label: tag, kind: 'tag' })
     for (const fileRel of tagToFiles[tag]) {
@@ -765,7 +778,7 @@ async function buildGlobalGraph(sourceId: string): Promise<{ nodes: GlobalGraphN
     }
   }
 
-  return { nodes, edges }
+  return { nodes, edges, orphanNodes }
 }
 
 // ─── AI Analysis ──────────────────────────────────────────────────────────────
@@ -1471,9 +1484,9 @@ async function startHttpServer(port: number) {
             return
           }
           case 'global-graph': {
-            const graphData = await buildGlobalGraph(source)
+            const { nodes, edges, orphanNodes } = await buildGlobalGraph(source)
             res.writeHead(200, { 'Content-Type': 'application/json' })
-            res.end(JSON.stringify(graphData))
+            res.end(JSON.stringify({ nodes, edges, orphanNodes }))
             return
           }
           case 'ai/analyze': {

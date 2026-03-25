@@ -23,14 +23,24 @@ interface GlobalGraphProps {
   onTagSelect?: (tag: string) => void
 }
 
-// Format label for display: strip extension, replace separators with spaces
+// Format label for display: if backend already provides a good label, just clean it up
 function formatLabel(name: string): string {
+  // If it's already readable (contains CJK or spaces), just trim
+  if (/[\u4e00-\u9fa5]/.test(name) || /\s/.test(name)) {
+    return name
+      .replace(/\.(md|markdown)$/i, '')
+      .replace(/\s+/g, ' ')
+      .trim()
+      .slice(0, 30)
+  }
+  // Otherwise apply full transformation
   return name
     .replace(/\.(md|markdown)$/i, '')
     .replace(/[-_]+/g, ' ')
     .replace(/([a-z])([A-Z])/g, '$1 $2')
     .replace(/\s+/g, ' ')
     .trim()
+    .slice(0, 30)
 }
 
 const NODE_COLORS: Record<string, string> = {

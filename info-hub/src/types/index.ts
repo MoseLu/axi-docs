@@ -137,6 +137,7 @@ export interface GraphEdge {
 export interface GraphData {
   nodes: GraphNode[]
   edges: GraphEdge[]
+  orphanNodes?: GraphNode[]
 }
 
 // ─── AI Analysis Types ────────────────────────────────────────────────────────

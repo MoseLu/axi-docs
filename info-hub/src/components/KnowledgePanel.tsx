@@ -16,7 +16,7 @@ interface KnowledgePanelProps {
 }
 
 const GRAPH_SVG_WIDTH = 284  // approximate panel width minus borders
-type GraphMode = 'local' | 'global'
+type GraphMode = 'local' | 'global' | 'orphan'
 
 export function KnowledgePanel({
   content,
@@ -31,6 +31,8 @@ export function KnowledgePanel({
   const [graphMode, setGraphMode] = useState<GraphMode>('local')
   const [aiData, setAiData] = useState<AiAnalysis | null>(null)
   const [aiLoading, setAiLoading] = useState(false)
+  const [orphanNodes, setOrphanNodes] = useState<{ id: string; label: string; path: string; tags: string[] }[]>([])
+  const [orphanLoading, setOrphanLoading] = useState(false)
   const graphContainerRef = useRef<HTMLDivElement>(null)
   const [graphHeight, setGraphHeight] = useState(300)
 
@@ -97,6 +99,20 @@ export function KnowledgePanel({
     }
   }
 
+  const fetchOrphanNodes = useCallback(async () => {
+    if (!selectedFile || source?.type !== 'local') return
+    setOrphanLoading(true)
+    try {
+      const res = await fetch(`${API_BASE}/global-graph?source=${selectedFile.sourceId}`)
+      if (res.ok) {
+        const data = await res.json()
+        setOrphanNodes(data.orphanNodes || [])
+      }
+    } catch { /* ignore */ } finally {
+      setOrphanLoading(false)
+    }
+  }, [selectedFile, source])
+
   return (
     <aside className="knowledge-panel">
       <div className="kp-tabs">
@@ -137,6 +153,15 @@ export function KnowledgePanel({
                 >
                   全局
                 </button>
+                <button
+                  className={`graph-mode-btn${graphMode === 'orphan' ? ' active' : ''}`}
+                  onClick={() => {
+                    setGraphMode('orphan')
+                    if (orphanNodes.length === 0) fetchOrphanNodes()
+                  }}
+                >
+                  孤立 {orphanNodes.length > 0 && <span className="orphan-badge">{orphanNodes.length}</span>}
+                </button>
               </div>
             )}
 
@@ -172,6 +197,46 @@ export function KnowledgePanel({
                 onNavigate={onNavigate}
                 onTagSelect={onTagSelect}
               />
+            )}
+
+            {graphMode === 'orphan' && source?.type === 'local' && (
+              <div className="orphan-list">
+                {orphanLoading ? (
+                  <div className="kp-ai-loading">
+                    <div className="spinner" style={{ width: 'var(--icon-size-lg)', height: 'var(--icon-size-lg)' }} />
+                    分析中...
+                  </div>
+                ) : orphanNodes.length === 0 ? (
+                  <div className="orphan-empty">
+                    <div className="orphan-empty-icon">✓</div>
+                    <div className="orphan-empty-title">没有孤立文档</div>
+                    <div className="orphan-empty-desc">所有文档都已建立连接</div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="orphan-hint">
+                      以下文档尚未建立链接，是学习的空白区
+                    </div>
+                    {orphanNodes.map(node => (
+                      <button
+                        key={node.id}
+                        className="orphan-item"
+                        onClick={() => onNavigate(node.path || node.id)}
+                        title={node.path}
+                      >
+                        <span className="orphan-label">{node.label}</span>
+                        {node.tags?.length > 0 && (
+                          <span className="orphan-tags">
+                            {node.tags.slice(0, 3).map(t => (
+                              <span key={t} className="tag tag--tiny">#{t}</span>
+                            ))}
+                          </span>
+                        )}
+                      </button>
+                    ))}
+                  </>
+                )}
+              </div>
             )}
           </div>
         )}

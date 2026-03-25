@@ -5,6 +5,7 @@ import {
   ListToolsRequestSchema,
 } from '@modelcontextprotocol/sdk/types.js'
 import fs from 'fs'
+const fsp = fs.promises
 import path from 'path'
 import http from 'http'
 import crypto from 'crypto'
@@ -223,8 +224,7 @@ const docSources: DocSource[] = [
     enabled: true,
     type: 'api',
     apiUrl: process.env.BLINKO_URL || 'http://localhost:3006',
-    // 本地开发默认 token (使用 Blinko NEXTAUTH_SECRET 生成，userId: 1)
-    apiToken: process.env.BLINKO_TOKEN || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOjEsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc3NDM1MjQwMSwiZXhwIjoxODA1OTEwMDAxfQ.x_jjToCeq6hUSv6fclG6If-AHqB19xLJRRoQGB8SaQc',
+    apiToken: process.env.BLINKO_TOKEN || '',
     icon: 'blinko',
   },
 ]
@@ -260,47 +260,48 @@ interface FileItem {
   sourceId: string
 }
 
-function scanDir(sourceId: string, dirPath?: string): FileItem[] {
+async function scanDir(sourceId: string, dirPath?: string): Promise<FileItem[]> {
   const source = resolveSource(sourceId)
   if (!source) return []
 
   const basePath = dirPath ? path.join(source.path, dirPath) : source.path
-  if (!fs.existsSync(basePath)) return []
-
   const items: FileItem[] = []
   try {
-    const entries = fs.readdirSync(basePath, { withFileTypes: true })
+    const entries = await fsp.readdir(basePath, { withFileTypes: true })
     for (const entry of entries) {
       if (isExcluded(entry.name)) continue
       const fullPath = path.join(basePath, entry.name)
       const relativePath = dirPath ? path.join(dirPath, entry.name) : entry.name
 
-      if (entry.isDirectory()) {
-        items.push({
-          id: `${sourceId}:${relativePath}`,
-          name: entry.name,
-          path: fullPath,
-          relativePath,
-          type: 'directory',
-          extension: '',
-          lastModified: fs.statSync(fullPath).mtime.toISOString(),
-          sourceId,
-        })
-      } else if (entry.isFile() && isSupported(entry.name)) {
-        items.push({
-          id: `${sourceId}:${relativePath}`,
-          name: entry.name,
-          path: fullPath,
-          relativePath,
-          type: 'file',
-          extension: path.extname(entry.name),
-          lastModified: fs.statSync(fullPath).mtime.toISOString(),
-          sourceId,
-        })
-      }
+      try {
+        const stat = await fsp.stat(fullPath)
+        if (entry.isDirectory()) {
+          items.push({
+            id: `${sourceId}:${relativePath}`,
+            name: entry.name,
+            path: fullPath,
+            relativePath,
+            type: 'directory',
+            extension: '',
+            lastModified: stat.mtime.toISOString(),
+            sourceId,
+          })
+        } else if (entry.isFile() && isSupported(entry.name)) {
+          items.push({
+            id: `${sourceId}:${relativePath}`,
+            name: entry.name,
+            path: fullPath,
+            relativePath,
+            type: 'file',
+            extension: path.extname(entry.name),
+            lastModified: stat.mtime.toISOString(),
+            sourceId,
+          })
+        }
+      } catch { /* skip inaccessible entries */ }
     }
   } catch {
-    /* ignore */
+    /* directory unreadable or not found */
   }
 
   return items.sort((a, b) => {
@@ -309,28 +310,30 @@ function scanDir(sourceId: string, dirPath?: string): FileItem[] {
   })
 }
 
-function readFile(sourceId: string, filePath: string): string | null {
+async function readFile(sourceId: string, filePath: string): Promise<string | null> {
   const source = resolveSource(sourceId)
   if (!source) return null
   const fullPath = path.join(source.path, filePath)
-  if (!fs.existsSync(fullPath)) return null
   try {
-    return fs.readFileSync(fullPath, 'utf-8')
+    return await fsp.readFile(fullPath, 'utf-8')
   } catch {
     return null
   }
 }
 
-function writeFile(
+async function writeFile(
   sourceId: string,
   filePath: string,
   content: string,
-): { success: boolean; path: string; error?: string } {
+): Promise<{ success: boolean; path: string; error?: string }> {
   const source = resolveSource(sourceId)
   if (!source) return { success: false, path: '', error: `未知文档源: ${sourceId}` }
 
-  const fullPath = path.normalize(path.join(source.path, filePath))
-  if (!fullPath.startsWith(path.normalize(source.path))) {
+  const sourcePath = path.normalize(source.path)
+  const fullPath = path.normalize(path.join(sourcePath, filePath))
+  // path.relative returns e.g. "../../../etc/passwd" for traversal attempts
+  const rel = path.relative(sourcePath, fullPath)
+  if (rel.startsWith('..') || path.isAbsolute(rel) || filePath.includes('..')) {
     return { success: false, path: fullPath, error: '禁止路径穿越' }
   }
 
@@ -344,8 +347,8 @@ function writeFile(
 
   try {
     const dir = path.dirname(fullPath)
-    fs.mkdirSync(dir, { recursive: true })
-    fs.writeFileSync(fullPath, content, 'utf-8')
+    await fsp.mkdir(dir, { recursive: true })
+    await fsp.writeFile(fullPath, content, 'utf-8')
     return { success: true, path: fullPath }
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e)
@@ -354,12 +357,12 @@ function writeFile(
 }
 
 // Filename-only search (shallow, fast)
-function searchFiles(
+async function searchFiles(
   sourceId: string,
   query: string,
   dirPath?: string,
-): FileItem[] {
-  const all = scanDir(sourceId, dirPath)
+): Promise<FileItem[]> {
+  const all = await scanDir(sourceId, dirPath)
   const q = query.toLowerCase()
 
   const results: FileItem[] = []
@@ -374,7 +377,7 @@ function searchFiles(
   }
 
   for (const sub of dirs) {
-    results.push(...searchFiles(sourceId, query, sub))
+    results.push(...(await searchFiles(sourceId, query, sub)))
   }
 
   return results
@@ -399,18 +402,18 @@ interface TagInfo {
 }
 
 // 获取某个源下所有文件的标签
-function getAllTags(sourceId: string): TagInfo[] {
+async function getAllTags(sourceId: string): Promise<TagInfo[]> {
   const source = resolveSource(sourceId)
   if (!source) return []
 
   const tagCounts = new Map<string, number>()
 
   try {
-    const scanResults = scanDir(sourceId)
+    const scanResults = await scanDir(sourceId)
     const mdFiles = scanResults.filter(item => item.type === 'file' && item.extension === '.md')
 
     for (const file of mdFiles) {
-      const content = readFile(sourceId, file.relativePath)
+      const content = await readFile(sourceId, file.relativePath)
       if (content) {
         const tags = extractTagsFromContent(content)
         for (const tag of tags) {
@@ -422,36 +425,34 @@ function getAllTags(sourceId: string): TagInfo[] {
     console.error('Error extracting tags:', error)
   }
 
-  // 按出现次数降序排序
   return Array.from(tagCounts.entries())
     .map(([name, count]) => ({ name, count }))
     .sort((a, b) => b.count - a.count)
 }
 
 // Full-text search across all files
-function searchFullText(
+async function searchFullText(
   sourceId: string,
   query: string,
-): Array<{ path: string; name: string; snippet: string; score: number }> {
+): Promise<Array<{ path: string; name: string; snippet: string; score: number }>> {
   const source = resolveSource(sourceId)
   if (!source) return []
 
   const results: Array<{ path: string; name: string; snippet: string; score: number }> = []
-  const lowerQuery = query.toLowerCase()
+  const lowerQuery = query.toLowerCase().slice(0, 100) // guard against absurdly long queries
 
-  function walk(dir: string) {
-    if (!fs.existsSync(dir)) return
+  async function walk(dir: string) {
     let entries: fs.Dirent[]
-    try { entries = fs.readdirSync(dir, { withFileTypes: true }) } catch { return }
+    try { entries = await fsp.readdir(dir, { withFileTypes: true }) } catch { return }
 
     for (const entry of entries) {
       if (isExcluded(entry.name)) continue
       const fullPath = path.join(dir, entry.name)
       if (entry.isDirectory()) {
-        walk(fullPath)
+        await walk(fullPath)
       } else if (entry.isFile() && isSupported(entry.name)) {
         try {
-          const content = fs.readFileSync(fullPath, 'utf-8')
+          const content = await fsp.readFile(fullPath, 'utf-8')
           const relativePath = path.relative(source!.path, fullPath).replace(/\\/g, '/')
           const lowerContent = content.toLowerCase()
           const lowerName = entry.name.toLowerCase()
@@ -467,7 +468,8 @@ function searchFullText(
           }
 
           const nameScore = lowerName.includes(lowerQuery) ? 10 : 0
-          const freq = (lowerContent.match(new RegExp(lowerQuery.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'g')) || []).length
+          // Use split instead of regex to avoid ReDoS
+          const freq = lowerContent.split(lowerQuery).length - 1
 
           results.push({ path: relativePath, name: entry.name, snippet, score: nameScore + freq })
         } catch { /* skip */ }
@@ -475,7 +477,7 @@ function searchFullText(
     }
   }
 
-  walk(source.path)
+  await walk(source.path)
   return results.sort((a, b) => b.score - a.score).slice(0, 20)
 }
 
@@ -512,20 +514,19 @@ interface GraphEdge {
   kind: 'wikilink' | 'tag'
 }
 
-function buildGraphData(sourceId: string, currentRelativePath: string): { nodes: GraphNode[]; edges: GraphEdge[] } {
+async function buildGraphData(sourceId: string, currentRelativePath: string): Promise<{ nodes: GraphNode[]; edges: GraphEdge[] }> {
   const source = resolveSource(sourceId)
   if (!source || source.type !== 'local') return { nodes: [], edges: [] }
 
   const nameToPath: Record<string, string> = {}
-  function indexFiles(dir: string) {
-    if (!fs.existsSync(dir)) return
+  async function indexFiles(dir: string) {
     let entries: fs.Dirent[]
-    try { entries = fs.readdirSync(dir, { withFileTypes: true }) } catch { return }
+    try { entries = await fsp.readdir(dir, { withFileTypes: true }) } catch { return }
     for (const entry of entries) {
       if (isExcluded(entry.name)) continue
       const fullPath = path.join(dir, entry.name)
       if (entry.isDirectory()) {
-        indexFiles(fullPath)
+        await indexFiles(fullPath)
       } else if (entry.isFile() && isSupported(entry.name)) {
         const rel = path.relative(source!.path, fullPath).replace(/\\/g, '/')
         const stem = entry.name.replace(/\.(md|markdown)$/i, '')
@@ -533,7 +534,7 @@ function buildGraphData(sourceId: string, currentRelativePath: string): { nodes:
       }
     }
   }
-  indexFiles(source.path)
+  await indexFiles(source.path)
 
   const nodesMap = new Map<string, GraphNode>()
   const edges: GraphEdge[] = []
@@ -548,9 +549,12 @@ function buildGraphData(sourceId: string, currentRelativePath: string): { nodes:
   addNode(currentRelativePath, currentStem, 'current')
 
   const currentFullPath = path.join(source.path, currentRelativePath)
-  if (!fs.existsSync(currentFullPath)) return { nodes: [...nodesMap.values()], edges }
-
-  const currentContent = fs.readFileSync(currentFullPath, 'utf-8')
+  let currentContent: string
+  try {
+    currentContent = await fsp.readFile(currentFullPath, 'utf-8')
+  } catch {
+    return { nodes: [...nodesMap.values()], edges }
+  }
 
   const wikilinkRegex = /\[\[([^\]|#]+)(?:\|[^\]]+)?\]\]/g
   let match: RegExpExecArray | null
@@ -570,20 +574,19 @@ function buildGraphData(sourceId: string, currentRelativePath: string): { nodes:
     edges.push({ source: currentRelativePath, target: tagId, kind: 'tag' })
   }
 
-  function findBacklinks(dir: string) {
-    if (!fs.existsSync(dir)) return
+  async function findBacklinks(dir: string) {
     let entries: fs.Dirent[]
-    try { entries = fs.readdirSync(dir, { withFileTypes: true }) } catch { return }
+    try { entries = await fsp.readdir(dir, { withFileTypes: true }) } catch { return }
     for (const entry of entries) {
       if (isExcluded(entry.name)) continue
       const fullPath = path.join(dir, entry.name)
       if (entry.isDirectory()) {
-        findBacklinks(fullPath)
+        await findBacklinks(fullPath)
       } else if (entry.isFile() && isSupported(entry.name)) {
         const rel = path.relative(source!.path, fullPath).replace(/\\/g, '/')
         if (rel === currentRelativePath) continue
         try {
-          const content = fs.readFileSync(fullPath, 'utf-8')
+          const content = await fsp.readFile(fullPath, 'utf-8')
           const re = /\[\[([^\]|#]+)(?:\|[^\]]+)?\]\]/g
           let m: RegExpExecArray | null
           while ((m = re.exec(content)) !== null) {
@@ -599,7 +602,7 @@ function buildGraphData(sourceId: string, currentRelativePath: string): { nodes:
       }
     }
   }
-  findBacklinks(source.path)
+  await findBacklinks(source.path)
 
   return { nodes: [...nodesMap.values()], edges }
 }
@@ -849,7 +852,7 @@ export function createServer() {
               isError: true,
             }
           }
-          const result = writeFile(source, filePath, content)
+          const result = await writeFile(source, filePath, content)
           if (result.success) {
             return {
               content: [{ type: 'text', text: `✓ 文件已保存: ${result.path}` }],
@@ -903,7 +906,7 @@ export function createServer() {
           if (args?.title) meta.title = args.title as string
           if (args?.tags && Array.isArray(args.tags)) meta.tags = args.tags
           const fullContent = buildFrontmatter(meta) + body
-          const result = writeFile(source, filePath, fullContent)
+          const result = await writeFile(source, filePath, fullContent)
           if (result.success) {
             return { content: [{ type: 'text', text: `✓ 笔记已保存: ${result.path}` }] }
           }
@@ -946,6 +949,36 @@ function loadOrCreateToken(): string {
 }
 
 const AUTH_TOKEN = loadOrCreateToken()
+
+// ─── 请求安全常量 ──────────────────────────────────────────────────────────
+
+const MAX_BODY_SIZE = 10 * 1024 * 1024 // 10 MB
+
+const ALLOWED_ORIGINS: string[] = process.env.ALLOWED_ORIGINS
+  ? process.env.ALLOWED_ORIGINS.split(',').map((o: string) => o.trim())
+  : []
+
+function getAllowedOrigin(requestOrigin: string | undefined): string {
+  if (!requestOrigin) return ALLOWED_ORIGINS[0] || ''
+  if (ALLOWED_ORIGINS.includes(requestOrigin)) return requestOrigin
+  // 开发模式：若未配置允许域名则允许所有（便于本地调试）
+  if (ALLOWED_ORIGINS.length === 0) return requestOrigin
+  return ALLOWED_ORIGINS[0] || ''
+}
+
+async function readBody(req: http.IncomingMessage): Promise<string> {
+  let body = ''
+  let size = 0
+  for await (const chunk of req) {
+    const bytes = chunk as { length: number }
+    size += bytes.length
+    if (size > MAX_BODY_SIZE) {
+      throw Object.assign(new Error('Payload Too Large'), { statusCode: 413 })
+    }
+    body += chunk
+  }
+  return body
+}
 
 // ─── 暴力破解保护（速率限制）────────────────────────────────────────────────
 
@@ -1032,15 +1065,14 @@ async function startHttpServer(port: number) {
         return
       }
 
-      let body = ''
-      for await (const chunk of req) {
-        body += chunk
-      }
+      const body = await readBody(req)
 
+      const origin = getAllowedOrigin(req.headers.origin)
       res.writeHead(200, {
         'Content-Type': 'application/json',
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Headers': '*',
+        'Access-Control-Allow-Origin': origin,
+        'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Max-Age': '86400',
       })
 
       try {
@@ -1081,10 +1113,12 @@ async function startHttpServer(port: number) {
     // ── CORS 预检 ──────────────────────────────────────────────────────────
 
     if (req.method === 'OPTIONS') {
+      const origin = getAllowedOrigin(req.headers.origin)
       res.writeHead(204, {
-        'Access-Control-Allow-Origin': '*',
+        'Access-Control-Allow-Origin': origin,
         'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
         'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+        'Access-Control-Max-Age': '86400',
       })
       res.end()
       return
@@ -1101,16 +1135,16 @@ async function startHttpServer(port: number) {
     // ── API 代理（便捷 HTTP API，无需 JSON-RPC，远程访问友好）────────────────
 
     if (pathname.startsWith('/api/')) {
-      // Blinko API 代理 - 不需要 token 认证
-      if (url.searchParams.get('source') === 'blinko') {
-        handleBlinkoApi(req, res, url)
-        return
-      }
-
-      // 本地源 API - 需要 token 认证
+      // 所有 API 端点均需 token 认证
       if (!authMiddleware(req)) {
         res.writeHead(401, { 'Content-Type': 'application/json' })
         res.end(JSON.stringify({ error: 'Unauthorized' }))
+        return
+      }
+
+      // Blinko API 代理
+      if (url.searchParams.get('source') === 'blinko') {
+        handleBlinkoApi(req, res, url)
         return
       }
 
@@ -1126,7 +1160,7 @@ async function startHttpServer(port: number) {
           case 'file': // 别名：read
           case 'read': {
             if (!filePath) throw new Error('path 参数必填')
-            result = readFile(source, filePath)
+            result = await readFile(source, filePath)
             if (result === null) {
               statusCode = 404
               result = `文件不存在：${filePath}`
@@ -1134,28 +1168,15 @@ async function startHttpServer(port: number) {
             break
           }
           case 'scan': {
-            const items = scanDir(source, filePath || undefined)
+            const items = await scanDir(source, filePath || undefined)
             res.writeHead(200, { 'Content-Type': 'application/json' })
             res.end(JSON.stringify(items))
             return
           }
-          case 'read': {
-            if (!filePath) throw new Error('path 参数必填')
-            result = readFile(source, filePath)
-            if (result === null) {
-              statusCode = 404
-              result = `文件不存在: ${filePath}`
-            }
-            break
-          }
           case 'write': {
             if (!filePath) throw new Error('path 参数必填')
-            let body2 = ''
-            for await (const chunk of req) {
-              body2 += chunk
-            }
-            const payload = JSON.parse(body2)
-            const writeResult = writeFile(source, filePath, payload.content || '')
+            const payload = JSON.parse(await readBody(req))
+            const writeResult = await writeFile(source, filePath, payload.content || '')
             if (!writeResult.success) {
               statusCode = 400
               result = writeResult.error || '写入失败'
@@ -1172,7 +1193,7 @@ async function startHttpServer(port: number) {
           case 'search': {
             const query = url.searchParams.get('query')
             if (!query) throw new Error('query 参数必填')
-            const items = searchFiles(source, query, filePath || undefined)
+            const items = await searchFiles(source, query, filePath || undefined)
             res.writeHead(200, { 'Content-Type': 'application/json' })
             res.end(JSON.stringify(items))
             return
@@ -1180,28 +1201,26 @@ async function startHttpServer(port: number) {
           case 'fulltext_search': {
             const query = url.searchParams.get('query')
             if (!query) throw new Error('query 参数必填')
-            const items = searchFullText(source, query)
+            const items = await searchFullText(source, query)
             res.writeHead(200, { 'Content-Type': 'application/json' })
             res.end(JSON.stringify(items))
             return
           }
           case 'tags': {
-            const tags = getAllTags(source)
+            const tags = await getAllTags(source)
             res.writeHead(200, { 'Content-Type': 'application/json' })
             res.end(JSON.stringify(tags))
             return
           }
           case 'graph': {
             if (!filePath) throw new Error('path 参数必填')
-            const graphData = buildGraphData(source, filePath)
+            const graphData = await buildGraphData(source, filePath)
             res.writeHead(200, { 'Content-Type': 'application/json' })
             res.end(JSON.stringify(graphData))
             return
           }
           case 'ai/analyze': {
-            let body = ''
-            for await (const chunk of req) body += chunk
-            const payload = JSON.parse(body)
+            const payload = JSON.parse(await readBody(req))
             const aiResult = await analyzeDocumentContent(payload.content || '', payload.fileName || '')
             res.writeHead(200, { 'Content-Type': 'application/json' })
             res.end(JSON.stringify(aiResult))
@@ -1212,14 +1231,17 @@ async function startHttpServer(port: number) {
             result = `未知端点: ${apiPath}`
         }
 
+        const origin = getAllowedOrigin(req.headers.origin)
         res.writeHead(statusCode, {
           'Content-Type': 'application/json',
-          'Access-Control-Allow-Origin': '*',
+          'Access-Control-Allow-Origin': origin,
+          'Access-Control-Max-Age': '86400',
         })
         res.end(JSON.stringify(result))
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : String(e)
-        res.writeHead(400, { 'Content-Type': 'application/json' })
+        const code = (e as { statusCode?: number }).statusCode ?? 400
+        res.writeHead(code, { 'Content-Type': 'application/json' })
         res.end(JSON.stringify({ error: msg }))
       }
       return
@@ -1237,10 +1259,13 @@ async function startHttpServer(port: number) {
     const ext = path.extname(pathname)
     if (ext && mimeTypes[ext]) {
       const staticPath = path.join(process.cwd(), pathname)
-      if (fs.existsSync(staticPath)) {
+      try {
+        const staticContent = await fsp.readFile(staticPath)
         res.writeHead(200, { 'Content-Type': mimeTypes[ext] })
-        res.end(fs.readFileSync(staticPath))
+        res.end(staticContent)
         return
+      } catch {
+        // file not found, fall through to 404
       }
     }
 
@@ -1267,13 +1292,13 @@ async function handleToolCall(name: string, args: Record<string, unknown>) {
     case 'obsidian_scan': {
       const source = (args.source as string) || 'obsidian'
       const dirPath = args.path as string | undefined
-      return { content: [{ type: 'text', text: JSON.stringify(scanDir(source, dirPath), null, 2) }] }
+      return { content: [{ type: 'text', text: JSON.stringify(await scanDir(source, dirPath), null, 2) }] }
     }
     case 'obsidian_read': {
       const source = (args.source as string) || 'obsidian'
       const filePath = args.path as string
       if (!filePath) return { content: [{ type: 'text', text: '错误: path 参数必填' }], isError: true }
-      const content = readFile(source, filePath)
+      const content = await readFile(source, filePath)
       if (content === null) return { content: [{ type: 'text', text: `文件不存在: ${filePath}` }], isError: true }
       return { content: [{ type: 'text', text: content }] }
     }
@@ -1282,7 +1307,7 @@ async function handleToolCall(name: string, args: Record<string, unknown>) {
       const filePath = args.path as string
       const content = args.content as string
       if (!filePath || content === undefined) return { content: [{ type: 'text', text: '错误: path 和 content 参数必填' }], isError: true }
-      const result = writeFile(source, filePath, content)
+      const result = await writeFile(source, filePath, content)
       if (result.success) return { content: [{ type: 'text', text: `✓ 文件已保存: ${result.path}` }] }
       return { content: [{ type: 'text', text: `✗ 保存失败: ${result.error}` }], isError: true }
     }
@@ -1294,13 +1319,13 @@ async function handleToolCall(name: string, args: Record<string, unknown>) {
       const query = args.query as string
       const dirPath = args.path as string | undefined
       if (!query) return { content: [{ type: 'text', text: '错误: query 参数必填' }], isError: true }
-      return { content: [{ type: 'text', text: JSON.stringify(searchFiles(source, query, dirPath), null, 2) }] }
+      return { content: [{ type: 'text', text: JSON.stringify(await searchFiles(source, query, dirPath), null, 2) }] }
     }
     case 'obsidian_fulltext_search': {
       const source = (args.source as string) || 'obsidian'
       const query = args.query as string
       if (!query) return { content: [{ type: 'text', text: '错误: query 参数必填' }], isError: true }
-      return { content: [{ type: 'text', text: JSON.stringify(searchFullText(source, query), null, 2) }] }
+      return { content: [{ type: 'text', text: JSON.stringify(await searchFullText(source, query), null, 2) }] }
     }
     case 'obsidian_write_note': {
       const source = (args.source as string) || 'obsidian'
@@ -1311,7 +1336,7 @@ async function handleToolCall(name: string, args: Record<string, unknown>) {
       if (args.title) meta.title = args.title as string
       if (args.tags && Array.isArray(args.tags)) meta.tags = args.tags
       const fullContent = buildFrontmatter(meta) + body
-      const result = writeFile(source, filePath, fullContent)
+      const result = await writeFile(source, filePath, fullContent)
       if (result.success) return { content: [{ type: 'text', text: `✓ 笔记已保存: ${result.path}` }] }
       return { content: [{ type: 'text', text: `✗ 保存失败: ${result.error}` }], isError: true }
     }

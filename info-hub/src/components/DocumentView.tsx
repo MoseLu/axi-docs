@@ -121,6 +121,10 @@ export function DocumentView({
   const tags: string[] = Array.isArray(frontmatter.tags) ? frontmatter.tags as string[] : []
   const date = (frontmatter.date || frontmatter.updated) as string | undefined
   const description = frontmatter.description as string | undefined
+  const docType = frontmatter.type as string | undefined
+  const weather = frontmatter.weather as string | undefined
+  const mood = frontmatter.mood as string | undefined
+  const isDaily = docType === 'daily'
 
   return (
     <div className="doc-layout">
@@ -138,7 +142,10 @@ export function DocumentView({
             ))}
           </div>
 
-          <h1 className="doc-title">{title}</h1>
+          <div className="doc-title-row">
+            <h1 className="doc-title">{title}</h1>
+            {isDaily && <span className="doc-type-badge">日记</span>}
+          </div>
 
           {description && <p className="doc-description">{description}</p>}
 
@@ -147,6 +154,18 @@ export function DocumentView({
               <span className="doc-meta-item">
                 <ClockIcon />
                 {new Date(date).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}
+              </span>
+            )}
+            {weather && (
+              <span className="doc-meta-item">
+                <span className="doc-meta-icon">☁</span>
+                {weather}
+              </span>
+            )}
+            {mood && (
+              <span className="doc-meta-item">
+                <span className="doc-meta-icon">◉</span>
+                {mood}
               </span>
             )}
             {tags.length > 0 && (

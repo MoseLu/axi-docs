@@ -4,6 +4,7 @@ import remarkGfm from 'remark-gfm'
 import { DocSource, SelectedFile, KnowledgePanelTab, GraphData, AiAnalysis } from '../types'
 import { TableOfContents } from './TableOfContents'
 import { KnowledgeGraph } from './KnowledgeGraph'
+import { GlobalGraph } from './GlobalGraph'
 import { API_BASE } from '../constants'
 
 interface KnowledgePanelProps {
@@ -15,6 +16,7 @@ interface KnowledgePanelProps {
 }
 
 const GRAPH_SVG_WIDTH = 284  // approximate panel width minus borders
+type GraphMode = 'local' | 'global'
 
 export function KnowledgePanel({
   content,
@@ -26,6 +28,7 @@ export function KnowledgePanel({
   const [activeTab, setActiveTab] = useState<KnowledgePanelTab>('toc')
   const [graphData, setGraphData] = useState<GraphData | null>(null)
   const [graphLoading, setGraphLoading] = useState(false)
+  const [graphMode, setGraphMode] = useState<GraphMode>('local')
   const [aiData, setAiData] = useState<AiAnalysis | null>(null)
   const [aiLoading, setAiLoading] = useState(false)
   const graphContainerRef = useRef<HTMLDivElement>(null)
@@ -89,7 +92,7 @@ export function KnowledgePanel({
 
   const handleTabClick = (tab: KnowledgePanelTab) => {
     setActiveTab(tab)
-    if (tab === 'graph' && !graphData && !graphLoading) {
+    if (tab === 'graph' && graphMode === 'local' && !graphData && !graphLoading) {
       fetchGraphData()
     }
   }
@@ -120,25 +123,55 @@ export function KnowledgePanel({
       <div className="kp-content">
         {activeTab === 'graph' && (
           <div ref={graphContainerRef} className="kp-graph" style={{ flex: 1 }}>
-            {graphLoading && (
-              <div className="kp-ai-loading">
-                <div className="spinner" style={{ width: 'var(--icon-size-lg)', height: 'var(--icon-size-lg)' }} />
-                加载图谱...
+            {source?.type === 'local' && (
+              <div className="graph-mode-toggle">
+                <button
+                  className={`graph-mode-btn${graphMode === 'local' ? ' active' : ''}`}
+                  onClick={() => setGraphMode('local')}
+                >
+                  局部
+                </button>
+                <button
+                  className={`graph-mode-btn${graphMode === 'global' ? ' active' : ''}`}
+                  onClick={() => setGraphMode('global')}
+                >
+                  全局
+                </button>
               </div>
             )}
-            {!graphLoading && graphData && (
-              <KnowledgeGraph
-                data={graphData}
+
+            {graphMode === 'local' && (
+              <>
+                {graphLoading && (
+                  <div className="kp-ai-loading">
+                    <div className="spinner" style={{ width: 'var(--icon-size-lg)', height: 'var(--icon-size-lg)' }} />
+                    加载图谱...
+                  </div>
+                )}
+                {!graphLoading && graphData && (
+                  <KnowledgeGraph
+                    data={graphData}
+                    width={GRAPH_SVG_WIDTH}
+                    height={graphHeight}
+                    onNavigate={onNavigate}
+                    onTagSelect={onTagSelect}
+                  />
+                )}
+                {!graphLoading && !graphData && (
+                  <div style={{ padding: 'var(--spacing-5)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)', textAlign: 'center' }}>
+                    选择文档后查看关系图谱
+                  </div>
+                )}
+              </>
+            )}
+
+            {graphMode === 'global' && source?.type === 'local' && (
+              <GlobalGraph
                 width={GRAPH_SVG_WIDTH}
                 height={graphHeight}
                 onNavigate={onNavigate}
                 onTagSelect={onTagSelect}
               />
-            )}
-            {!graphLoading && !graphData && source?.type !== 'local' && (
-              <div style={{ padding: 'var(--spacing-5)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)', textAlign: 'center' }}>
-                仅本地文档源支持知识图谱
-              </div>
             )}
           </div>
         )}

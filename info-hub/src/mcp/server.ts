@@ -628,6 +628,103 @@ async function buildGraphData(sourceId: string, currentRelativePath: string): Pr
   return { nodes: [...nodesMap.values()], edges }
 }
 
+// ─── Global Knowledge Graph (full vault overview) ───────────────────────────────
+
+interface GlobalGraphNode {
+  id: string
+  label: string
+  kind: 'note' | 'tag'
+  path?: string
+  tags?: string[]
+  x?: number
+  y?: number
+  vx?: number
+  vy?: number
+}
+
+interface GlobalGraphEdge {
+  source: string
+  target: string
+  kind: 'wikilink' | 'tag'
+}
+
+async function buildGlobalGraph(sourceId: string): Promise<{ nodes: GlobalGraphNode[]; edges: GlobalGraphEdge[] }> {
+  const source = resolveSource(sourceId)
+  if (!source || source.type !== 'local') return { nodes: [], edges: [] }
+
+  // ── Step 1: Index all files ──────────────────────────────────────────────────
+  const nameToPath: Record<string, string> = {}
+  const pathToMeta: Record<string, { name: string; tags: string[] }> = {}
+
+  async function indexFiles(dir: string) {
+    let entries: fs.Dirent[]
+    try { entries = await fsp.readdir(dir, { withFileTypes: true }) } catch { return }
+    for (const entry of entries) {
+      if (isExcluded(entry.name)) continue
+      const fullPath = path.join(dir, entry.name)
+      if (entry.isDirectory()) {
+        await indexFiles(fullPath)
+      } else if (entry.isFile() && isSupported(entry.name)) {
+        const rel = path.relative(source!.path, fullPath).replace(/\\/g, '/')
+        const stem = entry.name.replace(/\.(md|markdown)$/i, '')
+        nameToPath[stem.toLowerCase()] = rel
+        pathToMeta[rel] = { name: stem, tags: [] }
+      }
+    }
+  }
+  await indexFiles(source.path)
+
+  // ── Step 2: Scan all tags (read each file once) ──────────────────────────────
+  const wikilinkRegex = /\[\[([^\]|#]+)(?:\|[^\]]+)?\]\]/g
+  const tagRegex = /#([\w\u4e00-\u9fa5-]+)/g
+
+  const edges: GlobalGraphEdge[] = []
+  const tagToFiles: Record<string, Set<string>> = {}
+
+  for (const [rel] of Object.entries(pathToMeta)) {
+    try {
+      const content = await fsp.readFile(path.join(source.path, rel), 'utf-8')
+      const fileTags: string[] = []
+      let m: RegExpExecArray | null
+
+      // Extract tags
+      while ((m = tagRegex.exec(content)) !== null) {
+        const tag = m[1].trim()
+        if (tag && !tag.includes('```')) {
+          fileTags.push(tag)
+          if (!tagToFiles[tag]) tagToFiles[tag] = new Set()
+          tagToFiles[tag].add(rel)
+        }
+      }
+      pathToMeta[rel].tags = fileTags
+
+      // Extract wikilinks
+      while ((m = wikilinkRegex.exec(content)) !== null) {
+        const resolved = nameToPath[m[1].trim().toLowerCase()]
+        if (resolved && resolved !== rel) {
+          edges.push({ source: rel, target: resolved, kind: 'wikilink' })
+        }
+      }
+    } catch { /* skip unreadable files */ }
+  }
+
+  // ── Step 3: Build nodes ──────────────────────────────────────────────────────
+  const nodes: GlobalGraphNode[] = []
+
+  for (const [rel, meta] of Object.entries(pathToMeta)) {
+    nodes.push({ id: rel, label: meta.name, kind: 'note', path: rel, tags: meta.tags })
+  }
+
+  for (const [tag] of Object.entries(tagToFiles)) {
+    nodes.push({ id: '#' + tag, label: tag, kind: 'tag' })
+    for (const fileRel of tagToFiles[tag]) {
+      edges.push({ source: fileRel, target: '#' + tag, kind: 'tag' })
+    }
+  }
+
+  return { nodes, edges }
+}
+
 // ─── AI Analysis ──────────────────────────────────────────────────────────────
 
 // MiniMax Anthropic 兼容端点配置（直接硬编码，绕过环境变量和系统代理问题）
@@ -1326,6 +1423,12 @@ async function startHttpServer(port: number) {
           case 'graph': {
             if (!filePath) throw new Error('path 参数必填')
             const graphData = await buildGraphData(source, filePath)
+            res.writeHead(200, { 'Content-Type': 'application/json' })
+            res.end(JSON.stringify(graphData))
+            return
+          }
+          case 'global-graph': {
+            const graphData = await buildGlobalGraph(source)
             res.writeHead(200, { 'Content-Type': 'application/json' })
             res.end(JSON.stringify(graphData))
             return

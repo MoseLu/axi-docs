@@ -683,6 +683,35 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 }
 .kp-graph svg:active { cursor: grabbing; }
 
+/* Graph mode toggle (局部 / 全局) */
+.graph-mode-toggle {
+  display: flex;
+  gap: 2px;
+  padding: var(--spacing-2) var(--spacing-3);
+  background: var(--color-bg-secondary);
+  border-radius: var(--radius);
+}
+.graph-mode-btn {
+  flex: 1;
+  padding: var(--spacing-1) var(--spacing-2);
+  font-size: var(--font-size-xs);
+  border: none;
+  background: transparent;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-radius: var(--radius-xs);
+  transition: all var(--transition);
+}
+.graph-mode-btn:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text);
+}
+.graph-mode-btn.active {
+  background: var(--color-primary);
+  color: #fff;
+  font-weight: 500;
+}
+
 .graph-node { cursor: pointer; }
 .graph-node circle { transition: r var(--transition); }
 .graph-node:hover circle { opacity: 0.85; }

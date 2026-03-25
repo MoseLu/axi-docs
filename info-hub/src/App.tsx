@@ -5,6 +5,7 @@ import { Sidebar } from './components/Sidebar'
 import { DocumentView } from './components/DocumentView'
 import { BlinkoView } from './components/BlinkoView'
 import { SearchResults } from './components/SearchResults'
+import { ErrorBoundary } from './components/ErrorBoundary'
 import { DocSource, SelectedFile, SearchResult } from './types'
 import { API_BASE } from './constants'
 
@@ -138,25 +139,27 @@ function HomePage() {
           onTagSelect={handleTagSelect}
         />
         <main className="app-main">
-          {searchResults !== null ? (
-            <SearchResults
-              results={searchResults}
-              query={searchQuery}
-              onFileSelect={handleFileSelect}
-            />
-          ) : isBlinko ? (
-            <BlinkoView onNoteSelect={handleFileSelect} refreshKey={refreshKey} />
-          ) : (
-            <DocumentView
-              content={fileContent}
-              fileName={fileName}
-              loading={loading}
-              selectedFile={selectedFile}
-              source={currentSource}
-              onWikiLink={handleWikiLink}
-              onTagSelect={tag => handleTagSelect(tag)}
-            />
-          )}
+          <ErrorBoundary>
+            {searchResults !== null ? (
+              <SearchResults
+                results={searchResults}
+                query={searchQuery}
+                onFileSelect={handleFileSelect}
+              />
+            ) : isBlinko ? (
+              <BlinkoView onNoteSelect={handleFileSelect} refreshKey={refreshKey} />
+            ) : (
+              <DocumentView
+                content={fileContent}
+                fileName={fileName}
+                loading={loading}
+                selectedFile={selectedFile}
+                source={currentSource}
+                onWikiLink={handleWikiLink}
+                onTagSelect={tag => handleTagSelect(tag)}
+              />
+            )}
+          </ErrorBoundary>
         </main>
       </div>
     </div>

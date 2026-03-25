@@ -253,6 +253,10 @@ function isExcluded(name: string): boolean {
   return excludePatterns.some((p) => name === p || name.startsWith('.'))
 }
 
+function isHiddenDir(name: string): boolean {
+  return name.startsWith('_')
+}
+
 function isSupported(filename: string): boolean {
   const ext = filename.toLowerCase()
   return supportedExtensions.some((e) => ext.endsWith(e))
@@ -291,6 +295,7 @@ async function scanDir(sourceId: string, dirPath?: string): Promise<FileItem[]> 
       try {
         const stat = await fsp.stat(fullPath)
         if (entry.isDirectory()) {
+          if (isHiddenDir(entry.name)) continue
           items.push({
             id: `${sourceId}:${relativePath}`,
             name: entry.name,
@@ -470,6 +475,7 @@ async function searchFullText(
       if (isExcluded(entry.name)) continue
       const fullPath = path.join(dir, entry.name)
       if (entry.isDirectory()) {
+        if (isHiddenDir(entry.name)) continue
         await walk(fullPath)
       } else if (entry.isFile() && isSupported(entry.name)) {
         try {
@@ -602,6 +608,7 @@ async function buildGraphData(sourceId: string, currentRelativePath: string): Pr
       if (isExcluded(entry.name)) continue
       const fullPath = path.join(dir, entry.name)
       if (entry.isDirectory()) {
+        if (isHiddenDir(entry.name)) continue
         await findBacklinks(fullPath)
       } else if (entry.isFile() && isSupported(entry.name)) {
         const rel = path.relative(source!.path, fullPath).replace(/\\/g, '/')

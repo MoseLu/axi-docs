@@ -186,11 +186,7 @@ export function KnowledgePanel({
                     <div className="kp-ai-section-title">要点</div>
                     <ul className="kp-ai-keypoints">
                       {aiData.keyPoints.map((pt: string, i: number) => (
-                        <li key={i} className="kp-ai-keypoint">
-                          <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                            {pt}
-                          </ReactMarkdown>
-                        </li>
+                        <li key={i} className="kp-ai-keypoint">{pt}</li>
                       ))}
                     </ul>
                   </div>

@@ -38,7 +38,7 @@ export function SearchResults({ results, query, onFileSelect }: SearchResultsPro
         <div className="empty-state" style={{ flex: 1 }}>
           <FileIcon />
           <p className="empty-state-text">没有匹配的文档</p>
-          <p style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 4 }}>
+          <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)', marginTop: 'var(--spacing-1)' }}>
             尝试使用不同的关键词
           </p>
         </div>

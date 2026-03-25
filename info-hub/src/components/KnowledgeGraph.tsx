@@ -194,7 +194,7 @@ export function KnowledgeGraph({ data, width, height, onNavigate, onTagSelect }:
 
   if (!data.nodes.length) {
     return (
-      <div className="kp-graph" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-muted)', fontSize: 12 }}>
+      <div className="kp-graph" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'var(--color-text-muted)', fontSize: 'var(--font-size-sm)' }}>
         无关联节点
       </div>
     )

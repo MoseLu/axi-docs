@@ -30,6 +30,7 @@
   --header-height: 54px;
 
   /* Radius */
+  --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 8px;
   --radius-lg: 12px;
@@ -42,6 +43,40 @@
 
   /* Transition */
   --transition: 0.15s ease;
+
+  /* Font Size */
+  --font-size-xxs: 10px;
+  --font-size-xs: 11px;
+  --font-size-sm: 12px;
+  --font-size-base: 13px;
+  --font-size-md: 14px;
+  --font-size-lg: 15px;
+  --font-size-xl: 16px;
+  --font-size-2xl: 26px;
+  --font-size-3xl: 32px;
+
+  /* Spacing */
+  --spacing-1: 4px;
+  --spacing-2: 6px;
+  --spacing-3: 8px;
+  --spacing-4: 12px;
+  --spacing-5: 16px;
+  --spacing-6: 20px;
+  --spacing-7: 24px;
+  --spacing-8: 32px;
+  --spacing-9: 48px;
+
+  /* Icon Size */
+  --icon-size-xs: 11px;
+  --icon-size-sm: 14px;
+  --icon-size-md: 16px;
+  --icon-size-lg: 20px;
+  --icon-size-xl: 28px;
+  --icon-size-2xl: 48px;
+
+  /* Tree indentation */
+  --tree-indent-base: 12px;
+  --tree-indent-step: 14px;
 }
 
 /* ─── Dark Mode ──────────────────────────────────────────────────────────────── */
@@ -76,7 +111,7 @@ html, body, #root {
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Segoe UI', 'Noto Sans SC', sans-serif;
-  font-size: 14px;
+  font-size: var(--font-size-md);
   line-height: 1.6;
   color: var(--color-text);
   background: var(--color-bg);
@@ -126,7 +161,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 16px;
+  font-size: var(--font-size-xl);
   font-weight: 700;
   color: var(--color-text);
   white-space: nowrap;
@@ -135,8 +170,8 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 }
 
 .app-logo svg {
-  width: 20px;
-  height: 20px;
+  width: var(--icon-size-lg);
+  height: var(--icon-size-lg);
   color: var(--color-primary);
 }
 
@@ -164,8 +199,8 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 }
 
 .search-spinner {
-  width: 14px;
-  height: 14px;
+  width: var(--icon-size-sm);
+  height: var(--icon-size-sm);
   border: 2px solid var(--color-border);
   border-top-color: var(--color-primary);
   border-radius: 50%;
@@ -178,7 +213,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   border: 1px solid var(--color-border);
   border-radius: var(--radius-lg);
   background: var(--color-bg-secondary);
-  font-size: 13px;
+  font-size: var(--font-size-base);
   outline: none;
   transition: border-color var(--transition), box-shadow var(--transition), background var(--transition);
 }
@@ -199,7 +234,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   border-radius: 50%;
   background: var(--color-text-muted);
   color: white;
-  font-size: 12px;
+  font-size: var(--font-size-sm);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -215,7 +250,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   gap: 5px;
   padding: 6px 10px;
   border-radius: var(--radius-md);
-  font-size: 13px;
+  font-size: var(--font-size-base);
   color: var(--color-text-secondary);
   transition: background var(--transition), color var(--transition);
   flex-shrink: 0;
@@ -223,7 +258,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 }
 
 .refresh-btn:hover { background: var(--color-bg-tertiary); color: var(--color-text); }
-.refresh-btn svg { width: 14px; height: 14px; }
+.refresh-btn svg { width: var(--icon-size-sm); height: var(--icon-size-sm); }
 
 /* ─── Sidebar ────────────────────────────────────────────────────────────────── */
 .app-sidebar {
@@ -252,7 +287,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   gap: 8px;
   padding: 7px 10px;
   border-radius: var(--radius-md);
-  font-size: 13px;
+  font-size: var(--font-size-base);
   font-weight: 500;
   color: var(--color-text-secondary);
   transition: background var(--transition), color var(--transition);
@@ -279,7 +314,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 }
 
 .sidebar-source-label {
-  font-size: 11px;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   color: var(--color-text-muted);
   text-transform: uppercase;
@@ -287,7 +322,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 }
 
 .sidebar-source-desc {
-  font-size: 11px;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
 }
 
@@ -303,7 +338,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   gap: 6px;
   width: 100%;
   padding: 8px 12px;
-  font-size: 12px;
+  font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--color-text-secondary);
   text-transform: uppercase;
@@ -318,7 +353,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   margin-left: auto;
   background: var(--color-bg-tertiary);
   color: var(--color-text-muted);
-  font-size: 10px;
+  font-size: var(--font-size-xxs);
   padding: 1px 5px;
   border-radius: 10px;
   font-weight: 600;
@@ -380,7 +415,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  font-size: 13px;
+  font-size: var(--font-size-base);
 }
 
 .tree-item-tags {
@@ -390,7 +425,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 }
 
 .tree-item-empty {
-  font-size: 11px;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
   padding: 3px 0;
   font-style: italic;
@@ -407,12 +442,12 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   gap: 10px;
   color: var(--color-text-muted);
   text-align: center;
-  font-size: 12px;
+  font-size: var(--font-size-sm);
 }
 
 .sidebar-blinko-hint svg {
-  width: 28px;
-  height: 28px;
+  width: var(--icon-size-xl);
+  height: var(--icon-size-xl);
   color: var(--color-blinko);
   opacity: 0.7;
 }
@@ -424,7 +459,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   gap: 2px;
   padding: 2px 8px;
   border-radius: 20px;
-  font-size: 12px;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   background: var(--color-bg-tertiary);
   color: var(--color-text-secondary);
@@ -437,9 +472,9 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 .tag:hover { background: var(--color-primary-light); color: var(--color-primary); border-color: color-mix(in srgb, var(--color-primary) 30%, transparent); }
 .tag--active { background: var(--color-primary); color: white; }
 .tag--active:hover { background: var(--color-primary-hover); color: white; }
-.tag--small { padding: 1px 6px; font-size: 11px; }
-.tag--tiny { padding: 1px 4px; font-size: 10px; background: var(--color-primary-light); color: var(--color-primary); }
-.tag-count { margin-left: 3px; opacity: 0.7; font-size: 10px; }
+.tag--small { padding: 1px 6px; font-size: var(--font-size-xs); }
+.tag--tiny { padding: 1px 4px; font-size: var(--font-size-xxs); background: var(--color-primary-light); color: var(--color-primary); }
+.tag-count { margin-left: 3px; opacity: 0.7; font-size: var(--font-size-xxs); }
 
 /* ─── Document Layout ────────────────────────────────────────────────────────── */
 .doc-layout {
@@ -469,7 +504,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  font-size: 12px;
+  font-size: var(--font-size-sm);
   color: var(--color-text-muted);
   margin-bottom: 12px;
   gap: 2px;
@@ -497,7 +532,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 }
 
 .doc-title {
-  font-size: 26px;
+  font-size: var(--font-size-2xl);
   font-weight: 700;
   color: var(--color-text);
   line-height: 1.3;
@@ -505,7 +540,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 }
 
 .doc-type-badge {
-  font-size: 11px;
+  font-size: var(--font-size-xs);
   font-weight: 500;
   padding: 2px 8px;
   border-radius: 10px;
@@ -516,12 +551,12 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 }
 
 .doc-meta-icon {
-  font-size: 12px;
+  font-size: var(--font-size-sm);
   line-height: 1;
 }
 
 .doc-description {
-  font-size: 15px;
+  font-size: var(--font-size-lg);
   color: var(--color-text-secondary);
   margin-bottom: 10px;
   line-height: 1.5;
@@ -532,7 +567,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   align-items: center;
   flex-wrap: wrap;
   gap: 12px;
-  font-size: 12px;
+  font-size: var(--font-size-sm);
   color: var(--color-text-muted);
 }
 
@@ -554,7 +589,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 /* ─── Table of Contents (kept for use inside knowledge panel) ────────────────── */
 .toc-header {
   padding: 16px 16px 8px;
-  font-size: 11px;
+  font-size: var(--font-size-xs);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.8px;
@@ -574,7 +609,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   text-align: left;
   padding: 4px 8px;
   border-radius: var(--radius-sm);
-  font-size: 12px;
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   transition: background var(--transition), color var(--transition);
   overflow: hidden;
@@ -588,9 +623,9 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 
 .toc-level-1 { font-weight: 600; }
 .toc-level-2 { padding-left: 16px; }
-.toc-level-3 { padding-left: 24px; font-size: 11px; }
-.toc-level-4 { padding-left: 32px; font-size: 11px; color: var(--color-text-muted); }
-.toc-level-5, .toc-level-6 { padding-left: 40px; font-size: 11px; color: var(--color-text-muted); }
+.toc-level-3 { padding-left: 24px; font-size: var(--font-size-xs); }
+.toc-level-4 { padding-left: 32px; font-size: var(--font-size-xs); color: var(--color-text-muted); }
+.toc-level-5, .toc-level-6 { padding-left: 40px; font-size: var(--font-size-xs); color: var(--color-text-muted); }
 
 /* ─── Knowledge Panel ────────────────────────────────────────────────────────── */
 .knowledge-panel {
@@ -613,7 +648,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 .kp-tab {
   flex: 1;
   padding: 10px 4px;
-  font-size: 12px;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   color: var(--color-text-muted);
   text-align: center;
@@ -649,10 +684,10 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 .kp-graph svg:active { cursor: grabbing; }
 
 .graph-node { cursor: pointer; }
-.graph-node circle { transition: r 0.15s; }
+.graph-node circle { transition: r var(--transition); }
 .graph-node:hover circle { opacity: 0.85; }
 .graph-node text {
-  font-size: 10px;
+  font-size: var(--font-size-xxs);
   fill: var(--color-text-secondary);
   pointer-events: none;
   user-select: none;
@@ -688,7 +723,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 }
 
 .kp-ai-section-title {
-  font-size: 11px;
+  font-size: var(--font-size-xs);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.6px;
@@ -697,7 +732,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 }
 
 .kp-ai-summary {
-  font-size: 13px;
+  font-size: var(--font-size-base);
   color: var(--color-text-secondary);
   line-height: 1.6;
 }
@@ -710,7 +745,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 }
 
 .kp-ai-keypoint {
-  font-size: 12px;
+  font-size: var(--font-size-sm);
   color: var(--color-text-secondary);
   padding: 4px 8px;
   background: var(--color-bg-tertiary);
@@ -725,19 +760,19 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 }
 
 .kp-ai-concept-term {
-  font-size: 12px;
+  font-size: var(--font-size-sm);
   font-weight: 600;
   color: var(--color-text);
 }
 
 .kp-ai-concept-def {
-  font-size: 11px;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
   line-height: 1.5;
 }
 
 .kp-ai-error {
-  font-size: 12px;
+  font-size: var(--font-size-sm);
   color: var(--color-danger);
   padding: 12px;
   background: color-mix(in srgb, var(--color-danger) 8%, transparent);
@@ -753,7 +788,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   background: var(--color-primary);
   color: white;
   border-radius: var(--radius-md);
-  font-size: 13px;
+  font-size: var(--font-size-base);
   font-weight: 500;
   transition: background var(--transition);
   margin: 8px;
@@ -763,7 +798,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 
 /* ─── Markdown Body ──────────────────────────────────────────────────────────── */
 .markdown-body {
-  font-size: 15px;
+  font-size: var(--font-size-lg);
   line-height: 1.75;
   color: var(--color-text);
 }
@@ -826,7 +861,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 
 .code-lang {
   padding: 6px 14px;
-  font-size: 11px;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -843,7 +878,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 
 .code-block code {
   font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
-  font-size: 13px;
+  font-size: var(--font-size-base);
   line-height: 1.6;
   background: none;
   padding: 0;
@@ -864,7 +899,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   width: 100%;
   border-collapse: collapse;
   margin: 16px 0;
-  font-size: 14px;
+  font-size: var(--font-size-md);
   border: 1px solid var(--color-border);
   border-radius: var(--radius-md);
   overflow: hidden;
@@ -879,7 +914,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 .markdown-body th {
   background: var(--color-bg-tertiary);
   font-weight: 600;
-  font-size: 12px;
+  font-size: var(--font-size-sm);
   text-transform: uppercase;
   letter-spacing: 0.3px;
 }
@@ -892,7 +927,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 
 /* Compact markdown for Blinko cards */
 .markdown-body--compact {
-  font-size: 13px;
+  font-size: var(--font-size-base);
   line-height: 1.6;
 }
 
@@ -942,13 +977,13 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   display: flex;
   align-items: center;
   gap: 8px;
-  font-size: 16px;
+  font-size: var(--font-size-xl);
   font-weight: 700;
   color: var(--color-text);
 }
 
 .blinko-count {
-  font-size: 13px;
+  font-size: var(--font-size-base);
   font-weight: 400;
   color: var(--color-text-muted);
   background: var(--color-bg-tertiary);
@@ -970,7 +1005,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   gap: 4px;
   padding: 5px 12px;
   border-radius: var(--radius-sm);
-  font-size: 12px;
+  font-size: var(--font-size-sm);
   font-weight: 500;
   color: var(--color-text-secondary);
   transition: background var(--transition), color var(--transition);
@@ -998,7 +1033,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   text-align: center;
   color: var(--color-text-muted);
   padding: 48px;
-  font-size: 14px;
+  font-size: var(--font-size-md);
 }
 
 /* Blinko Cards */
@@ -1034,7 +1069,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   position: absolute;
   top: 10px;
   right: 10px;
-  font-size: 10px;
+  font-size: var(--font-size-xxs);
   font-weight: 700;
   color: var(--color-blinko);
   background: color-mix(in srgb, var(--color-blinko) 12%, transparent);
@@ -1069,13 +1104,13 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   display: flex;
   align-items: center;
   gap: 3px;
-  font-size: 11px;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
   white-space: nowrap;
   flex-shrink: 0;
 }
 
-.blinko-card__time svg { width: 11px; height: 11px; }
+.blinko-card__time svg { width: var(--icon-size-xs); height: var(--icon-size-xs); }
 
 .blinko-error {
   flex: 1;
@@ -1103,13 +1138,13 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 }
 
 .search-results-title {
-  font-size: 15px;
+  font-size: var(--font-size-lg);
   font-weight: 700;
   color: var(--color-text);
 }
 
 .search-results-count {
-  font-size: 13px;
+  font-size: var(--font-size-base);
   color: var(--color-text-muted);
 }
 
@@ -1161,7 +1196,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 
 .search-result-name {
   flex: 1;
-  font-size: 14px;
+  font-size: var(--font-size-md);
   font-weight: 600;
   color: var(--color-text);
   overflow: hidden;
@@ -1170,7 +1205,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 }
 
 .search-result-source {
-  font-size: 11px;
+  font-size: var(--font-size-xs);
   font-weight: 600;
   padding: 2px 7px;
   border-radius: 10px;
@@ -1180,7 +1215,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 }
 
 .search-result-path {
-  font-size: 11px;
+  font-size: var(--font-size-xs);
   color: var(--color-text-muted);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1188,7 +1223,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 }
 
 .search-result-snippet {
-  font-size: 13px;
+  font-size: var(--font-size-base);
   color: var(--color-text-secondary);
   line-height: 1.5;
   overflow: hidden;
@@ -1204,7 +1239,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   flex-wrap: wrap;
 }
 
-.search-result-tags svg { width: 11px; height: 11px; color: var(--color-text-muted); }
+.search-result-tags svg { width: var(--icon-size-xs); height: var(--icon-size-xs); color: var(--color-text-muted); }
 
 .search-highlight {
   background: color-mix(in srgb, var(--color-blinko) 25%, transparent);
@@ -1228,8 +1263,8 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   text-align: center;
 }
 
-.empty-state svg { width: 48px; height: 48px; opacity: 0.4; }
-.empty-state-text { font-size: 14px; font-weight: 500; }
+.empty-state svg { width: var(--icon-size-2xl); height: var(--icon-size-2xl); opacity: 0.4; }
+.empty-state-text { font-size: var(--font-size-md); font-weight: 500; }
 
 /* ─── Loading ────────────────────────────────────────────────────────────────── */
 .loading {
@@ -1241,8 +1276,8 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 }
 
 .spinner {
-  width: 28px;
-  height: 28px;
+  width: var(--icon-size-xl);
+  height: var(--icon-size-xl);
   border: 2px solid var(--color-border);
   border-top-color: var(--color-primary);
   border-radius: 50%;

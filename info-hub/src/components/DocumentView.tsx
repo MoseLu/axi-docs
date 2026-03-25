@@ -100,7 +100,7 @@ export function DocumentView({
           <DocumentIcon />
           <div>
             <p className="empty-state-text">从左侧选择一个文档开始阅读</p>
-            <p style={{ fontSize: 12, color: 'var(--color-text-muted)', marginTop: 8 }}>
+            <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)', marginTop: 'var(--spacing-3)' }}>
               支持 Obsidian 双向链接 · 标签筛选 · 全文搜索
             </p>
           </div>

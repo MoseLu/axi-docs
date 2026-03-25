@@ -80,7 +80,7 @@ export function FileTree({ sourceId, onFileSelect, selectedFile, filterTag }: Fi
       <div key={item.id}>
         <div
           className={`tree-item ${isSelected ? 'active' : ''} ${item.type === 'directory' ? 'tree-item--dir' : ''}`}
-          style={{ paddingLeft: `${12 + depth * 14}px` }}
+          style={{ paddingLeft: `calc(var(--tree-indent-base) + ${depth} * var(--tree-indent-step))` }}
           onClick={() => {
             if (item.type === 'directory') {
               toggleDir(item)
@@ -93,7 +93,7 @@ export function FileTree({ sourceId, onFileSelect, selectedFile, filterTag }: Fi
           {item.type === 'directory' ? (
             <ChevronIcon expanded={isExpanded} />
           ) : (
-            <span style={{ width: 14, flexShrink: 0 }} />
+            <span style={{ width: 'var(--icon-size-sm)', flexShrink: 0 }} />
           )}
           <span className="tree-item-icon">
             {item.type === 'directory'
@@ -117,7 +117,7 @@ export function FileTree({ sourceId, onFileSelect, selectedFile, filterTag }: Fi
         {item.type === 'directory' && isExpanded && children.length === 0 && (
           <div
             className="tree-item-empty"
-            style={{ paddingLeft: `${12 + (depth + 1) * 14 + 28}px` }}
+            style={{ paddingLeft: `calc(var(--tree-indent-base) + ${depth + 1} * var(--tree-indent-step) + 2 * var(--icon-size-sm))` }}
           >
             空目录
           </div>
@@ -132,7 +132,7 @@ export function FileTree({ sourceId, onFileSelect, selectedFile, filterTag }: Fi
 
   if (items.length === 0) {
     return (
-      <div className="empty-state" style={{ padding: '24px 16px' }}>
+      <div className="empty-state" style={{ padding: 'var(--spacing-7) var(--spacing-5)' }}>
         <span className="empty-state-text">
           {filterTag ? `没有带 #${filterTag} 标签的文档` : '暂无文档'}
         </span>

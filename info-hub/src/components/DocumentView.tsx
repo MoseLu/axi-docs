@@ -1,6 +1,7 @@
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import rehypeHighlight from 'rehype-highlight'
 import { Components } from 'react-markdown'
 import { DocumentIcon, TagIcon, ClockIcon } from './Icons'
 import { KnowledgePanel } from './KnowledgePanel'
@@ -44,10 +45,90 @@ function parseFrontmatter(content: string): { frontmatter: Frontmatter; body: st
   return { frontmatter, body }
 }
 
-// Replace [[WikiLinks]] with clickable spans
-// function processWikiLinks(content: string, onClick: (name: string) => void): string {
-//   return content  // We handle this in the custom renderer below
-// }
+function headingId(children: React.ReactNode): string {
+  const text = String(children)
+  return text.toLowerCase().replace(/[^\w\u4e00-\u9fa5\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim()
+}
+
+// Extract raw text from React children (for copy button)
+function extractText(node: React.ReactNode): string {
+  if (typeof node === 'string') return node
+  if (typeof node === 'number') return String(node)
+  if (Array.isArray(node)) return node.map(extractText).join('')
+  if (node && typeof node === 'object' && 'props' in (node as object)) {
+    return extractText((node as React.ReactElement).props.children)
+  }
+  return ''
+}
+
+// Copy button with "Copied!" feedback
+function CopyButton({ text }: { text: string }) {
+  const [copied, setCopied] = useState(false)
+  const handleCopy = () => {
+    navigator.clipboard.writeText(text.trim()).catch(() => {
+      const ta = document.createElement('textarea')
+      ta.value = text.trim()
+      document.body.appendChild(ta)
+      ta.select()
+      document.execCommand('copy')
+      document.body.removeChild(ta)
+    })
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
+  return (
+    <button className={`copy-btn${copied ? ' copy-btn--copied' : ''}`} onClick={handleCopy}>
+      {copied ? '✓ 已复制' : '复制'}
+    </button>
+  )
+}
+
+// Process children and convert [[WikiLinks]] to clickable elements
+function processChildren(children: React.ReactNode, onWikiLink: (name: string) => void): React.ReactNode {
+  if (typeof children === 'string') {
+    return renderWikiLinks(children, onWikiLink)
+  }
+  if (Array.isArray(children)) {
+    return children.map((child, i) => {
+      if (typeof child === 'string') {
+        return <span key={i}>{renderWikiLinks(child, onWikiLink)}</span>
+      }
+      return child
+    })
+  }
+  return children
+}
+
+function renderWikiLinks(text: string, onWikiLink: (name: string) => void): React.ReactNode {
+  const wikiLinkRegex = /\[\[([^\]]+)\]\]/g
+  const parts: React.ReactNode[] = []
+  let lastIndex = 0
+  let match: RegExpExecArray | null
+
+  while ((match = wikiLinkRegex.exec(text)) !== null) {
+    if (match.index > lastIndex) {
+      parts.push(text.slice(lastIndex, match.index))
+    }
+    const [linkText, displayText] = match[1].split('|')
+    parts.push(
+      <button
+        key={match.index}
+        className="wiki-link"
+        onClick={() => onWikiLink(linkText.trim())}
+        title={`跳转到: ${linkText.trim()}`}
+      >
+        {displayText || linkText}
+      </button>
+    )
+    lastIndex = match.index + match[0].length
+  }
+
+  if (lastIndex < text.length) {
+    parts.push(text.slice(lastIndex))
+  }
+
+  return parts.length === 1 && typeof parts[0] === 'string' ? parts[0] : parts
+}
 
 export function DocumentView({
   content,
@@ -65,32 +146,72 @@ export function DocumentView({
 
   // Custom components for react-markdown
   const components: Components = useMemo(() => ({
-    // Render paragraphs with wikilink support
+    // Paragraphs with wiki link support
     p({ children }) {
       return <p>{processChildren(children, onWikiLink)}</p>
     },
     li({ children }) {
       return <li>{processChildren(children, onWikiLink)}</li>
     },
-    // Syntax-highlighted code blocks
-    code({ className, children }) {
-      const isBlock = className?.startsWith('language-')
-      const lang = className?.replace('language-', '') || ''
-      if (!isBlock) {
-        return <code className="inline-code">{children}</code>
-      }
+    // Code blocks: rehype-highlight handles syntax coloring; we add copy button + header
+    pre({ children }) {
+      const codeEl = Array.isArray(children) ? children[0] : children
+      const className = (codeEl as React.ReactElement)?.props?.className || ''
+      const lang = (className as string).replace('language-', '') || ''
+      const rawText = extractText(children)
       return (
         <div className="code-block">
-          {lang && <div className="code-lang">{lang}</div>}
-          <pre><code>{children}</code></pre>
+          <div className="code-header">
+            {lang && <span className="code-lang">{lang}</span>}
+            <CopyButton text={rawText} />
+          </div>
+          <pre>{children}</pre>
         </div>
       )
     },
-    // Heading with anchor IDs
-    h1: ({ children }) => <h1 id={headingId(children)}>{children}</h1>,
-    h2: ({ children }) => <h2 id={headingId(children)}>{children}</h2>,
-    h3: ({ children }) => <h3 id={headingId(children)}>{children}</h3>,
-    h4: ({ children }) => <h4 id={headingId(children)}>{children}</h4>,
+    // Inline code (not block)
+    code({ className, children }) {
+      const isBlock = className?.startsWith('language-')
+      if (isBlock) return <code className={className}>{children}</code>
+      return <code className="inline-code">{children}</code>
+    },
+    // Headings with hover anchor links (VitePress style)
+    h1: ({ children }) => {
+      const id = headingId(children)
+      return (
+        <h1 id={id}>
+          <a href={`#${id}`} className="heading-anchor" aria-hidden="true">#</a>
+          {children}
+        </h1>
+      )
+    },
+    h2: ({ children }) => {
+      const id = headingId(children)
+      return (
+        <h2 id={id}>
+          <a href={`#${id}`} className="heading-anchor" aria-hidden="true">#</a>
+          {children}
+        </h2>
+      )
+    },
+    h3: ({ children }) => {
+      const id = headingId(children)
+      return (
+        <h3 id={id}>
+          <a href={`#${id}`} className="heading-anchor" aria-hidden="true">#</a>
+          {children}
+        </h3>
+      )
+    },
+    h4: ({ children }) => {
+      const id = headingId(children)
+      return (
+        <h4 id={id}>
+          <a href={`#${id}`} className="heading-anchor" aria-hidden="true">#</a>
+          {children}
+        </h4>
+      )
+    },
   }), [onWikiLink])
 
   if (!selectedFile) {
@@ -172,7 +293,14 @@ export function DocumentView({
               <span className="doc-meta-item doc-meta-tags">
                 <TagIcon />
                 {tags.map(tag => (
-                  <span key={tag} className="tag">#{tag}</span>
+                  <span
+                    key={tag}
+                    className="tag"
+                    onClick={() => onTagSelect?.(tag)}
+                    style={onTagSelect ? { cursor: 'pointer' } : undefined}
+                  >
+                    #{tag}
+                  </span>
                 ))}
               </span>
             )}
@@ -184,6 +312,7 @@ export function DocumentView({
           <div className="markdown-body">
             <ReactMarkdown
               remarkPlugins={[remarkGfm]}
+              rehypePlugins={[rehypeHighlight]}
               components={components}
             >
               {body}
@@ -204,56 +333,4 @@ export function DocumentView({
       )}
     </div>
   )
-}
-
-function headingId(children: React.ReactNode): string {
-  const text = String(children)
-  return text.toLowerCase().replace(/[^\w\u4e00-\u9fa5\s-]/g, '').replace(/\s+/g, '-').replace(/-+/g, '-').trim()
-}
-
-// Process children and convert [[WikiLinks]] to clickable elements
-function processChildren(children: React.ReactNode, onWikiLink: (name: string) => void): React.ReactNode {
-  if (typeof children === 'string') {
-    return renderWikiLinks(children, onWikiLink)
-  }
-  if (Array.isArray(children)) {
-    return children.map((child, i) => {
-      if (typeof child === 'string') {
-        return <span key={i}>{renderWikiLinks(child, onWikiLink)}</span>
-      }
-      return child
-    })
-  }
-  return children
-}
-
-function renderWikiLinks(text: string, onWikiLink: (name: string) => void): React.ReactNode {
-  const wikiLinkRegex = /\[\[([^\]]+)\]\]/g
-  const parts: React.ReactNode[] = []
-  let lastIndex = 0
-  let match: RegExpExecArray | null
-
-  while ((match = wikiLinkRegex.exec(text)) !== null) {
-    if (match.index > lastIndex) {
-      parts.push(text.slice(lastIndex, match.index))
-    }
-    const [linkText, displayText] = match[1].split('|')
-    parts.push(
-      <button
-        key={match.index}
-        className="wiki-link"
-        onClick={() => onWikiLink(linkText.trim())}
-        title={`跳转到: ${linkText.trim()}`}
-      >
-        [[{displayText || linkText}]]
-      </button>
-    )
-    lastIndex = match.index + match[0].length
-  }
-
-  if (lastIndex < text.length) {
-    parts.push(text.slice(lastIndex))
-  }
-
-  return parts.length === 1 && typeof parts[0] === 'string' ? parts[0] : parts
 }

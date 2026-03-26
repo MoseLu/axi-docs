@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { Header } from './components/Header'
 import { Sidebar } from './components/Sidebar'
@@ -21,6 +21,7 @@ function HomePage() {
   const [searchResults, setSearchResults] = useState<SearchResult[] | null>(null)
   const [activeTag, setActiveTag] = useState<string | null>(null)
   const [searching, setSearching] = useState(false)
+  const abortRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
     fetchSources()
@@ -48,12 +49,18 @@ function HomePage() {
   }
 
   const loadFile = async (sourceId: string, filePath: string) => {
+    abortRef.current?.abort()
+    const controller = new AbortController()
+    abortRef.current = controller
+
     setLoading(true)
     setSearchResults(null)
     try {
       const response = await fetch(
-        `${API_BASE}/file?source=${sourceId}&path=${encodeURIComponent(filePath)}`
+        `${API_BASE}/file?source=${sourceId}&path=${encodeURIComponent(filePath)}`,
+        { signal: controller.signal }
       )
+      if (controller.signal.aborted) return
       if (response.ok) {
         const content = await response.text()
         setFileContent(content)
@@ -62,7 +69,8 @@ function HomePage() {
         setFileContent('# 文件加载失败\n\n无法加载该文件内容。')
         setFileName('Error')
       }
-    } catch {
+    } catch (err) {
+      if (err instanceof Error && err.name === 'AbortError') return
       setFileContent('# 加载错误\n\n网络请求失败。')
       setFileName('Error')
     }

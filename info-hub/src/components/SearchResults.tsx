@@ -53,9 +53,9 @@ export function SearchResults({ results, query, onFileSelect }: SearchResultsPro
         <span className="search-results-count">找到 {results.length} 个结果 · "{query}"</span>
       </div>
       <div className="search-results-list">
-        {results.map((result, i) => (
+        {results.map((result) => (
           <article
-            key={i}
+            key={`${result.sourceId}:${result.path}`}
             className="search-result-item"
             onClick={() => onFileSelect(result.sourceId, result.path)}
           >

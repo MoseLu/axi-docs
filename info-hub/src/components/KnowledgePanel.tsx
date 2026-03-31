@@ -1,11 +1,14 @@
-import { useState, useEffect, useRef, useCallback } from 'react'
+import { lazy, Suspense, useState, useEffect, useRef, useCallback } from 'react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
-import { DocSource, SelectedFile, KnowledgePanelTab, GraphData, AiAnalysis } from '../types'
+import { DocSource, SelectedFile, KnowledgePanelTab, AiAnalysis } from '../types'
 import { TableOfContents } from './TableOfContents'
-import { KnowledgeGraph } from './KnowledgeGraph'
-import { GlobalGraph } from './GlobalGraph'
 import { API_BASE } from '../constants'
+
+const GlobalGraph = lazy(async () => {
+  const module = await import('./GlobalGraph')
+  return { default: module.GlobalGraph }
+})
 
 interface KnowledgePanelProps {
   content: string | null
@@ -15,8 +18,7 @@ interface KnowledgePanelProps {
   onTagSelect?: (tag: string) => void
 }
 
-const GRAPH_SVG_WIDTH = 284  // approximate panel width minus borders
-type GraphMode = 'local' | 'global' | 'orphan'
+type GraphMode = 'focus' | 'global' | 'tree' | 'orphan'
 
 export function KnowledgePanel({
   content,
@@ -26,21 +28,17 @@ export function KnowledgePanel({
   onTagSelect,
 }: KnowledgePanelProps) {
   const [activeTab, setActiveTab] = useState<KnowledgePanelTab>('toc')
-  const [graphData, setGraphData] = useState<GraphData | null>(null)
-  const [graphLoading, setGraphLoading] = useState(false)
-  const [graphMode, setGraphMode] = useState<GraphMode>('local')
+  const [graphMode, setGraphMode] = useState<GraphMode>('focus')
   const [aiData, setAiData] = useState<AiAnalysis | null>(null)
   const [aiLoading, setAiLoading] = useState(false)
-  const [orphanNodes, setOrphanNodes] = useState<{ id: string; label: string; path: string; tags: string[] }[]>([])
-  const [orphanLoading, setOrphanLoading] = useState(false)
   const graphContainerRef = useRef<HTMLDivElement>(null)
-  const [graphHeight, setGraphHeight] = useState(300)
+  const [graphViewport, setGraphViewport] = useState({ width: 360, height: 300 })
 
   // Reset on file change
   useEffect(() => {
-    setGraphData(null)
     setAiData(null)
     setActiveTab('toc')
+    setGraphMode('focus')
   }, [selectedFile?.path, selectedFile?.sourceId])
 
   // Measure graph container height
@@ -48,28 +46,15 @@ export function KnowledgePanel({
     if (!graphContainerRef.current) return
     const ro = new ResizeObserver(entries => {
       for (const entry of entries) {
-        setGraphHeight(entry.contentRect.height || 300)
+        setGraphViewport({
+          width: entry.contentRect.width || 360,
+          height: entry.contentRect.height || 300,
+        })
       }
     })
     ro.observe(graphContainerRef.current)
     return () => ro.disconnect()
   }, [])
-
-  const fetchGraphData = useCallback(async () => {
-    if (!selectedFile || source?.type !== 'local') return
-    setGraphLoading(true)
-    try {
-      const res = await fetch(
-        `${API_BASE}/graph?source=${selectedFile.sourceId}&path=${encodeURIComponent(selectedFile.path)}`
-      )
-      if (res.ok) {
-        const data: GraphData = await res.json()
-        setGraphData(data)
-      }
-    } catch { /* ignore */ } finally {
-      setGraphLoading(false)
-    }
-  }, [selectedFile, source])
 
   const fetchAiAnalysis = useCallback(async () => {
     if (!content || !selectedFile) return
@@ -94,27 +79,10 @@ export function KnowledgePanel({
 
   const handleTabClick = (tab: KnowledgePanelTab) => {
     setActiveTab(tab)
-    if (tab === 'graph' && graphMode === 'local' && !graphData && !graphLoading) {
-      fetchGraphData()
-    }
   }
 
-  const fetchOrphanNodes = useCallback(async () => {
-    if (!selectedFile || source?.type !== 'local') return
-    setOrphanLoading(true)
-    try {
-      const res = await fetch(`${API_BASE}/global-graph?source=${selectedFile.sourceId}`)
-      if (res.ok) {
-        const data = await res.json()
-        setOrphanNodes(data.orphanNodes || [])
-      }
-    } catch { /* ignore */ } finally {
-      setOrphanLoading(false)
-    }
-  }, [selectedFile, source])
-
   return (
-    <aside className="knowledge-panel">
+    <aside className={`knowledge-panel${activeTab === 'graph' && source?.type === 'local' ? ' knowledge-panel--graph-workspace' : ''}`}>
       <div className="kp-tabs">
         <button
           className={`kp-tab${activeTab === 'graph' ? ' active' : ''}`}
@@ -142,101 +110,51 @@ export function KnowledgePanel({
             {source?.type === 'local' && (
               <div className="graph-mode-toggle">
                 <button
-                  className={`graph-mode-btn${graphMode === 'local' ? ' active' : ''}`}
-                  onClick={() => setGraphMode('local')}
+                  className={`graph-mode-btn${graphMode === 'focus' ? ' active' : ''}`}
+                  onClick={() => setGraphMode('focus')}
                 >
-                  局部
+                  聚焦
                 </button>
                 <button
                   className={`graph-mode-btn${graphMode === 'global' ? ' active' : ''}`}
                   onClick={() => setGraphMode('global')}
                 >
-                  全局
+                  星图
+                </button>
+                <button
+                  className={`graph-mode-btn${graphMode === 'tree' ? ' active' : ''}`}
+                  onClick={() => setGraphMode('tree')}
+                >
+                  树构
                 </button>
                 <button
                   className={`graph-mode-btn${graphMode === 'orphan' ? ' active' : ''}`}
-                  onClick={() => {
-                    setGraphMode('orphan')
-                    if (orphanNodes.length === 0) fetchOrphanNodes()
-                  }}
+                  onClick={() => setGraphMode('orphan')}
                 >
-                  孤立 {orphanNodes.length > 0 && <span className="orphan-badge">{orphanNodes.length}</span>}
+                  孤岛
                 </button>
               </div>
             )}
 
-            {graphMode === 'local' && (
-              <>
-                {graphLoading && (
-                  <div className="kp-ai-loading">
+            {source?.type === 'local' && (
+              <Suspense
+                fallback={(
+                  <div className="kp-ai-loading" style={{ height: '100%' }}>
                     <div className="spinner" style={{ width: 'var(--icon-size-lg)', height: 'var(--icon-size-lg)' }} />
-                    加载图谱...
+                    载入 3D 图谱...
                   </div>
                 )}
-                {!graphLoading && graphData && (
-                  <KnowledgeGraph
-                    data={graphData}
-                    width={GRAPH_SVG_WIDTH}
-                    height={graphHeight}
-                    onNavigate={onNavigate}
-                    onTagSelect={onTagSelect}
-                  />
-                )}
-                {!graphLoading && !graphData && (
-                  <div style={{ padding: 'var(--spacing-5)', fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)', textAlign: 'center' }}>
-                    选择文档后查看关系图谱
-                  </div>
-                )}
-              </>
-            )}
-
-            {graphMode === 'global' && source?.type === 'local' && (
-              <GlobalGraph
-                width={GRAPH_SVG_WIDTH}
-                height={graphHeight}
-                onNavigate={onNavigate}
-                onTagSelect={onTagSelect}
-              />
-            )}
-
-            {graphMode === 'orphan' && source?.type === 'local' && (
-              <div className="orphan-list">
-                {orphanLoading ? (
-                  <div className="kp-ai-loading">
-                    <div className="spinner" style={{ width: 'var(--icon-size-lg)', height: 'var(--icon-size-lg)' }} />
-                    分析中...
-                  </div>
-                ) : orphanNodes.length === 0 ? (
-                  <div className="orphan-empty">
-                    <div className="orphan-empty-icon">✓</div>
-                    <div className="orphan-empty-title">没有孤立文档</div>
-                    <div className="orphan-empty-desc">所有文档都已建立连接</div>
-                  </div>
-                ) : (
-                  <>
-                    <div className="orphan-hint">
-                      以下文档尚未建立链接，是学习的空白区
-                    </div>
-                    {orphanNodes.map(node => (
-                      <button
-                        key={node.id}
-                        className="orphan-item"
-                        onClick={() => onNavigate(node.path || node.id)}
-                        title={node.path}
-                      >
-                        <span className="orphan-label">{node.label}</span>
-                        {node.tags?.length > 0 && (
-                          <span className="orphan-tags">
-                            {node.tags.slice(0, 3).map(t => (
-                              <span key={t} className="tag tag--tiny">#{t}</span>
-                            ))}
-                          </span>
-                        )}
-                      </button>
-                    ))}
-                  </>
-                )}
-              </div>
+              >
+                <GlobalGraph
+                  width={graphViewport.width}
+                  height={graphViewport.height}
+                  sourceId={selectedFile?.sourceId || source.id}
+                  focusPath={selectedFile?.path}
+                  mode={graphMode}
+                  onNavigate={onNavigate}
+                  onTagSelect={onTagSelect}
+                />
+              </Suspense>
             )}
           </div>
         )}

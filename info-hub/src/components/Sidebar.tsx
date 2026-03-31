@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { FileTree } from './FileTree'
 import { DocSource, SelectedFile } from '../types'
-import { ObsidianIcon, BlinkoIcon, FolderIcon, TagIcon } from './Icons'
+import { ObsidianIcon, BlinkoIcon, FolderIcon, TagIcon, FileIcon } from './Icons'
 import { API_BASE } from '../constants'
 
 interface SidebarProps {
@@ -32,7 +32,7 @@ export function Sidebar({
   onTagSelect,
 }: SidebarProps) {
   const [tags, setTags] = useState<{ name: string; count: number }[]>([])
-  const [showTags, setShowTags] = useState(false)
+  const [showTree, setShowTree] = useState(false) // 文件树默认折叠
 
   useEffect(() => {
     if (activeSource !== 'blinko') {
@@ -83,57 +83,72 @@ export function Sidebar({
         </div>
       )}
 
-      {/* Tag Filter (only for Obsidian-type sources) */}
-      {tags.length > 0 && (
-        <div className="sidebar-tags">
+      {/* Tag Cloud — Primary Navigation (always visible for Obsidian) */}
+      {activeSource !== 'blinko' && tags.length > 0 && (
+        <div className="sidebar-tags" style={{ flexShrink: 0 }}>
+          <div className="sidebar-section-toggle">
+            <TagIcon />
+            <span>技能标签</span>
+            <span className="tag-count-badge">{tags.length}</span>
+          </div>
+          <div className="tag-cloud">
+            <button
+              className={`tag ${activeTag === null ? 'tag--active' : ''}`}
+              onClick={() => onTagSelect(null)}
+            >全部</button>
+            {tags.map(tag => (
+              <button
+                key={tag.name}
+                className={`tag ${activeTag === tag.name ? 'tag--active' : ''}`}
+                onClick={() => onTagSelect(activeTag === tag.name ? null : tag.name)}
+                title={`${tag.count} 篇文档`}
+              >
+                #{tag.name}
+                <span className="tag-count">{tag.count}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* File Tree — Secondary, Collapsible */}
+      {activeSource !== 'blinko' && (
+        <div style={{ flexShrink: 0 }}>
           <button
             className="sidebar-section-toggle"
-            onClick={() => setShowTags(!showTags)}
+            onClick={() => setShowTree(v => !v)}
+            style={{ cursor: 'pointer' }}
           >
-            <TagIcon />
-            <span>标签筛选</span>
-            <span className="tag-count-badge">{tags.length}</span>
+            <FileIcon />
+            <span>文件</span>
+            <span style={{
+              marginLeft: 'auto', fontSize: 10,
+              transform: showTree ? 'rotate(90deg)' : 'rotate(0deg)',
+              transition: 'transform 0.2s',
+              color: 'var(--color-text-subtle)',
+            }}>
+              ▶
+            </span>
           </button>
-          {showTags && (
-            <div className="tag-cloud">
-              <button
-                className={`tag ${activeTag === null ? 'tag--active' : ''}`}
-                onClick={() => onTagSelect(null)}
-              >全部</button>
-              {tags.map(tag => (
-                <button
-                  key={tag.name}
-                  className={`tag ${activeTag === tag.name ? 'tag--active' : ''}`}
-                  onClick={() => onTagSelect(activeTag === tag.name ? null : tag.name)}
-                  title={`${tag.count} 篇文档`}
-                >
-                  #{tag.name}
-                  <span className="tag-count">{tag.count}</span>
-                </button>
-              ))}
+          {showTree && (
+            <div className="sidebar-tree">
+              <FileTree
+                key={`${activeSource}-${refreshKey}-${activeTag}`}
+                sourceId={activeSource}
+                onFileSelect={onFileSelect}
+                selectedFile={selectedFile}
+                filterTag={activeTag}
+              />
             </div>
           )}
         </div>
       )}
 
-      {/* File Tree (only for non-Blinko sources) */}
-      {activeSource !== 'blinko' && (
-        <div className="sidebar-tree">
-          <FileTree
-            key={`${activeSource}-${refreshKey}-${activeTag}`}
-            sourceId={activeSource}
-            onFileSelect={onFileSelect}
-            selectedFile={selectedFile}
-            filterTag={activeTag}
-          />
-        </div>
-      )}
-
-      {/* Blinko: just show the "Click to view" message */}
+      {/* Blinko hint */}
       {activeSource === 'blinko' && (
         <div className="sidebar-blinko-hint">
           <BlinkoIcon />
-          <span>Blinko 闪念以卡片形式显示在右侧主区域</span>
+          <span>Blinko 闪念以卡片形式显示在右侧</span>
         </div>
       )}
     </aside>

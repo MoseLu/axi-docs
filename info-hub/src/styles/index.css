@@ -1683,16 +1683,6 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 }
 
 /* ─── Knowledge Workbench ───────────────────────────────────────────────────── */
-.knowledge-workbench {
-  height: 100%;
-  overflow: auto;
-  padding: 24px;
-  background:
-    radial-gradient(circle at top left, rgba(30, 64, 175, 0.14), transparent 24%),
-    radial-gradient(circle at top right, rgba(14, 165, 233, 0.12), transparent 26%),
-    linear-gradient(180deg, #f5f7fb 0%, #eef2ff 100%);
-}
-
 .workbench-hero {
   display: grid;
   grid-template-columns: minmax(0, 1.3fr) minmax(280px, 360px);
@@ -2789,6 +2779,8 @@ textarea:focus-visible {
   background: rgba(3, 8, 18, 0.68);
   border: 1px solid rgba(125, 211, 252, 0.1);
   box-shadow: var(--shadow-lg);
+  display: flex;
+  flex-direction: column;
 }
 
 .hero-knowledge-scene,
@@ -2894,10 +2886,7 @@ textarea:focus-visible {
 }
 
 .command-center__hero {
-  position: absolute;
-  top: 28px;
-  left: 28px;
-  right: 28px;
+  padding: 28px 28px 0;
   display: grid;
   grid-template-columns: minmax(320px, 430px) minmax(180px, 224px);
   justify-content: space-between;
@@ -3052,10 +3041,10 @@ textarea:focus-visible {
 }
 
 .command-center__dock {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  bottom: 24px;
+  margin-top: auto;
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 24px;
   width: min(1040px, calc(100% - 72px));
   display: flex;
   flex-direction: column;
@@ -3666,10 +3655,6 @@ textarea:focus-visible {
   }
 
   .command-center__hero {
-    position: relative;
-    top: auto;
-    left: auto;
-    right: auto;
     grid-template-columns: 1fr;
     justify-content: stretch;
     padding: 28px 28px 0;
@@ -3677,14 +3662,12 @@ textarea:focus-visible {
   }
 
   .command-center__dock {
-    position: relative;
-    left: auto;
-    right: auto;
-    bottom: auto;
-    transform: none;
     width: auto;
-    padding: 0 28px 28px;
     margin-top: 24px;
+    margin-left: 0;
+    margin-right: 0;
+    margin-bottom: 0;
+    padding: 0 28px 28px;
     background: none;
     border: none;
     box-shadow: none;

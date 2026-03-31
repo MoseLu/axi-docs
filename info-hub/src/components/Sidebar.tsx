@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react'
-import { FileTree } from './FileTree'
-import { DocSource, SelectedFile } from '../types'
-import { ObsidianIcon, BlinkoIcon, FolderIcon, TagIcon, FileIcon } from './Icons'
+import { useEffect, useState } from 'react'
 import { API_BASE } from '../constants'
+import { DocSource, SelectedFile } from '../types'
+import { BlinkoIcon, FileIcon, FolderIcon, ObsidianIcon, TagIcon } from './Icons'
+import { FileTree } from './FileTree'
 
 interface SidebarProps {
   sources: DocSource[]
@@ -14,6 +14,8 @@ interface SidebarProps {
   activeTag: string | null
   onTagSelect: (tag: string | null) => void
 }
+
+type SidebarPanel = 'tags' | 'files' | null
 
 function SourceIcon({ icon }: { icon?: string }) {
   if (icon === 'obsidian') return <span className="source-icon source-icon--obsidian"><ObsidianIcon /></span>
@@ -32,123 +34,135 @@ export function Sidebar({
   onTagSelect,
 }: SidebarProps) {
   const [tags, setTags] = useState<{ name: string; count: number }[]>([])
-  const [showTree, setShowTree] = useState(false) // 文件树默认折叠
+  const [activePanel, setActivePanel] = useState<SidebarPanel>(null)
 
   useEffect(() => {
     if (activeSource !== 'blinko') {
-      loadTags(activeSource)
+      void loadTags(activeSource)
     } else {
       setTags([])
+      setActivePanel(null)
     }
   }, [activeSource, refreshKey])
 
   const loadTags = async (sourceId: string) => {
     try {
       const response = await fetch(`${API_BASE}/tags?source=${sourceId}`)
-      if (response.ok) {
-        const data = await response.json()
-        setTags(data)
+      if (!response.ok) {
+        setTags([])
+        return
       }
+      const data = await response.json() as { name: string; count: number }[]
+      setTags(data)
     } catch {
       setTags([])
     }
   }
 
-  const currentSource = sources.find(s => s.id === activeSource)
+  const currentSource = sources.find((source) => source.id === activeSource)
+  const isBlinko = activeSource === 'blinko'
 
   return (
-    <aside className="app-sidebar">
-      {/* Source Tabs */}
-      <div className="sidebar-sources">
-        {sources.filter(s => s.enabled).map(source => (
-          <button
-            key={source.id}
-            className={`source-tab ${activeSource === source.id ? 'active' : ''}`}
-            onClick={() => onSourceChange(source.id)}
-            title={source.name}
-          >
-            <SourceIcon icon={source.icon} />
-            <span className="source-tab-name">{source.name}</span>
-          </button>
-        ))}
+    <aside className={`app-sidebar app-sidebar--command${activePanel ? ' app-sidebar--expanded' : ''}`}>
+      <div className="sidebar-rail">
+        <div className="sidebar-rail__group">
+          {sources.filter((source) => source.enabled).map((source) => (
+            <button
+              key={source.id}
+              className={`source-tab source-tab--rail ${activeSource === source.id ? 'active' : ''}`}
+              onClick={() => onSourceChange(source.id)}
+              title={source.name}
+              aria-label={`切换到 ${source.name}`}
+              type="button"
+            >
+              <SourceIcon icon={source.icon} />
+              <span className="source-tab-name">{source.name}</span>
+            </button>
+          ))}
+        </div>
+
+        {!isBlinko && (
+          <div className="sidebar-rail__group sidebar-rail__group--tools">
+            <button
+              className={`sidebar-rail__button${activePanel === 'tags' ? ' active' : ''}`}
+              onClick={() => setActivePanel((current) => current === 'tags' ? null : 'tags')}
+              aria-expanded={activePanel === 'tags'}
+              aria-label="切换标签筛选面板"
+              type="button"
+            >
+              <TagIcon />
+              <span>标签</span>
+            </button>
+            <button
+              className={`sidebar-rail__button${activePanel === 'files' ? ' active' : ''}`}
+              onClick={() => setActivePanel((current) => current === 'files' ? null : 'files')}
+              aria-expanded={activePanel === 'files'}
+              aria-label="切换文件浏览面板"
+              type="button"
+            >
+              <FileIcon />
+              <span>文件</span>
+            </button>
+          </div>
+        )}
+
+        <div className="sidebar-rail__footer">
+          <span className="sidebar-rail__eyebrow">Source</span>
+          <strong>{currentSource?.name || 'Info Hub'}</strong>
+          {activeTag && <span className="sidebar-rail__hint">#{activeTag}</span>}
+        </div>
       </div>
 
-      {/* Source Info */}
-      {currentSource && (
-        <div className="sidebar-source-info">
-          <span className="sidebar-source-label">{currentSource.name}</span>
-          {currentSource.description && (
-            <span className="sidebar-source-desc">{currentSource.description}</span>
-          )}
-        </div>
-      )}
-
-      {/* Tag Cloud — Primary Navigation (always visible for Obsidian) */}
-      {activeSource !== 'blinko' && tags.length > 0 && (
-        <div className="sidebar-tags" style={{ flexShrink: 0 }}>
-          <div className="sidebar-section-toggle">
-            <TagIcon />
-            <span>技能标签</span>
-            <span className="tag-count-badge">{tags.length}</span>
-          </div>
-          <div className="tag-cloud">
+      {!isBlinko && activePanel && (
+        <div className="sidebar-panel">
+          <div className="sidebar-panel__header">
+            <div>
+              <span className="sidebar-panel__eyebrow">{currentSource?.name || 'Knowledge Source'}</span>
+              <strong>{activePanel === 'tags' ? '标签过滤' : '文件结构'}</strong>
+            </div>
             <button
-              className={`tag ${activeTag === null ? 'tag--active' : ''}`}
-              onClick={() => onTagSelect(null)}
-            >全部</button>
-            {tags.map(tag => (
-              <button
-                key={tag.name}
-                className={`tag ${activeTag === tag.name ? 'tag--active' : ''}`}
-                onClick={() => onTagSelect(activeTag === tag.name ? null : tag.name)}
-                title={`${tag.count} 篇文档`}
-              >
-                #{tag.name}
-                <span className="tag-count">{tag.count}</span>
-              </button>
-            ))}
+              className="sidebar-panel__close"
+              onClick={() => setActivePanel(null)}
+              aria-label="关闭侧边面板"
+              type="button"
+            >
+              ×
+            </button>
           </div>
-        </div>
-      )}
 
-      {/* File Tree — Secondary, Collapsible */}
-      {activeSource !== 'blinko' && (
-        <div style={{ flexShrink: 0 }}>
-          <button
-            className="sidebar-section-toggle"
-            onClick={() => setShowTree(v => !v)}
-            style={{ cursor: 'pointer' }}
-          >
-            <FileIcon />
-            <span>文件</span>
-            <span style={{
-              marginLeft: 'auto', fontSize: 10,
-              transform: showTree ? 'rotate(90deg)' : 'rotate(0deg)',
-              transition: 'transform 0.2s',
-              color: 'var(--color-text-subtle)',
-            }}>
-              ▶
-            </span>
-          </button>
-          {showTree && (
-            <div className="sidebar-tree">
+          {activePanel === 'tags' ? (
+            <div className="sidebar-panel__body sidebar-panel__body--tags">
+              <button
+                className={`tag ${activeTag === null ? 'tag--active' : ''}`}
+                onClick={() => onTagSelect(null)}
+                type="button"
+              >
+                全部标签
+              </button>
+              {tags.map((tag) => (
+                <button
+                  key={tag.name}
+                  className={`tag ${activeTag === tag.name ? 'tag--active' : ''}`}
+                  onClick={() => onTagSelect(activeTag === tag.name ? null : tag.name)}
+                  title={`${tag.count} 篇文档`}
+                  type="button"
+                >
+                  #{tag.name}
+                  <span className="tag-count">{tag.count}</span>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <div className="sidebar-panel__body sidebar-panel__body--files">
               <FileTree
                 key={`${activeSource}-${refreshKey}-${activeTag}`}
-                sourceId={activeSource}
+                filterTag={activeTag}
                 onFileSelect={onFileSelect}
                 selectedFile={selectedFile}
-                filterTag={activeTag}
+                sourceId={activeSource}
               />
             </div>
           )}
-        </div>
-      )}
-
-      {/* Blinko hint */}
-      {activeSource === 'blinko' && (
-        <div className="sidebar-blinko-hint">
-          <BlinkoIcon />
-          <span>Blinko 闪念以卡片形式显示在右侧</span>
         </div>
       )}
     </aside>

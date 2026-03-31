@@ -65,6 +65,11 @@ interface GlobalGraphProps {
   sourceId: string
   focusPath?: string | null
   mode: GlobalGraphMode
+  layout?: 'workspace' | 'dock' | 'hero'
+  selectedBranch?: string | null
+  selectedNodeId?: string | null
+  onBranchChange?: (branch: string | null) => void
+  onNodeSelect?: (nodeId: string | null) => void
   onNavigate?: (path: string) => void
   onTagSelect?: (tag: string) => void
 }
@@ -281,17 +286,18 @@ function createTreeGraph(
   return { nodes, links }
 }
 
-function createNodeObject(node: SpaceNode, selectedId: string | null, hoveredId: string | null) {
+function createNodeObject(node: SpaceNode, selectedId: string | null, hoveredId: string | null, hero = false) {
   const color = SPACE_COLORS[node.kind]
   const isSelected = node.id === selectedId
   const isHovered = node.id === hoveredId
+  const scale = hero ? 1.6 : 1
   const radius = node.kind === 'current'
-    ? 10
+    ? 10 * scale
     : node.kind === 'branch'
-      ? 7
+      ? 7 * scale
       : node.kind === 'tag'
-        ? 5
-        : 6.5
+        ? 5 * scale
+        : 6.5 * scale
 
   const geometry = new THREE.SphereGeometry(radius, 24, 24)
   const material = new THREE.MeshStandardMaterial({
@@ -316,20 +322,47 @@ function createNodeObject(node: SpaceNode, selectedId: string | null, hoveredId:
   group.add(halo)
   group.add(mesh)
 
-  const label = new SpriteText(
-    node.kind === 'tag'
-      ? `#${truncateLabel(formatLabel(node.label), 18)}`
-      : truncateLabel(formatLabel(node.label), 20),
-  )
-  label.color = node.kind === 'tag' ? '#fde68a' : '#e5eef9'
-  label.textHeight = isSelected ? 7 : node.kind === 'branch' ? 6 : 5
-  label.backgroundColor = 'rgba(8, 15, 32, 0.78)'
-  label.padding = 3
-  label.borderRadius = 3
-  ;(label as unknown as THREE.Object3D).position.set(0, radius + 8, 0)
-  group.add(label)
+  const showLabel = !hero || isSelected || isHovered || node.kind === 'branch' || node.kind === 'current'
+  if (showLabel) {
+    const label = new SpriteText(
+      node.kind === 'tag'
+        ? `#${truncateLabel(formatLabel(node.label), 18)}`
+        : truncateLabel(formatLabel(node.label), hero ? 18 : 20),
+    )
+    label.color = node.kind === 'tag' ? '#fde68a' : '#e5eef9'
+    label.textHeight = hero
+      ? (isSelected ? 10 : node.kind === 'branch' ? 7.6 : 6.4)
+      : (isSelected ? 7 : node.kind === 'branch' ? 6 : 5)
+    label.backgroundColor = 'rgba(8, 15, 32, 0.78)'
+    label.padding = 3
+    label.borderRadius = 3
+    ;(label as unknown as THREE.Object3D).position.set(0, radius + (hero ? 14 : 8), 0)
+    group.add(label)
+  }
 
   return group
+}
+
+function simplifyGraphForHero(graph: { nodes: SpaceNode[]; links: SpaceLink[] }) {
+  const visibleNodes = [...graph.nodes]
+    .filter((node) => node.kind !== 'tag')
+    .sort((left, right) => {
+      const score = (node: SpaceNode) => {
+        if (node.kind === 'current') return 100
+        if (node.kind === 'branch') return 80 - (node.depth || 0)
+        if (node.kind === 'note') return 50
+        return 10
+      }
+      return score(right) - score(left)
+    })
+    .slice(0, 26)
+
+  const visibleIds = new Set(visibleNodes.map((node) => node.id))
+  const links = graph.links
+    .filter((link) => visibleIds.has(normalizeEndpoint(link.source)) && visibleIds.has(normalizeEndpoint(link.target)))
+    .slice(0, 42)
+
+  return { nodes: visibleNodes, links }
 }
 
 export function GlobalGraph({
@@ -338,6 +371,11 @@ export function GlobalGraph({
   sourceId,
   focusPath,
   mode,
+  layout = 'workspace',
+  selectedBranch: selectedBranchProp,
+  selectedNodeId: selectedNodeIdProp,
+  onBranchChange,
+  onNodeSelect,
   onNavigate,
   onTagSelect,
 }: GlobalGraphProps) {
@@ -353,20 +391,46 @@ export function GlobalGraph({
     }
     zoomToFit?: (ms?: number, padding?: number, nodeFilter?: (node: SpaceNode) => boolean) => void
     scene?: () => THREE.Scene
+    d3Force?: (forceName: string) => {
+      distance?: (distance: number) => void
+      strength?: (strength: number) => void
+    } | undefined
   } | null>(null)
 
   const [globalData, setGlobalData] = useState<GraphApiResponse>({ nodes: [], edges: [], orphanNodes: [] })
   const [focusData, setFocusData] = useState<GraphApiResponse | null>(null)
   const [loadingGlobal, setLoadingGlobal] = useState(true)
   const [loadingFocus, setLoadingFocus] = useState(false)
-  const [selectedBranch, setSelectedBranch] = useState<string | null>(null)
-  const [selectedNodeId, setSelectedNodeId] = useState<string | null>(null)
+  const [internalSelectedBranch, setInternalSelectedBranch] = useState<string | null>(null)
+  const [internalSelectedNodeId, setInternalSelectedNodeId] = useState<string | null>(null)
   const [hoveredNodeId, setHoveredNodeId] = useState<string | null>(null)
   const [showTags, setShowTags] = useState(true)
-  const [autoRotate, setAutoRotate] = useState(true)
+  const [autoRotate, setAutoRotate] = useState(() => {
+    if (typeof window === 'undefined') return true
+    return !window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  })
   const [query, setQuery] = useState('')
   const [expandedBranches, setExpandedBranches] = useState<Set<string>>(new Set())
+  const clickStateRef = useRef<{ id: string; at: number } | null>(null)
   const deferredQuery = useDeferredValue(query.trim().toLowerCase())
+  const isDockLayout = layout === 'dock'
+  const isHeroLayout = layout === 'hero'
+  const selectedBranch = selectedBranchProp === undefined ? internalSelectedBranch : selectedBranchProp
+  const selectedNodeId = selectedNodeIdProp === undefined ? internalSelectedNodeId : selectedNodeIdProp
+
+  const setSelectedBranch = (branch: string | null) => {
+    onBranchChange?.(branch)
+    if (selectedBranchProp === undefined) {
+      setInternalSelectedBranch(branch)
+    }
+  }
+
+  const setSelectedNodeId = (nodeId: string | null) => {
+    onNodeSelect?.(nodeId)
+    if (selectedNodeIdProp === undefined) {
+      setInternalSelectedNodeId(nodeId)
+    }
+  }
 
   useEffect(() => {
     let cancelled = false
@@ -403,8 +467,9 @@ export function GlobalGraph({
   }, [sourceId])
 
   useEffect(() => {
-    if (!focusPath) {
+    if (mode !== 'focus' || !focusPath) {
       setFocusData(null)
+      setLoadingFocus(false)
       return
     }
 
@@ -428,7 +493,7 @@ export function GlobalGraph({
     return () => {
       cancelled = true
     }
-  }, [focusPath, sourceId])
+  }, [focusPath, mode, sourceId])
 
   const connectedNotes = useMemo(
     () => globalData.nodes.filter((node): node is GraphNoteNode => node.kind === 'note'),
@@ -451,7 +516,7 @@ export function GlobalGraph({
   const tree = useMemo(() => buildKnowledgeTree(allNotes), [allNotes])
   const selectedTree = useMemo(() => resolveSelectedTree(tree, selectedBranch), [tree, selectedBranch])
 
-  const currentGraph = useMemo(() => {
+  const baseGraph = useMemo(() => {
     if (mode === 'focus') {
       const nodes = (focusData?.nodes || [])
         .filter(node => node.kind === 'current' || node.kind === 'note' || (showTags && node.kind === 'tag'))
@@ -544,12 +609,20 @@ export function GlobalGraph({
     return { nodes: [...notes, ...tags], links }
   }, [allNotes, deferredQuery, focusData, globalData.edges, globalData.nodes, mode, orphanNotes, selectedBranch, selectedTree, showTags, tree.branchMap])
 
+  const currentGraph = useMemo(
+    () => isHeroLayout ? simplifyGraphForHero(baseGraph) : baseGraph,
+    [baseGraph, isHeroLayout],
+  )
+
   const adjacency = useMemo(() => buildAdjacency(currentGraph.links), [currentGraph.links])
 
   const selectedNode = useMemo(
     () => currentGraph.nodes.find(node => node.id === selectedNodeId) || null,
     [currentGraph.nodes, selectedNodeId],
   )
+  const showTreePanel = !isHeroLayout && (!isDockLayout || mode === 'tree')
+  const showInspectorPanel = !isHeroLayout && !isDockLayout
+  const showFloatingInspector = isDockLayout && Boolean(selectedNode)
 
   const selectedNeighbors = useMemo(
     () => selectedNodeId ? adjacency.get(selectedNodeId) || new Set<string>() : new Set<string>(),
@@ -569,10 +642,10 @@ export function GlobalGraph({
     controls.enableDamping = true
     controls.dampingFactor = 0.08
     controls.autoRotate = autoRotate
-    controls.autoRotateSpeed = 0.32
+    controls.autoRotateSpeed = isHeroLayout ? 0.2 : 0.32
     controls.minDistance = 120
     controls.maxDistance = 2400
-  }, [autoRotate, currentGraph.nodes.length])
+  }, [autoRotate, currentGraph.nodes.length, isHeroLayout])
 
   useEffect(() => {
     const scene = graphRef.current?.scene?.()
@@ -603,10 +676,67 @@ export function GlobalGraph({
   useEffect(() => {
     if (currentGraph.nodes.length === 0) return
     const timeout = window.setTimeout(() => {
-      graphRef.current?.zoomToFit?.(700, 80)
+      graphRef.current?.zoomToFit?.(700, isHeroLayout ? 8 : 80)
     }, 220)
     return () => window.clearTimeout(timeout)
-  }, [currentGraph.links.length, currentGraph.nodes.length, mode])
+  }, [currentGraph.links.length, currentGraph.nodes.length, isHeroLayout, mode])
+
+  useEffect(() => {
+    if (!isHeroLayout || currentGraph.nodes.length === 0) return
+
+    const timeout = window.setTimeout(() => {
+      const positionedNodes = currentGraph.nodes.filter((node) => (
+        typeof (node as SpaceNode & { x?: number }).x === 'number'
+        && typeof (node as SpaceNode & { y?: number }).y === 'number'
+        && typeof (node as SpaceNode & { z?: number }).z === 'number'
+      )) as Array<SpaceNode & { x: number; y: number; z: number }>
+
+      if (positionedNodes.length === 0) return
+
+      const bounds = positionedNodes.reduce(
+        (accumulator, node) => ({
+          minX: Math.min(accumulator.minX, node.x),
+          maxX: Math.max(accumulator.maxX, node.x),
+          minY: Math.min(accumulator.minY, node.y),
+          maxY: Math.max(accumulator.maxY, node.y),
+          minZ: Math.min(accumulator.minZ, node.z),
+          maxZ: Math.max(accumulator.maxZ, node.z),
+        }),
+        {
+          minX: positionedNodes[0].x,
+          maxX: positionedNodes[0].x,
+          minY: positionedNodes[0].y,
+          maxY: positionedNodes[0].y,
+          minZ: positionedNodes[0].z,
+          maxZ: positionedNodes[0].z,
+        },
+      )
+
+      const center = {
+        x: (bounds.minX + bounds.maxX) / 2,
+        y: (bounds.minY + bounds.maxY) / 2,
+        z: (bounds.minZ + bounds.maxZ) / 2,
+      }
+      const span = Math.max(bounds.maxX - bounds.minX, bounds.maxY - bounds.minY, bounds.maxZ - bounds.minZ, 220)
+      const distance = Math.max(span * 0.92, 260)
+
+      graphRef.current?.cameraPosition?.(
+        {
+          x: center.x + distance * 0.42,
+          y: center.y + distance * 0.18,
+          z: center.z + distance * 0.94,
+        },
+        {
+          x: center.x,
+          y: center.y + distance * 0.03,
+          z: center.z,
+        },
+        900,
+      )
+    }, 1100)
+
+    return () => window.clearTimeout(timeout)
+  }, [currentGraph.nodes, isHeroLayout])
 
   useEffect(() => {
     if (!selectedNodeId && currentGraph.nodes.length > 0) {
@@ -637,7 +767,7 @@ export function GlobalGraph({
     focusNode(node)
   }
 
-  function handleNodeDoubleClick(node: SpaceNode) {
+  function handleNodeOpen(node: SpaceNode) {
     if ((node.kind === 'note' || node.kind === 'current') && node.path) {
       onNavigate?.(node.path)
       return
@@ -645,6 +775,19 @@ export function GlobalGraph({
     if (node.kind === 'tag') {
       onTagSelect?.(node.label)
     }
+  }
+
+  function handleNodeInteraction(node: SpaceNode & { x?: number; y?: number; z?: number }) {
+    const now = Date.now()
+    const last = clickStateRef.current
+    if (last && last.id === node.id && now - last.at < 260) {
+      clickStateRef.current = null
+      handleNodeOpen(node)
+      return
+    }
+
+    clickStateRef.current = { id: node.id, at: now }
+    handleNodeClick(node)
   }
 
   function toggleBranch(pathKey: string) {
@@ -668,6 +811,7 @@ export function GlobalGraph({
             onClick={() => startTransition(() => setSelectedBranch(isActive ? null : branch.pathKey))}
             onDoubleClick={() => toggleBranch(branch.pathKey)}
             title={branch.pathKey}
+            type="button"
           >
             <span className={`graph-tree-caret${isExpanded ? ' expanded' : ''}`}>▶</span>
             <FolderIcon />
@@ -685,6 +829,7 @@ export function GlobalGraph({
                 onNavigate?.(note.path || note.id)
               }}
               title={note.path}
+              type="button"
             >
               <FileIcon />
               <span className="graph-tree-label">{formatLabel(note.label)}</span>
@@ -695,6 +840,80 @@ export function GlobalGraph({
         </div>
       )
     })
+  }
+
+  function renderInspectorContent() {
+    if (!selectedNode) {
+      return (
+        <div className="graph-inspector graph-inspector--empty">
+          <p>点击一个节点查看路径、标签和快速操作。</p>
+        </div>
+      )
+    }
+
+    return (
+      <div className="graph-inspector">
+        <div className={`graph-inspector__badge graph-inspector__badge--${selectedNode.kind}`}>
+          {selectedNode.kind === 'current' && '当前文档'}
+          {selectedNode.kind === 'note' && '知识文档'}
+          {selectedNode.kind === 'tag' && '标签节点'}
+          {selectedNode.kind === 'branch' && '树形分支'}
+        </div>
+        <h4 className="graph-inspector__title">{formatLabel(selectedNode.label)}</h4>
+        {selectedNode.path && (
+          <div className="graph-inspector__path">{selectedNode.path}</div>
+        )}
+        {selectedNode.tags && selectedNode.tags.length > 0 && (
+          <div className="graph-inspector__tags">
+            {selectedNode.tags.slice(0, 8).map(tag => (
+              <button
+                key={tag}
+                className="tag tag--small"
+                onClick={() => onTagSelect?.(tag)}
+                type="button"
+              >
+                #{tag}
+              </button>
+            ))}
+          </div>
+        )}
+
+        <div className="graph-inspector__facts">
+          <div className="graph-fact">
+            <span>邻接节点</span>
+            <strong>{adjacency.get(selectedNode.id)?.size || 0}</strong>
+          </div>
+          <div className="graph-fact">
+            <span>类型</span>
+            <strong>{selectedNode.kind}</strong>
+          </div>
+          {selectedNode.count !== undefined && (
+            <div className="graph-fact">
+              <span>子文档</span>
+              <strong>{selectedNode.count}</strong>
+            </div>
+          )}
+        </div>
+
+        <div className="graph-inspector__actions">
+          {(selectedNode.kind === 'note' || selectedNode.kind === 'current') && selectedNode.path && (
+            <button className="graph-action" onClick={() => onNavigate?.(selectedNode.path!)} type="button">
+              打开文档
+            </button>
+          )}
+          {selectedNode.kind === 'tag' && (
+            <button className="graph-action" onClick={() => onTagSelect?.(selectedNode.label)} type="button">
+              以此标签筛选
+            </button>
+          )}
+          {selectedNode.kind === 'branch' && (
+            <button className="graph-action" onClick={() => setSelectedBranch(selectedNode.path || null)} type="button">
+              聚焦该分支
+            </button>
+          )}
+        </div>
+      </div>
+    )
   }
 
   if ((loadingGlobal && mode !== 'focus') || (mode === 'focus' && loadingFocus)) {
@@ -724,8 +943,68 @@ export function GlobalGraph({
     )
   }
 
+  if (isHeroLayout) {
+    return (
+      <div className="graph-space graph-space--hero" style={{ width, height }}>
+        <section className="graph-space__stage graph-space__stage--hero">
+          <div className="graph-stage__overlay graph-stage__overlay--hero">
+            <div className="graph-stage__hint">拖拽旋转，单击聚焦，双击打开证据</div>
+            <div className="graph-stage__mode">Command Tree</div>
+          </div>
+          <ForceGraph3D
+            ref={graphRef as never}
+            width={Math.max(width, 320)}
+            height={Math.max(height, 360)}
+            graphData={currentGraph as never}
+            nodeLabel={(node: object) => {
+              const current = node as SpaceNode
+              return current.path
+                ? `${formatLabel(current.label)}\n${current.path}`
+                : formatLabel(current.label)
+            }}
+            backgroundColor={GRAPH_BACKDROP}
+            showNavInfo={false}
+            linkColor={(link: object) => {
+              const current = link as SpaceLink
+              if (current.kind === 'tag') return 'rgba(245, 158, 11, 0.2)'
+              if (current.kind === 'hierarchy') return 'rgba(52, 211, 153, 0.34)'
+              return 'rgba(129, 140, 248, 0.28)'
+            }}
+            linkWidth={(link: object) => {
+              const current = link as SpaceLink
+              return current.kind === 'hierarchy' ? 1.8 : 1.2
+            }}
+            linkOpacity={0.7}
+            linkDirectionalParticles={0}
+            nodeAutoColorBy="kind"
+            nodeThreeObject={(node: object) => createNodeObject(node as SpaceNode, selectedNodeId, hoveredNodeId, true)}
+            nodeThreeObjectExtend={false}
+            onNodeClick={(node: object) => handleNodeInteraction(node as SpaceNode & { x?: number; y?: number; z?: number })}
+            onNodeHover={(node: object | null) => {
+              const current = node as SpaceNode | null
+              setHoveredNodeId(current?.id || null)
+              document.body.style.cursor = current ? 'pointer' : 'default'
+            }}
+            dagMode={mode === 'tree' ? 'zout' : undefined}
+            dagLevelDistance={mode === 'tree' ? 112 : undefined}
+            d3AlphaDecay={0.05}
+            d3VelocityDecay={0.26}
+            cooldownTicks={120}
+          />
+        </section>
+      </div>
+    )
+  }
+
   return (
-    <div className="graph-space" style={{ width, height }}>
+    <div
+      className={[
+        'graph-space',
+        isDockLayout ? 'graph-space--dock' : 'graph-space--workspace',
+        showTreePanel ? 'graph-space--tree-panel' : 'graph-space--no-tree',
+      ].join(' ')}
+      style={{ width, height }}
+    >
       <div className="graph-space__topbar">
         <div>
           <div className="graph-space__eyebrow">
@@ -743,9 +1022,10 @@ export function GlobalGraph({
         </div>
 
         <div className="graph-space__toolbar">
-          <label className="graph-space__search">
+          <label className="graph-space__search" aria-label="筛选图谱节点">
             <SearchIcon />
             <input
+              aria-label="筛选图谱节点"
               value={query}
               onChange={event => setQuery(event.target.value)}
               placeholder="筛选路径 / 标签 / 文档名"
@@ -755,17 +1035,19 @@ export function GlobalGraph({
           <button
             className={`graph-chip${showTags ? ' active' : ''}`}
             onClick={() => setShowTags(value => !value)}
+            type="button"
           >
             标签层
           </button>
           <button
             className={`graph-chip${autoRotate ? ' active' : ''}`}
             onClick={() => setAutoRotate(value => !value)}
+            type="button"
           >
             自旋
           </button>
           {selectedBranch && (
-            <button className="graph-chip" onClick={() => setSelectedBranch(null)}>
+            <button className="graph-chip" onClick={() => setSelectedBranch(null)} type="button">
               清除分支
             </button>
           )}
@@ -797,47 +1079,51 @@ export function GlobalGraph({
       </div>
 
       <div className="graph-space__body">
-        <aside className="graph-space__tree">
-          <div className="graph-panel__header">
-            <FolderIcon />
-            <span>知识树</span>
-          </div>
-          <div className="graph-tree">
-            <button
-              className={`graph-tree-root${selectedBranch === null ? ' active' : ''}`}
-              onClick={() => setSelectedBranch(null)}
-            >
-              <span className="graph-tree-root__title">全库视图</span>
-              <span className="graph-tree-count">{totals.notes}</span>
-            </button>
-            {renderTreeNodes(tree.rootChildren)}
-            {tree.looseNotes.length > 0 && (
-              <div className="graph-tree-node">
-                <div className="graph-tree-section">根文档</div>
-                {tree.looseNotes.map(note => (
-                  <button
-                    key={note.id}
-                    className={`graph-tree-leaf${selectedNodeId === note.id ? ' active' : ''}`}
-                    style={{ paddingLeft: '18px' }}
-                    onClick={() => {
-                      setSelectedNodeId(note.id)
-                      onNavigate?.(note.path || note.id)
-                    }}
-                    title={note.path}
-                  >
-                    <FileIcon />
-                    <span className="graph-tree-label">{formatLabel(note.label)}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-        </aside>
+        {showTreePanel && (
+          <aside className="graph-space__tree">
+            <div className="graph-panel__header">
+              <FolderIcon />
+              <span>知识树</span>
+            </div>
+            <div className="graph-tree">
+              <button
+                className={`graph-tree-root${selectedBranch === null ? ' active' : ''}`}
+                onClick={() => setSelectedBranch(null)}
+                type="button"
+              >
+                <span className="graph-tree-root__title">全库视图</span>
+                <span className="graph-tree-count">{totals.notes}</span>
+              </button>
+              {renderTreeNodes(tree.rootChildren)}
+              {tree.looseNotes.length > 0 && (
+                <div className="graph-tree-node">
+                  <div className="graph-tree-section">根文档</div>
+                  {tree.looseNotes.map(note => (
+                    <button
+                      key={note.id}
+                      className={`graph-tree-leaf${selectedNodeId === note.id ? ' active' : ''}`}
+                      style={{ paddingLeft: '18px' }}
+                      onClick={() => {
+                        setSelectedNodeId(note.id)
+                        onNavigate?.(note.path || note.id)
+                      }}
+                      title={note.path}
+                      type="button"
+                    >
+                      <FileIcon />
+                      <span className="graph-tree-label">{formatLabel(note.label)}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </aside>
+        )}
 
         <section className="graph-space__stage">
           <div className="graph-stage__overlay">
             <div className="graph-stage__hint">
-              拖拽旋转，滚轮缩放，单击聚焦，右键跳转
+              拖拽旋转，滚轮缩放，单击聚焦，双击打开证据
             </div>
             <div className="graph-stage__mode">
               {mode === 'tree' ? '3D Tree' : mode === 'orphan' ? 'Islands' : 'Force Space'}
@@ -845,8 +1131,8 @@ export function GlobalGraph({
           </div>
           <ForceGraph3D
             ref={graphRef as never}
-            width={Math.max(width - 540, 320)}
-            height={Math.max(height - 140, 280)}
+            width={Math.max(width - (isDockLayout ? (showTreePanel ? 220 : 0) : 540), 320)}
+            height={Math.max(height - (isDockLayout ? 116 : 140), 280)}
             graphData={currentGraph as never}
             nodeLabel={(node: object) => {
               const current = node as SpaceNode
@@ -896,8 +1182,7 @@ export function GlobalGraph({
             nodeAutoColorBy="kind"
             nodeThreeObject={(node: object) => createNodeObject(node as SpaceNode, selectedNodeId, hoveredNodeId)}
             nodeThreeObjectExtend={false}
-            onNodeClick={(node: object) => handleNodeClick(node as SpaceNode & { x?: number; y?: number; z?: number })}
-            onNodeRightClick={(node: object) => handleNodeDoubleClick(node as SpaceNode)}
+            onNodeClick={(node: object) => handleNodeInteraction(node as SpaceNode & { x?: number; y?: number; z?: number })}
             onNodeHover={(node: object | null) => {
               const current = node as SpaceNode | null
               setHoveredNodeId(current?.id || null)
@@ -909,81 +1194,23 @@ export function GlobalGraph({
             d3VelocityDecay={mode === 'tree' ? 0.3 : 0.24}
             cooldownTicks={mode === 'tree' ? 80 : 130}
           />
-        </section>
 
-        <aside className="graph-space__inspector">
-          <div className="graph-panel__header">
-            <LinkIcon />
-            <span>交互面板</span>
-          </div>
-
-          {selectedNode ? (
-            <div className="graph-inspector">
-              <div className={`graph-inspector__badge graph-inspector__badge--${selectedNode.kind}`}>
-                {selectedNode.kind === 'current' && '当前文档'}
-                {selectedNode.kind === 'note' && '知识文档'}
-                {selectedNode.kind === 'tag' && '标签节点'}
-                {selectedNode.kind === 'branch' && '树形分支'}
-              </div>
-              <h4 className="graph-inspector__title">{formatLabel(selectedNode.label)}</h4>
-              {selectedNode.path && (
-                <div className="graph-inspector__path">{selectedNode.path}</div>
-              )}
-              {selectedNode.tags && selectedNode.tags.length > 0 && (
-                <div className="graph-inspector__tags">
-                  {selectedNode.tags.slice(0, 8).map(tag => (
-                    <button
-                      key={tag}
-                      className="tag tag--small"
-                      onClick={() => onTagSelect?.(tag)}
-                    >
-                      #{tag}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              <div className="graph-inspector__facts">
-                <div className="graph-fact">
-                  <span>邻接节点</span>
-                  <strong>{adjacency.get(selectedNode.id)?.size || 0}</strong>
-                </div>
-                <div className="graph-fact">
-                  <span>类型</span>
-                  <strong>{selectedNode.kind}</strong>
-                </div>
-                {selectedNode.count !== undefined && (
-                  <div className="graph-fact">
-                    <span>子文档</span>
-                    <strong>{selectedNode.count}</strong>
-                  </div>
-                )}
-              </div>
-
-              <div className="graph-inspector__actions">
-                {(selectedNode.kind === 'note' || selectedNode.kind === 'current') && selectedNode.path && (
-                  <button className="graph-action" onClick={() => onNavigate?.(selectedNode.path!)}>
-                    打开文档
-                  </button>
-                )}
-                {selectedNode.kind === 'tag' && (
-                  <button className="graph-action" onClick={() => onTagSelect?.(selectedNode.label)}>
-                    以此标签筛选
-                  </button>
-                )}
-                {selectedNode.kind === 'branch' && (
-                  <button className="graph-action" onClick={() => setSelectedBranch(selectedNode.path || null)}>
-                    聚焦该分支
-                  </button>
-                )}
-              </div>
-            </div>
-          ) : (
-            <div className="graph-inspector graph-inspector--empty">
-              <p>点击一个节点查看路径、标签和快速操作。</p>
+          {showFloatingInspector && (
+            <div className="graph-stage__inspector-float">
+              {renderInspectorContent()}
             </div>
           )}
-        </aside>
+        </section>
+
+        {showInspectorPanel && (
+          <aside className="graph-space__inspector">
+            <div className="graph-panel__header">
+              <LinkIcon />
+              <span>交互面板</span>
+            </div>
+            {renderInspectorContent()}
+          </aside>
+        )}
       </div>
     </div>
   )

@@ -28,17 +28,18 @@ export function KnowledgePanel({
   onTagSelect,
 }: KnowledgePanelProps) {
   const [activeTab, setActiveTab] = useState<KnowledgePanelTab>('toc')
-  const [graphMode, setGraphMode] = useState<GraphMode>('focus')
+  const [graphMode, setGraphMode] = useState<GraphMode>('tree')
   const [aiData, setAiData] = useState<AiAnalysis | null>(null)
   const [aiLoading, setAiLoading] = useState(false)
   const graphContainerRef = useRef<HTMLDivElement>(null)
   const [graphViewport, setGraphViewport] = useState({ width: 360, height: 300 })
+  const isGraphWorkspace = activeTab === 'graph' && source?.type === 'local'
 
   // Reset on file change
   useEffect(() => {
     setAiData(null)
     setActiveTab('toc')
-    setGraphMode('focus')
+    setGraphMode('tree')
   }, [selectedFile?.path, selectedFile?.sourceId])
 
   // Measure graph container height
@@ -82,8 +83,8 @@ export function KnowledgePanel({
   }
 
   return (
-    <aside className={`knowledge-panel${activeTab === 'graph' && source?.type === 'local' ? ' knowledge-panel--graph-workspace' : ''}`}>
-      <div className="kp-tabs">
+    <aside className={`knowledge-panel${isGraphWorkspace ? ' knowledge-panel--graph-workspace' : ''}`}>
+      <div className={`kp-tabs${isGraphWorkspace ? ' kp-tabs--graph-workspace' : ''}`}>
         <button
           className={`kp-tab${activeTab === 'graph' ? ' active' : ''}`}
           onClick={() => handleTabClick('graph')}
@@ -104,9 +105,13 @@ export function KnowledgePanel({
         </button>
       </div>
 
-      <div className="kp-content">
+      <div className={`kp-content${isGraphWorkspace ? ' kp-content--graph-workspace' : ''}`}>
         {activeTab === 'graph' && (
-          <div ref={graphContainerRef} className="kp-graph" style={{ flex: 1 }}>
+          <div
+            ref={graphContainerRef}
+            className={`kp-graph${isGraphWorkspace ? ' kp-graph--workspace' : ''}`}
+            style={{ flex: 1 }}
+          >
             {source?.type === 'local' && (
               <div className="graph-mode-toggle">
                 <button
@@ -151,6 +156,7 @@ export function KnowledgePanel({
                   sourceId={selectedFile?.sourceId || source.id}
                   focusPath={selectedFile?.path}
                   mode={graphMode}
+                  layout="dock"
                   onNavigate={onNavigate}
                   onTagSelect={onTagSelect}
                 />

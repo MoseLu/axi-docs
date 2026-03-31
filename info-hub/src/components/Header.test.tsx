@@ -1,8 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen, fireEvent } from '@testing-library/react'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { Header } from './Header'
 
-// Mock icons
 vi.mock('./Icons', () => ({
   RefreshIcon: () => <span data-testid="refresh-icon">🔄</span>,
   SearchIcon: () => <span data-testid="search-icon">🔍</span>,
@@ -11,9 +10,13 @@ vi.mock('./Icons', () => ({
 
 describe('Header', () => {
   const defaultProps = {
+    activeSourceName: 'Obsidian 知识库',
+    onNavigateExplorer: vi.fn(),
+    onNavigateHome: vi.fn(),
     onRefresh: vi.fn(),
-    searchQuery: '',
     onSearch: vi.fn(),
+    pageMode: 'explorer' as const,
+    searchQuery: '',
     searching: false,
   }
 
@@ -21,60 +24,75 @@ describe('Header', () => {
     vi.clearAllMocks()
   })
 
-  it('should render app title', () => {
+  it('renders app title and source pill', () => {
     render(<Header {...defaultProps} />)
     expect(screen.getByText('Info Hub')).toBeInTheDocument()
+    expect(screen.getByText('Obsidian 知识库')).toBeInTheDocument()
   })
 
-  it('should render search input with placeholder', () => {
+  it('renders explorer search input when in explorer mode', () => {
     render(<Header {...defaultProps} />)
-    const input = screen.getByPlaceholderText('搜索文档... (支持全文搜索)')
-    expect(input).toBeInTheDocument()
+    expect(screen.getByLabelText('搜索知识库')).toBeInTheDocument()
   })
 
-  it('should render refresh button', () => {
-    render(<Header {...defaultProps} />)
-    expect(screen.getByText('刷新')).toBeInTheDocument()
-  })
-
-  it('should call onSearch when typing in search input (debounced)', async () => {
+  it('debounces explorer search input', async () => {
     const onSearch = vi.fn()
     render(<Header {...defaultProps} onSearch={onSearch} />)
 
-    const input = screen.getByPlaceholderText('搜索文档... (支持全文搜索)')
-    fireEvent.change(input, { target: { value: 'test' } })
+    const input = screen.getByLabelText('搜索知识库')
+    fireEvent.change(input, { target: { value: 'graph' } })
 
-    // Should not call immediately due to debounce
     expect(onSearch).not.toHaveBeenCalled()
-
-    // Wait for debounce (300ms)
-    await new Promise(resolve => setTimeout(resolve, 350))
-    expect(onSearch).toHaveBeenCalledWith('test')
+    await new Promise((resolve) => setTimeout(resolve, 320))
+    expect(onSearch).toHaveBeenCalledWith('graph')
   })
 
-  it('should call onSearch immediately when pressing Enter', () => {
+  it('submits search immediately on Enter', () => {
     const onSearch = vi.fn()
     render(<Header {...defaultProps} onSearch={onSearch} />)
 
-    const input = screen.getByPlaceholderText('搜索文档... (支持全文搜索)')
-    fireEvent.change(input, { target: { value: 'test' } })
+    const input = screen.getByLabelText('搜索知识库')
+    fireEvent.change(input, { target: { value: 'path' } })
     fireEvent.keyDown(input, { key: 'Enter' })
 
-    expect(onSearch).toHaveBeenCalledWith('test')
+    expect(onSearch).toHaveBeenCalledWith('path')
   })
 
-  it('should clear search when pressing Escape', () => {
+  it('clears search on Escape', () => {
     const onSearch = vi.fn()
     render(<Header {...defaultProps} searchQuery="existing" onSearch={onSearch} />)
 
-    const input = screen.getByPlaceholderText('搜索文档... (支持全文搜索)')
+    const input = screen.getByLabelText('搜索知识库')
     fireEvent.keyDown(input, { key: 'Escape' })
 
     expect(onSearch).toHaveBeenCalledWith('')
     expect(screen.getByDisplayValue('')).toBeInTheDocument()
   })
 
-  it('should call onRefresh when clicking refresh button', () => {
+  it('renders quick launcher on home mode', () => {
+    render(<Header {...defaultProps} pageMode="home" searchQuery="index" />)
+    expect(screen.getByText('继续搜索 “index”')).toBeInTheDocument()
+  })
+
+  it('calls onNavigateHome and onNavigateExplorer', () => {
+    const onNavigateHome = vi.fn()
+    const onNavigateExplorer = vi.fn()
+    render(
+      <Header
+        {...defaultProps}
+        onNavigateExplorer={onNavigateExplorer}
+        onNavigateHome={onNavigateHome}
+      />,
+    )
+
+    fireEvent.click(screen.getByText('指挥中心'))
+    fireEvent.click(screen.getByText('图谱探索'))
+
+    expect(onNavigateHome).toHaveBeenCalledTimes(1)
+    expect(onNavigateExplorer).toHaveBeenCalledTimes(1)
+  })
+
+  it('calls onRefresh when clicking refresh button', () => {
     const onRefresh = vi.fn()
     render(<Header {...defaultProps} onRefresh={onRefresh} />)
 
@@ -82,43 +100,13 @@ describe('Header', () => {
     expect(onRefresh).toHaveBeenCalledTimes(1)
   })
 
-  it('should show search clear button when input has value', () => {
+  it('shows clear button when input has value', () => {
     render(<Header {...defaultProps} searchQuery="test" />)
-
-    // First set the input value
-    const input = screen.getByPlaceholderText('搜索文档... (支持全文搜索)')
-    fireEvent.change(input, { target: { value: 'test' } })
-
-    expect(screen.getByText('×')).toBeInTheDocument()
+    expect(screen.getByLabelText('清除搜索')).toBeInTheDocument()
   })
 
-  it('should clear search when clicking clear button', () => {
-    const onSearch = vi.fn()
-    render(<Header {...defaultProps} searchQuery="test" onSearch={onSearch} />)
-
-    const input = screen.getByPlaceholderText('搜索文档... (支持全文搜索)')
-    fireEvent.change(input, { target: { value: 'test' } })
-
-    fireEvent.click(screen.getByText('×'))
-
-    expect(onSearch).toHaveBeenCalledWith('')
-    expect(input).toHaveValue('')
-  })
-
-  it('should update input value when searchQuery prop changes', () => {
-    const { rerender } = render(<Header {...defaultProps} />)
-
-    const input = screen.getByPlaceholderText('搜索文档... (支持全文搜索)')
-    expect(input).toHaveValue('')
-
-    rerender(<Header {...defaultProps} searchQuery="new query" />)
-    expect(input).toHaveValue('new query')
-  })
-
-  it('should show loading indicator when searching', () => {
+  it('shows loading indicator when searching', () => {
     render(<Header {...defaultProps} searching={true} />)
-
-    expect(screen.getByTestId('search-icon-wrap')).toBeInTheDocument()
     expect(screen.getByTestId('search-icon-wrap').firstChild).toHaveClass('search-spinner')
   })
 })

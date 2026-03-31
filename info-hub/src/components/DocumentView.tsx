@@ -15,6 +15,8 @@ interface DocumentViewProps {
   source?: DocSource
   onWikiLink: (noteName: string) => void
   onTagSelect?: (tag: string) => void
+  showKnowledgePanel?: boolean
+  variant?: 'page' | 'panel'
 }
 
 // Decode JSON-encoded content strings
@@ -153,6 +155,8 @@ function SkillBadge({ label, value }: { label: string; value: string }) {
 
 export function DocumentView({
   content, fileName, loading, selectedFile, source, onWikiLink, onTagSelect,
+  showKnowledgePanel = true,
+  variant = 'page',
 }: DocumentViewProps) {
   const { frontmatter, body } = useMemo(() => {
     if (!content) return { frontmatter: {}, body: '' }
@@ -238,7 +242,7 @@ export function DocumentView({
   const isDaily = docType === 'daily'
 
   return (
-    <div className="doc-layout">
+    <div className={`doc-layout${variant === 'panel' ? ' doc-layout--panel' : ''}`}>
       <div className="app-content">
         {/* Document Header */}
         <div className="doc-header">
@@ -292,7 +296,7 @@ export function DocumentView({
       </div>
 
       {/* Knowledge Panel */}
-      {selectedFile && (
+      {selectedFile && showKnowledgePanel && (
         <KnowledgePanel
           content={body || null}
           selectedFile={selectedFile}

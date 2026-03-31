@@ -73,26 +73,19 @@ export function HomeCommandCenter({
 
   return (
     <section className="command-center">
-      <HeroKnowledgeScene
-        focusPath={graphFocusPath}
-        mode={graphMode}
-        onNavigate={(path) => onOpenItem(source.id, path)}
-        onTagSelect={(tag) => onTagSelect(tag)}
-        sourceId={source.id}
-      />
-
-      <div className="command-center__scrim" />
-
-      <div className="command-center__hero">
+      {/* ── Left panel: copy + search + metrics ── */}
+      <div className="command-center__left">
         <div className="command-center__copy">
           <div className="command-center__eyebrow">{source.name}</div>
           <h1>知识指挥中心</h1>
-          <p>
-            先搜答案，再沿着 3D 知识树回到上下文和原文证据。
-          </p>
+          <p>先搜答案，再沿着 3D 知识树回到上下文和原文证据。</p>
 
           <div className="command-center__actions">
-            <button className="command-center__action command-center__action--primary" onClick={onOpenExplorer} type="button">
+            <button
+              className="command-center__action command-center__action--primary"
+              onClick={onOpenExplorer}
+              type="button"
+            >
               进入图谱探索
             </button>
             {selectedFile && (
@@ -106,40 +99,30 @@ export function HomeCommandCenter({
             )}
           </div>
 
-          <div className="command-center__states">
-            {searchQuery.trim() && (
-              <span className="command-center__state-pill">
-                <SearchIcon />
-                <span>当前检索 “{searchQuery}”</span>
-              </span>
-            )}
-            {activeTag && (
-              <button className="command-center__state-pill" onClick={onTagClear} type="button">
-                <TagIcon />
-                <span>标签过滤 #{activeTag}</span>
-              </button>
-            )}
-            {selectedFile && (
-              <span className="command-center__state-pill">
-                <FileIcon />
-                <span>已锁定证据 {selectedFile.path.split('/').pop()}</span>
-              </span>
-            )}
-          </div>
-        </div>
-
-        <div className="command-center__intel">
-          {spotlightCards.map((card) => (
-            <div key={card.key} className="command-center__intel-card">
-              <span>{card.title}</span>
-              <strong>{card.count}</strong>
-              <p>{card.description}</p>
+          {(searchQuery.trim() || activeTag || selectedFile) && (
+            <div className="command-center__states">
+              {searchQuery.trim() && (
+                <span className="command-center__state-pill">
+                  <SearchIcon />
+                  <span>当前检索 "{searchQuery}"</span>
+                </span>
+              )}
+              {activeTag && (
+                <button className="command-center__state-pill" onClick={onTagClear} type="button">
+                  <TagIcon />
+                  <span>标签过滤 #{activeTag}</span>
+                </button>
+              )}
+              {selectedFile && (
+                <span className="command-center__state-pill">
+                  <FileIcon />
+                  <span>已锁定证据 {selectedFile.path.split('/').pop()}</span>
+                </span>
+              )}
             </div>
-          ))}
+          )}
         </div>
-      </div>
 
-      <div className="command-center__dock">
         <div className="command-search">
           <label className="command-search__label" htmlFor="command-search">
             搜索知识库
@@ -175,21 +158,39 @@ export function HomeCommandCenter({
           </div>
         </div>
 
-        <div className="command-center__dock-footer">
-          <div className="command-center__metrics">
-            <div className="command-center__metric">
-              <span>知识文档</span>
-              <strong>{catalog?.totalDocs || 0}</strong>
-            </div>
-            <div className="command-center__metric">
-              <span>经验分层</span>
-              <strong>{catalog?.sections.length || 0}</strong>
-            </div>
-            <div className="command-center__metric">
-              <span>高频标签</span>
-              <strong>{catalog?.topTags.length || 0}</strong>
-            </div>
+        <div className="command-center__metrics">
+          <div className="command-center__metric">
+            <span>知识文档</span>
+            <strong>{catalog?.totalDocs || 0}</strong>
           </div>
+          <div className="command-center__metric">
+            <span>经验分层</span>
+            <strong>{catalog?.sections.length || 0}</strong>
+          </div>
+          <div className="command-center__metric">
+            <span>高频标签</span>
+            <strong>{catalog?.topTags.length || 0}</strong>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Right panel: 3D graph + intel cards ── */}
+      <div className="command-center__right">
+        <HeroKnowledgeScene
+          focusPath={graphFocusPath}
+          mode={graphMode}
+          onNavigate={(path) => onOpenItem(source.id, path)}
+          onTagSelect={(tag) => onTagSelect(tag)}
+          sourceId={source.id}
+        />
+        <div className="command-center__scrim" />
+        <div className="command-center__intel">
+          {spotlightCards.map((card) => (
+            <div key={card.key} className="command-center__intel-card">
+              <span>{card.title}</span>
+              <strong>{card.count}</strong>
+            </div>
+          ))}
         </div>
       </div>
     </section>

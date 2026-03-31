@@ -6,7 +6,8 @@ import { DocumentView } from './components/DocumentView'
 import { BlinkoView } from './components/BlinkoView'
 import { SearchResults } from './components/SearchResults'
 import { ErrorBoundary } from './components/ErrorBoundary'
-import { DocSource, SelectedFile, SearchResult } from './types'
+import { KnowledgeOverview } from './components/KnowledgeOverview'
+import { DocSource, KnowledgeCatalog, SelectedFile, SearchResult } from './types'
 import { API_BASE } from './constants'
 
 function HomePage() {
@@ -21,6 +22,9 @@ function HomePage() {
   const [searchResults, setSearchResults] = useState<SearchResult[] | null>(null)
   const [activeTag, setActiveTag] = useState<string | null>(null)
   const [searching, setSearching] = useState(false)
+  const [catalog, setCatalog] = useState<KnowledgeCatalog | null>(null)
+  const [catalogLoading, setCatalogLoading] = useState(false)
+  const [catalogError, setCatalogError] = useState<string | null>(null)
   const abortRef = useRef<AbortController | null>(null)
 
   useEffect(() => {
@@ -32,6 +36,15 @@ function HomePage() {
       loadFile(selectedFile.sourceId, selectedFile.path)
     }
   }, [selectedFile])
+
+  useEffect(() => {
+    if (activeSource === 'blinko') {
+      setCatalog(null)
+      setCatalogError(null)
+      return
+    }
+    void loadCatalog(activeSource)
+  }, [activeSource, refreshKey])
 
   const fetchSources = async () => {
     try {
@@ -75,6 +88,23 @@ function HomePage() {
       setFileName('Error')
     }
     setLoading(false)
+  }
+
+  const loadCatalog = async (sourceId: string) => {
+    setCatalogLoading(true)
+    setCatalogError(null)
+    try {
+      const response = await fetch(`${API_BASE}/catalog?source=${sourceId}`)
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`)
+      }
+      const data: KnowledgeCatalog = await response.json()
+      setCatalog(data)
+    } catch (error) {
+      setCatalog(null)
+      setCatalogError(error instanceof Error ? error.message : '目录加载失败')
+    }
+    setCatalogLoading(false)
   }
 
   const handleFileSelect = useCallback((sourceId: string, path: string) => {
@@ -146,7 +176,7 @@ function HomePage() {
           activeTag={activeTag}
           onTagSelect={handleTagSelect}
         />
-        <main className="app-main">
+        <main className="app-main" style={{ flexShrink: 0 }}>
           <ErrorBoundary>
             {searchResults !== null ? (
               <SearchResults
@@ -156,6 +186,15 @@ function HomePage() {
               />
             ) : isBlinko ? (
               <BlinkoView onNoteSelect={handleFileSelect} refreshKey={refreshKey} />
+            ) : !selectedFile ? (
+              <KnowledgeOverview
+                sourceName={currentSource?.name || activeSource}
+                catalog={catalog}
+                loading={catalogLoading}
+                error={catalogError}
+                onOpenItem={handleFileSelect}
+                onTagSelect={(tag) => handleTagSelect(tag)}
+              />
             ) : (
               <DocumentView
                 content={fileContent}

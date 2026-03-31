@@ -18,10 +18,25 @@ export interface Frontmatter {
   title?: string
   tags?: string[]
   category?: string
+  categories?: string[] | string
   date?: string
   updated?: string
+  created?: string
+  modified?: string
   description?: string
   aliases?: string[]
+  type?: string
+  status?: string
+  tech?: string
+  version?: string
+  domain?: string
+  problem?: string
+  section?: string[] | string
+  sections?: string[] | string
+  knowledgeSection?: string[] | string
+  knowledgeSections?: string[] | string
+  ['tech-stack']?: string[] | string
+  ['project-status']?: string
   [key: string]: unknown
 }
 
@@ -98,6 +113,11 @@ export interface SearchResult {
   matches: SearchMatch[]
   score: number
   tags?: string[]
+  title?: string
+  description?: string
+  docType?: string
+  categories?: string[]
+  matchedBy?: string[]
 }
 
 export interface SearchMatch {
@@ -138,6 +158,38 @@ export interface GraphData {
   nodes: GraphNode[]
   edges: GraphEdge[]
   orphanNodes?: GraphNode[]
+}
+
+export interface KnowledgeCatalogItem {
+  sourceId: string
+  path: string
+  name: string
+  title: string
+  description?: string
+  docType?: string
+  status?: string
+  tags: string[]
+  categories: string[]
+  techStack: string[]
+  updated?: string
+}
+
+export interface KnowledgeCatalogSection {
+  key: string
+  title: string
+  description: string
+  count: number
+  items: KnowledgeCatalogItem[]
+}
+
+export interface KnowledgeCatalog {
+  sourceId: string
+  totalDocs: number
+  totalTags: number
+  generatedAt: string
+  topTags: Array<{ name: string; count: number }>
+  recentDocs: KnowledgeCatalogItem[]
+  sections: KnowledgeCatalogSection[]
 }
 
 // ─── AI Analysis Types ────────────────────────────────────────────────────────

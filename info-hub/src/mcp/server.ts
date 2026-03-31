@@ -11,6 +11,7 @@ import http from 'http'
 import crypto from 'crypto'
 import { URL } from 'url'
 import { IncomingMessage, ServerResponse } from 'http'
+import * as knowledgeBase from '../lib/knowledgeBase'
 
 // ─── 加载环境变量 ────────────────────────────────────────────────────────────
 
@@ -37,19 +38,6 @@ interface BlinkoNote {
   files?: unknown[]
   createdAt: string
   updatedAt: string
-}
-
-interface BlinkoFileItem {
-  id: string
-  name: string
-  path: string
-  relativePath: string
-  type: 'file' | 'directory'
-  extension: string
-  lastModified: string
-  sourceId: string
-  tags?: string[]
-  blinkoData?: BlinkoNote
 }
 
 function blinkoRequest<T>(
@@ -89,111 +77,45 @@ function blinkoRequest<T>(
 }
 
 async function handleBlinkoApi(_req: IncomingMessage, res: ServerResponse, url: URL) {
-  const apiToken = process.env.BLINKO_TOKEN
-    || docSources.find(s => s.id === 'blinko')?.apiToken
-    || ''
+  const source = docSources.find(s => s.id === 'blinko')
+  if (!source) {
+    res.writeHead(404, { 'Content-Type': 'application/json' })
+    res.end(JSON.stringify({ error: 'Blinko source is not configured' }))
+    return
+  }
   const apiPath = url.pathname.slice(5) // 去掉 /api/
-  // action 保留用于未来扩展
 
   try {
-    let result: unknown
-
     if (apiPath === 'scan') {
-      // 获取笔记列表
-      result = await blinkoRequest<BlinkoNote[] | { message: string }>(
-        '/api/v1/note/list',
-        'POST',
-        { page: 1, size: 200, orderBy: 'desc', type: -1, isRecycle: false },
-        apiToken
-      )
-
-      if (!Array.isArray(result)) {
-        // 返回错误信息给前端
-        const items: BlinkoFileItem[] = [{
-          id: 'blinko:auth-required',
-          name: '需要配置 Blinko API Token',
-          path: 'auth-required',
-          relativePath: 'auth-required',
-          type: 'file',
-          extension: '.md',
-          lastModified: new Date().toISOString(),
-          sourceId: 'blinko',
-        }]
-        res.writeHead(200, { 'Content-Type': 'application/json' })
-        res.end(JSON.stringify(items))
-        return
-      }
-
-      const items: BlinkoFileItem[] = (result as BlinkoNote[]).map((note: BlinkoNote) => ({
-        id: `blinko:${note.id}`,
-        name: note.content.split('\n')[0].slice(0, 60) || `Blinko #${note.id}`,
-        path: String(note.id),
-        relativePath: String(note.id),
-        type: 'file' as const,
-        extension: '.md',
-        lastModified: note.updatedAt || note.createdAt,
-        sourceId: 'blinko',
-        tags: note.tags,
-        blinkoData: note,
-      }))
-
       res.writeHead(200, { 'Content-Type': 'application/json' })
-      res.end(JSON.stringify(items))
+      res.end(JSON.stringify(await knowledgeBase.scanKnowledgeSource('blinko')))
       return
     }
 
     if (apiPath === 'file') {
-      // 获取笔记内容
       const noteId = url.searchParams.get('path') || ''
-      if (noteId === 'auth-required') {
-        res.writeHead(200, { 'Content-Type': 'text/plain' })
-        res.end('# Blinko — 需要 API Token\n\n请在 .env 文件中配置 BLINKO_TOKEN')
-        return
-      }
-
-      const detail = await blinkoRequest<{ content?: string }>(
-        '/api/v1/note/detail',
-        'POST',
-        { id: parseInt(noteId, 10) },
-        apiToken
-      )
-
-      const content = (detail as { content?: string }).content || '# 笔记内容为空'
+      const content = await knowledgeBase.readKnowledgeFile('blinko', noteId)
       res.writeHead(200, { 'Content-Type': 'text/plain' })
-      res.end(content)
+      res.end(content || '# 笔记内容为空')
       return
     }
 
     if (apiPath === 'tags') {
-      // Blinko 标签从笔记中提取
-      const notes = await blinkoRequest<BlinkoNote[]>(
-        '/api/v1/note/list',
-        'POST',
-        { page: 1, size: 200, orderBy: 'desc', type: -1, isRecycle: false },
-        apiToken
-      )
-
-      if (!Array.isArray(notes)) {
-        res.writeHead(200, { 'Content-Type': 'application/json' })
-        res.end(JSON.stringify([]))
-        return
-      }
-
-      const tagCounts = new Map<string, number>()
-      for (const note of notes) {
-        if (note.tags) {
-          for (const tag of note.tags) {
-            tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1)
-          }
-        }
-      }
-
-      const tags = Array.from(tagCounts.entries())
-        .map(([name, count]) => ({ name, count }))
-        .sort((a, b) => b.count - a.count)
-
       res.writeHead(200, { 'Content-Type': 'application/json' })
-      res.end(JSON.stringify(tags))
+      res.end(JSON.stringify(await knowledgeBase.getKnowledgeTags('blinko')))
+      return
+    }
+
+    if (apiPath === 'search') {
+      const query = url.searchParams.get('query') || url.searchParams.get('q') || ''
+      res.writeHead(200, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify(await knowledgeBase.searchKnowledge('blinko', query, url.searchParams.get('tag'))))
+      return
+    }
+
+    if (apiPath === 'catalog') {
+      res.writeHead(200, { 'Content-Type': 'application/json' })
+      res.end(JSON.stringify(await knowledgeBase.getKnowledgeCatalog('blinko')))
       return
     }
 
@@ -220,29 +142,7 @@ interface DocSource {
   icon?: string
 }
 
-const docSources: DocSource[] = [
-  {
-    id: 'obsidian',
-    name: 'Obsidian 知识库',
-    description: '本地 Obsidian Vault',
-    path: process.env.OBSIDIAN_PATH || 'F:/docs/obsidian/',
-    enabled: true,
-    type: 'local',
-    icon: 'obsidian',
-  },
-  {
-    id: 'blinko',
-    name: 'Blinko 闪念',
-    description: '闪念笔记 & 灵感捕捉',
-    path: '',
-    enabled: true,
-    type: 'api',
-    apiUrl: process.env.BLINKO_URL || 'http://localhost:1111',
-    // 优先级：BLINKO_TOKEN 环境变量 > 空字符串（Blinko 关闭认证时）
-    apiToken: process.env.BLINKO_TOKEN || '',
-    icon: 'blinko',
-  },
-]
+const docSources: DocSource[] = knowledgeBase.listKnowledgeSources()
 
 // ─── 安全限制 ─────────────────────────────────────────────────────────────────
 
@@ -387,26 +287,13 @@ async function searchFiles(
   sourceId: string,
   query: string,
   dirPath?: string,
-): Promise<FileItem[]> {
-  const all = await scanDir(sourceId, dirPath)
-  const q = query.toLowerCase()
-
-  const results: FileItem[] = []
-  const dirs: string[] = []
-
-  for (const item of all) {
-    if (item.type === 'directory') {
-      dirs.push(item.relativePath)
-    } else if (item.name.toLowerCase().includes(q)) {
-      results.push(item)
-    }
-  }
-
-  for (const sub of dirs) {
-    results.push(...(await searchFiles(sourceId, query, sub)))
-  }
-
-  return results
+): Promise<Array<Record<string, unknown>>> {
+  const results = await knowledgeBase.searchKnowledge(sourceId, query)
+  if (!dirPath) return results as unknown as Array<Record<string, unknown>>
+  const normalizedDir = dirPath.replace(/\\/g, '/').replace(/\/$/, '')
+  return results.filter((result) =>
+    typeof result.path === 'string' && result.path.startsWith(`${normalizedDir}/`)
+  ) as unknown as Array<Record<string, unknown>>
 }
 
 // 从 markdown 文件中提取所有标签（#tag-name 格式）
@@ -429,31 +316,7 @@ interface TagInfo {
 
 // 获取某个源下所有文件的标签
 async function getAllTags(sourceId: string): Promise<TagInfo[]> {
-  const source = resolveSource(sourceId)
-  if (!source) return []
-
-  const tagCounts = new Map<string, number>()
-
-  try {
-    const scanResults = await scanDir(sourceId)
-    const mdFiles = scanResults.filter(item => item.type === 'file' && item.extension === '.md')
-
-    for (const file of mdFiles) {
-      const content = await readFile(sourceId, file.relativePath)
-      if (content) {
-        const tags = extractTagsFromContent(content)
-        for (const tag of tags) {
-          tagCounts.set(tag, (tagCounts.get(tag) || 0) + 1)
-        }
-      }
-    }
-  } catch (error) {
-    console.error('Error extracting tags:', error)
-  }
-
-  return Array.from(tagCounts.entries())
-    .map(([name, count]) => ({ name, count }))
-    .sort((a, b) => b.count - a.count)
+  return knowledgeBase.getKnowledgeTags(sourceId)
 }
 
 // Full-text search across all files
@@ -461,51 +324,13 @@ async function searchFullText(
   sourceId: string,
   query: string,
 ): Promise<Array<{ path: string; name: string; snippet: string; score: number }>> {
-  const source = resolveSource(sourceId)
-  if (!source) return []
-
-  const results: Array<{ path: string; name: string; snippet: string; score: number }> = []
-  const lowerQuery = query.toLowerCase().slice(0, 100) // guard against absurdly long queries
-
-  async function walk(dir: string) {
-    let entries: fs.Dirent[]
-    try { entries = await fsp.readdir(dir, { withFileTypes: true }) } catch { return }
-
-    for (const entry of entries) {
-      if (isExcluded(entry.name)) continue
-      const fullPath = path.join(dir, entry.name)
-      if (entry.isDirectory()) {
-        if (isHiddenDir(entry.name)) continue
-        await walk(fullPath)
-      } else if (entry.isFile() && isSupported(entry.name)) {
-        try {
-          const content = await fsp.readFile(fullPath, 'utf-8')
-          const relativePath = path.relative(source!.path, fullPath).replace(/\\/g, '/')
-          const lowerContent = content.toLowerCase()
-          const lowerName = entry.name.toLowerCase()
-
-          if (!lowerContent.includes(lowerQuery) && !lowerName.includes(lowerQuery)) continue
-
-          const matchIdx = lowerContent.indexOf(lowerQuery)
-          let snippet = ''
-          if (matchIdx !== -1) {
-            const start = Math.max(0, matchIdx - 60)
-            const end = Math.min(content.length, matchIdx + query.length + 100)
-            snippet = (start > 0 ? '…' : '') + content.slice(start, end).replace(/\n+/g, ' ') + (end < content.length ? '…' : '')
-          }
-
-          const nameScore = lowerName.includes(lowerQuery) ? 10 : 0
-          // Use split instead of regex to avoid ReDoS
-          const freq = lowerContent.split(lowerQuery).length - 1
-
-          results.push({ path: relativePath, name: entry.name, snippet, score: nameScore + freq })
-        } catch { /* skip */ }
-      }
-    }
-  }
-
-  await walk(source.path)
-  return results.sort((a, b) => b.score - a.score).slice(0, 20)
+  const results = await knowledgeBase.searchKnowledge(sourceId, query)
+  return results.map((result) => ({
+    path: result.path,
+    name: result.title || result.name,
+    snippet: result.snippet,
+    score: result.score,
+  }))
 }
 
 // Build markdown frontmatter
@@ -1005,6 +830,43 @@ function getToolSchemas() {
         required: ['path', 'content'],
       },
     },
+    {
+      name: 'knowledge_catalog',
+      description: '返回知识库的分类索引摘要，适合快速判断是否已有项目经验、架构决策、编码规范、组件/函数库和问题解决方案。',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          source: {
+            type: 'string',
+            description: '文档源 ID，默认 obsidian',
+            default: 'obsidian',
+          },
+        },
+      },
+    },
+    {
+      name: 'knowledge_search',
+      description: '面向经验复用的统一搜索，优先返回组件库、函数库、规范、架构、技术选型和 FAQ 等高价值文档。',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          source: {
+            type: 'string',
+            description: '文档源 ID，默认 obsidian',
+            default: 'obsidian',
+          },
+          query: {
+            type: 'string',
+            description: '搜索关键词（必填）',
+          },
+          tag: {
+            type: 'string',
+            description: '按标签过滤（可选）',
+          },
+        },
+        required: ['query'],
+      },
+    },
     // ── Blinko 工具 ──────────────────────────────────────────────────────────────
     {
       name: 'blinko_list_notes',
@@ -1094,7 +956,7 @@ export function createServer() {
           const source = (args?.source as string) || 'obsidian'
           const dirPath = args?.path as string | undefined
           return {
-            content: [{ type: 'text', text: JSON.stringify(scanDir(source, dirPath), null, 2) }],
+            content: [{ type: 'text', text: JSON.stringify(await scanDir(source, dirPath), null, 2) }],
           }
         }
 
@@ -1104,7 +966,7 @@ export function createServer() {
           if (!filePath) {
             return { content: [{ type: 'text', text: '错误: path 参数必填' }], isError: true }
           }
-          const content = readFile(source, filePath)
+          const content = await readFile(source, filePath)
           if (content === null) {
             return { content: [{ type: 'text', text: `文件不存在: ${filePath}` }], isError: true }
           }
@@ -1146,7 +1008,7 @@ export function createServer() {
             return { content: [{ type: 'text', text: '错误: query 参数必填' }], isError: true }
           }
           return {
-            content: [{ type: 'text', text: JSON.stringify(searchFiles(source, query, dirPath), null, 2) }],
+            content: [{ type: 'text', text: JSON.stringify(await searchFiles(source, query, dirPath), null, 2) }],
           }
         }
 
@@ -1156,7 +1018,7 @@ export function createServer() {
           if (!query) {
             return { content: [{ type: 'text', text: '错误: query 参数必填' }], isError: true }
           }
-          const results = searchFullText(source, query)
+          const results = await searchFullText(source, query)
           return {
             content: [{ type: 'text', text: JSON.stringify(results, null, 2) }],
           }
@@ -1180,6 +1042,27 @@ export function createServer() {
             return { content: [{ type: 'text', text: `✓ 笔记已保存: ${result.path}` }] }
           }
           return { content: [{ type: 'text', text: `✗ 保存失败: ${result.error}` }], isError: true }
+        }
+
+        case 'knowledge_catalog': {
+          const source = (args?.source as string) || 'obsidian'
+          const catalog = await knowledgeBase.getKnowledgeCatalog(source)
+          return {
+            content: [{ type: 'text', text: JSON.stringify(catalog, null, 2) }],
+          }
+        }
+
+        case 'knowledge_search': {
+          const source = (args?.source as string) || 'obsidian'
+          const query = args?.query as string
+          const tag = args?.tag as string | undefined
+          if (!query) {
+            return { content: [{ type: 'text', text: '错误: query 参数必填' }], isError: true }
+          }
+          const results = await knowledgeBase.searchKnowledge(source, query, tag)
+          return {
+            content: [{ type: 'text', text: JSON.stringify(results, null, 2) }],
+          }
         }
 
         default:
@@ -1460,7 +1343,7 @@ async function startHttpServer(port: number) {
             return
           }
           case 'search': {
-            const query = url.searchParams.get('query')
+            const query = url.searchParams.get('query') || url.searchParams.get('q')
             if (!query) throw new Error('query 参数必填')
             const items = await searchFiles(source, query, filePath || undefined)
             res.writeHead(200, { 'Content-Type': 'application/json' })
@@ -1494,6 +1377,12 @@ async function startHttpServer(port: number) {
             res.end(JSON.stringify({ nodes, edges, orphanNodes }))
             return
           }
+          case 'catalog': {
+            const catalog = await knowledgeBase.getKnowledgeCatalog(source)
+            res.writeHead(200, { 'Content-Type': 'application/json' })
+            res.end(JSON.stringify(catalog))
+            return
+          }
           case 'ai/analyze': {
             const payload = JSON.parse(await readBody(req))
             const aiResult = await analyzeDocumentContent(payload.content || '', payload.fileName || '')
@@ -1522,18 +1411,37 @@ async function startHttpServer(port: number) {
       return
     }
 
-    // ── 静态首页 ────────────────────────────────────────────────────────────
+    // ── 静态首页 / SPA 部署 ──────────────────────────────────────────────────
+
+    const distDir = path.join(process.cwd(), 'dist')
+    const distIndex = path.join(distDir, 'index.html')
+    const hasBuiltApp = fs.existsSync(distIndex)
 
     if (pathname === '/' || pathname === '/index.html') {
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
-      res.end(HOME_PAGE)
+      if (hasBuiltApp) {
+        res.writeHead(302, { Location: '/docs/' })
+        res.end()
+      } else {
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
+        res.end(HOME_PAGE)
+      }
       return
     }
 
-    // 静态资源
-    const ext = path.extname(pathname)
+    if (hasBuiltApp && (pathname === '/docs' || pathname === '/docs/' || pathname === '/docs/index.html')) {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
+      res.end(await fsp.readFile(distIndex, 'utf-8'))
+      return
+    }
+
+    const staticRelativePath = pathname.startsWith('/docs/')
+      ? pathname.slice('/docs/'.length)
+      : pathname.slice(1)
+    const ext = path.extname(staticRelativePath)
     if (ext && mimeTypes[ext]) {
-      const staticPath = path.join(process.cwd(), pathname)
+      const staticPath = hasBuiltApp
+        ? path.join(distDir, staticRelativePath)
+        : path.join(process.cwd(), pathname)
       try {
         const staticContent = await fsp.readFile(staticPath)
         res.writeHead(200, { 'Content-Type': mimeTypes[ext] })
@@ -1542,6 +1450,12 @@ async function startHttpServer(port: number) {
       } catch {
         // file not found, fall through to 404
       }
+    }
+
+    if (hasBuiltApp && pathname.startsWith('/docs/')) {
+      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
+      res.end(await fsp.readFile(distIndex, 'utf-8'))
+      return
     }
 
     res.writeHead(404, { 'Content-Type': 'text/plain' })
@@ -1614,6 +1528,17 @@ async function handleToolCall(name: string, args: Record<string, unknown>) {
       const result = await writeFile(source, filePath, fullContent)
       if (result.success) return { content: [{ type: 'text', text: `✓ 笔记已保存: ${result.path}` }] }
       return { content: [{ type: 'text', text: `✗ 保存失败: ${result.error}` }], isError: true }
+    }
+    case 'knowledge_catalog': {
+      const source = (args.source as string) || 'obsidian'
+      return { content: [{ type: 'text', text: JSON.stringify(await knowledgeBase.getKnowledgeCatalog(source), null, 2) }] }
+    }
+    case 'knowledge_search': {
+      const source = (args.source as string) || 'obsidian'
+      const query = args.query as string
+      const tag = args.tag as string | undefined
+      if (!query) return { content: [{ type: 'text', text: '错误: query 参数必填' }], isError: true }
+      return { content: [{ type: 'text', text: JSON.stringify(await knowledgeBase.searchKnowledge(source, query, tag), null, 2) }] }
     }
     // ── Blinko 工具 ───────────────────────────────────────────────────────────
     case 'blinko_list_notes': {

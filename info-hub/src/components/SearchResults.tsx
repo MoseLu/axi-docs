@@ -1,3 +1,4 @@
+import { getKnowledgeCategoryLabel } from '../config/knowledgeRules'
 import { SearchResult } from '../types'
 import { FileIcon, TagIcon } from './Icons'
 
@@ -62,14 +63,25 @@ export function SearchResults({ results, query, onFileSelect }: SearchResultsPro
             <div className="search-result-header">
               <span className="search-result-icon"><FileIcon /></span>
               <span className="search-result-name">
-                {highlightText(result.name.replace(/\.md$/, ''), query)}
+                {highlightText((result.title || result.name).replace(/\.md$/, ''), query)}
               </span>
               <span className="search-result-source">{sourceLabel(result.sourceId)}</span>
             </div>
+            {result.description && (
+              <div className="search-result-desc">{result.description}</div>
+            )}
             <div className="search-result-path">{result.path}</div>
             {result.snippet && (
               <div className="search-result-snippet">
                 {highlightText(result.snippet, query)}
+              </div>
+            )}
+            {result.categories && result.categories.length > 0 && (
+              <div className="search-result-categories">
+                {result.categories.slice(0, 3).map(category => (
+                  <span key={category} className="search-result-pill">{getKnowledgeCategoryLabel(category)}</span>
+                ))}
+                {result.docType && <span className="search-result-pill">{result.docType}</span>}
               </div>
             )}
             {result.tags && result.tags.length > 0 && (
@@ -78,6 +90,11 @@ export function SearchResults({ results, query, onFileSelect }: SearchResultsPro
                 {result.tags.map(tag => (
                   <span key={tag} className="tag tag--small">#{tag}</span>
                 ))}
+              </div>
+            )}
+            {result.matchedBy && result.matchedBy.length > 0 && (
+              <div className="search-result-why">
+                命中: {result.matchedBy.join(' · ')}
               </div>
             )}
           </article>

@@ -133,13 +133,22 @@ async function syncNotes() {
 // 导出函数以便测试
 export { fetchNotes, noteToMarkdown, syncNotes }
 
-// 运行同步
-syncNotes().catch((error) => {
-  console.error('[fatal] 同步失败:', error.message)
-  // 即使同步失败，也确保目录存在（info-hub 需要）
-  if (!fs.existsSync(SYNC_DIR)) {
-    fs.mkdirSync(SYNC_DIR, { recursive: true })
-    console.log('[info] 已创建空白的 blinko-notes 目录')
+const isDirectExecution = process.argv[1] && path.resolve(process.argv[1]) === __filename
+
+async function main() {
+  try {
+    await syncNotes()
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error)
+    console.error('[fatal] 同步失败:', message)
+    if (!fs.existsSync(SYNC_DIR)) {
+      fs.mkdirSync(SYNC_DIR, { recursive: true })
+      console.log('[info] 已创建空白的 blinko-notes 目录')
+    }
+    process.exit(0)
   }
-  process.exit(0) // 不退出错误，允许 info-hub 继续运行
-})
+}
+
+if (isDirectExecution) {
+  void main()
+}

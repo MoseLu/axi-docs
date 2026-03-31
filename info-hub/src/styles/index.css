@@ -2772,21 +2772,36 @@ textarea:focus-visible {
 }
 
 .command-center {
-  position: relative;
-  min-height: 68vh;
+  display: grid;
+  grid-template-columns: 440px 1fr;
   border-radius: 36px;
   overflow: hidden;
-  background: rgba(3, 8, 18, 0.68);
   border: 1px solid rgba(125, 211, 252, 0.1);
   box-shadow: var(--shadow-lg);
-  display: flex;
-  flex-direction: column;
+  min-height: 480px;
 }
 
 .hero-knowledge-scene,
 .command-center__scrim {
   position: absolute;
   inset: 0;
+}
+
+.command-center__left {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 32px 28px;
+  background: rgba(3, 8, 18, 0.97);
+  border-right: 1px solid rgba(125, 211, 252, 0.08);
+  position: relative;
+  z-index: 1;
+}
+
+.command-center__right {
+  position: relative;
+  overflow: hidden;
+  background: rgba(3, 8, 18, 0.68);
 }
 
 .hero-knowledge-scene__fallback {
@@ -2879,34 +2894,10 @@ textarea:focus-visible {
   z-index: 1;
 }
 
-.command-center__hero,
-.command-center__dock {
-  position: relative;
-  z-index: 2;
-}
-
-.command-center__hero {
-  padding: 28px 28px 0;
-  display: grid;
-  grid-template-columns: minmax(320px, 430px) minmax(180px, 224px);
-  justify-content: space-between;
-  align-items: start;
-  gap: 18px;
-  pointer-events: none;
-}
-
 .command-center__copy {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  max-width: 430px;
-  padding: 20px 22px;
-  border-radius: 28px;
-  background: linear-gradient(180deg, rgba(4, 14, 28, 0.74), rgba(4, 14, 28, 0.52));
-  border: 1px solid rgba(125, 211, 252, 0.1);
-  box-shadow: 0 24px 54px rgba(2, 6, 23, 0.28);
-  backdrop-filter: blur(20px);
-  pointer-events: auto;
 }
 
 .command-center__eyebrow,
@@ -2921,9 +2912,9 @@ textarea:focus-visible {
 
 .command-center__copy h1,
 .knowledge-explorer__intro h1 {
-  font-size: clamp(34px, 4.6vw, 64px);
-  line-height: 0.92;
-  letter-spacing: -0.07em;
+  font-size: clamp(28px, 2.8vw, 46px);
+  line-height: 1;
+  letter-spacing: -0.05em;
   color: #f8fafc;
 }
 
@@ -2994,10 +2985,13 @@ textarea:focus-visible {
 }
 
 .command-center__intel {
-  width: min(224px, 100%);
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 2;
+  width: 196px;
   display: grid;
-  gap: 10px;
-  pointer-events: auto;
+  gap: 8px;
 }
 
 .command-center__intel-card,
@@ -3040,22 +3034,7 @@ textarea:focus-visible {
   display: none;
 }
 
-.command-center__dock {
-  margin-top: auto;
-  margin-left: auto;
-  margin-right: auto;
-  margin-bottom: 24px;
-  width: min(1040px, calc(100% - 72px));
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 16px 18px;
-  border-radius: 30px;
-  background: rgba(7, 16, 30, 0.76);
-  border: 1px solid rgba(125, 211, 252, 0.1);
-  box-shadow: 0 22px 54px rgba(2, 6, 23, 0.36);
-  backdrop-filter: blur(22px);
-}
+/* .command-center__dock removed — search is now a direct child of __left */
 
 .command-search {
   padding: 0;
@@ -3132,24 +3111,16 @@ textarea:focus-visible {
   text-align: left;
 }
 
-.command-center__dock-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
 .command-center__metrics {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: auto;
 }
 
 .command-center__metric {
-  min-width: 112px;
   padding: 12px 14px;
-  border-radius: 18px;
+  border-radius: 16px;
   background: rgba(15, 23, 42, 0.58);
   border: 1px solid rgba(125, 211, 252, 0.08);
 }
@@ -3626,14 +3597,6 @@ textarea:focus-visible {
 }
 
 @media (max-width: 1440px) {
-  .command-center__hero {
-    grid-template-columns: minmax(280px, 390px) minmax(170px, 210px);
-  }
-
-  .command-center__dock-footer {
-    align-items: flex-start;
-  }
-
   .results-evidence__grid,
   .knowledge-explorer__body {
     grid-template-columns: 1fr;
@@ -3645,46 +3608,36 @@ textarea:focus-visible {
   }
 }
 
+/* Collapse command-center to single column below 1100px */
+@media (max-width: 1100px) {
+  .command-center {
+    grid-template-columns: 1fr;
+    min-height: auto;
+  }
+
+  .command-center__right {
+    min-height: 280px;
+    order: -1; /* graph on top, controls below */
+  }
+
+  .command-center__left {
+    padding: 24px 24px;
+    border-right: none;
+    border-top: 1px solid rgba(125, 211, 252, 0.08);
+  }
+
+  .command-center__metrics {
+    grid-template-columns: repeat(3, 1fr);
+    margin-top: 0;
+  }
+}
+
 @media (max-width: 1180px) {
   .app-header--command {
     padding: 0 16px;
   }
 
   .header-nav {
-    justify-content: flex-start;
-  }
-
-  .command-center__hero {
-    grid-template-columns: 1fr;
-    justify-content: stretch;
-    padding: 28px 28px 0;
-    pointer-events: auto;
-  }
-
-  .command-center__dock {
-    width: auto;
-    margin-top: 24px;
-    margin-left: 0;
-    margin-right: 0;
-    margin-bottom: 0;
-    padding: 0 28px 28px;
-    background: none;
-    border: none;
-    box-shadow: none;
-    backdrop-filter: none;
-  }
-
-  .command-center__copy {
-    max-width: none;
-  }
-
-  .command-center__intel {
-    width: auto;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-
-  .command-center__dock-footer,
-  .command-center__quickstrip {
     justify-content: flex-start;
   }
 }
@@ -3707,27 +3660,22 @@ textarea:focus-visible {
     padding: 16px;
   }
 
-  .command-center {
-    min-height: auto;
-  }
-
-  .command-center__hero,
-  .command-center__dock {
-    padding-left: 18px;
-    padding-right: 18px;
+  .command-center__right {
+    min-height: 220px;
   }
 
   .command-center__intel {
-    grid-template-columns: 1fr;
-  }
-
-  .command-center__dock {
-    padding-bottom: 18px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    top: auto;
+    bottom: 12px;
+    right: 12px;
+    left: 12px;
+    width: auto;
   }
 
   .command-center__copy h1,
   .knowledge-explorer__intro h1 {
-    font-size: clamp(34px, 11vw, 52px);
+    font-size: clamp(26px, 7vw, 38px);
   }
 }
 

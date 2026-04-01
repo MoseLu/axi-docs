@@ -2,10 +2,15 @@ import { startTransition, useDeferredValue, useEffect, useMemo, useRef, useState
 import ForceGraph3D from 'react-force-graph-3d'
 import * as THREE from 'three'
 import SpriteText from 'three-spritetext'
-import { API_BASE } from '../constants'
+import { pageCopy } from '../config/pageCopy'
+import {
+  getGlobalKnowledgeGraph as loadGlobalKnowledgeGraph,
+  getKnowledgeGraph as loadKnowledgeGraph,
+} from '../lib/knowledgeClient'
 import { FileIcon, FolderIcon, LinkIcon, SearchIcon } from './Icons'
 
 type GlobalGraphMode = 'focus' | 'global' | 'tree' | 'orphan'
+type GraphChrome = 'hero' | 'cockpit' | 'minimal'
 
 interface GlobalGraphNode {
   id: string
@@ -65,11 +70,14 @@ interface GlobalGraphProps {
   sourceId: string
   focusPath?: string | null
   mode: GlobalGraphMode
+  chrome?: GraphChrome
   layout?: 'workspace' | 'dock' | 'hero'
+  filterPaths?: string[]
   selectedBranch?: string | null
   selectedNodeId?: string | null
   onBranchChange?: (branch: string | null) => void
   onNodeSelect?: (nodeId: string | null) => void
+  onNotePreview?: (path: string) => void
   onNavigate?: (path: string) => void
   onTagSelect?: (tag: string) => void
 }
@@ -365,17 +373,81 @@ function simplifyGraphForHero(graph: { nodes: SpaceNode[]; links: SpaceLink[] })
   return { nodes: visibleNodes, links }
 }
 
+function describeNodeKind(kind: SpaceNodeKind) {
+  if (kind === 'current') return pageCopy.graph.badges.current
+  if (kind === 'note') return pageCopy.graph.badges.note
+  if (kind === 'tag') return pageCopy.graph.badges.tag
+  return pageCopy.graph.badges.branch
+}
+
+function filterGraphByPaths(graph: { nodes: SpaceNode[]; links: SpaceLink[] }, filterPaths?: string[]) {
+  if (!filterPaths || filterPaths.length === 0) return graph
+
+  const allowedPaths = new Set(filterPaths)
+  const nodeById = new Map(graph.nodes.map((node) => [node.id, node]))
+  const keepIds = new Set(
+    graph.nodes
+      .filter((node) => (node.kind === 'note' || node.kind === 'current') && node.path && allowedPaths.has(node.path))
+      .map((node) => node.id),
+  )
+
+  if (keepIds.size === 0) {
+    return { nodes: [] as SpaceNode[], links: [] as SpaceLink[] }
+  }
+
+  let changed = true
+  while (changed) {
+    changed = false
+    for (const link of graph.links) {
+      const sourceId = normalizeEndpoint(link.source)
+      const targetId = normalizeEndpoint(link.target)
+      const sourceNode = nodeById.get(sourceId)
+      const targetNode = nodeById.get(targetId)
+      if (!sourceNode || !targetNode) continue
+
+      if (link.kind === 'hierarchy') {
+        if (keepIds.has(sourceId) && !keepIds.has(targetId)) {
+          keepIds.add(targetId)
+          changed = true
+        }
+        if (keepIds.has(targetId) && !keepIds.has(sourceId)) {
+          keepIds.add(sourceId)
+          changed = true
+        }
+        continue
+      }
+
+      if (link.kind === 'tag') {
+        const noteId = sourceNode.kind === 'tag' ? targetId : sourceId
+        const tagId = noteId === sourceId ? targetId : sourceId
+        if (keepIds.has(noteId) && !keepIds.has(tagId)) {
+          keepIds.add(tagId)
+          changed = true
+        }
+      }
+    }
+  }
+
+  return {
+    nodes: graph.nodes.filter((node) => keepIds.has(node.id)),
+    links: graph.links.filter((link) => keepIds.has(normalizeEndpoint(link.source)) && keepIds.has(normalizeEndpoint(link.target))),
+  }
+}
+
 export function GlobalGraph({
   width,
   height,
   sourceId,
   focusPath,
   mode,
+  chrome,
   layout = 'workspace',
+  filterPaths,
   selectedBranch: selectedBranchProp,
   selectedNodeId: selectedNodeIdProp,
   onBranchChange,
   onNodeSelect,
+  onNotePreview,
   onNavigate,
   onTagSelect,
 }: GlobalGraphProps) {
@@ -413,8 +485,10 @@ export function GlobalGraph({
   const [expandedBranches, setExpandedBranches] = useState<Set<string>>(new Set())
   const clickStateRef = useRef<{ id: string; at: number } | null>(null)
   const deferredQuery = useDeferredValue(query.trim().toLowerCase())
+  const resolvedChrome = chrome || (layout === 'hero' ? 'hero' : layout === 'dock' ? 'minimal' : 'cockpit')
   const isDockLayout = layout === 'dock'
-  const isHeroLayout = layout === 'hero'
+  const isHeroChrome = resolvedChrome === 'hero'
+  const isMinimalChrome = resolvedChrome === 'minimal'
   const selectedBranch = selectedBranchProp === undefined ? internalSelectedBranch : selectedBranchProp
   const selectedNodeId = selectedNodeIdProp === undefined ? internalSelectedNodeId : selectedNodeIdProp
 
@@ -435,10 +509,8 @@ export function GlobalGraph({
   useEffect(() => {
     let cancelled = false
     setLoadingGlobal(true)
-    fetch(`${API_BASE}/global-graph?source=${sourceId}`)
-      .then(async response => {
-        if (!response.ok) throw new Error('global graph request failed')
-        const payload = await response.json() as GraphApiResponse
+    loadGlobalKnowledgeGraph(sourceId)
+      .then((payload) => {
         if (!cancelled) {
           setGlobalData({
             nodes: payload.nodes || [],
@@ -475,10 +547,8 @@ export function GlobalGraph({
 
     let cancelled = false
     setLoadingFocus(true)
-    fetch(`${API_BASE}/graph?source=${sourceId}&path=${encodeURIComponent(focusPath)}`)
-      .then(async response => {
-        if (!response.ok) throw new Error('focus graph request failed')
-        const payload = await response.json() as GraphApiResponse
+    loadKnowledgeGraph(sourceId, focusPath)
+      .then((payload) => {
         if (!cancelled) {
           setFocusData({ nodes: payload.nodes || [], edges: payload.edges || [] })
         }
@@ -609,9 +679,14 @@ export function GlobalGraph({
     return { nodes: [...notes, ...tags], links }
   }, [allNotes, deferredQuery, focusData, globalData.edges, globalData.nodes, mode, orphanNotes, selectedBranch, selectedTree, showTags, tree.branchMap])
 
+  const filteredGraph = useMemo(
+    () => filterGraphByPaths(baseGraph, filterPaths),
+    [baseGraph, filterPaths],
+  )
+
   const currentGraph = useMemo(
-    () => isHeroLayout ? simplifyGraphForHero(baseGraph) : baseGraph,
-    [baseGraph, isHeroLayout],
+    () => isHeroChrome ? simplifyGraphForHero(filteredGraph) : filteredGraph,
+    [filteredGraph, isHeroChrome],
   )
 
   const adjacency = useMemo(() => buildAdjacency(currentGraph.links), [currentGraph.links])
@@ -620,9 +695,9 @@ export function GlobalGraph({
     () => currentGraph.nodes.find(node => node.id === selectedNodeId) || null,
     [currentGraph.nodes, selectedNodeId],
   )
-  const showTreePanel = !isHeroLayout && (!isDockLayout || mode === 'tree')
-  const showInspectorPanel = !isHeroLayout && !isDockLayout
-  const showFloatingInspector = isDockLayout && Boolean(selectedNode)
+  const showTreePanel = !isHeroChrome && (!isDockLayout || mode === 'tree')
+  const showInspectorPanel = !isHeroChrome && !isDockLayout && !isMinimalChrome
+  const showFloatingInspector = (isDockLayout || isMinimalChrome) && Boolean(selectedNode)
 
   const selectedNeighbors = useMemo(
     () => selectedNodeId ? adjacency.get(selectedNodeId) || new Set<string>() : new Set<string>(),
@@ -630,11 +705,13 @@ export function GlobalGraph({
   )
 
   const totals = useMemo(() => ({
-    notes: allNotes.length,
-    links: globalData.edges.filter(edge => edge.kind === 'wikilink').length,
-    tags: globalData.nodes.filter(node => node.kind === 'tag').length,
-    orphans: orphanNotes.length,
-  }), [allNotes.length, globalData.edges, globalData.nodes, orphanNotes.length])
+    notes: currentGraph.nodes.filter(node => node.kind === 'note' || node.kind === 'current').length,
+    links: currentGraph.links.filter(edge => edge.kind === 'wikilink').length,
+    tags: currentGraph.nodes.filter(node => node.kind === 'tag').length,
+    orphans: filterPaths && filterPaths.length > 0
+      ? orphanNotes.filter(node => filterPaths.includes(node.path || '')).length
+      : orphanNotes.length,
+  }), [currentGraph.links, currentGraph.nodes, filterPaths, orphanNotes])
 
   useEffect(() => {
     const controls = graphRef.current?.controls?.()
@@ -642,14 +719,14 @@ export function GlobalGraph({
     controls.enableDamping = true
     controls.dampingFactor = 0.08
     controls.autoRotate = autoRotate
-    controls.autoRotateSpeed = isHeroLayout ? 0.2 : 0.32
+    controls.autoRotateSpeed = isHeroChrome ? 0.2 : 0.32
     controls.minDistance = 120
     controls.maxDistance = 2400
-  }, [autoRotate, currentGraph.nodes.length, isHeroLayout])
+  }, [autoRotate, currentGraph.nodes.length, isHeroChrome])
 
   useEffect(() => {
     const scene = graphRef.current?.scene?.()
-    if (!scene || scene.getObjectByName('knowledge-space-grid')) return
+    if (!scene || scene.getObjectByName('knowledge-space-ambient')) return
 
     scene.fog = new THREE.FogExp2(GRAPH_BACKDROP, 0.00065)
 
@@ -666,23 +743,18 @@ export function GlobalGraph({
     accentLight.name = 'knowledge-space-accent'
     accentLight.position.set(-120, -60, 180)
     scene.add(accentLight)
-
-    const grid = new THREE.GridHelper(1800, 28, '#1f4f82', '#10263f')
-    grid.name = 'knowledge-space-grid'
-    grid.position.y = -180
-    scene.add(grid)
   }, [currentGraph.nodes.length])
 
   useEffect(() => {
     if (currentGraph.nodes.length === 0) return
     const timeout = window.setTimeout(() => {
-      graphRef.current?.zoomToFit?.(700, isHeroLayout ? 8 : 80)
+      graphRef.current?.zoomToFit?.(700, isHeroChrome ? 8 : 80)
     }, 220)
     return () => window.clearTimeout(timeout)
-  }, [currentGraph.links.length, currentGraph.nodes.length, isHeroLayout, mode])
+  }, [currentGraph.links.length, currentGraph.nodes.length, isHeroChrome, mode])
 
   useEffect(() => {
-    if (!isHeroLayout || currentGraph.nodes.length === 0) return
+    if (!isHeroChrome || currentGraph.nodes.length === 0) return
 
     const timeout = window.setTimeout(() => {
       const positionedNodes = currentGraph.nodes.filter((node) => (
@@ -736,7 +808,7 @@ export function GlobalGraph({
     }, 1100)
 
     return () => window.clearTimeout(timeout)
-  }, [currentGraph.nodes, isHeroLayout])
+  }, [currentGraph.nodes, isHeroChrome])
 
   useEffect(() => {
     if (!selectedNodeId && currentGraph.nodes.length > 0) {
@@ -763,6 +835,9 @@ export function GlobalGraph({
       startTransition(() => {
         setSelectedBranch(node.path || null)
       })
+    }
+    if ((node.kind === 'note' || node.kind === 'current') && node.path) {
+      onNotePreview?.(node.path)
     }
     focusNode(node)
   }
@@ -826,8 +901,13 @@ export function GlobalGraph({
               style={{ paddingLeft: `${branch.depth * 12 + 36}px` }}
               onClick={() => {
                 setSelectedNodeId(note.id)
-                onNavigate?.(note.path || note.id)
+                if (note.path) {
+                  onNotePreview?.(note.path)
+                } else {
+                  onNavigate?.(note.id)
+                }
               }}
+              onDoubleClick={() => onNavigate?.(note.path || note.id)}
               title={note.path}
               type="button"
             >
@@ -846,7 +926,7 @@ export function GlobalGraph({
     if (!selectedNode) {
       return (
         <div className="graph-inspector graph-inspector--empty">
-          <p>点击一个节点查看路径、标签和快速操作。</p>
+          <p>{pageCopy.graph.labels.inspectorEmpty}</p>
         </div>
       )
     }
@@ -854,10 +934,10 @@ export function GlobalGraph({
     return (
       <div className="graph-inspector">
         <div className={`graph-inspector__badge graph-inspector__badge--${selectedNode.kind}`}>
-          {selectedNode.kind === 'current' && '当前文档'}
-          {selectedNode.kind === 'note' && '知识文档'}
-          {selectedNode.kind === 'tag' && '标签节点'}
-          {selectedNode.kind === 'branch' && '树形分支'}
+          {selectedNode.kind === 'current' && pageCopy.graph.badges.current}
+          {selectedNode.kind === 'note' && pageCopy.graph.badges.note}
+          {selectedNode.kind === 'tag' && pageCopy.graph.badges.tag}
+          {selectedNode.kind === 'branch' && pageCopy.graph.badges.branch}
         </div>
         <h4 className="graph-inspector__title">{formatLabel(selectedNode.label)}</h4>
         {selectedNode.path && (
@@ -885,7 +965,7 @@ export function GlobalGraph({
           </div>
           <div className="graph-fact">
             <span>类型</span>
-            <strong>{selectedNode.kind}</strong>
+            <strong>{describeNodeKind(selectedNode.kind)}</strong>
           </div>
           {selectedNode.count !== undefined && (
             <div className="graph-fact">
@@ -896,19 +976,24 @@ export function GlobalGraph({
         </div>
 
         <div className="graph-inspector__actions">
+          {(selectedNode.kind === 'note' || selectedNode.kind === 'current') && selectedNode.path && onNotePreview && (
+            <button className="graph-action" onClick={() => onNotePreview(selectedNode.path!)} type="button">
+              {pageCopy.graph.labels.preview}
+            </button>
+          )}
           {(selectedNode.kind === 'note' || selectedNode.kind === 'current') && selectedNode.path && (
             <button className="graph-action" onClick={() => onNavigate?.(selectedNode.path!)} type="button">
-              打开文档
+              {pageCopy.graph.labels.open}
             </button>
           )}
           {selectedNode.kind === 'tag' && (
             <button className="graph-action" onClick={() => onTagSelect?.(selectedNode.label)} type="button">
-              以此标签筛选
+              {pageCopy.graph.labels.filterByTag}
             </button>
           )}
           {selectedNode.kind === 'branch' && (
             <button className="graph-action" onClick={() => setSelectedBranch(selectedNode.path || null)} type="button">
-              聚焦该分支
+              {pageCopy.graph.labels.focusBranch}
             </button>
           )}
         </div>
@@ -920,7 +1005,7 @@ export function GlobalGraph({
     return (
       <div className="graph-space graph-space--loading" style={{ width, height }}>
         <div className="spinner" style={{ width: 24, height: 24 }} />
-        <span>构建 3D 知识空间中...</span>
+        <span>{pageCopy.graph.loading}</span>
       </div>
     )
   }
@@ -929,7 +1014,7 @@ export function GlobalGraph({
     return (
       <div className="graph-space graph-space--empty" style={{ width, height }}>
         <FileIcon />
-        <p>先选择一篇文档，再进入聚焦图谱。</p>
+        <p>{pageCopy.graph.emptyFocus}</p>
       </div>
     )
   }
@@ -938,18 +1023,18 @@ export function GlobalGraph({
     return (
       <div className="graph-space graph-space--empty" style={{ width, height }}>
         <SearchIcon />
-        <p>当前筛选下没有可展示的节点。</p>
+        <p>{pageCopy.graph.emptyFiltered}</p>
       </div>
     )
   }
 
-  if (isHeroLayout) {
+  if (isHeroChrome) {
     return (
       <div className="graph-space graph-space--hero" style={{ width, height }}>
         <section className="graph-space__stage graph-space__stage--hero">
           <div className="graph-stage__overlay graph-stage__overlay--hero">
-            <div className="graph-stage__hint">拖拽旋转，单击聚焦，双击打开证据</div>
-            <div className="graph-stage__mode">Command Tree</div>
+            <div className="graph-stage__hint">{pageCopy.graph.heroHint}</div>
+            <div className="graph-stage__mode">{pageCopy.graph.heroMode}</div>
           </div>
           <ForceGraph3D
             ref={graphRef as never}
@@ -1001,6 +1086,7 @@ export function GlobalGraph({
       className={[
         'graph-space',
         isDockLayout ? 'graph-space--dock' : 'graph-space--workspace',
+        `graph-space--chrome-${resolvedChrome}`,
         showTreePanel ? 'graph-space--tree-panel' : 'graph-space--no-tree',
       ].join(' ')}
       style={{ width, height }}
@@ -1008,16 +1094,16 @@ export function GlobalGraph({
       <div className="graph-space__topbar">
         <div>
           <div className="graph-space__eyebrow">
-            {mode === 'focus' && 'Document Focus'}
-            {mode === 'global' && 'Knowledge Galaxy'}
-            {mode === 'tree' && 'Knowledge Tree'}
-            {mode === 'orphan' && 'Orphan Radar'}
+            {mode === 'focus' && pageCopy.graph.labels.focusEyebrow}
+            {mode === 'global' && pageCopy.graph.labels.globalEyebrow}
+            {mode === 'tree' && pageCopy.graph.labels.treeEyebrow}
+            {mode === 'orphan' && pageCopy.graph.labels.orphanEyebrow}
           </div>
           <h3 className="graph-space__title">
-            {mode === 'focus' && '局部关系星图'}
-            {mode === 'global' && '全局知识星图'}
-            {mode === 'tree' && '树形知识架构'}
-            {mode === 'orphan' && '孤岛知识雷达'}
+            {mode === 'focus' && pageCopy.graph.labels.focusTitle}
+            {mode === 'global' && pageCopy.graph.labels.globalTitle}
+            {mode === 'tree' && pageCopy.graph.labels.treeTitle}
+            {mode === 'orphan' && pageCopy.graph.labels.orphanTitle}
           </h3>
         </div>
 
@@ -1028,7 +1114,7 @@ export function GlobalGraph({
               aria-label="筛选图谱节点"
               value={query}
               onChange={event => setQuery(event.target.value)}
-              placeholder="筛选路径 / 标签 / 文档名"
+              placeholder={pageCopy.graph.labels.searchPlaceholder}
             />
           </label>
 
@@ -1037,18 +1123,18 @@ export function GlobalGraph({
             onClick={() => setShowTags(value => !value)}
             type="button"
           >
-            标签层
+            {pageCopy.graph.labels.tagsToggle}
           </button>
           <button
             className={`graph-chip${autoRotate ? ' active' : ''}`}
             onClick={() => setAutoRotate(value => !value)}
             type="button"
           >
-            自旋
+            {pageCopy.graph.labels.rotateToggle}
           </button>
           {selectedBranch && (
             <button className="graph-chip" onClick={() => setSelectedBranch(null)} type="button">
-              清除分支
+              {pageCopy.graph.labels.clearBranch}
             </button>
           )}
         </div>
@@ -1056,19 +1142,19 @@ export function GlobalGraph({
 
       <div className="graph-space__stats">
         <div className="graph-metric">
-          <span>文档</span>
+          <span>{pageCopy.graph.labels.documents}</span>
           <strong>{totals.notes}</strong>
         </div>
         <div className="graph-metric">
-          <span>连接</span>
+          <span>{pageCopy.graph.labels.links}</span>
           <strong>{totals.links}</strong>
         </div>
         <div className="graph-metric">
-          <span>标签</span>
+          <span>{pageCopy.graph.labels.tags}</span>
           <strong>{totals.tags}</strong>
         </div>
         <div className="graph-metric">
-          <span>孤立</span>
+          <span>{pageCopy.graph.labels.orphans}</span>
           <strong>{totals.orphans}</strong>
         </div>
         <div className="graph-legend">
@@ -1083,7 +1169,7 @@ export function GlobalGraph({
           <aside className="graph-space__tree">
             <div className="graph-panel__header">
               <FolderIcon />
-              <span>知识树</span>
+              <span>{pageCopy.graph.treePanel}</span>
             </div>
             <div className="graph-tree">
               <button
@@ -1091,13 +1177,13 @@ export function GlobalGraph({
                 onClick={() => setSelectedBranch(null)}
                 type="button"
               >
-                <span className="graph-tree-root__title">全库视图</span>
+                <span className="graph-tree-root__title">{pageCopy.graph.labels.rootView}</span>
                 <span className="graph-tree-count">{totals.notes}</span>
               </button>
               {renderTreeNodes(tree.rootChildren)}
               {tree.looseNotes.length > 0 && (
                 <div className="graph-tree-node">
-                  <div className="graph-tree-section">根文档</div>
+                  <div className="graph-tree-section">{pageCopy.graph.labels.looseDocs}</div>
                   {tree.looseNotes.map(note => (
                     <button
                       key={note.id}
@@ -1105,8 +1191,13 @@ export function GlobalGraph({
                       style={{ paddingLeft: '18px' }}
                       onClick={() => {
                         setSelectedNodeId(note.id)
-                        onNavigate?.(note.path || note.id)
+                        if (note.path) {
+                          onNotePreview?.(note.path)
+                        } else {
+                          onNavigate?.(note.id)
+                        }
                       }}
+                      onDoubleClick={() => onNavigate?.(note.path || note.id)}
                       title={note.path}
                       type="button"
                     >
@@ -1122,11 +1213,15 @@ export function GlobalGraph({
 
         <section className="graph-space__stage">
           <div className="graph-stage__overlay">
-            <div className="graph-stage__hint">
-              拖拽旋转，滚轮缩放，单击聚焦，双击打开证据
-            </div>
+            <div className="graph-stage__hint">{pageCopy.graph.stageHint}</div>
             <div className="graph-stage__mode">
-              {mode === 'tree' ? '3D Tree' : mode === 'orphan' ? 'Islands' : 'Force Space'}
+              {mode === 'focus'
+                ? pageCopy.graph.labels.focusMode
+                : mode === 'tree'
+                ? pageCopy.graph.labels.treeMode
+                : mode === 'orphan'
+                  ? pageCopy.graph.labels.orphanMode
+                  : pageCopy.graph.labels.globalMode}
             </div>
           </div>
           <ForceGraph3D
@@ -1206,7 +1301,7 @@ export function GlobalGraph({
           <aside className="graph-space__inspector">
             <div className="graph-panel__header">
               <LinkIcon />
-              <span>交互面板</span>
+              <span>{pageCopy.graph.inspectorPanel}</span>
             </div>
             {renderInspectorContent()}
           </aside>

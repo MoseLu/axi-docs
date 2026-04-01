@@ -1,5 +1,7 @@
 import { getKnowledgeCategoryLabel } from '../config/knowledgeRules'
+import { pageCopy } from '../config/pageCopy'
 import { DocSource, KnowledgeCatalog, KnowledgeCatalogSection, SearchResult, SelectedFile } from '../types'
+import { CompactEmptyState, MetricPill, RailPanel, SectionHeader } from './CockpitPrimitives'
 import { DocumentView } from './DocumentView'
 import { BookIcon, FileIcon, GridIcon, LinkIcon } from './Icons'
 import { QuickKnowledgeItemLike } from './HomeCommandCenter'
@@ -78,15 +80,13 @@ export function ResultsEvidenceSection({
   return (
     <section className="results-evidence">
       <div className="results-evidence__header">
-        <div>
-          <div className="results-evidence__eyebrow">Answers & Evidence</div>
-          <h2>{searchQuery.trim() ? '答案候选与原文证据' : '从经验分层进入证据阅读'}</h2>
-          <p>
-            {searchQuery.trim()
-              ? '先判断命中的经验层，再打开最可靠的原文证据。'
-              : '首页第二屏专注于答案候选和证据阅读，不再和图谱舞台争夺主视线。'}
-          </p>
-        </div>
+        <SectionHeader
+          description={searchQuery.trim()
+            ? '先判断命中的经验层，再打开最可靠的原文证据。'
+            : pageCopy.results.description}
+          eyebrow={pageCopy.results.eyebrow}
+          title={<h2>{searchQuery.trim() ? pageCopy.results.title : pageCopy.results.idleTitle}</h2>}
+        />
         <button className="results-evidence__explore" onClick={onOpenExplorer} type="button">
           进入图谱探索
         </button>
@@ -114,19 +114,15 @@ export function ResultsEvidenceSection({
       </div>
 
       <div className="results-evidence__grid">
-        <section className="results-evidence__panel results-evidence__panel--answers">
-          <div className="panel-heading">
-            <div>
-              <div className="panel-eyebrow">Candidate Radar</div>
-              <h2>{searchQuery.trim() ? '查询结果与经验分层' : '经验分层总览'}</h2>
-              <p>
-                {searchQuery.trim()
-                  ? '命中结果按照经验层重新归组，方便先做判断再打开证据。'
-                  : '从项目、架构、规范、组件和方案层快速判断知识库是否已有成熟沉淀。'}
-              </p>
-            </div>
-            <GridIcon />
-          </div>
+        <RailPanel className="results-evidence__panel results-evidence__panel--answers" tone="secondary">
+          <SectionHeader
+            actions={<GridIcon />}
+            description={searchQuery.trim()
+              ? '命中结果按照经验层重新归组，方便先做判断再打开证据。'
+              : '从项目、架构、规范、组件和方案层快速判断知识库是否已有成熟沉淀。'}
+            eyebrow="答案工作台"
+            title={<h2>{searchQuery.trim() ? '查询结果与经验分层' : '经验分层总览'}</h2>}
+          />
 
           {searchQuery.trim() ? (
             <>
@@ -158,8 +154,7 @@ export function ResultsEvidenceSection({
                       onClick={() => setActiveCategory(activeCategory === group.key ? null : group.key)}
                       type="button"
                     >
-                      <span>{getKnowledgeCategoryLabel(group.key)}</span>
-                      <strong>{group.count}</strong>
+                      <MetricPill accent="blue" label={getKnowledgeCategoryLabel(group.key)} value={group.count} />
                     </button>
                   ))}
                 </div>
@@ -205,31 +200,25 @@ export function ResultsEvidenceSection({
                   ))}
                 </div>
               ) : (
-                <div className="workbench-empty">
-                  <BookIcon />
-                  <div>
-                    <strong>还没有命中结果</strong>
-                    <p>换一个关键词，或者从经验分层直接进入已有沉淀。</p>
-                  </div>
-                </div>
+                <CompactEmptyState
+                  icon={<BookIcon />}
+                  title="还没有命中结果"
+                  description="换一个关键词，或者从经验分层直接进入已有沉淀。"
+                />
               )}
             </>
           ) : catalogLoading ? (
-            <div className="workbench-empty">
-              <div className="spinner" />
-              <div>
-                <strong>正在整理知识库</strong>
-                <p>读取分类索引、标签和最近沉淀的经验。</p>
-              </div>
-            </div>
+            <CompactEmptyState
+              icon={<div className="spinner" />}
+              title="正在整理知识库"
+              description="读取分类索引、标签和最近沉淀的经验。"
+            />
           ) : catalogError ? (
-            <div className="workbench-empty">
-              <BookIcon />
-              <div>
-                <strong>知识目录加载失败</strong>
-                <p>{catalogError}</p>
-              </div>
-            </div>
+            <CompactEmptyState
+              icon={<BookIcon />}
+              title="知识目录加载失败"
+              description={catalogError}
+            />
           ) : (
             <div className="section-board">
               {filteredSections.map((section) => (
@@ -263,21 +252,17 @@ export function ResultsEvidenceSection({
               ))}
             </div>
           )}
-        </section>
+        </RailPanel>
 
-        <section className="results-evidence__panel results-evidence__panel--evidence">
-          <div className="panel-heading">
-            <div>
-              <div className="panel-eyebrow">Evidence Dock</div>
-              <h2>{selectedFile ? '原文证据' : '待选证据'}</h2>
-              <p>
-                {selectedFile
-                  ? '保持原文证据、frontmatter 与双向链接在同一阅读区，减少来回跳转。'
-                  : '打开任意答案候选后，这里会变成证据阅读区；没有选中时展示最近入口。'}
-              </p>
-            </div>
-            <LinkIcon />
-          </div>
+        <RailPanel className="results-evidence__panel results-evidence__panel--evidence" tone="primary">
+          <SectionHeader
+            actions={<LinkIcon />}
+            description={selectedFile
+              ? '保持原文证据、frontmatter 与双向链接在同一阅读区，减少来回跳转。'
+              : '打开任意答案候选后，这里会变成证据阅读区；没有选中时展示最近入口。'}
+            eyebrow="证据阅读区"
+            title={<h2>{selectedFile ? '原文证据' : '待选证据'}</h2>}
+          />
 
           <div className="evidence-shell evidence-shell--command">
             {selectedFile ? (
@@ -294,13 +279,12 @@ export function ResultsEvidenceSection({
               />
             ) : (
               <div className="evidence-empty">
-                <div className="evidence-empty__intro">
-                  <FileIcon />
-                  <div>
-                    <strong>还没有锁定证据</strong>
-                    <p>从左侧答案候选中打开一份文档，这里就会进入证据阅读模式。</p>
-                  </div>
-                </div>
+                <CompactEmptyState
+                  className="evidence-empty__intro"
+                  icon={<FileIcon />}
+                  title="还没有锁定证据"
+                  description="从左侧答案候选中打开一份文档，这里就会进入证据阅读模式。"
+                />
 
                 <div className="evidence-suggestions">
                   <div className="evidence-suggestions__header">
@@ -347,7 +331,7 @@ export function ResultsEvidenceSection({
               </div>
             )}
           </div>
-        </section>
+        </RailPanel>
       </div>
     </section>
   )

@@ -1,21 +1,28 @@
 import { useEffect, useRef, useState } from 'react'
+import { pageCopy } from '../config/pageCopy'
 import { BookIcon, RefreshIcon, SearchIcon } from './Icons'
 
 interface HeaderProps {
-  activeSourceName: string
-  onNavigateExplorer: () => void
+  contextLabel?: string
+  activeSourceName?: string
+  onNavigateCategory?: () => void
+  onNavigateExplorer?: () => void
   onNavigateHome: () => void
+  onNavigateSearch?: () => void
   onRefresh: () => void
   onSearch: (query: string) => void
-  pageMode: 'home' | 'explorer'
+  pageMode: 'home' | 'category' | 'search' | 'document' | 'explorer'
   searchQuery: string
   searching: boolean
 }
 
 export function Header({
+  contextLabel,
   activeSourceName,
+  onNavigateCategory,
   onNavigateExplorer,
   onNavigateHome,
+  onNavigateSearch,
   onRefresh,
   onSearch,
   pageMode,
@@ -24,6 +31,10 @@ export function Header({
 }: HeaderProps) {
   const [inputValue, setInputValue] = useState(searchQuery)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const resolvedContextLabel = contextLabel || activeSourceName || pageCopy.header.defaultContext
+  const resolvedNavigateCategory = onNavigateCategory || onNavigateExplorer || (() => undefined)
+  const resolvedNavigateSearch = onNavigateSearch || (() => undefined)
+  const showsSearchInput = pageMode === 'search' || pageMode === 'explorer'
 
   useEffect(() => {
     setInputValue(searchQuery)
@@ -57,35 +68,45 @@ export function Header({
     <header className="app-header app-header--command">
       <div className="app-logo">
         <BookIcon />
-        <span>Info Hub</span>
+        <div className="app-logo__copy">
+          <span>{pageCopy.header.brandPrimary}</span>
+          <small>{pageCopy.header.brandSecondary}</small>
+        </div>
       </div>
 
       <div className="header-nav">
         <button
           className={`header-nav__button${pageMode === 'home' ? ' active' : ''}`}
           onClick={onNavigateHome}
-          aria-label="打开知识指挥中心"
+          aria-label="打开知识总览"
         >
-          指挥中心
+          首页
         </button>
         <button
-          className={`header-nav__button${pageMode === 'explorer' ? ' active' : ''}`}
-          onClick={onNavigateExplorer}
-          aria-label="打开图谱探索"
+          className={`header-nav__button${pageMode === 'category' || pageMode === 'explorer' ? ' active' : ''}`}
+          onClick={resolvedNavigateCategory}
+          aria-label="打开分类图谱"
         >
-          图谱探索
+          分类图谱
         </button>
-        <span className="header-source-pill" aria-label={`当前数据源 ${activeSourceName}`}>
-          {activeSourceName}
+        <button
+          className={`header-nav__button${pageMode === 'search' ? ' active' : ''}`}
+          onClick={resolvedNavigateSearch}
+          aria-label="打开全局搜索"
+        >
+          搜索
+        </button>
+        <span className="header-source-pill" aria-label={`当前上下文 ${resolvedContextLabel}`}>
+          {resolvedContextLabel}
         </span>
       </div>
 
       <div className="header-actions">
-        {pageMode === 'explorer' ? (
+        {showsSearchInput ? (
           <label className="header-search header-search--explorer" htmlFor="header-search-input">
-            <span className="search-icon-wrap" data-testid="search-icon-wrap">
-              {searching ? (
-                <span className="search-spinner" />
+          <span className="search-icon-wrap" data-testid="search-icon-wrap">
+            {searching ? (
+              <span className="search-spinner" />
               ) : (
                 <SearchIcon />
               )}
@@ -95,7 +116,7 @@ export function Header({
               aria-label="搜索知识库"
               className="header-search-input"
               type="text"
-              placeholder="搜索路径、标签或文档"
+              placeholder={pageCopy.header.searchPlaceholder}
               value={inputValue}
               onChange={(event) => handleInput(event.target.value)}
               onKeyDown={(event) => {
@@ -125,11 +146,11 @@ export function Header({
         ) : (
           <button
             className="header-command-launcher"
-            onClick={focusCommandSearch}
-            aria-label="聚焦首页搜索指令栏"
+            onClick={pageMode === 'home' ? focusCommandSearch : resolvedNavigateSearch}
+            aria-label={pageMode === 'home' ? '聚焦首页搜索指令栏' : '打开全局搜索页'}
           >
             <SearchIcon />
-            <span>{searchQuery ? `继续搜索 “${searchQuery}”` : '搜索知识库'}</span>
+            <span>{searchQuery ? `继续搜索 “${searchQuery}”` : pageCopy.header.commandSearchIdle}</span>
           </button>
         )}
 

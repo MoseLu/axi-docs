@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
+import { pageCopy } from '../config/pageCopy'
 
 const GlobalGraph = lazy(async () => {
   const module = await import('./GlobalGraph')
@@ -73,11 +74,12 @@ export function HeroKnowledgeScene({
           fallback={(
             <div className="hero-knowledge-scene__fallback">
               <div className="spinner" />
-              <span>正在构建首页知识树场景...</span>
+              <span>{pageCopy.graph.loading}</span>
             </div>
           )}
         >
           <GlobalGraph
+            chrome="hero"
             focusPath={focusPath}
             height={viewport.height}
             layout="hero"
@@ -94,8 +96,8 @@ export function HeroKnowledgeScene({
           <div className="hero-knowledge-scene__poster-orbit hero-knowledge-scene__poster-orbit--one" />
           <div className="hero-knowledge-scene__poster-orbit hero-knowledge-scene__poster-orbit--two" />
           <div className="hero-knowledge-scene__poster-copy">
-            <strong>Knowledge Tree 3D</strong>
-            <span>首屏空闲后加载高密度图谱，先把主内容稳定渲染出来。</span>
+            <strong>{pageCopy.graph.heroPosterTitle}</strong>
+            <span>{pageCopy.graph.heroPosterDescription}</span>
           </div>
         </div>
       )}

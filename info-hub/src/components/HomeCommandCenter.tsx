@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
+import { pageCopy } from '../config/pageCopy'
 import { DocSource, KnowledgeCatalog, SelectedFile } from '../types'
+import { CompactEmptyState, MetricPill, PageShell, RailPanel, SectionHeader } from './CockpitPrimitives'
 import { FileIcon, SearchIcon, TagIcon } from './Icons'
 import { HeroKnowledgeScene } from './HeroKnowledgeScene'
 
@@ -43,6 +45,7 @@ export function HomeCommandCenter({
   selectedFile,
   promptDeck,
   spotlightCards,
+  quickOpenItems,
   onSearch,
   onOpenItem,
   onOpenExplorer,
@@ -53,6 +56,7 @@ export function HomeCommandCenter({
   const [inputValue, setInputValue] = useState(searchQuery)
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const graphMode = selectedFile ? 'focus' : searchQuery.trim() ? 'global' : 'tree'
+  const hasSpotlightCards = spotlightCards.length > 0
 
   useEffect(() => {
     setInputValue(searchQuery)
@@ -72,39 +76,41 @@ export function HomeCommandCenter({
   }
 
   return (
-    <section className="command-center">
-      {/* ── Left panel: copy + search + metrics ── */}
-      <div className="command-center__left">
-        <div className="command-center__copy">
-          <div className="command-center__eyebrow">{source.name}</div>
-          <h1>知识指挥中心</h1>
-          <p>先搜答案，再沿着 3D 知识树回到上下文和原文证据。</p>
-
-          <div className="command-center__actions">
-            <button
-              className="command-center__action command-center__action--primary"
-              onClick={onOpenExplorer}
-              type="button"
-            >
-              进入图谱探索
-            </button>
-            {selectedFile && (
-              <button
-                className="command-center__action"
-                onClick={() => onOpenItem(selectedFile.sourceId, selectedFile.path)}
-                type="button"
-              >
-                查看当前证据
-              </button>
+    <PageShell className="command-center command-center--cockpit">
+      <aside className="command-center__left">
+        <RailPanel className="command-center__copy" tone="primary">
+          <SectionHeader
+            actions={(
+              <div className="command-center__actions">
+                <button
+                  className="command-center__action command-center__action--primary"
+                  onClick={onOpenExplorer}
+                  type="button"
+                >
+                  {pageCopy.home.actionPrimary}
+                </button>
+                {selectedFile && (
+                  <button
+                    className="command-center__action"
+                    onClick={() => onOpenItem(selectedFile.sourceId, selectedFile.path)}
+                    type="button"
+                  >
+                    {pageCopy.home.actionSecondary}
+                  </button>
+                )}
+              </div>
             )}
-          </div>
+            description={pageCopy.home.description}
+            eyebrow={source.name || pageCopy.home.eyebrow}
+            title={<h1>{pageCopy.home.title}</h1>}
+          />
 
           {(searchQuery.trim() || activeTag || selectedFile) && (
             <div className="command-center__states">
               {searchQuery.trim() && (
                 <span className="command-center__state-pill">
                   <SearchIcon />
-                  <span>当前检索 "{searchQuery}"</span>
+                  <span>当前检索 “{searchQuery}”</span>
                 </span>
               )}
               {activeTag && (
@@ -121,18 +127,21 @@ export function HomeCommandCenter({
               )}
             </div>
           )}
-        </div>
+        </RailPanel>
 
-        <div className="command-search">
-          <label className="command-search__label" htmlFor="command-search">
-            搜索知识库
-          </label>
+        <RailPanel className="command-search" tone="secondary">
+          <SectionHeader
+            compact
+            description="用一句问题、一个模块名或一个标签，直接缩小答案范围。"
+            eyebrow={pageCopy.home.commandLabel}
+            title={<strong>把问题送进知识库</strong>}
+          />
           <div className="command-search__field">
             <SearchIcon />
             <input
               id="command-search"
               aria-label="搜索知识库指令栏"
-              placeholder="搜索问题、组件、规范、ADR、排障记录"
+              placeholder={pageCopy.home.commandPlaceholder}
               type="text"
               value={inputValue}
               onChange={(event) => handleInput(event.target.value)}
@@ -156,43 +165,84 @@ export function HomeCommandCenter({
               </button>
             ))}
           </div>
-        </div>
+        </RailPanel>
 
         <div className="command-center__metrics">
-          <div className="command-center__metric">
-            <span>知识文档</span>
-            <strong>{catalog?.totalDocs || 0}</strong>
-          </div>
-          <div className="command-center__metric">
-            <span>经验分层</span>
-            <strong>{catalog?.sections.length || 0}</strong>
-          </div>
-          <div className="command-center__metric">
-            <span>高频标签</span>
-            <strong>{catalog?.topTags.length || 0}</strong>
-          </div>
+          <MetricPill accent="blue" label={pageCopy.home.metrics[0]} value={catalog?.totalDocs || 0} />
+          <MetricPill accent="teal" label={pageCopy.home.metrics[1]} value={catalog?.sections.length || 0} />
+          <MetricPill accent="amber" label={pageCopy.home.metrics[2]} value={catalog?.topTags.length || 0} />
         </div>
-      </div>
 
-      {/* ── Right panel: 3D graph + intel cards ── */}
-      <div className="command-center__right">
-        <HeroKnowledgeScene
-          focusPath={graphFocusPath}
-          mode={graphMode}
-          onNavigate={(path) => onOpenItem(source.id, path)}
-          onTagSelect={(tag) => onTagSelect(tag)}
-          sourceId={source.id}
-        />
-        <div className="command-center__scrim" />
-        <div className="command-center__intel">
-          {spotlightCards.map((card) => (
-            <div key={card.key} className="command-center__intel-card">
-              <span>{card.title}</span>
-              <strong>{card.count}</strong>
+        <RailPanel className="command-center__quickstrip" tone="ghost">
+          <SectionHeader
+            compact
+            eyebrow="快速入口"
+            meta={<span>{quickOpenItems.length} 条</span>}
+            title={<strong>最近可直接打开的知识节点</strong>}
+          />
+          {quickOpenItems.length > 0 ? (
+            <div className="command-center__quicklist">
+              {quickOpenItems.slice(0, 4).map((item) => (
+                <button
+                  key={`${item.sourceId}:${item.path}`}
+                  className="command-center__quickitem"
+                  onClick={() => onOpenItem(item.sourceId, item.path)}
+                  type="button"
+                >
+                  <div>
+                    <strong>{item.title || item.name}</strong>
+                    <span>{item.path}</span>
+                  </div>
+                </button>
+              ))}
             </div>
-          ))}
+          ) : (
+            <CompactEmptyState
+              title="还没有快速入口"
+              description="加载到目录后，这里会显示最近最值得直接进入的文档。"
+            />
+          )}
+        </RailPanel>
+      </aside>
+
+      <div className={`command-center__right${hasSpotlightCards ? '' : ' command-center__right--full'}`}>
+        <div className="command-center__graph-shell">
+          <SectionHeader
+            className="command-center__graph-header"
+            compact
+            description={pageCopy.home.stageHint}
+            eyebrow={pageCopy.home.stageLabel}
+            meta={<span>{searchQuery.trim() ? '搜索联动中' : '关系总览'}</span>}
+            title={<strong>知识关系主舞台</strong>}
+          />
+          <div className="command-center__graph">
+            <HeroKnowledgeScene
+              focusPath={graphFocusPath}
+              mode={graphMode}
+              onNavigate={(path) => onOpenItem(source.id, path)}
+              onTagSelect={(tag) => onTagSelect(tag)}
+              sourceId={source.id}
+            />
+            <div className="command-center__scrim" />
+          </div>
         </div>
+
+        {hasSpotlightCards && (
+          <aside className="command-center__aside" aria-label="知识情报摘要">
+            <div className="command-center__intel">
+              {spotlightCards.map((card) => (
+                <MetricPill
+                  key={card.key}
+                  accent="blue"
+                  label={card.title}
+                  subtle={card.description}
+                  value={card.count}
+                />
+              ))}
+            </div>
+          </aside>
+        )}
       </div>
-    </section>
+    </PageShell>
   )
 }

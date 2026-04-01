@@ -21,9 +21,14 @@ interface KnowledgeExplorerProps {
   activeTag: string | null
   quickOpenItems: QuickKnowledgeItemLike[]
   graphFocusPath?: string | null
+  filterPaths?: string[]
   view: ExplorerView
   selectedBranch: string | null
   selectedNodeId: string | null
+  eyebrow?: string
+  title?: string
+  description?: string
+  backLabel?: string
   onViewChange: (view: ExplorerView) => void
   onBranchChange: (branch: string | null) => void
   onNodeChange: (node: string | null) => void
@@ -54,9 +59,14 @@ export function KnowledgeExplorer({
   activeTag,
   quickOpenItems,
   graphFocusPath,
+  filterPaths,
   view,
   selectedBranch,
   selectedNodeId,
+  eyebrow,
+  title,
+  description,
+  backLabel,
   onViewChange,
   onBranchChange,
   onNodeChange,
@@ -90,12 +100,12 @@ export function KnowledgeExplorer({
       <div className="knowledge-explorer__header">
         <div className="knowledge-explorer__intro">
           <button className="knowledge-explorer__back" onClick={onNavigateHome} type="button">
-            返回指挥中心
+            {backLabel || '返回指挥中心'}
           </button>
           <div>
-            <div className="knowledge-explorer__eyebrow">{source.name}</div>
-            <h1>Knowledge Explorer</h1>
-            <p>把树构、路径和孤岛切换到一张全屏探索舞台里，用证据抽屉承接阅读。</p>
+            <div className="knowledge-explorer__eyebrow">{eyebrow || source.name}</div>
+            <h1>{title || 'Knowledge Explorer'}</h1>
+            <p>{description || '把树构、路径和孤岛切换到一张全屏探索舞台里，用证据抽屉承接阅读。'}</p>
           </div>
         </div>
 
@@ -151,6 +161,7 @@ export function KnowledgeExplorer({
               selectedBranch={selectedBranch}
               selectedNodeId={selectedNodeId}
               sourceId={source.id}
+              filterPaths={filterPaths}
               width={viewport.width}
             />
           </Suspense>

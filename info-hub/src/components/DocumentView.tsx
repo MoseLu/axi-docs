@@ -98,7 +98,7 @@ function CopyButton({ text }: { text: string }) {
     setTimeout(() => setCopied(false), 2000)
   }
   return (
-    <button className={`copy-btn${copied ? ' copy-btn--copied' : ''}`} onClick={handleCopy}>
+    <button className={`copy-btn${copied ? ' copy-btn--copied' : ''}`} onClick={handleCopy} type="button">
       {copied ? '✓ 已复制' : '复制'}
     </button>
   )
@@ -119,6 +119,7 @@ function renderWikiLinks(text: string, onWikiLink: (name: string) => void): Reac
         className="wiki-link"
         onClick={() => onWikiLink(linkText.trim())}
         title={`跳转到: ${linkText.trim()}`}
+        type="button"
       >
         {displayText || linkText}
       </button>

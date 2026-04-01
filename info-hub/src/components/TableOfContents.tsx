@@ -3,6 +3,8 @@ import { TocHeading } from '../types'
 
 interface TableOfContentsProps {
   content: string
+  scrollContainerSelector?: string
+  headingRootSelector?: string
 }
 
 function extractHeadings(markdown: string): TocHeading[] {
@@ -33,7 +35,11 @@ function extractHeadings(markdown: string): TocHeading[] {
   return headings
 }
 
-export function TableOfContents({ content }: TableOfContentsProps) {
+export function TableOfContents({
+  content,
+  scrollContainerSelector = '.app-main',
+  headingRootSelector = '.doc-body',
+}: TableOfContentsProps) {
   const [headings, setHeadings] = useState<TocHeading[]>([])
   const [activeId, setActiveId] = useState<string>('')
 
@@ -44,7 +50,7 @@ export function TableOfContents({ content }: TableOfContentsProps) {
 
   useEffect(() => {
     const handleScroll = () => {
-      const docBody = document.querySelector('.doc-body')
+      const docBody = document.querySelector(headingRootSelector)
       if (!docBody) return
 
       const allHeadings = docBody.querySelectorAll('h1, h2, h3, h4, h5, h6')
@@ -59,13 +65,14 @@ export function TableOfContents({ content }: TableOfContentsProps) {
       setActiveId(current)
     }
 
-    const docBody = document.querySelector('.app-main')
-    docBody?.addEventListener('scroll', handleScroll)
-    return () => docBody?.removeEventListener('scroll', handleScroll)
-  }, [headings])
+    const scrollContainer = document.querySelector(scrollContainerSelector)
+    handleScroll()
+    scrollContainer?.addEventListener('scroll', handleScroll)
+    return () => scrollContainer?.removeEventListener('scroll', handleScroll)
+  }, [headingRootSelector, headings, scrollContainerSelector])
 
   const scrollToHeading = (heading: TocHeading) => {
-    const docBody = document.querySelector('.doc-body')
+    const docBody = document.querySelector(headingRootSelector)
     if (!docBody) return
 
     const allHeadings = docBody.querySelectorAll('h1, h2, h3, h4, h5, h6')

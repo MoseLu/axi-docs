@@ -24,6 +24,13 @@ export const docSources: DocSource[] = [
     enabled: true,
     type: 'local',
   },
+  {
+    id: 'workspace-governance',
+    name: 'Enterprise Workspace Governance',
+    path: 'F:/docs/project/docs/workspace-enterprise-governance/',
+    enabled: true,
+    type: 'local',
+  },
   // API 模式（需要 Blinko 服务运行）
   // {
   //   id: 'blinko-api',

@@ -38,6 +38,13 @@ describe('sources configuration', () => {
       expect(blinko?.enabled).toBe(true)
       expect(blinko?.type).toBe('local')
     })
+
+    it('should have workspace-governance source configured', () => {
+      const workspace = docSources.find(s => s.id === 'workspace-governance')
+      expect(workspace).toBeDefined()
+      expect(workspace?.enabled).toBe(true)
+      expect(workspace?.type).toBe('local')
+    })
   })
 
   describe('excludePatterns', () => {

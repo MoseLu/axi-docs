@@ -1,0 +1,24 @@
+---
+id: reference-workspace-adr-index
+title: Enterprise Workspace ADR Index
+type: reference
+status: evergreen
+tags: [workspace, adr, governance]
+created: 2026-04-01
+modified: 2026-04-01
+agent-readable: true
+---
+
+# Enterprise Workspace ADR Index
+
+最后生成：2026-04-01
+
+## ADR 列表
+
+- [ADR-001-governance-repo-as-index-plane](ADR-001-governance-repo-as-index-plane.md)
+- [ADR-002-progressive-repository-naming-policy](ADR-002-progressive-repository-naming-policy.md)
+
+## 约束
+
+- ADR 目录只保存治理决策，不保存项目级业务实现细节。
+- 新 ADR 命名格式：`ADR-XXX-<topic>.md`。

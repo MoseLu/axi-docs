@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
+import { scanKnowledgeSource as loadKnowledgeSourceDirectory } from '../lib/knowledgeClient'
 import { BlinkoNote } from '../types'
-import { API_BASE } from '../constants'
 import { ClockIcon, TagIcon, GridIcon } from './Icons'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -88,13 +88,8 @@ export function BlinkoView({ onNoteSelect, refreshKey }: BlinkoViewProps) {
     setLoading(true)
     setError(null)
     try {
-      const response = await fetch(`${API_BASE}/scan?source=blinko`)
-      if (response.ok) {
-        const data: BlinkoListItem[] = await response.json()
-        setNotes(data)
-      } else {
-        setError('无法加载 Blinko 笔记')
-      }
+      const data = await loadKnowledgeSourceDirectory('blinko') as BlinkoListItem[]
+      setNotes(data)
     } catch {
       setError('无法连接到 Blinko 服务，请确保 Blinko 正在运行（端口 1111）')
     }

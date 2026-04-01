@@ -5,7 +5,7 @@ import { localDocsPlugin } from './vite.config.plugin'
 
 export default defineConfig({
   plugins: [react(), localDocsPlugin()],
-  base: '/docs',
+  base: './',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),

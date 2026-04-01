@@ -4,6 +4,8 @@ import path from 'path'
 import matter from 'gray-matter'
 import Anthropic from '@anthropic-ai/sdk'
 import {
+  getKnowledgeDirectoryIndex,
+  getKnowledgeDocuments,
   getGlobalKnowledgeGraph,
   getKnowledgeCatalog,
   getKnowledgeGraph,
@@ -13,11 +15,152 @@ import {
   scanKnowledgeSource,
   searchKnowledge,
 } from './src/lib/knowledgeBase'
+import { encodeBase64Url } from './src/lib/routes'
+import type { DocSource, StaticKnowledgeManifest, StaticKnowledgeSourceBundle } from './src/types'
 
 const API_PREFIXES = ['/docs/api', '/api']
+const STATIC_KNOWLEDGE_ROOT = 'generated/knowledge'
+const STATIC_KNOWLEDGE_PREFIXES = [
+  `/${STATIC_KNOWLEDGE_ROOT}`,
+  `/docs/${STATIC_KNOWLEDGE_ROOT}`,
+]
+const STATIC_BUNDLE_VERSION = 1
 
 function matchesApiPath(pathname: string, suffix: string): boolean {
   return API_PREFIXES.some((prefix) => pathname === `${prefix}${suffix}`)
+}
+
+type MiddlewareRequest = NodeJS.ReadableStream & {
+  method?: string
+  on: (event: 'data' | 'end', listener: (...args: any[]) => void) => void
+  url?: string
+}
+
+type MiddlewareResponse = NodeJS.WritableStream & {
+  setHeader: (name: string, value: string) => void
+  end: (content?: string) => void
+  statusCode: number
+}
+
+type NextFunction = () => void
+type GeneratedKnowledgeAsset = {
+  content: string
+  contentType: string
+}
+
+function sanitizeSource(source: DocSource): DocSource {
+  return {
+    id: source.id,
+    name: source.name,
+    description: source.description,
+    path: '',
+    enabled: source.enabled,
+    type: 'local',
+    icon: source.icon,
+  }
+}
+
+function registerJsonAsset(
+  assets: Map<string, GeneratedKnowledgeAsset>,
+  fileName: string,
+  payload: unknown,
+) {
+  assets.set(fileName, {
+    content: JSON.stringify(payload),
+    contentType: 'application/json; charset=utf-8',
+  })
+}
+
+async function buildStaticKnowledgeAssets() {
+  const assets = new Map<string, GeneratedKnowledgeAsset>()
+  const generatedAt = new Date().toISOString()
+  const localSources = listKnowledgeSources()
+    .filter((source) => source.enabled && source.type === 'local')
+    .map(sanitizeSource)
+
+  const manifest: StaticKnowledgeManifest = {
+    version: STATIC_BUNDLE_VERSION,
+    generatedAt,
+    defaultSourceId: localSources[0]?.id || null,
+    sources: localSources,
+  }
+
+  registerJsonAsset(assets, `${STATIC_KNOWLEDGE_ROOT}/manifest.json`, manifest)
+
+  for (const source of localSources) {
+    const [catalog, tags, documents, directoryIndex, globalGraph] = await Promise.all([
+      getKnowledgeCatalog(source.id),
+      getKnowledgeTags(source.id),
+      getKnowledgeDocuments(source.id),
+      getKnowledgeDirectoryIndex(source.id),
+      getGlobalKnowledgeGraph(source.id),
+    ])
+
+    const bundle: StaticKnowledgeSourceBundle = {
+      version: STATIC_BUNDLE_VERSION,
+      generatedAt,
+      source,
+      catalog,
+      tags,
+      documents,
+      directoryIndex,
+      globalGraph,
+    }
+
+    registerJsonAsset(assets, `${STATIC_KNOWLEDGE_ROOT}/sources/${source.id}/bundle.json`, bundle)
+
+    for (const document of documents) {
+      const graph = await getKnowledgeGraph(source.id, document.path)
+      registerJsonAsset(
+        assets,
+        `${STATIC_KNOWLEDGE_ROOT}/sources/${source.id}/graphs/${encodeBase64Url(document.path)}.json`,
+        graph,
+      )
+    }
+  }
+
+  return assets
+}
+
+function matchStaticKnowledgeAsset(pathname: string): string | null {
+  for (const prefix of STATIC_KNOWLEDGE_PREFIXES) {
+    if (pathname === prefix) return `${STATIC_KNOWLEDGE_ROOT}/manifest.json`
+    if (pathname.startsWith(`${prefix}/`)) {
+      return pathname.slice(prefix.startsWith('/docs/') ? '/docs/'.length : 1)
+    }
+  }
+  return null
+}
+
+function createStaticKnowledgeMiddleware(
+  ensureAssets: () => Promise<Map<string, GeneratedKnowledgeAsset>>,
+) {
+  return (req: MiddlewareRequest, res: MiddlewareResponse, next: NextFunction) => {
+    void (async () => {
+      const url = new URL(req.url || '/', 'http://localhost')
+      const assetKey = matchStaticKnowledgeAsset(url.pathname)
+      if (!assetKey) {
+        next()
+        return
+      }
+
+      const assets = await ensureAssets()
+      const asset = assets.get(assetKey)
+      if (!asset) {
+        res.statusCode = 404
+        res.end('Not found')
+        return
+      }
+
+      res.setHeader('Content-Type', asset.contentType)
+      res.setHeader('Cache-Control', 'no-store')
+      res.end(asset.content)
+    })().catch((error) => {
+      res.statusCode = 500
+      res.setHeader('Content-Type', 'application/json; charset=utf-8')
+      res.end(JSON.stringify({ error: error instanceof Error ? error.message : String(error) }))
+    })
+  }
 }
 
 async function analyzeDocument(content: string, fileName: string) {
@@ -63,7 +206,7 @@ Return exactly:
   }
 }
 
-function sendJson(res: NodeJS.WritableStream & { setHeader: (name: string, value: string) => void; end: (content?: string) => void }, payload: unknown) {
+function sendJson(res: MiddlewareResponse, payload: unknown) {
   res.setHeader('Content-Type', 'application/json')
   res.setHeader('Access-Control-Allow-Origin', '*')
   res.end(JSON.stringify(payload))
@@ -76,7 +219,12 @@ async function buildFileInfo(sourceId: string, filePath: string) {
   if (!fs.existsSync(fullPath)) return null
 
   const raw = await fs.promises.readFile(fullPath, 'utf-8')
-  const parsed = matter(raw)
+  let parsed: { data: Record<string, unknown> }
+  try {
+    parsed = matter(raw)
+  } catch {
+    parsed = { data: {} }
+  }
   const stat = await fs.promises.stat(fullPath)
   return {
     id: `${sourceId}:${filePath}`,
@@ -92,134 +240,172 @@ async function buildFileInfo(sourceId: string, filePath: string) {
   }
 }
 
+function createDocsApiMiddleware() {
+  return (req: MiddlewareRequest, res: MiddlewareResponse, next: NextFunction) => {
+    void (async () => {
+      const url = new URL(req.url || '/', 'http://localhost')
+      const pathname = url.pathname
+
+      if (matchesApiPath(pathname, '/sources')) {
+        sendJson(res, listKnowledgeSources().map((source) => ({
+          id: source.id,
+          name: source.name,
+          description: source.description,
+          type: source.type,
+          enabled: source.enabled,
+          icon: source.icon,
+        })))
+        return
+      }
+
+      if (matchesApiPath(pathname, '/scan')) {
+        const sourceId = url.searchParams.get('source') || 'obsidian'
+        const dirPath = url.searchParams.get('path') || undefined
+        const filterTag = url.searchParams.get('tag')
+        sendJson(res, await scanKnowledgeSource(sourceId, dirPath, filterTag))
+        return
+      }
+
+      if (matchesApiPath(pathname, '/file')) {
+        const sourceId = url.searchParams.get('source') || 'obsidian'
+        const filePath = url.searchParams.get('path') || ''
+        const content = await readKnowledgeFile(sourceId, filePath)
+        res.setHeader('Content-Type', 'text/plain; charset=utf-8')
+        res.setHeader('Access-Control-Allow-Origin', '*')
+        if (content === null) {
+          res.statusCode = 404
+          res.end('File not found')
+          return
+        }
+        res.end(content)
+        return
+      }
+
+      if (matchesApiPath(pathname, '/tags')) {
+        const sourceId = url.searchParams.get('source') || 'obsidian'
+        sendJson(res, await getKnowledgeTags(sourceId))
+        return
+      }
+
+      if (matchesApiPath(pathname, '/search')) {
+        const sourceId = url.searchParams.get('source') || 'obsidian'
+        const query = url.searchParams.get('query') || url.searchParams.get('q') || ''
+        const filterTag = url.searchParams.get('tag')
+        if (!query.trim()) {
+          sendJson(res, [])
+          return
+        }
+        sendJson(res, await searchKnowledge(sourceId, query, filterTag))
+        return
+      }
+
+      if (matchesApiPath(pathname, '/graph')) {
+        const sourceId = url.searchParams.get('source') || 'obsidian'
+        const filePath = url.searchParams.get('path') || ''
+        if (!filePath) {
+          res.statusCode = 400
+          sendJson(res, { error: 'path required' })
+          return
+        }
+        sendJson(res, await getKnowledgeGraph(sourceId, filePath))
+        return
+      }
+
+      if (matchesApiPath(pathname, '/global-graph')) {
+        const sourceId = url.searchParams.get('source') || 'obsidian'
+        sendJson(res, await getGlobalKnowledgeGraph(sourceId))
+        return
+      }
+
+      if (matchesApiPath(pathname, '/catalog')) {
+        const sourceId = url.searchParams.get('source') || 'obsidian'
+        sendJson(res, await getKnowledgeCatalog(sourceId))
+        return
+      }
+
+      if (matchesApiPath(pathname, '/ai/analyze')) {
+        res.setHeader('Content-Type', 'application/json')
+        res.setHeader('Access-Control-Allow-Origin', '*')
+        if (req.method === 'OPTIONS') {
+          res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
+          res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
+          res.end()
+          return
+        }
+        let body = ''
+        req.on('data', (chunk) => { body += chunk })
+        req.on('end', async () => {
+          try {
+            const { content, fileName } = JSON.parse(body)
+            res.end(JSON.stringify(await analyzeDocument(content || '', fileName || '')))
+          } catch (error) {
+            res.statusCode = 400
+            res.end(JSON.stringify({ error: error instanceof Error ? error.message : String(error) }))
+          }
+        })
+        return
+      }
+
+      if (matchesApiPath(pathname, '/file-info')) {
+        const sourceId = url.searchParams.get('source') || 'obsidian'
+        const filePath = url.searchParams.get('path') || ''
+        const info = await buildFileInfo(sourceId, filePath)
+        if (!info) {
+          res.statusCode = 404
+          sendJson(res, { error: 'File not found' })
+          return
+        }
+        sendJson(res, info)
+        return
+      }
+
+      next()
+    })().catch((error) => {
+      res.statusCode = 500
+      sendJson(res, { error: error instanceof Error ? error.message : String(error) })
+    })
+  }
+}
+
 export function localDocsPlugin(): Plugin {
+  const docsApiMiddleware = createDocsApiMiddleware()
+  let staticAssetsPromise: Promise<Map<string, GeneratedKnowledgeAsset>> | null = null
+
+  const ensureStaticAssets = () => {
+    staticAssetsPromise ??= buildStaticKnowledgeAssets()
+    return staticAssetsPromise
+  }
+
+  const resetStaticAssets = () => {
+    staticAssetsPromise = null
+  }
+
+  const staticKnowledgeMiddleware = createStaticKnowledgeMiddleware(ensureStaticAssets)
+
   return {
     name: 'vite-plugin-local-docs',
+    async buildStart() {
+      resetStaticAssets()
+      await ensureStaticAssets()
+    },
     configureServer(server) {
-      server.middlewares.use((req, res, next) => {
-        void (async () => {
-          const url = new URL(req.url || '/', 'http://localhost')
-          const pathname = url.pathname
-
-          if (matchesApiPath(pathname, '/sources')) {
-            sendJson(res, listKnowledgeSources().map((source) => ({
-              id: source.id,
-              name: source.name,
-              description: source.description,
-              type: source.type,
-              enabled: source.enabled,
-              icon: source.icon,
-            })))
-            return
-          }
-
-          if (matchesApiPath(pathname, '/scan')) {
-            const sourceId = url.searchParams.get('source') || 'obsidian'
-            const dirPath = url.searchParams.get('path') || undefined
-            const filterTag = url.searchParams.get('tag')
-            sendJson(res, await scanKnowledgeSource(sourceId, dirPath, filterTag))
-            return
-          }
-
-          if (matchesApiPath(pathname, '/file')) {
-            const sourceId = url.searchParams.get('source') || 'obsidian'
-            const filePath = url.searchParams.get('path') || ''
-            const content = await readKnowledgeFile(sourceId, filePath)
-            res.setHeader('Content-Type', 'text/plain; charset=utf-8')
-            res.setHeader('Access-Control-Allow-Origin', '*')
-            if (content === null) {
-              res.statusCode = 404
-              res.end('File not found')
-              return
-            }
-            res.end(content)
-            return
-          }
-
-          if (matchesApiPath(pathname, '/tags')) {
-            const sourceId = url.searchParams.get('source') || 'obsidian'
-            sendJson(res, await getKnowledgeTags(sourceId))
-            return
-          }
-
-          if (matchesApiPath(pathname, '/search')) {
-            const sourceId = url.searchParams.get('source') || 'obsidian'
-            const query = url.searchParams.get('query') || url.searchParams.get('q') || ''
-            const filterTag = url.searchParams.get('tag')
-            if (!query.trim()) {
-              sendJson(res, [])
-              return
-            }
-            sendJson(res, await searchKnowledge(sourceId, query, filterTag))
-            return
-          }
-
-          if (matchesApiPath(pathname, '/graph')) {
-            const sourceId = url.searchParams.get('source') || 'obsidian'
-            const filePath = url.searchParams.get('path') || ''
-            if (!filePath) {
-              res.statusCode = 400
-              sendJson(res, { error: 'path required' })
-              return
-            }
-            sendJson(res, await getKnowledgeGraph(sourceId, filePath))
-            return
-          }
-
-          if (matchesApiPath(pathname, '/global-graph')) {
-            const sourceId = url.searchParams.get('source') || 'obsidian'
-            sendJson(res, await getGlobalKnowledgeGraph(sourceId))
-            return
-          }
-
-          if (matchesApiPath(pathname, '/catalog')) {
-            const sourceId = url.searchParams.get('source') || 'obsidian'
-            sendJson(res, await getKnowledgeCatalog(sourceId))
-            return
-          }
-
-          if (matchesApiPath(pathname, '/ai/analyze')) {
-            res.setHeader('Content-Type', 'application/json')
-            res.setHeader('Access-Control-Allow-Origin', '*')
-            if (req.method === 'OPTIONS') {
-              res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
-              res.setHeader('Access-Control-Allow-Headers', 'Content-Type')
-              res.end()
-              return
-            }
-            let body = ''
-            req.on('data', (chunk) => { body += chunk })
-            req.on('end', async () => {
-              try {
-                const { content, fileName } = JSON.parse(body)
-                res.end(JSON.stringify(await analyzeDocument(content || '', fileName || '')))
-              } catch (error) {
-                res.statusCode = 400
-                res.end(JSON.stringify({ error: error instanceof Error ? error.message : String(error) }))
-              }
-            })
-            return
-          }
-
-          if (matchesApiPath(pathname, '/file-info')) {
-            const sourceId = url.searchParams.get('source') || 'obsidian'
-            const filePath = url.searchParams.get('path') || ''
-            const info = await buildFileInfo(sourceId, filePath)
-            if (!info) {
-              res.statusCode = 404
-              sendJson(res, { error: 'File not found' })
-              return
-            }
-            sendJson(res, info)
-            return
-          }
-
-          next()
-        })().catch((error) => {
-          res.statusCode = 500
-          sendJson(res, { error: error instanceof Error ? error.message : String(error) })
+      resetStaticAssets()
+      server.middlewares.use(staticKnowledgeMiddleware)
+      server.middlewares.use(docsApiMiddleware)
+    },
+    configurePreviewServer(server) {
+      server.middlewares.use(staticKnowledgeMiddleware)
+      server.middlewares.use(docsApiMiddleware)
+    },
+    async generateBundle() {
+      const assets = await ensureStaticAssets()
+      for (const [fileName, asset] of assets.entries()) {
+        this.emitFile({
+          type: 'asset',
+          fileName,
+          source: asset.content,
         })
-      })
+      }
     },
   }
 }

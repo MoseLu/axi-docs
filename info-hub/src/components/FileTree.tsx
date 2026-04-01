@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { FolderIcon, FolderOpenIcon, FileIcon, ChevronIcon } from './Icons'
+import { scanKnowledgeSource as loadKnowledgeDirectory } from '../lib/knowledgeClient'
 import { FileItem, SelectedFile } from '../types'
-import { API_BASE } from '../constants'
 
 interface FileTreeProps {
   sourceId: string
@@ -25,21 +25,11 @@ export function FileTree({ sourceId, onFileSelect, selectedFile, filterTag }: Fi
     setChildrenMap(new Map())
   }, [sourceId, filterTag])
 
-  const buildUrl = (path?: string) => {
-    const params = new URLSearchParams({ source: sourceId })
-    if (path) params.set('path', path)
-    if (filterTag) params.set('tag', filterTag)
-    return `${API_BASE}/scan?${params}`
-  }
-
   const loadRootItems = async () => {
     setLoading(true)
     try {
-      const response = await fetch(buildUrl())
-      if (response.ok) {
-        const data: FileItem[] = await response.json()
-        setItems(data)
-      }
+      const data = await loadKnowledgeDirectory(sourceId, undefined, filterTag)
+      setItems(data)
     } catch (error) {
       console.error('Failed to load root items:', error)
     }
@@ -50,15 +40,12 @@ export function FileTree({ sourceId, onFileSelect, selectedFile, filterTag }: Fi
     if (loadingRef.current.has(itemId)) return
     loadingRef.current.add(itemId)
     try {
-      const response = await fetch(buildUrl(dirPath))
-      if (response.ok) {
-        const data: FileItem[] = await response.json()
-        setChildrenMap(prev => {
-          const next = new Map(prev)
-          next.set(itemId, data)
-          return next
-        })
-      }
+      const data = await loadKnowledgeDirectory(sourceId, dirPath, filterTag)
+      setChildrenMap(prev => {
+        const next = new Map(prev)
+        next.set(itemId, data)
+        return next
+      })
     } catch (error) {
       console.error('Failed to load children:', error)
     } finally {
@@ -72,7 +59,6 @@ export function FileTree({ sourceId, onFileSelect, selectedFile, filterTag }: Fi
       newExpanded.delete(item.id)
     } else {
       newExpanded.add(item.id)
-      // item.relativePath may contain backslashes; use as-is for the API call
       loadChildren(item.id, item.relativePath)
     }
     setExpandedDirs(newExpanded)

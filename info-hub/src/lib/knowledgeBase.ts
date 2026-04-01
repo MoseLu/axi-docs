@@ -7,7 +7,16 @@ import {
   getKnowledgeCategoryQueryHints,
   KNOWLEDGE_CATEGORY_ORDER,
 } from '../config/knowledgeRules'
-import { DocSource, Frontmatter, GraphData, KnowledgeCatalog, KnowledgeCatalogItem, SearchResult } from '../types'
+import {
+  DocSource,
+  FileItem,
+  Frontmatter,
+  GraphData,
+  KnowledgeCatalog,
+  KnowledgeCatalogItem,
+  SearchResult,
+  StaticKnowledgeDocument,
+} from '../types'
 
 const DEFAULT_OBSIDIAN_PATH = 'F:/docs/obsidian/'
 const DEFAULT_BLINKO_URL = 'http://localhost:1111'
@@ -19,6 +28,7 @@ const WIKILINK_REGEX = /\[\[([^\]|#]+)(?:\|[^\]]+)?\]\]/g
 type SourceMap = Map<string, DocSource>
 
 type ParsedDocument = KnowledgeCatalogItem & {
+  raw: string
   body: string
   frontmatter: Frontmatter
   aliases: string[]
@@ -87,6 +97,53 @@ function normalizeStringArray(value: unknown): string[] {
 function normalizeDate(value: unknown): string | undefined {
   if (typeof value !== 'string' || !value.trim()) return undefined
   return value.trim()
+}
+
+function parseLooseFrontmatter(raw: string): { data: Frontmatter; content: string } {
+  if (!raw.startsWith('---')) {
+    return { data: {}, content: raw }
+  }
+
+  const end = raw.indexOf('\n---', 3)
+  if (end === -1) {
+    return { data: {}, content: raw }
+  }
+
+  const yaml = raw.slice(4, end)
+  const content = raw.slice(end + 4).trimStart()
+  const data: Frontmatter = {}
+
+  for (const line of yaml.split('\n')) {
+    const trimmed = line.trim()
+    if (!trimmed || trimmed.startsWith('#')) continue
+
+    const colonIndex = trimmed.indexOf(':')
+    if (colonIndex === -1) continue
+
+    const key = trimmed.slice(0, colonIndex).trim()
+    const value = trimmed.slice(colonIndex + 1).trim()
+
+    if (value.startsWith('[') && value.endsWith(']')) {
+      data[key] = value
+        .slice(1, -1)
+        .split(',')
+        .map((entry) => entry.trim().replace(/^["']|["']$/g, ''))
+        .filter(Boolean)
+      continue
+    }
+
+    data[key] = value.replace(/^["']|["']$/g, '')
+  }
+
+  return { data, content }
+}
+
+function parseMarkdownDocument(raw: string): { data: Frontmatter; content: string } {
+  try {
+    return matter(raw)
+  } catch {
+    return parseLooseFrontmatter(raw)
+  }
 }
 
 function extractInlineTags(markdown: string): string[] {
@@ -195,7 +252,7 @@ async function parseLocalDocumentFromFile(
   if (!fs.existsSync(fullPath)) return null
 
   const raw = await fs.promises.readFile(fullPath, 'utf-8')
-  const parsed = matter(raw)
+  const parsed = parseMarkdownDocument(raw)
   const frontmatter = parsed.data as Frontmatter
   const body = parsed.content
   const fileName = path.basename(relativePath).replace(/\.(md|markdown)$/i, '')
@@ -215,6 +272,7 @@ async function parseLocalDocumentFromFile(
     categories: [],
     techStack,
     updated: normalizeDate(frontmatter.modified) || normalizeDate(frontmatter.updated) || stat.mtime.toISOString(),
+    raw,
     body,
     frontmatter,
     aliases,
@@ -704,7 +762,7 @@ export async function getKnowledgeCatalog(sourceId: string): Promise<KnowledgeCa
           title: 'Blinko 快速记录',
           description: '近期闪念和碎片内容，适合先做模糊回忆检索。',
           count: items.length,
-          items: sortCatalogItems(items).slice(0, 12),
+          items: sortCatalogItems(items),
         },
       ],
     }
@@ -721,7 +779,7 @@ export async function getKnowledgeCatalog(sourceId: string): Promise<KnowledgeCa
         title: meta.title,
         description: meta.description,
         count: items.length,
-        items: items.slice(0, 10),
+        items,
       }
     })
     .filter(Boolean) as KnowledgeCatalog['sections']
@@ -735,6 +793,109 @@ export async function getKnowledgeCatalog(sourceId: string): Promise<KnowledgeCa
     recentDocs: sortCatalogItems(index.documents).slice(0, 8),
     sections,
   }
+}
+
+export async function getKnowledgeDocuments(sourceId: string): Promise<StaticKnowledgeDocument[]> {
+  const source = getSource(sourceId)
+  if (!source || source.type !== 'local') return []
+
+  const index = await getLocalSourceIndex(source)
+  return index.documents.map((document) => ({
+    sourceId: document.sourceId,
+    path: document.path,
+    name: document.name,
+    title: document.title,
+    description: document.description,
+    docType: document.docType,
+    status: document.status,
+    tags: [...document.tags],
+    categories: [...document.categories],
+    techStack: [...document.techStack],
+    updated: document.updated,
+    content: document.raw,
+    frontmatter: document.frontmatter,
+    aliases: [...document.aliases],
+  }))
+}
+
+export async function getKnowledgeDirectoryIndex(sourceId: string): Promise<Record<string, FileItem[]>> {
+  const source = getSource(sourceId)
+  if (!source || source.type !== 'local') return {}
+
+  const index = await getLocalSourceIndex(source)
+  const directoryChildren = new Map<string, FileItem[]>()
+  const knownDirectories = new Set<string>([''])
+
+  const ensureDirectory = (directoryPath: string) => {
+    if (!directoryChildren.has(directoryPath)) {
+      directoryChildren.set(directoryPath, [])
+    }
+    knownDirectories.add(directoryPath)
+  }
+
+  ensureDirectory('')
+
+  for (const document of index.documents) {
+    const segments = document.path.split('/').filter(Boolean)
+    let currentDirectory = ''
+
+    for (const [segmentIndex, segment] of segments.slice(0, -1).entries()) {
+      const nextDirectory = currentDirectory ? `${currentDirectory}/${segment}` : segment
+      ensureDirectory(nextDirectory)
+
+      const parentChildren = directoryChildren.get(currentDirectory) || []
+      const directoryId = `${source.id}:${nextDirectory}`
+      if (!parentChildren.some((item) => item.id === directoryId)) {
+        parentChildren.push({
+          id: directoryId,
+          name: segment,
+          path: nextDirectory,
+          relativePath: nextDirectory,
+          type: 'directory',
+          extension: '',
+          lastModified: document.updated || index.builtAt,
+          sourceId: source.id,
+        })
+        directoryChildren.set(currentDirectory, parentChildren)
+      }
+
+      currentDirectory = nextDirectory
+      if (segmentIndex === segments.length - 2) {
+        ensureDirectory(currentDirectory)
+      }
+    }
+
+    const parentDirectory = segments.slice(0, -1).join('/')
+    const parentChildren = directoryChildren.get(parentDirectory) || []
+    const fileId = `${source.id}:${document.path}`
+    if (!parentChildren.some((item) => item.id === fileId)) {
+      parentChildren.push({
+        id: fileId,
+        name: `${document.name}.md`,
+        path: document.path,
+        relativePath: document.path,
+        type: 'file',
+        extension: path.extname(document.path) || '.md',
+        lastModified: document.updated || index.builtAt,
+        sourceId: source.id,
+        tags: [...document.tags],
+        frontmatter: document.frontmatter,
+      })
+      directoryChildren.set(parentDirectory, parentChildren)
+    }
+  }
+
+  for (const directoryPath of knownDirectories) {
+    const sorted = (directoryChildren.get(directoryPath) || [])
+      .slice()
+      .sort((left, right) => {
+        if (left.type !== right.type) return left.type === 'directory' ? -1 : 1
+        return left.name.localeCompare(right.name, 'zh-CN')
+      })
+    directoryChildren.set(directoryPath, sorted)
+  }
+
+  return Object.fromEntries(directoryChildren.entries())
 }
 
 export function buildFrontmatter(meta: Record<string, unknown>): string {

@@ -3,12 +3,13 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { DocSource, SelectedFile, KnowledgePanelTab, AiAnalysis } from '../types'
 import { TableOfContents } from './TableOfContents'
-import { API_BASE } from '../constants'
 
 const GlobalGraph = lazy(async () => {
   const module = await import('./GlobalGraph')
   return { default: module.GlobalGraph }
 })
+
+const STATIC_AI_MESSAGE = '静态版当前未接入 AI 洞察服务。'
 
 interface KnowledgePanelProps {
   content: string | null
@@ -61,19 +62,13 @@ export function KnowledgePanel({
     if (!content || !selectedFile) return
     setAiLoading(true)
     try {
-      const res = await fetch(`${API_BASE}/ai/analyze`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          content,
-          fileName: selectedFile.path.split('/').pop() || selectedFile.path,
-        }),
-      })
-      if (res.ok) {
-        const data: AiAnalysis = await res.json()
-        setAiData(data)
-      }
-    } catch { /* ignore */ } finally {
+      setAiData({
+        summary: '',
+        keyPoints: [],
+        concepts: [],
+        error: STATIC_AI_MESSAGE,
+      } satisfies AiAnalysis)
+    } finally {
       setAiLoading(false)
     }
   }, [content, selectedFile])
@@ -174,13 +169,16 @@ export function KnowledgePanel({
         {activeTab === 'ai' && (
           <div className="kp-ai">
             {!aiData && !aiLoading && (
-              <button
-                className="kp-analyze-btn"
-                onClick={fetchAiAnalysis}
-                disabled={!content}
-              >
-                ✨ 分析文档
-              </button>
+              <div className="kp-ai-loading">
+                <p>{STATIC_AI_MESSAGE}</p>
+                <button
+                  className="kp-analyze-btn"
+                  onClick={fetchAiAnalysis}
+                  disabled={!content}
+                >
+                  查看说明
+                </button>
+              </div>
             )}
 
             {aiLoading && (

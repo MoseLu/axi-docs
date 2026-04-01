@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { API_BASE } from '../constants'
+import { getKnowledgeTags as loadKnowledgeTags } from '../lib/knowledgeClient'
 import { DocSource, SelectedFile } from '../types'
 import { BlinkoIcon, FileIcon, FolderIcon, ObsidianIcon, TagIcon } from './Icons'
 import { FileTree } from './FileTree'
@@ -47,13 +47,7 @@ export function Sidebar({
 
   const loadTags = async (sourceId: string) => {
     try {
-      const response = await fetch(`${API_BASE}/tags?source=${sourceId}`)
-      if (!response.ok) {
-        setTags([])
-        return
-      }
-      const data = await response.json() as { name: string; count: number }[]
-      setTags(data)
+      setTags(await loadKnowledgeTags(sourceId))
     } catch {
       setTags([])
     }

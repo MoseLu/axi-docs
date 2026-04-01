@@ -192,6 +192,50 @@ export interface KnowledgeCatalog {
   sections: KnowledgeCatalogSection[]
 }
 
+export interface KnowledgeGraphSnapshotNode {
+  id: string
+  label: string
+  kind: 'current' | 'note' | 'tag'
+  path?: string
+  tags?: string[]
+}
+
+export interface KnowledgeGraphSnapshotEdge {
+  source: string
+  target: string
+  kind: 'wikilink' | 'tag'
+}
+
+export interface KnowledgeGraphSnapshot {
+  nodes: KnowledgeGraphSnapshotNode[]
+  edges: KnowledgeGraphSnapshotEdge[]
+  orphanNodes?: KnowledgeGraphSnapshotNode[]
+}
+
+export interface StaticKnowledgeDocument extends KnowledgeCatalogItem {
+  content: string
+  frontmatter: Frontmatter
+  aliases: string[]
+}
+
+export interface StaticKnowledgeManifest {
+  version: number
+  generatedAt: string
+  defaultSourceId: string | null
+  sources: DocSource[]
+}
+
+export interface StaticKnowledgeSourceBundle {
+  version: number
+  generatedAt: string
+  source: DocSource
+  catalog: KnowledgeCatalog
+  tags: Array<{ name: string; count: number }>
+  documents: StaticKnowledgeDocument[]
+  directoryIndex: Record<string, FileItem[]>
+  globalGraph: KnowledgeGraphSnapshot
+}
+
 // ─── AI Analysis Types ────────────────────────────────────────────────────────
 
 export interface AiConcept {

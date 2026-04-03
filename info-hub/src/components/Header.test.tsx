@@ -85,8 +85,8 @@ describe('Header', () => {
       />,
     )
 
-    fireEvent.click(screen.getByText('指挥中心'))
-    fireEvent.click(screen.getByText('图谱探索'))
+    fireEvent.click(screen.getByText('首页'))
+    fireEvent.click(screen.getByText('分类图谱'))
 
     expect(onNavigateHome).toHaveBeenCalledTimes(1)
     expect(onNavigateExplorer).toHaveBeenCalledTimes(1)

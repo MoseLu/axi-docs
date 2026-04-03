@@ -1,6 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import { FolderIcon, FolderOpenIcon, FileIcon, ChevronIcon } from './Icons'
 import { scanKnowledgeSource as loadKnowledgeDirectory } from '../lib/knowledgeClient'
+import {
+  formatKnowledgeBranchLabel,
+  formatKnowledgeDocumentTitle,
+  formatKnowledgeTagLabel,
+} from '../lib/knowledgeFormatter'
 import { FileItem, SelectedFile } from '../types'
 
 interface FileTreeProps {
@@ -90,7 +95,9 @@ export function FileTree({ sourceId, onFileSelect, selectedFile, filterTag }: Fi
       return String(t)
     }).filter(Boolean)
 
-    const displayName = item.name.replace(/\.md$/, '')
+    const displayName = item.type === 'directory'
+      ? formatKnowledgeBranchLabel(item.name)
+      : formatKnowledgeDocumentTitle(item.name, item.relativePath, item.graphTitle)
 
     return (
       <div key={item.id}>
@@ -114,7 +121,7 @@ export function FileTree({ sourceId, onFileSelect, selectedFile, filterTag }: Fi
           {tagLabels.length > 0 && (
             <span className="tree-item-tags">
               {tagLabels.slice(0, 2).map(tag => (
-                <span key={tag} className="tag tag--tiny">#{tag}</span>
+                <span key={tag} className="tag tag--tiny">#{formatKnowledgeTagLabel(tag)}</span>
               ))}
             </span>
           )}

@@ -1,5 +1,10 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { DocumentView } from './DocumentView'
+import {
+  formatKnowledgeBranchPath,
+  formatKnowledgeItemTitle,
+  formatKnowledgeTagLabel,
+} from '../lib/knowledgeFormatter'
 import { DocSource, SelectedFile } from '../types'
 import { LinkIcon, SearchIcon } from './Icons'
 import { QuickKnowledgeItemLike } from './HomeCommandCenter'
@@ -45,8 +50,8 @@ function resolveGraphMode(view: ExplorerView, hasFocus: boolean) {
   return 'tree'
 }
 
-function documentTitle(item: Pick<QuickKnowledgeItemLike, 'title' | 'name'>) {
-  return (item.title || item.name).replace(/\.md$/i, '')
+function documentTitle(item: Pick<QuickKnowledgeItemLike, 'title' | 'name' | 'path' | 'graphTitle'>) {
+  return formatKnowledgeItemTitle(item)
 }
 
 export function KnowledgeExplorer({
@@ -104,7 +109,7 @@ export function KnowledgeExplorer({
           </button>
           <div>
             <div className="knowledge-explorer__eyebrow">{eyebrow || source.name}</div>
-            <h1>{title || 'Knowledge Explorer'}</h1>
+            <h1>{title || '知识探索台'}</h1>
             <p>{description || '把树构、路径和孤岛切换到一张全屏探索舞台里，用证据抽屉承接阅读。'}</p>
           </div>
         </div>
@@ -131,10 +136,10 @@ export function KnowledgeExplorer({
             )}
             {activeTag && (
               <button className="knowledge-explorer__pill" onClick={() => onTagSelect(null)} type="button">
-                <span>#{activeTag}</span>
+                <span>#{formatKnowledgeTagLabel(activeTag)}</span>
               </button>
             )}
-            {selectedBranch && <span className="knowledge-explorer__pill">分支 {selectedBranch}</span>}
+            {selectedBranch && <span className="knowledge-explorer__pill">分支 {formatKnowledgeBranchPath(selectedBranch)}</span>}
           </div>
         </div>
       </div>

@@ -2,21 +2,6 @@
    Data Cockpit Refresh
    ========================================================================== */
 
-:root {
-  --cockpit-bg: #07111d;
-  --cockpit-panel: rgba(7, 15, 29, 0.88);
-  --cockpit-panel-strong: linear-gradient(180deg, rgba(12, 26, 47, 0.96), rgba(6, 13, 24, 0.9));
-  --cockpit-panel-soft: linear-gradient(180deg, rgba(9, 18, 34, 0.88), rgba(4, 10, 19, 0.82));
-  --cockpit-border: rgba(116, 161, 211, 0.14);
-  --cockpit-border-strong: rgba(74, 163, 255, 0.24);
-  --cockpit-shadow: 0 22px 56px rgba(1, 6, 17, 0.38);
-  --cockpit-text: #edf5ff;
-  --cockpit-text-muted: rgba(179, 199, 227, 0.72);
-  --cockpit-text-soft: rgba(144, 168, 201, 0.62);
-  --cockpit-accent: #36a7ff;
-  --cockpit-accent-soft: rgba(54, 167, 255, 0.12);
-}
-
 .app-main--home,
 .app-main--category,
 .app-main--search,
@@ -31,7 +16,7 @@
   background: rgba(4, 10, 19, 0.78);
   border-bottom: 1px solid rgba(74, 163, 255, 0.12);
   box-shadow: 0 12px 32px rgba(1, 6, 17, 0.18);
-  padding: 0 22px;
+  padding: 0 var(--command-header-inline-padding);
 }
 
 .app-logo {
@@ -86,20 +71,20 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: var(--page-shell-gap);
 }
 
 .cockpit-shell--compact {
-  gap: 16px;
+  gap: var(--page-shell-gap-compact);
 }
 
 .rail-panel {
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding: 18px;
-  border-radius: 26px;
+  gap: var(--layout-gap-md);
+  padding: var(--panel-padding-lg);
+  border-radius: var(--panel-radius-xl);
   border: 1px solid var(--cockpit-border);
   box-shadow: var(--cockpit-shadow);
 }
@@ -121,11 +106,11 @@
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  gap: 16px;
+  gap: var(--layout-gap-md);
 }
 
 .section-header--compact {
-  gap: 12px;
+  gap: var(--layout-gap-sm);
 }
 
 .section-header__main {
@@ -171,7 +156,7 @@
 .section-header__actions {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--spacing-4);
   flex-wrap: wrap;
   color: var(--cockpit-text-soft);
   font-size: 12px;
@@ -181,8 +166,8 @@
   min-width: 0;
   display: grid;
   gap: 4px;
-  padding: 14px 16px;
-  border-radius: 18px;
+  padding: var(--panel-padding-sm) var(--panel-padding-md);
+  border-radius: var(--layout-gap-lg);
   background: rgba(12, 21, 37, 0.92);
   border: 1px solid rgba(74, 163, 255, 0.1);
 }
@@ -254,9 +239,9 @@
 .compact-empty-state {
   display: grid;
   justify-items: flex-start;
-  gap: 12px;
-  padding: 18px;
-  border-radius: 20px;
+  gap: var(--layout-gap-sm);
+  padding: var(--panel-padding-lg);
+  border-radius: var(--panel-radius-md);
   background: rgba(8, 14, 25, 0.58);
   border: 1px dashed rgba(123, 174, 231, 0.16);
 }
@@ -279,8 +264,8 @@
 
 .command-center--cockpit {
   display: grid;
-  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
-  gap: 18px;
+  grid-template-columns: var(--command-center-cockpit-columns);
+  gap: var(--layout-gap-lg);
   min-height: min(960px, calc(100vh - var(--header-height) - 72px));
 }
 
@@ -405,7 +390,7 @@
 }
 
 .command-center__graph {
-  min-height: 560px;
+  min-height: var(--command-center-graph-min-height-cockpit);
   border-radius: 24px;
   overflow: hidden;
   background: radial-gradient(circle at center, rgba(24, 49, 84, 0.24), rgba(3, 7, 15, 0.92) 72%);
@@ -455,8 +440,8 @@
 
 .results-evidence__grid {
   display: grid;
-  grid-template-columns: minmax(0, 1.12fr) minmax(360px, 0.88fr);
-  gap: 18px;
+  grid-template-columns: var(--results-evidence-grid-columns-cockpit);
+  gap: var(--layout-gap-lg);
 }
 
 .results-evidence__panel {
@@ -532,8 +517,8 @@
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(240px, 0.75fr) minmax(0, 1.8fr) minmax(300px, 0.85fr);
-  gap: 18px;
+  grid-template-columns: var(--category-graph-layout-columns-cockpit);
+  gap: var(--layout-gap-lg);
 }
 
 .category-graph-page__sidebar,
@@ -557,7 +542,7 @@
 
 .category-graph-page__graph-stage {
   flex: 1;
-  min-height: 620px;
+  min-height: var(--category-graph-stage-min-height);
 }
 
 .category-graph-page__section-list,
@@ -636,8 +621,8 @@
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(340px, 400px);
-  gap: 18px;
+  grid-template-columns: var(--search-page-layout-columns-cockpit);
+  gap: var(--layout-gap-lg);
 }
 
 .search-page__results,
@@ -688,8 +673,8 @@
 .document-detail-page {
   height: 100%;
   display: grid;
-  grid-template-columns: minmax(240px, 0.72fr) minmax(0, 1.32fr) minmax(280px, 0.8fr);
-  gap: 18px;
+  grid-template-columns: var(--document-detail-page-columns-cockpit);
+  gap: var(--layout-gap-lg);
 }
 
 .document-detail-page__main {
@@ -733,7 +718,7 @@
 .document-detail-page__reader .app-content {
   max-width: 860px;
   margin: 0 auto;
-  padding: 0 28px 56px;
+  padding: 0 var(--document-reader-inline-padding) var(--document-reader-bottom-padding);
 }
 
 .document-detail-page__reader .doc-header {
@@ -858,67 +843,3 @@
   color: var(--cockpit-text-muted);
 }
 
-@media (max-width: 1365px) {
-  .category-graph-page__layout,
-  .document-detail-page,
-  .search-page__layout,
-  .results-evidence__grid {
-    grid-template-columns: 1fr;
-  }
-
-  .category-graph-page__sidebar,
-  .category-graph-page__preview,
-  .document-detail-page__sidebar,
-  .document-detail-page__aside,
-  .search-page__results {
-    overflow: visible;
-    padding-right: 0;
-  }
-
-  .category-graph-page__graph-stage {
-    min-height: 560px;
-  }
-}
-
-@media (max-width: 1180px) {
-  .command-center--cockpit {
-    grid-template-columns: 1fr;
-    min-height: auto;
-  }
-
-  .command-center__right {
-    order: -1;
-  }
-
-  .command-center__graph {
-    min-height: 420px;
-  }
-
-  .command-center__metrics,
-  .category-graph-page__metrics,
-  .document-detail-page__metrics {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 860px) {
-  .section-header,
-  .category-graph-page__header,
-  .search-page__workbenchbar,
-  .document-detail-page__toolbar,
-  .results-evidence__header {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .command-center__metrics,
-  .category-graph-page__metrics,
-  .document-detail-page__metrics,
-  .command-center__intel {
-    grid-template-columns: 1fr;
-  }
-
-  .document-detail-page__reader .app-content {
-    padding: 0 8px 40px;
-  }
-}

@@ -1,5 +1,6 @@
 import { useEffect, useRef, useCallback, MouseEvent } from 'react'
 import { GraphData, GraphNode, GraphEdge } from '../types'
+import { formatKnowledgeNodeLabel } from '../lib/knowledgeFormatter'
 
 // ─── Physics constants ────────────────────────────────────────────────────────
 const REPULSION = 3000
@@ -247,7 +248,10 @@ export function KnowledgeGraph({ data, width, height, onNavigate, onTagSelect }:
                 opacity={nodeOpacity(node.kind)}
               />
               <text textAnchor="middle" dy={nodeRadius(node.kind) + 12}>
-                {node.label.length > 12 ? node.label.slice(0, 12) + '…' : node.label}
+                {(() => {
+                  const displayLabel = formatKnowledgeNodeLabel(node)
+                  return displayLabel.length > 12 ? displayLabel.slice(0, 12) + '…' : displayLabel
+                })()}
               </text>
             </g>
           ))}

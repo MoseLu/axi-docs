@@ -524,7 +524,7 @@ async function buildGlobalGraph(sourceId: string): Promise<{ nodes: GlobalGraphN
         try {
           const content = await fsp.readFile(fullPath, 'utf-8')
           // Skip empty or nearly-empty files
-          const stripped = content.replace(/^---\n[\s\S]*?\n---\n*/, '').replace(/[#*`\[\]]/g, '').trim()
+          const stripped = content.replace(/^---\n[\s\S]*?\n---\n*/, '').replace(/[#*`\]]|\[/g, '').trim()
           if (stripped.length < 10) continue
 
           const rel = path.relative(source!.path, fullPath).replace(/\\/g, '/')

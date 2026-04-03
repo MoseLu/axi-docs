@@ -1,5 +1,10 @@
 import { buildCategoryRoute } from '../lib/routes'
 import { pageCopy } from '../config/pageCopy'
+import {
+  formatKnowledgeDocumentTitle,
+  formatKnowledgeItemTitle,
+  formatKnowledgeTagLabel,
+} from '../lib/knowledgeFormatter'
 import type { DocSource, KnowledgeCatalogItem, SelectedFile } from '../types'
 import { CompactEmptyState, MetricPill, PageShell, RailPanel, SectionHeader } from './CockpitPrimitives'
 import { ClockIcon, FileIcon, FolderIcon, SearchIcon, TagIcon } from './Icons'
@@ -25,8 +30,8 @@ interface DocumentDetailPageProps {
   onWikiLink: (noteName: string) => void
 }
 
-function documentTitle(title: string) {
-  return title.replace(/\.md$/i, '')
+function documentTitle(item: { title?: string | null; name?: string | null; path?: string | null; graphTitle?: string | null }) {
+  return formatKnowledgeItemTitle(item)
 }
 
 export function DocumentDetailPage({
@@ -47,7 +52,12 @@ export function DocumentDetailPage({
   onTagSelect,
   onWikiLink,
 }: DocumentDetailPageProps) {
-  const resolvedTitle = selectedCatalogItem?.title || fileName || selectedFile.path
+  const resolvedRawTitle = selectedCatalogItem?.rawTitle || fileName || selectedFile.path
+  const resolvedDisplayTitle = formatKnowledgeDocumentTitle(
+    selectedCatalogItem?.title || resolvedRawTitle,
+    selectedCatalogItem?.path || selectedFile.path,
+    selectedCatalogItem?.graphTitle,
+  )
   const resolvedDescription = selectedCatalogItem?.description || pageCopy.document.description
   const resolvedTags = selectedCatalogItem?.tags || []
   const resolvedTechStack = selectedCatalogItem?.techStack || []
@@ -62,7 +72,7 @@ export function DocumentDetailPage({
           <SectionHeader
             description={resolvedDescription}
             eyebrow={source.name}
-            title={<h1>{documentTitle(resolvedTitle)}</h1>}
+            title={<h1>{resolvedDisplayTitle}</h1>}
           />
           <div className="document-detail-page__metrics">
             <MetricPill accent="blue" label="当前分类" value={categoryTitle} />
@@ -103,7 +113,7 @@ export function DocumentDetailPage({
               >
                 <FileIcon />
                 <div>
-                  <strong>{documentTitle(item.title)}</strong>
+                  <strong>{documentTitle(item)}</strong>
                   <span>{item.path}</span>
                 </div>
                 </button>
@@ -124,7 +134,7 @@ export function DocumentDetailPage({
             </button>
             <span>/</span>
             <span className="document-detail-page__crumb document-detail-page__crumb--current">
-              {documentTitle(resolvedTitle)}
+              {resolvedDisplayTitle}
             </span>
           </div>
 
@@ -138,7 +148,7 @@ export function DocumentDetailPage({
             </button>
             <button
               className="document-detail-page__action"
-              onClick={() => onOpenSearch(documentTitle(resolvedTitle))}
+              onClick={() => onOpenSearch(resolvedRawTitle.replace(/\.md$/i, ''))}
               type="button"
             >
               <SearchIcon />
@@ -192,7 +202,7 @@ export function DocumentDetailPage({
                 <div className="document-detail-page__tag-row">
                   {resolvedTechStack.map((entry) => (
                     <span key={entry} className="document-detail-page__tag">
-                      {entry}
+                      {formatKnowledgeTagLabel(entry)}
                     </span>
                   ))}
                 </div>
@@ -209,7 +219,7 @@ export function DocumentDetailPage({
                       onClick={() => onTagSelect(tag)}
                       type="button"
                     >
-                      #{tag}
+                      #{formatKnowledgeTagLabel(tag)}
                     </button>
                   ))}
                 </div>
@@ -236,7 +246,7 @@ export function DocumentDetailPage({
                 >
                   <FolderIcon />
                   <div>
-                    <strong>{documentTitle(item.title)}</strong>
+                    <strong>{documentTitle(item)}</strong>
                     <span>{item.path}</span>
                   </div>
                 </button>

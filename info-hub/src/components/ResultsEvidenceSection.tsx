@@ -1,5 +1,6 @@
 import { getKnowledgeCategoryLabel } from '../config/knowledgeRules'
 import { pageCopy } from '../config/pageCopy'
+import { formatKnowledgeItemTitle } from '../lib/knowledgeFormatter'
 import { DocSource, KnowledgeCatalog, KnowledgeCatalogSection, SearchResult, SelectedFile } from '../types'
 import { CompactEmptyState, MetricPill, RailPanel, SectionHeader } from './CockpitPrimitives'
 import { DocumentView } from './DocumentView'
@@ -12,8 +13,11 @@ function sourceLabel(sourceId: string): string {
   return sourceId
 }
 
-function documentTitle(result: Pick<SearchResult, 'title' | 'name'> | Pick<QuickKnowledgeItemLike, 'title' | 'name'>) {
-  return (result.title || result.name).replace(/\.md$/i, '')
+function documentTitle(
+  result: Pick<SearchResult, 'title' | 'name' | 'path'>
+    | Pick<QuickKnowledgeItemLike, 'title' | 'name' | 'path'>,
+) {
+  return formatKnowledgeItemTitle(result)
 }
 
 function summarizeText(value: string | null | undefined, limit = 180) {
@@ -239,7 +243,7 @@ export function ResultsEvidenceSection({
                         onClick={() => onOpenItem(item.sourceId, item.path)}
                         type="button"
                       >
-                        <div className="section-doc__title">{item.title}</div>
+                        <div className="section-doc__title">{formatKnowledgeItemTitle(item)}</div>
                         <div className="section-doc__desc">{summarizeText(item.description, 140) || item.path}</div>
                         <div className="section-doc__footer">
                           <span>{item.path}</span>

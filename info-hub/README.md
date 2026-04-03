@@ -25,13 +25,17 @@
 
 ```bash
 # 安装依赖
-npm install
+pnpm install
+
+# 初始化 Git 运维规范
+pnpm git:bootstrap
+pnpm hooks:install
 
 # 复制环境变量模板
 cp .env.example .env
 
 # 启动开发服务器
-npm run dev
+pnpm dev
 ```
 
 ### 生产部署（Docker）
@@ -69,14 +73,37 @@ http://localhost:5173
 ## 开发命令
 
 ```bash
-npm install          # 安装依赖
-npm run dev          # 开发模式
-npm run build        # 生产构建
-npm run preview      # 预览生产构建
-npm run test         # 运行测试
-npm run mcp          # 运行 MCP 服务器
-npm run mcp:http     # MCP HTTP 模式
+pnpm install            # 安装依赖
+pnpm git:bootstrap      # 初始化 dev/main 治理基线
+pnpm hooks:install      # 安装 commit-msg / pre-commit / pre-push
+pnpm commit             # 交互式约定式提交
+pnpm quality:check      # 治理 + lint + coverage
+pnpm verify             # 构建验证
+pnpm dev                # 开发模式
+pnpm build              # 生产构建
+pnpm preview            # 预览生产构建
+pnpm test               # 运行测试
+pnpm mcp                # 运行 MCP 服务器
+pnpm mcp:http           # MCP HTTP 模式
 ```
+
+## 运维规范
+
+Info-Hub 已对齐 Axi 的统一运维基线：
+
+- `dev` 是默认集成分支
+- `main` 是生产发布分支
+- 所有工作通过 Pull Request 合入
+- commit message 和 PR 标题统一使用 Conventional Commits
+
+运维入口文档：
+
+- `docs/OPERATIONS.md`
+- `docs/GITHUB_FLOW.md`
+- `docs/BRANCH_PROTECTION.md`
+- `docs/COMMIT_CONVENTION.md`
+- `docs/RELEASE_OPERATIONS.md`
+- `docs/QUALITY_GATE.md`
 
 ## 端口
 

@@ -15,6 +15,12 @@ pnpm test:run
 
 # 生成覆盖率报告
 pnpm test:coverage
+
+# 运行统一质量门禁
+pnpm quality:check
+
+# 运行构建验证
+pnpm verify
 ```
 
 ## 测试文件
@@ -106,5 +112,6 @@ fileService.ts     |     100 |      100 |     100 |     100
 
 ```bash
 pnpm install
-pnpm test:run
+pnpm quality:check
+pnpm verify
 ```

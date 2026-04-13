@@ -144,6 +144,19 @@ interface DocSource {
 
 const docSources: DocSource[] = knowledgeBase.listKnowledgeSources()
 
+function sanitizeSource(source: DocSource) {
+  return {
+    id: source.id,
+    name: source.name,
+    path: source.path,
+    enabled: source.enabled,
+    description: source.description,
+    type: source.type,
+    apiUrl: source.apiUrl,
+    icon: source.icon,
+  }
+}
+
 // ─── 安全限制 ─────────────────────────────────────────────────────────────────
 
 const excludePatterns = ['.git', 'node_modules', '.obsidian', '.trash']
@@ -524,7 +537,7 @@ async function buildGlobalGraph(sourceId: string): Promise<{ nodes: GlobalGraphN
         try {
           const content = await fsp.readFile(fullPath, 'utf-8')
           // Skip empty or nearly-empty files
-          const stripped = content.replace(/^---\n[\s\S]*?\n---\n*/, '').replace(/[#*`\[\]]/g, '').trim()
+          const stripped = content.replace(/^---\n[\s\S]*?\n---\n*/, '').replace(/[#*`\]]|\[/g, '').trim()
           if (stripped.length < 10) continue
 
           const rel = path.relative(source!.path, fullPath).replace(/\\/g, '/')
@@ -995,7 +1008,7 @@ export function createServer() {
         case 'obsidian_list': {
           return {
             content: [
-              { type: 'text', text: JSON.stringify(docSources.filter((s) => s.enabled), null, 2) },
+              { type: 'text', text: JSON.stringify(docSources.filter((s) => s.enabled).map(sanitizeSource), null, 2) },
             ],
           }
         }
@@ -1339,7 +1352,7 @@ async function startHttpServer(port: number) {
           }
           case 'sources': {
             res.writeHead(200, { 'Content-Type': 'application/json' })
-            res.end(JSON.stringify(docSources.filter((s) => s.enabled)))
+            res.end(JSON.stringify(docSources.filter((s) => s.enabled).map(sanitizeSource)))
             return
           }
           case 'search': {
@@ -1411,16 +1424,29 @@ async function startHttpServer(port: number) {
       return
     }
 
+    if (pathname === '/docs' || pathname === '/docs/' || pathname.startsWith('/docs/')) {
+      res.writeHead(404, { 'Content-Type': 'text/plain' })
+      res.end('Not Found')
+      return
+    }
+
     // ── 静态首页 / SPA 部署 ──────────────────────────────────────────────────
 
     const distDir = path.join(process.cwd(), 'dist')
     const distIndex = path.join(distDir, 'index.html')
     const hasBuiltApp = fs.existsSync(distIndex)
 
-    if (pathname === '/' || pathname === '/index.html') {
+    const spaRoutes = [
+      pathname === '/' || pathname === '/index.html',
+      pathname === '/search',
+      pathname.startsWith('/nodes/'),
+      pathname.startsWith('/doc/'),
+    ]
+
+    if (spaRoutes.some(Boolean)) {
       if (hasBuiltApp) {
-        res.writeHead(302, { Location: '/docs/' })
-        res.end()
+        res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
+        res.end(await fsp.readFile(distIndex, 'utf-8'))
       } else {
         res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
         res.end(HOME_PAGE)
@@ -1428,15 +1454,7 @@ async function startHttpServer(port: number) {
       return
     }
 
-    if (hasBuiltApp && (pathname === '/docs' || pathname === '/docs/' || pathname === '/docs/index.html')) {
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
-      res.end(await fsp.readFile(distIndex, 'utf-8'))
-      return
-    }
-
-    const staticRelativePath = pathname.startsWith('/docs/')
-      ? pathname.slice('/docs/'.length)
-      : pathname.slice(1)
+    const staticRelativePath = pathname.slice(1)
     const ext = path.extname(staticRelativePath)
     if (ext && mimeTypes[ext]) {
       const staticPath = hasBuiltApp
@@ -1450,12 +1468,6 @@ async function startHttpServer(port: number) {
       } catch {
         // file not found, fall through to 404
       }
-    }
-
-    if (hasBuiltApp && pathname.startsWith('/docs/')) {
-      res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' })
-      res.end(await fsp.readFile(distIndex, 'utf-8'))
-      return
     }
 
     res.writeHead(404, { 'Content-Type': 'text/plain' })
@@ -1501,7 +1513,7 @@ async function handleToolCall(name: string, args: Record<string, unknown>) {
       return { content: [{ type: 'text', text: `✗ 保存失败: ${result.error}` }], isError: true }
     }
     case 'obsidian_list': {
-      return { content: [{ type: 'text', text: JSON.stringify(docSources.filter((s) => s.enabled), null, 2) }] }
+      return { content: [{ type: 'text', text: JSON.stringify(docSources.filter((s) => s.enabled).map(sanitizeSource), null, 2) }] }
     }
     case 'obsidian_search': {
       const source = (args.source as string) || 'obsidian'

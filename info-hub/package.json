@@ -3,16 +3,36 @@
   "version": "1.0.0",
   "description": "文档同步与查看平台",
   "type": "module",
+  "packageManager": "pnpm@10.11.0",
+  "config": {
+    "commitizen": {
+      "path": "cz-git"
+    }
+  },
   "scripts": {
+    "blinko:export": "node ./sync-blinko.js",
+    "blinko:import": "node ./scripts/blinko-import-mirror.mjs",
+    "blinko:sync": "node ./scripts/blinko-sync-cycle.mjs",
+    "branch:check": "node ./scripts/check-git-branch.mjs",
     "dev": "vite",
     "build": "tsc && vite build",
+    "commit": "pnpm exec cz",
+    "commit:check:last": "pnpm exec commitlint --last --verbose",
+    "commit:lint:range": "node ./scripts/check-commit-range.mjs",
+    "docs:check": "node ./scripts/check-docs.mjs",
+    "git:bootstrap": "node ./scripts/setup-git-governance.mjs",
+    "governance:check": "pnpm branch:check && pnpm docs:check",
+    "hooks:install": "node ./scripts/install-hooks.mjs",
     "preview": "vite preview",
     "lint": "eslint . --ext ts,tsx",
+    "pr:title:check": "node ./scripts/check-pr-title.mjs",
+    "quality:check": "pnpm governance:check && pnpm lint && pnpm test:coverage",
     "mcp": "tsx src/mcp/server.ts",
     "mcp:http": "tsx src/mcp/server.ts http",
     "test": "vitest",
     "test:run": "vitest run",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "verify": "pnpm build"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.39.0",
@@ -31,6 +51,9 @@
     "three-spritetext": "^1.10.0"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
+    "@eslint/js": "^9.24.0",
     "@testing-library/jest-dom": "^6.4.0",
     "@testing-library/react": "^14.1.0",
     "@types/node": "^20.10.0",
@@ -39,7 +62,14 @@
     "@types/three": "^0.183.1",
     "@vitejs/plugin-react": "^4.3.1",
     "@vitest/coverage-v8": "^1.6.1",
+    "commitizen": "^4.3.1",
+    "cz-git": "^1.11.0",
+    "eslint": "^9.24.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "globals": "^15.15.0",
     "jsdom": "^23.0.0",
+    "typescript-eslint": "^8.29.0",
     "tsx": "^4.19.4",
     "typescript": "^5.5.3",
     "vite": "^5.4.2",

@@ -1,5 +1,10 @@
 import { lazy, Suspense, useEffect, useMemo, useRef, useState } from 'react'
 import { pageCopy } from '../config/pageCopy'
+import {
+  formatKnowledgeBranchPath,
+  formatKnowledgeItemTitle,
+  formatKnowledgeTagLabel,
+} from '../lib/knowledgeFormatter'
 import { buildCategoryRoute } from '../lib/routes'
 import type { DocSource, KnowledgeCatalog, KnowledgeCatalogSection, SelectedFile } from '../types'
 import { CompactEmptyState, MetricPill, PageShell, RailPanel, SectionHeader, SegmentedTabs } from './CockpitPrimitives'
@@ -43,8 +48,8 @@ function resolveGraphMode(view: CategoryExplorerView) {
   return 'tree'
 }
 
-function documentTitle(title: string) {
-  return title.replace(/\.md$/i, '')
+function documentTitle(item: { title?: string | null; name?: string | null; path?: string | null }) {
+  return formatKnowledgeItemTitle(item)
 }
 
 export function CategoryGraphPage({
@@ -148,10 +153,10 @@ export function CategoryGraphPage({
               )}
               {activeTag && (
                 <button className="category-graph-page__state" onClick={() => onTagSelect(null)} type="button">
-                  #{activeTag}
+                  #{formatKnowledgeTagLabel(activeTag)}
                 </button>
               )}
-              {selectedBranch && <span className="category-graph-page__state">分支 {selectedBranch}</span>}
+              {selectedBranch && <span className="category-graph-page__state">分支 {formatKnowledgeBranchPath(selectedBranch)}</span>}
             </div>
           )}
         </div>
@@ -218,7 +223,7 @@ export function CategoryGraphPage({
                 >
                   <FileIcon />
                   <div>
-                    <strong>{documentTitle(item.title)}</strong>
+                    <strong>{documentTitle(item)}</strong>
                     <span>{item.path}</span>
                   </div>
                 </button>
@@ -228,7 +233,7 @@ export function CategoryGraphPage({
               <div className="category-graph-page__tag-list">
                 {categoryTags.map((tag) => (
                   <button key={tag.name} className="category-graph-page__tag" onClick={() => onTagSelect(tag.name)} type="button">
-                    #{tag.name}
+                    #{formatKnowledgeTagLabel(tag.name)}
                     <small>{tag.count}</small>
                   </button>
                 ))}
@@ -283,7 +288,7 @@ export function CategoryGraphPage({
               compact
               eyebrow={pageCopy.category.nodeIntel}
               meta={selectedCatalogItem?.docType || '等待选择'}
-              title={<strong>{selectedCatalogItem ? documentTitle(selectedCatalogItem.title) : '先选择一个节点'}</strong>}
+              title={<strong>{selectedCatalogItem ? documentTitle(selectedCatalogItem) : '先选择一个节点'}</strong>}
               actions={selectedFile ? (
                 <button className="category-graph-page__inline-action" onClick={() => onOpenItem(selectedFile.sourceId, selectedFile.path)} type="button">
                   打开详情
@@ -309,7 +314,7 @@ export function CategoryGraphPage({
                     {selectedCatalogItem.tags.slice(0, 8).map((tag) => (
                       <button key={tag} className="category-graph-page__tag" onClick={() => onTagSelect(tag)} type="button">
                         <TagIcon />
-                        <span>{tag}</span>
+                        <span>{formatKnowledgeTagLabel(tag)}</span>
                       </button>
                     ))}
                   </div>
@@ -375,7 +380,7 @@ export function CategoryGraphPage({
                   >
                     <FolderIcon />
                     <div>
-                      <strong>{documentTitle(item.title)}</strong>
+                      <strong>{documentTitle(item)}</strong>
                       <span>{item.path}</span>
                     </div>
                   </button>

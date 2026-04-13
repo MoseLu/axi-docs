@@ -3,7 +3,12 @@ import os from 'os'
 import path from 'path'
 import { afterEach, describe, expect, it } from 'vitest'
 import { classifyKnowledgeCategories } from '../config/knowledgeRules'
-import { __clearKnowledgeBaseCacheForTests, getKnowledgeCatalog, searchKnowledge } from './knowledgeBase'
+import {
+  __clearKnowledgeBaseCacheForTests,
+  getKnowledgeCatalog,
+  listKnowledgeSources,
+  searchKnowledge,
+} from './knowledgeBase'
 
 describe('knowledge classification rules', () => {
   it('prefers explicit frontmatter categories over heuristics', () => {
@@ -40,6 +45,7 @@ describe('knowledge classification rules', () => {
 
 describe('knowledge base local index', () => {
   const originalObsidianPath = process.env.OBSIDIAN_PATH
+  const originalExtraSources = process.env.INFO_HUB_EXTRA_SOURCES_JSON
   let tempDir = ''
 
   afterEach(async () => {
@@ -48,6 +54,11 @@ describe('knowledge base local index', () => {
       delete process.env.OBSIDIAN_PATH
     } else {
       process.env.OBSIDIAN_PATH = originalObsidianPath
+    }
+    if (originalExtraSources === undefined) {
+      delete process.env.INFO_HUB_EXTRA_SOURCES_JSON
+    } else {
+      process.env.INFO_HUB_EXTRA_SOURCES_JSON = originalExtraSources
     }
     if (tempDir) {
       await fs.promises.rm(tempDir, { recursive: true, force: true })
@@ -63,8 +74,15 @@ describe('knowledge base local index', () => {
 
     await fs.promises.writeFile(filePath, [
       '---',
+      'id: concept-button-playbook',
+      'title: Button Playbook',
       'tags: [react, component]',
       'type: component',
+      'status: draft',
+      'created: 2026-03-25',
+      'modified: 2026-03-25',
+      'graph-title: 按钮手册',
+      'graph-tags: [前端, 组件]',
       '---',
       '# Button Playbook',
       '',
@@ -81,9 +99,16 @@ describe('knowledge base local index', () => {
 
     await fs.promises.writeFile(filePath, [
       '---',
+      'id: solution-cache-recovery-playbook',
+      'title: Cache Recovery Playbook',
       'category: solutions',
       'tags: [incident, fix]',
       'type: troubleshooting',
+      'status: evergreen',
+      'created: 2026-03-25',
+      'modified: 2026-03-26',
+      'graph-title: 缓存恢复手册',
+      'graph-tags: [排障, 缓存]',
       '---',
       '# Cache Recovery Playbook',
       '',
@@ -96,5 +121,74 @@ describe('knowledge base local index', () => {
     const updatedCatalog = await getKnowledgeCatalog('obsidian')
     const solutionsSection = updatedCatalog.sections.find((section) => section.key === 'solutions')
     expect(solutionsSection?.items.some((item) => item.path === 'playbook.md')).toBe(true)
+  })
+
+  it('admits documents with standard frontmatter even when graph metadata is omitted', async () => {
+    tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'info-hub-kb-fallback-'))
+    process.env.OBSIDIAN_PATH = tempDir
+
+    await fs.promises.writeFile(path.join(tempDir, 'context.md'), [
+      '---',
+      'id: agent-context',
+      'title: Current Context',
+      'tags: [vault, context, current]',
+      'type: concept',
+      'status: evergreen',
+      'created: 2026-03-25',
+      'modified: 2026-03-25',
+      '---',
+      '# Current Context',
+      '',
+      'This note should still be indexed without explicit graph metadata.',
+    ].join('\n'), 'utf-8')
+
+    const catalog = await getKnowledgeCatalog('obsidian')
+    expect(catalog.totalDocs).toBe(1)
+    expect(catalog.recentDocs[0]?.title).toBe('Current Context')
+    expect(catalog.recentDocs[0]?.tags).toEqual(['vault', 'context', 'current'])
+
+    const searchResults = await searchKnowledge('obsidian', 'current context')
+    expect(searchResults.some((result) => result.path === 'context.md')).toBe(true)
+  })
+
+  it('blocks documents from the library when IQC metadata is missing', async () => {
+    tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'info-hub-kb-iqc-'))
+    process.env.OBSIDIAN_PATH = tempDir
+
+    await fs.promises.writeFile(path.join(tempDir, 'invalid.md'), [
+      '# Missing Frontmatter',
+      '',
+      'This note should never enter the knowledge library.',
+    ].join('\n'), 'utf-8')
+
+    const catalog = await getKnowledgeCatalog('obsidian')
+    expect(catalog.totalDocs).toBe(0)
+
+    const searchResults = await searchKnowledge('obsidian', 'missing')
+    expect(searchResults).toHaveLength(0)
+  })
+
+  it('supports extra local sources from INFO_HUB_EXTRA_SOURCES_JSON', async () => {
+    tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'info-hub-kb-extra-'))
+    const extraDir = path.join(tempDir, 'hermes-system')
+    await fs.promises.mkdir(extraDir, { recursive: true })
+
+    process.env.OBSIDIAN_PATH = path.join(tempDir, 'primary')
+    process.env.INFO_HUB_EXTRA_SOURCES_JSON = JSON.stringify([
+      {
+        id: 'hermes-system',
+        name: 'Hermes System',
+        path: extraDir,
+        type: 'local',
+        enabled: true,
+      },
+    ])
+
+    await fs.promises.mkdir(process.env.OBSIDIAN_PATH, { recursive: true })
+    const sources = listKnowledgeSources()
+    const hermesSource = sources.find((source) => source.id === 'hermes-system')
+    expect(hermesSource).toBeDefined()
+    expect(hermesSource?.path).toBe(extraDir)
+    expect(hermesSource?.type).toBe('local')
   })
 })

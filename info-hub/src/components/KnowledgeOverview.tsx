@@ -1,4 +1,5 @@
 import { KnowledgeCatalog } from '../types'
+import { formatKnowledgeItemTitle, formatKnowledgeTagLabel } from '../lib/knowledgeFormatter'
 import { BookIcon, TagIcon, FileIcon, FolderIcon } from './Icons'
 
 interface KnowledgeOverviewProps {
@@ -96,7 +97,7 @@ export function KnowledgeOverview({
                 onClick={() => onTagSelect(tag.name)}
                 title={`${tag.count} 篇文档`}
               >
-                #{tag.name}
+                #{formatKnowledgeTagLabel(tag.name)}
                 <span className="tag-count">{tag.count}</span>
               </button>
             ))}
@@ -121,7 +122,7 @@ export function KnowledgeOverview({
                 onClick={() => onOpenItem(item.sourceId, item.path)}
               >
                 <div>
-                  <div className="overview-list-item__title">{item.title}</div>
+                  <div className="overview-list-item__title">{formatKnowledgeItemTitle(item)}</div>
                   <div className="overview-list-item__meta">{item.path}</div>
                 </div>
                 <span className="overview-list-item__badge">{item.docType || 'note'}</span>
@@ -150,7 +151,7 @@ export function KnowledgeOverview({
                   onClick={() => onOpenItem(item.sourceId, item.path)}
                 >
                   <div>
-                    <div className="overview-list-item__title">{item.title}</div>
+                    <div className="overview-list-item__title">{formatKnowledgeItemTitle(item)}</div>
                     <div className="overview-list-item__meta">{item.path}</div>
                   </div>
                   <FolderIcon />

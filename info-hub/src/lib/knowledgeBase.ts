@@ -7,6 +7,7 @@ import {
   getKnowledgeCategoryQueryHints,
   KNOWLEDGE_CATEGORY_ORDER,
 } from '../config/knowledgeRules'
+import { normalizeStringArray, runKnowledgeIntake } from './knowledgeIntake'
 import {
   DocSource,
   FileItem,
@@ -32,6 +33,8 @@ type ParsedDocument = KnowledgeCatalogItem & {
   body: string
   frontmatter: Frontmatter
   aliases: string[]
+  sourceTags: string[]
+  intakeIssues: string[]
 }
 
 type IndexedLocalFile = {
@@ -47,6 +50,7 @@ type LocalSourceIndex = {
   builtAt: string
   files: Map<string, IndexedLocalFile>
   documents: ParsedDocument[]
+  rejected: Array<{ path: string; issues: string[] }>
   tags: Array<{ name: string; count: number }>
   byPath: Map<string, ParsedDocument>
   byStem: Map<string, ParsedDocument>
@@ -60,6 +64,47 @@ type LocalFileEntry = {
 
 const localSourceIndexCache = new Map<string, LocalSourceIndex>()
 
+function parseExtraSources(): DocSource[] {
+  const raw = process.env.INFO_HUB_EXTRA_SOURCES_JSON?.trim()
+  if (!raw) return []
+
+  try {
+    const parsed = JSON.parse(raw) as unknown
+    if (!Array.isArray(parsed)) return []
+
+    return parsed
+      .flatMap((entry) => {
+        if (!entry || typeof entry !== 'object') return []
+
+        const source = entry as Record<string, unknown>
+        const id = typeof source.id === 'string' ? source.id.trim() : ''
+        const name = typeof source.name === 'string' ? source.name.trim() : ''
+        const type = source.type === 'api' ? 'api' : source.type === 'local' ? 'local' : null
+        if (!id || !name || !type) return []
+
+        const normalized: DocSource = {
+          id,
+          name,
+          description: typeof source.description === 'string' ? source.description : undefined,
+          path: typeof source.path === 'string' ? source.path : '',
+          enabled: source.enabled !== false,
+          type,
+          apiUrl: typeof source.apiUrl === 'string' ? source.apiUrl : undefined,
+          apiToken: typeof source.apiToken === 'string' ? source.apiToken : undefined,
+          icon: source.icon === 'obsidian' || source.icon === 'blinko' || source.icon === 'folder'
+            ? source.icon
+            : 'folder',
+        }
+
+        if (normalized.type === 'local' && !normalized.path.trim()) return []
+        if (normalized.type === 'api' && !normalized.apiUrl?.trim()) return []
+        return [normalized]
+      })
+  } catch {
+    return []
+  }
+}
+
 function isSupportedFile(filename: string): boolean {
   return SUPPORTED_EXTENSIONS.has(path.extname(filename).toLowerCase())
 }
@@ -72,31 +117,10 @@ function normalizeSlashes(inputPath: string): string {
   return inputPath.replace(/\\/g, '/')
 }
 
-function normalizeStringArray(value: unknown): string[] {
-  if (Array.isArray(value)) {
-    return value
-      .map((entry) => String(entry).trim())
-      .filter(Boolean)
-  }
-  if (typeof value === 'string') {
-    if (value.startsWith('[') && value.endsWith(']')) {
-      return value
-        .slice(1, -1)
-        .split(',')
-        .map((entry) => entry.trim().replace(/^["']|["']$/g, ''))
-        .filter(Boolean)
-    }
-    return value
-      .split(',')
-      .map((entry) => entry.trim())
-      .filter(Boolean)
-  }
-  return []
-}
-
 function normalizeDate(value: unknown): string | undefined {
-  if (typeof value !== 'string' || !value.trim()) return undefined
-  return value.trim()
+  if (typeof value === 'string' && value.trim()) return value.trim()
+  if (value instanceof Date && !Number.isNaN(value.getTime())) return value.toISOString()
+  return undefined
 }
 
 function parseLooseFrontmatter(raw: string): { data: Frontmatter; content: string } {
@@ -163,7 +187,7 @@ function extractInlineTags(markdown: string): string[] {
   return [...tags]
 }
 
-function extractTitle(frontmatter: Frontmatter, body: string, fallbackName: string): string {
+function extractRawTitle(frontmatter: Frontmatter, body: string, fallbackName: string): string {
   if (typeof frontmatter.title === 'string' && frontmatter.title.trim()) {
     return frontmatter.title.trim()
   }
@@ -221,8 +245,14 @@ function createSourceMap(): SourceMap {
       apiToken: process.env.BLINKO_TOKEN || '',
       icon: 'blinko',
     },
+    ...parseExtraSources(),
   ]
-  return new Map(sources.filter((source) => source.enabled).map((source) => [source.id, source]))
+  const deduped = new Map<string, DocSource>()
+  for (const source of sources) {
+    if (!source.enabled) continue
+    deduped.set(source.id, source)
+  }
+  return deduped
 }
 
 export function listKnowledgeSources(): DocSource[] {
@@ -256,28 +286,41 @@ async function parseLocalDocumentFromFile(
   const frontmatter = parsed.data as Frontmatter
   const body = parsed.content
   const fileName = path.basename(relativePath).replace(/\.(md|markdown)$/i, '')
-  const tags = [...new Set([...normalizeStringArray(frontmatter.tags), ...extractInlineTags(raw)])]
+  const sourceTags = [...new Set([...normalizeStringArray(frontmatter.tags), ...extractInlineTags(raw)])]
   const aliases = normalizeStringArray(frontmatter.aliases)
-  const title = extractTitle(frontmatter, body, fileName)
-  const techStack = extractTechStack(frontmatter, tags)
+  const rawTitle = extractRawTitle(frontmatter, body, fileName)
+  const intake = runKnowledgeIntake({ ...frontmatter, tags: sourceTags })
+  if (!intake.accepted || !intake.graphTitle) {
+    return null
+  }
+  const techStack = extractTechStack(frontmatter, sourceTags)
   const item: ParsedDocument = {
     sourceId: source.id,
     path: normalizeSlashes(relativePath),
     name: fileName,
-    title,
+    title: intake.graphTitle,
+    rawTitle,
     description: extractDescription(frontmatter, body),
     docType: typeof frontmatter.type === 'string' ? frontmatter.type : undefined,
     status: typeof frontmatter.status === 'string' ? frontmatter.status : undefined,
-    tags,
+    tags: intake.graphTags,
+    rawTags: sourceTags,
     categories: [],
     techStack,
     updated: normalizeDate(frontmatter.modified) || normalizeDate(frontmatter.updated) || stat.mtime.toISOString(),
+    graphTitle: intake.graphTitle,
     raw,
     body,
     frontmatter,
-    aliases,
+    aliases: [...new Set([rawTitle, intake.graphTitle, ...aliases].filter(Boolean))],
+    sourceTags,
+    intakeIssues: intake.issues.map((issue) => issue.message),
   }
-  item.categories = classifyKnowledgeCategories(item)
+  item.categories = classifyKnowledgeCategories({
+    ...item,
+    title: rawTitle,
+    tags: sourceTags,
+  })
   return item
 }
 
@@ -322,6 +365,7 @@ function buildLocalSourceIndex(
   rootPath: string,
   files: Map<string, IndexedLocalFile>,
   documents: ParsedDocument[],
+  rejected: Array<{ path: string; issues: string[] }>,
 ): LocalSourceIndex {
   const byPath = new Map<string, ParsedDocument>()
   const byStem = new Map<string, ParsedDocument>()
@@ -329,7 +373,7 @@ function buildLocalSourceIndex(
 
   for (const document of documents) {
     byPath.set(document.path, document)
-    for (const stem of [document.name, document.title, ...document.aliases]) {
+    for (const stem of [document.name, document.rawTitle || '', document.title, ...document.aliases]) {
       const normalizedStem = stem.trim().toLowerCase()
       if (normalizedStem) {
         byStem.set(normalizedStem, document)
@@ -350,6 +394,7 @@ function buildLocalSourceIndex(
     builtAt: new Date().toISOString(),
     files,
     documents,
+    rejected,
     tags,
     byPath,
     byStem,
@@ -366,14 +411,33 @@ async function getLocalSourceIndex(source: DocSource): Promise<LocalSourceIndex>
   const currentFiles = await collectLocalMarkdownFiles(rootPath)
   const nextFiles = new Map<string, IndexedLocalFile>()
   const documents: ParsedDocument[] = []
+  const rejected: Array<{ path: string; issues: string[] }> = []
 
   for (const file of currentFiles) {
     const cachedFile = previousFiles.get(file.relativePath)
     let indexedFile = cachedFile
 
     if (!cachedFile || cachedFile.fullPath !== file.fullPath || cachedFile.mtimeMs !== file.stat.mtimeMs) {
+      const raw = await fs.promises.readFile(file.fullPath, 'utf-8')
+      const parsed = parseMarkdownDocument(raw)
+      const frontmatter = parsed.data as Frontmatter
+      const sourceTags = [...new Set([...normalizeStringArray(frontmatter.tags), ...extractInlineTags(raw)])]
+      const intake = runKnowledgeIntake({ ...frontmatter, tags: sourceTags })
+      if (!intake.accepted) {
+        rejected.push({
+          path: file.relativePath,
+          issues: intake.issues.map((issue) => issue.message),
+        })
+        continue
+      }
       const document = await parseLocalDocumentFromFile(source, file.relativePath, file.fullPath, file.stat)
-      if (!document) continue
+      if (!document) {
+        rejected.push({
+          path: file.relativePath,
+          issues: ['IQC 未通过，文档未入库。'],
+        })
+        continue
+      }
       indexedFile = {
         relativePath: file.relativePath,
         fullPath: file.fullPath,
@@ -389,7 +453,7 @@ async function getLocalSourceIndex(source: DocSource): Promise<LocalSourceIndex>
 
   documents.sort((left, right) => left.path.localeCompare(right.path, 'zh-CN'))
 
-  const index = buildLocalSourceIndex(source, rootPath, nextFiles, documents)
+  const index = buildLocalSourceIndex(source, rootPath, nextFiles, documents, rejected)
   localSourceIndexCache.set(source.id, index)
   return index
 }
@@ -531,6 +595,8 @@ export async function scanKnowledgeSource(sourceId: string, dirPath?: string, fi
       lastModified: parsed.updated || stat.mtime.toISOString(),
       sourceId: source.id,
       tags: parsed.tags,
+      rawTags: parsed.rawTags,
+      graphTitle: parsed.graphTitle,
       frontmatter: parsed.frontmatter,
     }
   }))
@@ -561,6 +627,8 @@ export async function readKnowledgeFile(sourceId: string, filePath: string): Pro
   const fullPath = resolveLocalPath(source, filePath)
   if (!fullPath || !fs.existsSync(fullPath) || !isSupportedFile(fullPath)) return null
   try {
+    const index = await getLocalSourceIndex(source)
+    if (!index.byPath.has(normalizeSlashes(filePath))) return null
     return await fs.promises.readFile(fullPath, 'utf-8')
   } catch {
     return null
@@ -653,12 +721,17 @@ export async function searchKnowledge(sourceId: string, query: string, filterTag
     let score = 0
     const pathLower = document.path.toLowerCase()
     const titleLower = document.title.toLowerCase()
+    const rawTitleLower = (document.rawTitle || '').toLowerCase()
     const descriptionLower = (document.description || '').toLowerCase()
     const bodyLower = document.body.toLowerCase()
 
     if (matchesQuery(titleLower, queryTokens)) {
       matchedBy.push('title')
       score += 20
+    }
+    if (rawTitleLower && matchesQuery(rawTitleLower, queryTokens)) {
+      matchedBy.push('raw-title')
+      score += 10
     }
     if (matchesQuery(pathLower, queryTokens)) {
       matchedBy.push('path')
@@ -667,6 +740,10 @@ export async function searchKnowledge(sourceId: string, query: string, filterTag
     if (document.tags.some((tag) => matchesQuery(tag.toLowerCase(), queryTokens))) {
       matchedBy.push('tags')
       score += 10
+    }
+    if (document.sourceTags.some((tag) => matchesQuery(tag.toLowerCase(), queryTokens))) {
+      matchedBy.push('raw-tags')
+      score += 8
     }
     if (document.aliases.some((alias) => matchesQuery(alias.toLowerCase(), queryTokens))) {
       matchedBy.push('aliases')
@@ -695,12 +772,14 @@ export async function searchKnowledge(sourceId: string, query: string, filterTag
       path: document.path,
       name: document.name,
       title: document.title,
+      rawTitle: document.rawTitle,
       description: document.description,
       type: 'file',
       snippet: createSnippet(document.body, query),
       matches: [],
       score,
       tags: document.tags,
+      rawTags: document.sourceTags,
       docType: document.docType,
       categories: document.categories,
       matchedBy,
@@ -805,16 +884,20 @@ export async function getKnowledgeDocuments(sourceId: string): Promise<StaticKno
     path: document.path,
     name: document.name,
     title: document.title,
+    rawTitle: document.rawTitle,
     description: document.description,
     docType: document.docType,
     status: document.status,
     tags: [...document.tags],
+    rawTags: [...document.sourceTags],
     categories: [...document.categories],
     techStack: [...document.techStack],
     updated: document.updated,
+    graphTitle: document.graphTitle,
     content: document.raw,
     frontmatter: document.frontmatter,
     aliases: [...document.aliases],
+    sourceTags: [...document.sourceTags],
   }))
 }
 
@@ -879,6 +962,8 @@ export async function getKnowledgeDirectoryIndex(sourceId: string): Promise<Reco
         lastModified: document.updated || index.builtAt,
         sourceId: source.id,
         tags: [...document.tags],
+        rawTags: [...document.sourceTags],
+        graphTitle: document.graphTitle,
         frontmatter: document.frontmatter,
       })
       directoryChildren.set(parentDirectory, parentChildren)

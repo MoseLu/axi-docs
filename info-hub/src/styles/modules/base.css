@@ -1,150 +1,10 @@
-/* ─── Design Tokens — Apple-inspired ─────────────────────────────────────────── */
-:root {
-  /* Colors */
-  --color-bg: #ffffff;
-  --color-bg-secondary: #f5f5f7;
-  --color-bg-tertiary: #f0f0f2;
-  --color-surface: #ffffff;
-  --color-border: #d2d2d7;
-  --color-border-light: #e5e5ea;
-
-  --color-text: #1d1d1f;
-  --color-text-secondary: #424245;
-  --color-text-muted: #86868b;
-  --color-text-subtle: #acacb0;
-
-  /* Brand — refined blue-violet */
-  --color-primary: #0071e3;
-  --color-primary-hover: #0077ED;
-  --color-primary-light: #f0f5ff;
-  --color-accent: #5e5ce6;
-  --color-accent-light: #f3f3fd;
-  --color-obsidian: #6e6ce6;
-  --color-blinko: #ff9f0a;
-  --color-blinko-light: #fff9f0;
-
-  --color-success: #30d158;
-  --color-warning: #ff9f0a;
-  --color-danger: #ff453a;
-  --color-info: #0a84ff;
-
-  /* Tag palette */
-  --tag-bg: #f0f0f5;
-  --tag-text: #515154;
-  --tag-border: #d1d1d6;
-  --tag-hover-bg: #e8e8ed;
-  --tag-active-bg: var(--color-primary);
-  --tag-active-text: #ffffff;
-
-  /* Layout */
-  --sidebar-width: 240px;
-  --knowledge-panel-width: 260px;
-  --knowledge-graph-workspace-width: min(62vw, 980px);
-  --header-height: 52px;
-
-  /* Radius */
-  --radius-xs: 4px;
-  --radius-sm: 6px;
-  --radius-md: 10px;
-  --radius-lg: 14px;
-  --radius-xl: 20px;
-
-  /* Shadow */
-  --shadow-xs: 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
-  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
-  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
-
-  /* Transition */
-  --transition: 0.2s cubic-bezier(0.25, 0.1, 0.25, 1);
-
-  /* Scrollbar — Element Plus inspired */
-  --scrollbar-size: 8px;
-  --scrollbar-radius: 999px;
-  --scrollbar-track: transparent;
-  --scrollbar-thumb: rgba(144, 147, 153, 0.3);
-  --scrollbar-thumb-hover: rgba(144, 147, 153, 0.5);
-  --scrollbar-thumb-active: rgba(144, 147, 153, 0.68);
-
-  /* Font */
-  --font-size-xxs: 10px;
-  --font-size-xs: 11px;
-  --font-size-sm: 12px;
-  --font-size-base: 14px;
-  --font-size-md: 15px;
-  --font-size-lg: 16px;
-  --font-size-xl: 18px;
-  --font-size-2xl: 24px;
-  --font-size-3xl: 32px;
-
-  /* Spacing */
-  --spacing-1: 4px;
-  --spacing-2: 6px;
-  --spacing-3: 8px;
-  --spacing-4: 12px;
-  --spacing-5: 16px;
-  --spacing-6: 20px;
-  --spacing-7: 24px;
-  --spacing-8: 32px;
-  --spacing-9: 48px;
-
-  /* Icon */
-  --icon-size-xs: 11px;
-  --icon-size-sm: 13px;
-  --icon-size-md: 16px;
-  --icon-size-lg: 20px;
-  --icon-size-xl: 26px;
-  --icon-size-2xl: 48px;
-}
-
-/* ─── Dark Mode ──────────────────────────────────────────────────────────────── */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --color-bg: #000000;
-    --color-bg-secondary: #1c1c1e;
-    --color-bg-tertiary: #2c2c2e;
-    --color-surface: #1c1c1e;
-    --color-border: #38383a;
-    --color-border-light: #2c2c2e;
-
-    --color-text: #f5f5f7;
-    --color-text-secondary: #a1a1a6;
-    --color-text-muted: #636366;
-    --color-text-subtle: #48484a;
-
-    --color-primary: #0a84ff;
-    --color-primary-hover: #409cff;
-    --color-primary-light: #1a1a2e;
-    --color-accent: #8e8ef0;
-    --color-accent-light: #1e1e2e;
-    --color-obsidian: #8e8ef0;
-    --color-blinko: #ffd60a;
-    --color-blinko-light: #1a1200;
-
-    --color-success: #30d158;
-    --color-warning: #ffd60a;
-    --color-danger: #ff453a;
-    --color-info: #0a84ff;
-
-    --tag-bg: #2c2c2e;
-    --tag-text: #a1a1a6;
-    --tag-border: #38383a;
-    --tag-hover-bg: #3a3a3c;
-
-    --scrollbar-thumb: rgba(144, 147, 153, 0.36);
-    --scrollbar-thumb-hover: rgba(144, 147, 153, 0.56);
-    --scrollbar-thumb-active: rgba(144, 147, 153, 0.76);
-  }
-}
-
 /* ─── Reset ──────────────────────────────────────────────────────────────────── */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
 html, body, #root { height: 100%; width: 100%; overflow: hidden; }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'SF Pro Display',
-    'Inter', 'Segoe UI', 'Helvetica Neue', 'Noto Sans SC', sans-serif;
+  font-family: var(--font-family-sans);
   font-size: var(--font-size-base);
   line-height: 1.5;
   color: var(--color-text);
@@ -499,7 +359,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
 .inline-code {
   background: var(--color-bg-secondary);
   padding: 2px 6px; border-radius: var(--radius-sm);
-  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', Consolas, monospace;
+  font-family: var(--font-family-mono);
   font-size: 0.875em; color: var(--color-accent);
   border: 1px solid var(--color-border-light);
   white-space: nowrap;
@@ -523,7 +383,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   font-size: var(--font-size-xs); font-weight: 600;
   text-transform: uppercase; letter-spacing: 0.08em;
   color: #8b8b8b;
-  font-family: 'SF Mono', 'Fira Code', Consolas, monospace;
+  font-family: var(--font-family-mono);
 }
 .copy-btn {
   font-size: var(--font-size-xs); font-weight: 500;
@@ -545,7 +405,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   --scrollbar-thumb-active: rgba(196, 196, 196, 0.78);
 }
 .code-block code {
-  font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', Consolas, 'Liberation Mono', monospace;
+  font-family: var(--font-family-mono);
   font-size: 13px; line-height: 1.65;
   background: none; padding: 0; border: none;
   color: #d4d4d4; white-space: pre;

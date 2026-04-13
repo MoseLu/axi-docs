@@ -697,7 +697,7 @@ function App() {
       <Route path="/" element={<HubPage pageMode="home" />} />
       <Route path="/nodes/:categoryId" element={<HubPage pageMode="category" />} />
       <Route path="/nodes/:categoryId/sub/:subId" element={<HubPage pageMode="category" />} />
-      <Route path="/docs/:docId" element={<HubPage pageMode="document" />} />
+      <Route path="/doc/:docId" element={<HubPage pageMode="document" />} />
       <Route path="/search" element={<HubPage pageMode="search" />} />
       <Route path="*" element={<RouteFallback />} />
     </Routes>

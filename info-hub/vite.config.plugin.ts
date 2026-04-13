@@ -1,7 +1,6 @@
 import type { Plugin } from 'vite'
 import fs from 'fs'
 import path from 'path'
-import matter from 'gray-matter'
 import Anthropic from '@anthropic-ai/sdk'
 import {
   getKnowledgeDirectoryIndex,
@@ -18,12 +17,9 @@ import {
 import { encodeBase64Url } from './src/lib/routes'
 import type { DocSource, StaticKnowledgeManifest, StaticKnowledgeSourceBundle } from './src/types'
 
-const API_PREFIXES = ['/docs/api', '/api']
+const API_PREFIXES = ['/api']
 const STATIC_KNOWLEDGE_ROOT = 'generated/knowledge'
-const STATIC_KNOWLEDGE_PREFIXES = [
-  `/${STATIC_KNOWLEDGE_ROOT}`,
-  `/docs/${STATIC_KNOWLEDGE_ROOT}`,
-]
+const STATIC_KNOWLEDGE_PREFIXES = [`/${STATIC_KNOWLEDGE_ROOT}`]
 const STATIC_BUNDLE_VERSION = 1
 
 function matchesApiPath(pathname: string, suffix: string): boolean {
@@ -126,7 +122,7 @@ function matchStaticKnowledgeAsset(pathname: string): string | null {
   for (const prefix of STATIC_KNOWLEDGE_PREFIXES) {
     if (pathname === prefix) return `${STATIC_KNOWLEDGE_ROOT}/manifest.json`
     if (pathname.startsWith(`${prefix}/`)) {
-      return pathname.slice(prefix.startsWith('/docs/') ? '/docs/'.length : 1)
+      return pathname.slice(1)
     }
   }
   return null
@@ -215,28 +211,24 @@ function sendJson(res: MiddlewareResponse, payload: unknown) {
 async function buildFileInfo(sourceId: string, filePath: string) {
   const source = listKnowledgeSources().find((item) => item.id === sourceId && item.type === 'local')
   if (!source) return null
+  const documents = await getKnowledgeDocuments(sourceId)
+  const admittedDocument = documents.find((document) => document.path === filePath)
+  if (!admittedDocument) return null
   const fullPath = path.join(source.path, filePath)
   if (!fs.existsSync(fullPath)) return null
 
-  const raw = await fs.promises.readFile(fullPath, 'utf-8')
-  let parsed: { data: Record<string, unknown> }
-  try {
-    parsed = matter(raw)
-  } catch {
-    parsed = { data: {} }
-  }
   const stat = await fs.promises.stat(fullPath)
   return {
     id: `${sourceId}:${filePath}`,
-    name: path.basename(filePath),
+    name: admittedDocument.name,
     path: fullPath,
     relativePath: filePath,
     type: 'file',
     extension: path.extname(filePath),
     lastModified: stat.mtime.toISOString(),
     sourceId,
-    tags: Array.isArray(parsed.data.tags) ? parsed.data.tags : [],
-    frontmatter: parsed.data,
+    tags: admittedDocument.tags,
+    frontmatter: admittedDocument.frontmatter,
   }
 }
 

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getKnowledgeTags as loadKnowledgeTags } from '../lib/knowledgeClient'
+import { formatKnowledgeTagLabel } from '../lib/knowledgeFormatter'
 import { DocSource, SelectedFile } from '../types'
 import { BlinkoIcon, FileIcon, FolderIcon, ObsidianIcon, TagIcon } from './Icons'
 import { FileTree } from './FileTree'
@@ -103,7 +104,7 @@ export function Sidebar({
         <div className="sidebar-rail__footer">
           <span className="sidebar-rail__eyebrow">Source</span>
           <strong>{currentSource?.name || 'Info Hub'}</strong>
-          {activeTag && <span className="sidebar-rail__hint">#{activeTag}</span>}
+          {activeTag && <span className="sidebar-rail__hint">#{formatKnowledgeTagLabel(activeTag)}</span>}
         </div>
       </div>
 
@@ -141,7 +142,7 @@ export function Sidebar({
                   title={`${tag.count} 篇文档`}
                   type="button"
                 >
-                  #{tag.name}
+                  #{formatKnowledgeTagLabel(tag.name)}
                   <span className="tag-count">{tag.count}</span>
                 </button>
               ))}

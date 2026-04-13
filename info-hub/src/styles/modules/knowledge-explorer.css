@@ -1,10 +1,10 @@
 .knowledge-explorer {
   height: 100%;
   overflow: hidden;
-  padding: 24px;
+  padding: var(--page-shell-padding);
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: var(--page-shell-gap);
 }
 
 .knowledge-explorer__header {
@@ -57,8 +57,8 @@
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(320px, 380px);
-  gap: 18px;
+  grid-template-columns: var(--knowledge-explorer-body-columns);
+  gap: var(--layout-gap-lg);
 }
 
 .knowledge-explorer__stage,

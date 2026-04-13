@@ -15,6 +15,7 @@ export interface DocSource {
 // ─── File / Document Types ────────────────────────────────────────────────────
 
 export interface Frontmatter {
+  id?: string
   title?: string
   tags?: string[]
   category?: string
@@ -31,6 +32,10 @@ export interface Frontmatter {
   version?: string
   domain?: string
   problem?: string
+  graphTitle?: string
+  graphTags?: string[] | string
+  ['graph-title']?: string
+  ['graph-tags']?: string[] | string
   section?: string[] | string
   sections?: string[] | string
   knowledgeSection?: string[] | string
@@ -50,6 +55,8 @@ export interface FileItem {
   lastModified: string
   sourceId: string
   tags?: string[]
+  rawTags?: string[]
+  graphTitle?: string
   frontmatter?: Frontmatter
 }
 
@@ -113,7 +120,9 @@ export interface SearchResult {
   matches: SearchMatch[]
   score: number
   tags?: string[]
+  rawTags?: string[]
   title?: string
+  rawTitle?: string
   description?: string
   docType?: string
   categories?: string[]
@@ -165,13 +174,16 @@ export interface KnowledgeCatalogItem {
   path: string
   name: string
   title: string
+  rawTitle?: string
   description?: string
   docType?: string
   status?: string
   tags: string[]
+  rawTags?: string[]
   categories: string[]
   techStack: string[]
   updated?: string
+  graphTitle?: string
 }
 
 export interface KnowledgeCatalogSection {
@@ -216,6 +228,7 @@ export interface StaticKnowledgeDocument extends KnowledgeCatalogItem {
   content: string
   frontmatter: Frontmatter
   aliases: string[]
+  sourceTags?: string[]
 }
 
 export interface StaticKnowledgeManifest {

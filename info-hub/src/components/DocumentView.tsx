@@ -5,6 +5,7 @@ import rehypeHighlight from 'rehype-highlight'
 import { Components } from 'react-markdown'
 import { DocumentIcon, ClockIcon } from './Icons'
 import { KnowledgePanel } from './KnowledgePanel'
+import { formatKnowledgeDocumentTitle } from '../lib/knowledgeFormatter'
 import { DocSource, SelectedFile, Frontmatter } from '../types'
 
 interface DocumentViewProps {
@@ -232,7 +233,9 @@ export function DocumentView({
   }
 
   const title = (frontmatter.title as string) || fileName
-  const date = (frontmatter.date || frontmatter.updated) as string | undefined
+  const graphTitle = (frontmatter['graph-title'] as string) || (frontmatter.graphTitle as string) || undefined
+  const displayTitle = formatKnowledgeDocumentTitle(title, selectedFile.path, graphTitle)
+  const date = (frontmatter.modified || frontmatter.updated || frontmatter.date || frontmatter.created) as string | undefined
   const description = frontmatter.description as string | undefined
   const docType = frontmatter.type as string | undefined
   // Skill metadata fields (MCP-ready)
@@ -258,7 +261,7 @@ export function DocumentView({
           </div>
 
           <div className="doc-title-row">
-            <h1 className="doc-title">{title}</h1>
+            <h1 className="doc-title">{displayTitle}</h1>
             {isDaily && <span className="doc-type-badge">日记</span>}
             {docType && !isDaily && <span className="doc-type-badge">{docType}</span>}
           </div>

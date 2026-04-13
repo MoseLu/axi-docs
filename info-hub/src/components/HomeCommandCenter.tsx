@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { pageCopy } from '../config/pageCopy'
+import { formatKnowledgeItemTitle, formatKnowledgeTagLabel } from '../lib/knowledgeFormatter'
 import { DocSource, KnowledgeCatalog, SelectedFile } from '../types'
 import { CompactEmptyState, MetricPill, PageShell, RailPanel, SectionHeader } from './CockpitPrimitives'
 import { FileIcon, SearchIcon, TagIcon } from './Icons'
@@ -10,6 +11,7 @@ export interface QuickKnowledgeItemLike {
   path: string
   name: string
   title?: string
+  graphTitle?: string
   description?: string
 }
 
@@ -116,7 +118,7 @@ export function HomeCommandCenter({
               {activeTag && (
                 <button className="command-center__state-pill" onClick={onTagClear} type="button">
                   <TagIcon />
-                  <span>标签过滤 #{activeTag}</span>
+                  <span>标签过滤 #{formatKnowledgeTagLabel(activeTag)}</span>
                 </button>
               )}
               {selectedFile && (
@@ -190,7 +192,7 @@ export function HomeCommandCenter({
                   type="button"
                 >
                   <div>
-                    <strong>{item.title || item.name}</strong>
+                    <strong>{formatKnowledgeItemTitle(item)}</strong>
                     <span>{item.path}</span>
                   </div>
                 </button>

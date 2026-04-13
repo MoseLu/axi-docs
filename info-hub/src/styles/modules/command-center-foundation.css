@@ -1,63 +1,10 @@
-/* ─── Command Center Redesign ──────────────────────────────────────────────── */
-:root {
-  --color-bg: #050b14;
-  --color-bg-secondary: #08111d;
-  --color-bg-tertiary: #101a29;
-  --color-surface: rgba(10, 18, 31, 0.84);
-  --color-border: rgba(139, 163, 199, 0.2);
-  --color-border-light: rgba(139, 163, 199, 0.12);
-  --color-text: #eff6ff;
-  --color-text-secondary: rgba(226, 232, 240, 0.82);
-  --color-text-muted: rgba(148, 163, 184, 0.88);
-  --color-text-subtle: rgba(148, 163, 184, 0.64);
-  --color-primary: #3ecfff;
-  --color-primary-hover: #7dd3fc;
-  --color-primary-light: rgba(62, 207, 255, 0.12);
-  --color-accent: #7cf29a;
-  --color-accent-light: rgba(124, 242, 154, 0.12);
-  --color-obsidian: #7dd3fc;
-  --color-blinko: #fbbf24;
-  --color-success: #4ade80;
-  --color-warning: #fbbf24;
-  --color-danger: #fb7185;
-  --color-info: #38bdf8;
-  --tag-bg: rgba(15, 23, 42, 0.88);
-  --tag-text: rgba(226, 232, 240, 0.86);
-  --tag-border: rgba(125, 211, 252, 0.14);
-  --tag-hover-bg: rgba(30, 41, 59, 0.96);
-  --tag-active-bg: linear-gradient(135deg, #0ea5e9, #2563eb);
-  --tag-active-text: #ffffff;
-  --header-height: 68px;
-  --sidebar-width: 92px;
-  --sidebar-panel-width: 280px;
-  --surface-hero: rgba(7, 16, 30, 0.8);
-  --surface-glass: rgba(7, 16, 30, 0.68);
-  --surface-panel: rgba(9, 16, 28, 0.88);
-  --glow-cyan: #67e8f9;
-  --glow-blue: #60a5fa;
-  --graph-branch: #34d399;
-  --graph-note: #818cf8;
-  --graph-tag: #f59e0b;
-  --shadow-xs: 0 1px 3px rgba(2, 6, 23, 0.22);
-  --shadow-sm: 0 10px 28px rgba(2, 6, 23, 0.2);
-  --shadow-md: 0 20px 48px rgba(2, 6, 23, 0.28);
-  --shadow-lg: 0 34px 80px rgba(2, 6, 23, 0.42);
-}
-
 body {
-  font-family: 'Space Grotesk', 'SF Pro Display', 'Noto Sans SC', 'Segoe UI', sans-serif;
+  font-family: var(--font-family-display);
   background:
     radial-gradient(circle at top left, rgba(34, 211, 238, 0.12), transparent 28%),
     radial-gradient(circle at top right, rgba(59, 130, 246, 0.16), transparent 32%),
     linear-gradient(180deg, #030712 0%, #06111f 52%, #08111d 100%);
   color: var(--color-text);
-}
-
-button:focus-visible,
-input:focus-visible,
-textarea:focus-visible {
-  outline: 2px solid var(--glow-cyan);
-  outline-offset: 2px;
 }
 
 .app-layout--home,
@@ -75,7 +22,7 @@ textarea:focus-visible {
   display: flex;
   justify-content: space-between;
   gap: 18px;
-  padding: 0 24px;
+  padding: 0 var(--command-header-inline-padding);
 }
 
 .app-logo {
@@ -348,7 +295,50 @@ textarea:focus-visible {
 
 .sidebar-panel__body--files {
   padding: 8px 0 12px;
-  overflow: hidden;
+  overflow: auto;
+  scrollbar-gutter: stable;
+  padding-right: 4px;
+  --scrollbar-size: 10px;
+  --scrollbar-track: rgba(15, 23, 42, 0.36);
+  --scrollbar-thumb: rgba(125, 211, 252, 0.34);
+  --scrollbar-thumb-hover: rgba(125, 211, 252, 0.56);
+  --scrollbar-thumb-active: rgba(96, 165, 250, 0.74);
+  scrollbar-width: thin;
+  scrollbar-color: var(--scrollbar-thumb) var(--scrollbar-track);
+}
+
+.sidebar-panel__body--files::-webkit-scrollbar {
+  width: var(--scrollbar-size);
+}
+
+.sidebar-panel__body--files::-webkit-scrollbar-track {
+  background: linear-gradient(180deg, rgba(8, 15, 27, 0.2), rgba(8, 15, 27, 0.5));
+  border-radius: 999px;
+}
+
+.sidebar-panel__body--files::-webkit-scrollbar-thumb {
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background-clip: padding-box;
+  background-color: var(--scrollbar-thumb);
+  box-shadow: inset 0 0 0 1px rgba(186, 230, 253, 0.12);
+}
+
+.sidebar-panel__body--files:hover::-webkit-scrollbar-thumb {
+  background-color: var(--scrollbar-thumb-hover);
+}
+
+.sidebar-panel__body--files::-webkit-scrollbar-thumb:active {
+  background-color: var(--scrollbar-thumb-active);
+}
+
+.sidebar-panel__body--files .loading,
+.sidebar-panel__body--files .empty-state {
+  min-height: 100%;
+}
+
+.sidebar-panel__body--files .file-tree {
+  padding-right: 6px;
 }
 
 .app-main--home,
@@ -362,11 +352,11 @@ textarea:focus-visible {
 .knowledge-workbench {
   height: 100%;
   overflow: auto;
-  padding: 24px;
+  padding: var(--page-shell-padding);
   background: transparent;
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: var(--layout-gap-xl);
 }
 
 .knowledge-workbench--search {
@@ -376,9 +366,9 @@ textarea:focus-visible {
 .document-route {
   height: 100%;
   display: grid;
-  grid-template-columns: minmax(220px, 0.22fr) minmax(0, 1fr) minmax(220px, 0.22fr);
-  gap: 18px;
-  padding: 24px;
+  grid-template-columns: var(--document-route-columns);
+  gap: var(--page-shell-gap);
+  padding: var(--page-shell-padding);
 }
 
 .document-route__nav,

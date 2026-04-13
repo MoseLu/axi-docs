@@ -38,12 +38,31 @@ Info-Hub 是一个文档同步与查看平台，提供以下功能：
 | 约束类型 | 规则 |
 |---------|------|
 | 语言版本 | TypeScript 5.5+ / Node.js 20+ |
-| 包管理 | npm（本项目使用 npm） |
+| 包管理 | pnpm（本项目运维基线使用 pnpm） |
 | 代码格式 | Vite + TypeScript |
 | 测试框架 | Vitest（单元/集成）+ Testing Library（组件测试） |
 | 构建工具 | Vite 5+ |
 | UI 框架 | React 18 / React Router 7 |
 | 数据格式 | Markdown / JSON |
+
+---
+
+## 仓库治理规则
+
+- `dev` 是默认集成分支，`main` 是生产发布分支
+- 常规开发从 `dev` 拉出短生命周期分支
+- 生产问题使用 `hotfix/*` 从 `main` 拉出并在上线后回灌 `dev`
+- Commit Message 与 PR 标题统一使用 Conventional Commits
+- 提交前至少通过：
+  - `pnpm quality:check`
+  - `pnpm verify`
+- 参考运维文档：
+  - `docs/OPERATIONS.md`
+  - `docs/GITHUB_FLOW.md`
+  - `docs/BRANCH_PROTECTION.md`
+  - `docs/COMMIT_CONVENTION.md`
+  - `docs/RELEASE_OPERATIONS.md`
+  - `docs/QUALITY_GATE.md`
 
 ---
 

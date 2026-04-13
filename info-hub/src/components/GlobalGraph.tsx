@@ -7,7 +7,20 @@ import {
   getGlobalKnowledgeGraph as loadGlobalKnowledgeGraph,
   getKnowledgeGraph as loadKnowledgeGraph,
 } from '../lib/knowledgeClient'
+import {
+  formatKnowledgeBranchLabel,
+  formatKnowledgeNodeLabel,
+  formatKnowledgeTagLabel,
+} from '../lib/knowledgeFormatter'
+import {
+  buildKnowledgeTree,
+  collectTreeBranchIds,
+  resolveSelectedTree,
+  type GraphNoteNode,
+  type GraphTreeNode,
+} from '../lib/knowledgeTreeGraph'
 import { FileIcon, FolderIcon, LinkIcon, SearchIcon } from './Icons'
+import { OverlayScrollbar } from './OverlayScrollbar'
 
 type GlobalGraphMode = 'focus' | 'global' | 'tree' | 'orphan'
 type GraphChrome = 'hero' | 'cockpit' | 'minimal'
@@ -30,20 +43,6 @@ interface GraphApiResponse {
   nodes: GlobalGraphNode[]
   edges: GlobalGraphEdge[]
   orphanNodes?: GlobalGraphNode[]
-}
-
-interface GraphTreeNode {
-  id: string
-  label: string
-  pathKey: string
-  depth: number
-  count: number
-  notes: GraphNoteNode[]
-  children: GraphTreeNode[]
-}
-
-interface GraphNoteNode extends GlobalGraphNode {
-  kind: 'current' | 'note'
 }
 
 type SpaceNodeKind = 'current' | 'note' | 'tag' | 'branch'
@@ -92,21 +91,8 @@ const SPACE_COLORS: Record<SpaceNodeKind, string> = {
 const GRAPH_BACKDROP = '#06111f'
 const TREE_ROOT_ID = 'branch:__knowledge-root__'
 
-function formatLabel(name: string): string {
-  if (/[\u4e00-\u9fa5]/.test(name) || /\s/.test(name)) {
-    return name
-      .replace(/\.(md|markdown)$/i, '')
-      .replace(/\s+/g, ' ')
-      .trim()
-      .slice(0, 40)
-  }
-  return name
-    .replace(/\.(md|markdown)$/i, '')
-    .replace(/[-_]+/g, ' ')
-    .replace(/([a-z])([A-Z])/g, '$1 $2')
-    .replace(/\s+/g, ' ')
-    .trim()
-    .slice(0, 40)
+function displayNodeLabel(node: Pick<SpaceNode, 'id' | 'kind' | 'label' | 'path'>): string {
+  return formatKnowledgeNodeLabel(node).slice(0, 40)
 }
 
 function truncateLabel(label: string, max = 26): string {
@@ -139,98 +125,6 @@ function buildAdjacency(links: SpaceLink[]) {
   return adjacency
 }
 
-function buildKnowledgeTree(notes: GraphNoteNode[]) {
-  const branchMap = new Map<string, GraphTreeNode>()
-  const rootChildren: GraphTreeNode[] = []
-  const looseNotes: GraphNoteNode[] = []
-
-  function ensureBranch(pathKey: string, label: string, depth: number): GraphTreeNode {
-    const existing = branchMap.get(pathKey)
-    if (existing) return existing
-
-    const branch: GraphTreeNode = {
-      id: `branch:${pathKey}`,
-      label,
-      pathKey,
-      depth,
-      count: 0,
-      notes: [],
-      children: [],
-    }
-    branchMap.set(pathKey, branch)
-    return branch
-  }
-
-  for (const note of notes) {
-    const parts = (note.path || note.label)
-      .split('/')
-      .filter(Boolean)
-    const directories = parts.slice(0, -1)
-
-    if (directories.length === 0) {
-      looseNotes.push(note)
-      continue
-    }
-
-    let parent: GraphTreeNode | null = null
-    let pathKey = ''
-    for (const [index, segment] of directories.entries()) {
-      pathKey = pathKey ? `${pathKey}/${segment}` : segment
-      const branch = ensureBranch(pathKey, formatLabel(segment), index + 1)
-      branch.count += 1
-
-      if (!parent) {
-        if (!rootChildren.some(item => item.id === branch.id)) {
-          rootChildren.push(branch)
-        }
-      } else if (!parent.children.some(item => item.id === branch.id)) {
-        parent.children.push(branch)
-      }
-
-      parent = branch
-    }
-
-    parent?.notes.push(note)
-  }
-
-  return { rootChildren, branchMap, looseNotes }
-}
-
-function collectTreeBranchIds(branch: GraphTreeNode): Set<string> {
-  const ids = new Set<string>([branch.pathKey])
-  for (const child of branch.children) {
-    for (const id of collectTreeBranchIds(child)) {
-      ids.add(id)
-    }
-  }
-  return ids
-}
-
-function resolveSelectedTree(tree: ReturnType<typeof buildKnowledgeTree>, selectedBranch: string | null) {
-  if (!selectedBranch) {
-    return {
-      roots: tree.rootChildren,
-      looseNotes: tree.looseNotes,
-      currentBranch: null as GraphTreeNode | null,
-    }
-  }
-
-  const currentBranch = tree.branchMap.get(selectedBranch) || null
-  if (!currentBranch) {
-    return {
-      roots: tree.rootChildren,
-      looseNotes: tree.looseNotes,
-      currentBranch: null as GraphTreeNode | null,
-    }
-  }
-
-  return {
-    roots: [currentBranch],
-    looseNotes: [],
-    currentBranch,
-  }
-}
-
 function createTreeGraph(
   roots: GraphTreeNode[],
   looseNotes: GraphNoteNode[],
@@ -239,7 +133,7 @@ function createTreeGraph(
 ) {
   const nodes: SpaceNode[] = [{
     id: TREE_ROOT_ID,
-    label: selectedBranch ? formatLabel(selectedBranch.label) : 'Knowledge Space',
+    label: selectedBranch ? formatKnowledgeBranchLabel(selectedBranch.label) : '知识空间',
     kind: 'branch',
     path: selectedBranch?.pathKey,
     count: selectedBranch?.count,
@@ -332,10 +226,11 @@ function createNodeObject(node: SpaceNode, selectedId: string | null, hoveredId:
 
   const showLabel = !hero || isSelected || isHovered || node.kind === 'branch' || node.kind === 'current'
   if (showLabel) {
+    const displayLabel = displayNodeLabel(node)
     const label = new SpriteText(
       node.kind === 'tag'
-        ? `#${truncateLabel(formatLabel(node.label), 18)}`
-        : truncateLabel(formatLabel(node.label), hero ? 18 : 20),
+        ? `#${truncateLabel(formatKnowledgeTagLabel(node.label), 18)}`
+        : truncateLabel(displayLabel, hero ? 18 : 20),
     )
     label.color = node.kind === 'tag' ? '#fde68a' : '#e5eef9'
     label.textHeight = hero
@@ -912,7 +807,7 @@ export function GlobalGraph({
               type="button"
             >
               <FileIcon />
-              <span className="graph-tree-label">{formatLabel(note.label)}</span>
+              <span className="graph-tree-label">{formatKnowledgeNodeLabel(note)}</span>
             </button>
           ))}
 
@@ -939,7 +834,7 @@ export function GlobalGraph({
           {selectedNode.kind === 'tag' && pageCopy.graph.badges.tag}
           {selectedNode.kind === 'branch' && pageCopy.graph.badges.branch}
         </div>
-        <h4 className="graph-inspector__title">{formatLabel(selectedNode.label)}</h4>
+        <h4 className="graph-inspector__title">{formatKnowledgeNodeLabel(selectedNode)}</h4>
         {selectedNode.path && (
           <div className="graph-inspector__path">{selectedNode.path}</div>
         )}
@@ -1044,8 +939,8 @@ export function GlobalGraph({
             nodeLabel={(node: object) => {
               const current = node as SpaceNode
               return current.path
-                ? `${formatLabel(current.label)}\n${current.path}`
-                : formatLabel(current.label)
+                ? `${formatKnowledgeNodeLabel(current)}\n${current.path}`
+                : formatKnowledgeNodeLabel(current)
             }}
             backgroundColor={GRAPH_BACKDROP}
             showNavInfo={false}
@@ -1171,7 +1066,12 @@ export function GlobalGraph({
               <FolderIcon />
               <span>{pageCopy.graph.treePanel}</span>
             </div>
-            <div className="graph-tree">
+            <OverlayScrollbar
+              ariaLabel={pageCopy.graph.treePanel}
+              className="graph-tree-scrollbar"
+              viewClassName="graph-tree"
+              wrapClassName="graph-tree-scrollbar__wrap"
+            >
               <button
                 className={`graph-tree-root${selectedBranch === null ? ' active' : ''}`}
                 onClick={() => setSelectedBranch(null)}
@@ -1202,12 +1102,12 @@ export function GlobalGraph({
                       type="button"
                     >
                       <FileIcon />
-                      <span className="graph-tree-label">{formatLabel(note.label)}</span>
+                      <span className="graph-tree-label">{formatKnowledgeNodeLabel(note)}</span>
                     </button>
                   ))}
                 </div>
               )}
-            </div>
+            </OverlayScrollbar>
           </aside>
         )}
 
@@ -1232,8 +1132,8 @@ export function GlobalGraph({
             nodeLabel={(node: object) => {
               const current = node as SpaceNode
               return current.path
-                ? `${formatLabel(current.label)}\n${current.path}`
-                : formatLabel(current.label)
+                ? `${formatKnowledgeNodeLabel(current)}\n${current.path}`
+                : formatKnowledgeNodeLabel(current)
             }}
             backgroundColor={GRAPH_BACKDROP}
             showNavInfo={false}

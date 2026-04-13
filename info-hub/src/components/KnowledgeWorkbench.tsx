@@ -14,6 +14,7 @@ import {
   SearchResult,
   SelectedFile,
 } from '../types'
+import { formatKnowledgeItemTitle } from '../lib/knowledgeFormatter'
 import { HomeCommandCenter, QuickKnowledgeItemLike } from './HomeCommandCenter'
 import { KnowledgeExplorer } from './KnowledgeExplorer'
 import { ResultsEvidenceSection } from './ResultsEvidenceSection'
@@ -256,7 +257,9 @@ export function KnowledgeWorkbench({
 export type { QuickKnowledgeItemLike as QuickKnowledgeItem }
 
 export function documentTitle(
-  result: Pick<SearchResult, 'title' | 'name'> | Pick<KnowledgeCatalogItem, 'title' | 'name'>,
+  result:
+    | Pick<SearchResult, 'title' | 'name' | 'path'>
+    | Pick<KnowledgeCatalogItem, 'title' | 'name' | 'path' | 'graphTitle'>,
 ) {
-  return (result.title || result.name).replace(/\.md$/i, '')
+  return formatKnowledgeItemTitle(result)
 }

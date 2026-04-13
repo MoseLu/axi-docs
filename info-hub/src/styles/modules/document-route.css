@@ -1,10 +1,10 @@
 .document-detail-page {
   height: 100%;
   overflow: hidden;
-  padding: 24px;
+  padding: var(--page-shell-padding);
   display: grid;
-  grid-template-columns: minmax(240px, 320px) minmax(0, 1fr) minmax(280px, 360px);
-  gap: 18px;
+  grid-template-columns: var(--document-sidebar-column) minmax(0, 1fr) var(--document-aside-column);
+  gap: var(--page-shell-gap);
 }
 
 .document-detail-page__sidebar,
@@ -316,7 +316,7 @@
 .standalone-route {
   min-height: 100%;
   display: flex;
-  padding: 24px;
+  padding: var(--page-shell-padding);
   background: var(--color-bg);
 }
 

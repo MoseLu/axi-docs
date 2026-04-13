@@ -162,12 +162,17 @@ export async function searchKnowledge(sourceId: string, query: string, filterTag
       let score = 0
       const pathLower = document.path.toLowerCase()
       const titleLower = document.title.toLowerCase()
+      const rawTitleLower = (document.rawTitle || '').toLowerCase()
       const descriptionLower = (document.description || '').toLowerCase()
       const bodyLower = body.toLowerCase()
 
       if (matchesQuery(titleLower, queryTokens)) {
         matchedBy.push('title')
         score += 20
+      }
+      if (rawTitleLower && matchesQuery(rawTitleLower, queryTokens)) {
+        matchedBy.push('raw-title')
+        score += 10
       }
       if (matchesQuery(pathLower, queryTokens)) {
         matchedBy.push('path')
@@ -176,6 +181,10 @@ export async function searchKnowledge(sourceId: string, query: string, filterTag
       if (document.tags.some((tag) => matchesQuery(tag.toLowerCase(), queryTokens))) {
         matchedBy.push('tags')
         score += 10
+      }
+      if ((document.sourceTags || []).some((tag) => matchesQuery(tag.toLowerCase(), queryTokens))) {
+        matchedBy.push('raw-tags')
+        score += 8
       }
       if (document.aliases.some((alias) => matchesQuery(alias.toLowerCase(), queryTokens))) {
         matchedBy.push('aliases')
@@ -206,12 +215,14 @@ export async function searchKnowledge(sourceId: string, query: string, filterTag
         path: document.path,
         name: document.name,
         title: document.title,
+        rawTitle: document.rawTitle,
         description: document.description,
         type: 'file',
         snippet: createSnippet(body, query),
         matches: [],
         score,
         tags: document.tags,
+        rawTags: document.sourceTags,
         docType: document.docType,
         categories: document.categories,
         matchedBy,

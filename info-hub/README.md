@@ -25,13 +25,17 @@
 
 ```bash
 # 安装依赖
-npm install
+pnpm install
+
+# 初始化 Git 运维规范
+pnpm git:bootstrap
+pnpm hooks:install
 
 # 复制环境变量模板
 cp .env.example .env
 
 # 启动开发服务器
-npm run dev
+pnpm dev
 ```
 
 ### 生产部署（Docker）
@@ -50,6 +54,27 @@ docker-compose up -d
 http://localhost:5173
 ```
 
+### 生产部署（Node.js + systemd）
+
+```bash
+# 1. 安装依赖并构建
+npm ci
+npm run build
+
+# 2. 准备服务环境
+cp .env.example .env.server
+
+# 3. 启动统一的 HTTP + MCP 服务
+MCP_HTTP_PORT=3010 BIND_ADDRESS=0.0.0.0 npm run mcp:http
+```
+
+和 Hermes 同机部署时，推荐至少补这两个环境变量：
+
+- `OBSIDIAN_PATH=/root/.hermes/knowledge`
+- `INFO_HUB_EXTRA_SOURCES_JSON=[{"id":"hermes-system","name":"Hermes System","path":"/root/.hermes/memories","type":"local","enabled":true,"description":"Hermes 长期记忆与系统文档","icon":"folder"}]`
+
+这样 Info-Hub 的前端和 MCP 都能直接读取 Hermes 的知识目录与长期记忆目录。
+
 ## 环境变量说明
 
 | 变量名 | 必填 | 说明 |
@@ -58,6 +83,7 @@ http://localhost:5173
 | `BLINKO_URL` | 否 | Blinko API 地址，默认 `http://localhost:3006` |
 | `BLINKO_TOKEN` | 条件 | Blinko API Token（Blinko 开启认证时必填） |
 | `OBSIDIAN_PATH` | 条件 | Obsidian Vault 路径（本地开发时需要） |
+| `INFO_HUB_EXTRA_SOURCES_JSON` | 否 | 追加本地/API 知识源的 JSON 数组，可用于挂载 Hermes 目录 |
 
 ### Token 优先级
 
@@ -69,19 +95,43 @@ http://localhost:5173
 ## 开发命令
 
 ```bash
-npm install          # 安装依赖
-npm run dev          # 开发模式
-npm run build        # 生产构建
-npm run preview      # 预览生产构建
-npm run test         # 运行测试
-npm run mcp          # 运行 MCP 服务器
-npm run mcp:http     # MCP HTTP 模式
+pnpm install            # 安装依赖
+pnpm git:bootstrap      # 初始化 dev/main 治理基线
+pnpm hooks:install      # 安装 commit-msg / pre-commit / pre-push
+pnpm commit             # 交互式约定式提交
+pnpm quality:check      # 治理 + lint + coverage
+pnpm verify             # 构建验证
+pnpm dev                # 开发模式
+pnpm build              # 生产构建
+pnpm preview            # 预览生产构建
+pnpm test               # 运行测试
+pnpm mcp                # 运行 MCP 服务器
+pnpm mcp:http           # MCP HTTP 模式
 ```
+
+## 运维规范
+
+Info-Hub 已对齐 Axi 的统一运维基线：
+
+- `dev` 是默认集成分支
+- `main` 是生产发布分支
+- 所有工作通过 Pull Request 合入
+- commit message 和 PR 标题统一使用 Conventional Commits
+
+运维入口文档：
+
+- `docs/OPERATIONS.md`
+- `docs/GITHUB_FLOW.md`
+- `docs/BRANCH_PROTECTION.md`
+- `docs/COMMIT_CONVENTION.md`
+- `docs/RELEASE_OPERATIONS.md`
+- `docs/QUALITY_GATE.md`
 
 ## 端口
 
 - 开发服务器：`http://localhost:5173`
 - Vite 代理：`/docs/api` → `http://localhost:3009`
+- MCP HTTP 服务：`http://localhost:3010`
 
 ## Docker 部署 Blinko + Info-Hub
 

@@ -54,6 +54,27 @@ docker-compose up -d
 http://localhost:5173
 ```
 
+### 生产部署（Node.js + systemd）
+
+```bash
+# 1. 安装依赖并构建
+npm ci
+npm run build
+
+# 2. 准备服务环境
+cp .env.example .env.server
+
+# 3. 启动统一的 HTTP + MCP 服务
+MCP_HTTP_PORT=3010 BIND_ADDRESS=0.0.0.0 npm run mcp:http
+```
+
+和 Hermes 同机部署时，推荐至少补这两个环境变量：
+
+- `OBSIDIAN_PATH=/root/.hermes/knowledge`
+- `INFO_HUB_EXTRA_SOURCES_JSON=[{"id":"hermes-system","name":"Hermes System","path":"/root/.hermes/memories","type":"local","enabled":true,"description":"Hermes 长期记忆与系统文档","icon":"folder"}]`
+
+这样 Info-Hub 的前端和 MCP 都能直接读取 Hermes 的知识目录与长期记忆目录。
+
 ## 环境变量说明
 
 | 变量名 | 必填 | 说明 |
@@ -62,6 +83,7 @@ http://localhost:5173
 | `BLINKO_URL` | 否 | Blinko API 地址，默认 `http://localhost:3006` |
 | `BLINKO_TOKEN` | 条件 | Blinko API Token（Blinko 开启认证时必填） |
 | `OBSIDIAN_PATH` | 条件 | Obsidian Vault 路径（本地开发时需要） |
+| `INFO_HUB_EXTRA_SOURCES_JSON` | 否 | 追加本地/API 知识源的 JSON 数组，可用于挂载 Hermes 目录 |
 
 ### Token 优先级
 
@@ -109,6 +131,7 @@ Info-Hub 已对齐 Axi 的统一运维基线：
 
 - 开发服务器：`http://localhost:5173`
 - Vite 代理：`/docs/api` → `http://localhost:3009`
+- MCP HTTP 服务：`http://localhost:3010`
 
 ## Docker 部署 Blinko + Info-Hub
 

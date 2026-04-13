@@ -3,7 +3,12 @@ import os from 'os'
 import path from 'path'
 import { afterEach, describe, expect, it } from 'vitest'
 import { classifyKnowledgeCategories } from '../config/knowledgeRules'
-import { __clearKnowledgeBaseCacheForTests, getKnowledgeCatalog, searchKnowledge } from './knowledgeBase'
+import {
+  __clearKnowledgeBaseCacheForTests,
+  getKnowledgeCatalog,
+  listKnowledgeSources,
+  searchKnowledge,
+} from './knowledgeBase'
 
 describe('knowledge classification rules', () => {
   it('prefers explicit frontmatter categories over heuristics', () => {
@@ -40,6 +45,7 @@ describe('knowledge classification rules', () => {
 
 describe('knowledge base local index', () => {
   const originalObsidianPath = process.env.OBSIDIAN_PATH
+  const originalExtraSources = process.env.INFO_HUB_EXTRA_SOURCES_JSON
   let tempDir = ''
 
   afterEach(async () => {
@@ -48,6 +54,11 @@ describe('knowledge base local index', () => {
       delete process.env.OBSIDIAN_PATH
     } else {
       process.env.OBSIDIAN_PATH = originalObsidianPath
+    }
+    if (originalExtraSources === undefined) {
+      delete process.env.INFO_HUB_EXTRA_SOURCES_JSON
+    } else {
+      process.env.INFO_HUB_EXTRA_SOURCES_JSON = originalExtraSources
     }
     if (tempDir) {
       await fs.promises.rm(tempDir, { recursive: true, force: true })
@@ -155,5 +166,29 @@ describe('knowledge base local index', () => {
 
     const searchResults = await searchKnowledge('obsidian', 'missing')
     expect(searchResults).toHaveLength(0)
+  })
+
+  it('supports extra local sources from INFO_HUB_EXTRA_SOURCES_JSON', async () => {
+    tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'info-hub-kb-extra-'))
+    const extraDir = path.join(tempDir, 'hermes-system')
+    await fs.promises.mkdir(extraDir, { recursive: true })
+
+    process.env.OBSIDIAN_PATH = path.join(tempDir, 'primary')
+    process.env.INFO_HUB_EXTRA_SOURCES_JSON = JSON.stringify([
+      {
+        id: 'hermes-system',
+        name: 'Hermes System',
+        path: extraDir,
+        type: 'local',
+        enabled: true,
+      },
+    ])
+
+    await fs.promises.mkdir(process.env.OBSIDIAN_PATH, { recursive: true })
+    const sources = listKnowledgeSources()
+    const hermesSource = sources.find((source) => source.id === 'hermes-system')
+    expect(hermesSource).toBeDefined()
+    expect(hermesSource?.path).toBe(extraDir)
+    expect(hermesSource?.type).toBe('local')
   })
 })

@@ -64,6 +64,47 @@ type LocalFileEntry = {
 
 const localSourceIndexCache = new Map<string, LocalSourceIndex>()
 
+function parseExtraSources(): DocSource[] {
+  const raw = process.env.INFO_HUB_EXTRA_SOURCES_JSON?.trim()
+  if (!raw) return []
+
+  try {
+    const parsed = JSON.parse(raw) as unknown
+    if (!Array.isArray(parsed)) return []
+
+    return parsed
+      .flatMap((entry) => {
+        if (!entry || typeof entry !== 'object') return []
+
+        const source = entry as Record<string, unknown>
+        const id = typeof source.id === 'string' ? source.id.trim() : ''
+        const name = typeof source.name === 'string' ? source.name.trim() : ''
+        const type = source.type === 'api' ? 'api' : source.type === 'local' ? 'local' : null
+        if (!id || !name || !type) return []
+
+        const normalized: DocSource = {
+          id,
+          name,
+          description: typeof source.description === 'string' ? source.description : undefined,
+          path: typeof source.path === 'string' ? source.path : '',
+          enabled: source.enabled !== false,
+          type,
+          apiUrl: typeof source.apiUrl === 'string' ? source.apiUrl : undefined,
+          apiToken: typeof source.apiToken === 'string' ? source.apiToken : undefined,
+          icon: source.icon === 'obsidian' || source.icon === 'blinko' || source.icon === 'folder'
+            ? source.icon
+            : 'folder',
+        }
+
+        if (normalized.type === 'local' && !normalized.path.trim()) return []
+        if (normalized.type === 'api' && !normalized.apiUrl?.trim()) return []
+        return [normalized]
+      })
+  } catch {
+    return []
+  }
+}
+
 function isSupportedFile(filename: string): boolean {
   return SUPPORTED_EXTENSIONS.has(path.extname(filename).toLowerCase())
 }
@@ -204,8 +245,14 @@ function createSourceMap(): SourceMap {
       apiToken: process.env.BLINKO_TOKEN || '',
       icon: 'blinko',
     },
+    ...parseExtraSources(),
   ]
-  return new Map(sources.filter((source) => source.enabled).map((source) => [source.id, source]))
+  const deduped = new Map<string, DocSource>()
+  for (const source of sources) {
+    if (!source.enabled) continue
+    deduped.set(source.id, source)
+  }
+  return deduped
 }
 
 export function listKnowledgeSources(): DocSource[] {

@@ -17,12 +17,9 @@ import {
 import { encodeBase64Url } from './src/lib/routes'
 import type { DocSource, StaticKnowledgeManifest, StaticKnowledgeSourceBundle } from './src/types'
 
-const API_PREFIXES = ['/docs/api', '/api']
+const API_PREFIXES = ['/api']
 const STATIC_KNOWLEDGE_ROOT = 'generated/knowledge'
-const STATIC_KNOWLEDGE_PREFIXES = [
-  `/${STATIC_KNOWLEDGE_ROOT}`,
-  `/docs/${STATIC_KNOWLEDGE_ROOT}`,
-]
+const STATIC_KNOWLEDGE_PREFIXES = [`/${STATIC_KNOWLEDGE_ROOT}`]
 const STATIC_BUNDLE_VERSION = 1
 
 function matchesApiPath(pathname: string, suffix: string): boolean {
@@ -125,7 +122,7 @@ function matchStaticKnowledgeAsset(pathname: string): string | null {
   for (const prefix of STATIC_KNOWLEDGE_PREFIXES) {
     if (pathname === prefix) return `${STATIC_KNOWLEDGE_ROOT}/manifest.json`
     if (pathname.startsWith(`${prefix}/`)) {
-      return pathname.slice(prefix.startsWith('/docs/') ? '/docs/'.length : 1)
+      return pathname.slice(1)
     }
   }
   return null

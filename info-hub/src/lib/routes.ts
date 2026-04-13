@@ -65,7 +65,7 @@ export function decodeDocumentId(documentId: string): SelectedFile | null {
 }
 
 export function buildDocumentRoute(file: SelectedFile): string {
-  return `/docs/${encodeDocumentId(file)}`
+  return `/doc/${encodeDocumentId(file)}`
 }
 
 export function normalizeCategoryRoute(categoryId?: string | null, subId?: string | null): KnowledgeCategoryKey | null {

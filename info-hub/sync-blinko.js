@@ -1,137 +1,264 @@
 /**
- * Blinko 笔记同步服务
+ * Blinko -> Markdown mirror exporter.
  *
- * 功能：
- * 1. 从 Blinko API 获取笔记列表
- * 2. 将笔记转换为 Markdown 格式
- * 3. 同步到 info-hub 的 blinko-notes 目录
- *
- * 使用方式：
- * - 手动：node sync-blinko.js
- * - 定时：配置 Windows 任务计划程序
+ * This script is intentionally server-friendly:
+ * - mirror filenames are stable (`<blinko_id>.md`)
+ * - exported frontmatter carries sync metadata for round-trip import
+ * - the mirror directory is configurable via env
  */
 
 import fs from 'fs'
 import path from 'path'
+import { createHash } from 'crypto'
 import { fileURLToPath } from 'url'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
 
-// 配置
-const BLINKO_API_URL = process.env.BLINKO_API_URL || 'http://localhost:1111/api'
-const SYNC_DIR = path.join(__dirname, 'blinko-notes')
-const BLINKO_TOKEN = process.env.BLINKO_TOKEN || ''
+const DEFAULT_PAGE_SIZE = 200
+const DEFAULT_ATTACHMENT_MAX_BYTES = 100 * 1024 * 1024
 
-// 确保同步目录存在
-if (!fs.existsSync(SYNC_DIR)) {
-  fs.mkdirSync(SYNC_DIR, { recursive: true })
-  console.log(`[info] 创建同步目录：${SYNC_DIR}`)
+function toPositiveNumber(value, fallback) {
+  const parsed = Number(value)
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback
 }
 
-/**
- * 从 Blinko API 获取笔记
- */
-async function fetchNotes() {
-  try {
-    const response = await fetch(`${BLINKO_API_URL}/notes`, {
-      headers: {
-        'Authorization': BLINKO_TOKEN ? `Bearer ${BLINKO_TOKEN}` : '',
-        'Content-Type': 'application/json',
+function buildConfig(overrides = {}) {
+  const attachmentMaxBytes = toPositiveNumber(
+    overrides.attachmentMaxBytes ?? process.env.BLINKO_ATTACHMENT_MAX_BYTES,
+    DEFAULT_ATTACHMENT_MAX_BYTES,
+  )
+
+  return {
+    apiUrl: String(overrides.apiUrl ?? process.env.BLINKO_API_URL ?? 'http://localhost:1111/api/v1').replace(/\/$/, ''),
+    syncDir: overrides.syncDir ?? process.env.BLINKO_SYNC_DIR ?? path.join(__dirname, 'blinko-notes'),
+    token: overrides.token ?? process.env.BLINKO_TOKEN ?? '',
+    pageSize: toPositiveNumber(overrides.pageSize ?? process.env.BLINKO_PAGE_SIZE, DEFAULT_PAGE_SIZE),
+    attachmentMaxBytes,
+    attachmentPolicy: `oss<=${Math.floor(attachmentMaxBytes / (1024 * 1024))}MB; local-only>${Math.floor(attachmentMaxBytes / (1024 * 1024))}MB`,
+    ossUploadCommand: String(overrides.ossUploadCommand ?? process.env.BLINKO_OSS_UPLOAD_COMMAND ?? '').trim(),
+  }
+}
+
+function ensureDir(dirPath) {
+  if (!fs.existsSync(dirPath)) {
+    fs.mkdirSync(dirPath, { recursive: true })
+    console.log(`[info] 创建同步目录：${dirPath}`)
+  }
+}
+
+function buildHeaders(config) {
+  const headers = { 'Content-Type': 'application/json' }
+  if (config.token) {
+    headers.Authorization = `Bearer ${config.token}`
+  }
+  return headers
+}
+
+async function blinkoRequest(config, endpoint, { method = 'POST', body } = {}) {
+  const response = await fetch(`${config.apiUrl}${endpoint}`, {
+    method,
+    headers: buildHeaders(config),
+    body: body === undefined ? undefined : JSON.stringify(body),
+  })
+
+  if (!response.ok) {
+    const message = await response.text()
+    throw new Error(`Blinko API ${endpoint} 返回 ${response.status}: ${message.slice(0, 200)}`)
+  }
+
+  return response.json()
+}
+
+function normalizeTagName(tag) {
+  if (!tag) return ''
+  if (typeof tag === 'string') return tag.trim()
+  if (tag.tag) return normalizeTagName(tag.tag)
+  if (typeof tag.name === 'string') return tag.name.trim()
+  return ''
+}
+
+function normalizeTags(note) {
+  return [...new Set((note.tags || []).map(normalizeTagName).filter(Boolean))]
+}
+
+function normalizeAttachments(note, config) {
+  return (note.attachments || []).map((attachment) => {
+    const size = Number(attachment?.size ?? 0)
+    return {
+      name: String(attachment?.name || ''),
+      path: String(attachment?.path || attachment?.url || ''),
+      type: String(attachment?.type || ''),
+      size: Number.isFinite(size) ? size : 0,
+      localOnly: Number.isFinite(size) && size > config.attachmentMaxBytes,
+    }
+  })
+}
+
+function extractTitle(note) {
+  const candidate = typeof note.title === 'string' && note.title.trim()
+    ? note.title.trim()
+    : String(note.contentText || note.content || '')
+      .split(/\r?\n/)
+      .map(line => line.replace(/^#+\s*/, '').trim())
+      .find(Boolean)
+
+  return (candidate || `Blinko-${note.id || 'untitled'}`).slice(0, 120)
+}
+
+function buildNoteSnapshot(note, config = buildConfig()) {
+  return {
+    id: note.id ?? null,
+    content: String(note.contentText || note.content || '').trimEnd(),
+    type: Number.isFinite(Number(note.type)) ? Number(note.type) : -1,
+    tags: normalizeTags(note),
+    isArchived: Boolean(note.isArchived),
+    isTop: Boolean(note.isTop),
+    isShare: Boolean(note.isShare),
+    attachments: normalizeAttachments(note, config).map(attachment => ({
+      name: attachment.name,
+      path: attachment.path,
+      type: attachment.type,
+      size: attachment.size,
+      localOnly: attachment.localOnly,
+    })),
+  }
+}
+
+function computeSyncHash(snapshot) {
+  return createHash('sha256').update(JSON.stringify(snapshot)).digest('hex')
+}
+
+function yamlString(value) {
+  return `"${String(value ?? '').replace(/\\/g, '\\\\').replace(/"/g, '\\"')}"`
+}
+
+function yamlStringArray(name, values) {
+  if (!values.length) return `${name}: []`
+  return `${name}:\n${values.map(value => `  - ${yamlString(value)}`).join('\n')}`
+}
+
+function noteToMarkdown(note, config = buildConfig()) {
+  const snapshot = buildNoteSnapshot(note, config)
+  const syncHash = computeSyncHash(snapshot)
+  const title = extractTitle(note)
+  const attachments = snapshot.attachments
+  const attachmentNames = attachments.map(attachment => attachment.name).filter(Boolean)
+  const localOnlyAttachments = attachments
+    .filter(attachment => attachment.localOnly)
+    .map(attachment => attachment.name)
+    .filter(Boolean)
+  const lines = [
+    '---',
+    `title: ${yamlString(title)}`,
+    `blinko_id: ${note.id ?? ''}`,
+    `blinko_type: ${snapshot.type}`,
+    `blinko_created_at: ${yamlString(note.createdAt || '')}`,
+    `blinko_updated_at: ${yamlString(note.updatedAt || '')}`,
+    `mirror_updated_at: ${yamlString(note.updatedAt || '')}`,
+    `sync_hash: ${yamlString(syncHash)}`,
+    `attachment_policy: ${yamlString(config.attachmentPolicy)}`,
+    `attachment_count: ${attachments.length}`,
+    yamlStringArray('tags', snapshot.tags),
+    yamlStringArray('attachment_names', attachmentNames),
+    yamlStringArray('local_only_attachments', localOnlyAttachments),
+    `source: ${yamlString('Blinko')}`,
+    '---',
+    '',
+  ]
+
+  const body = snapshot.content || `# ${title}`
+  return {
+    filename: `${note.id ?? Date.now()}.md`,
+    markdown: `${lines.join('\n')}${body.trimEnd()}\n`,
+    snapshot,
+    syncHash,
+  }
+}
+
+async function fetchNotes(config = buildConfig()) {
+  const notes = []
+  let page = 1
+
+  while (true) {
+    const data = await blinkoRequest(config, '/note/list', {
+      body: {
+        page,
+        size: config.pageSize,
+        orderBy: 'desc',
+        type: -1,
+        isRecycle: false,
       },
     })
 
-    if (!response.ok) {
-      throw new Error(`Blinko API 返回 ${response.status}: ${response.statusText}`)
-    }
+    const batch = Array.isArray(data)
+      ? data
+      : Array.isArray(data?.items)
+        ? data.items
+        : []
 
-    const data = await response.json()
-    console.log(`[info] 获取到 ${data.length || 0} 条笔记`)
-    return data || []
-  } catch (error) {
-    console.error('[error] 获取笔记失败:', error.message)
-    return []
+    notes.push(...batch)
+
+    if (batch.length < config.pageSize) {
+      break
+    }
+    page += 1
   }
+
+  console.log(`[info] 获取到 ${notes.length} 条笔记`)
+  return notes
 }
 
-/**
- * 将 Blinko 笔记转换为 Markdown 格式
- */
-function noteToMarkdown(note) {
-  let md = `---\n`
-  md += `title: "${note.title || '无标题'}"\n`
-  md += `created: ${note.createdAt || new Date().toISOString()}\n`
-  md += `updated: ${note.updatedAt || new Date().toISOString()}\n`
-  md += `tags: [${note.tags?.map(t => t.name || t).join(', ') || ''}]\n`
-  md += `source: Blinko\n`
-  md += `url: ${note.url || ''}\n`
-  md += `---\n\n`
+async function syncNotes(config = buildConfig()) {
+  ensureDir(config.syncDir)
+  console.log('[info] 开始导出 Blinko 笔记镜像...')
 
-  md += `# ${note.title || '无标题'}\n\n`
-  md += `${note.content || ''}\n`
-
-  // 添加附件链接
-  if (note.attachments && note.attachments.length > 0) {
-    md += `\n## 附件\n\n`
-    for (const attachment of note.attachments) {
-      md += `- [${attachment.name}](${attachment.url})\n`
-    }
-  }
-
-  // 添加评论
-  if (note.comments && note.comments.length > 0) {
-    md += `\n## 评论\n\n`
-    for (const comment of note.comments) {
-      md += `- **${comment.author}**: ${comment.content}\n`
-    }
-  }
-
-  return md
-}
-
-/**
- * 同步笔记到本地目录
- */
-async function syncNotes() {
-  console.log('[info] 开始同步 Blinko 笔记...')
-
-  const notes = await fetchNotes()
+  const notes = await fetchNotes(config)
   if (notes.length === 0) {
-    console.log('[info] 没有需要同步的笔记')
-    return
+    console.log('[info] 没有需要导出的笔记')
+    return { scanned: 0, written: 0, skipped: 0 }
   }
 
-  let syncedCount = 0
+  let written = 0
+  let skipped = 0
+
   for (const note of notes) {
     try {
-      // 生成安全的文件名
-      const filename = `${note.id || Date.now()}-${(note.title || 'untitled').replace(/[/\\:*?"<>|]/g, '_')}.md`
-      const filePath = path.join(SYNC_DIR, filename)
+      const { filename, markdown } = noteToMarkdown(note, config)
+      const filePath = path.join(config.syncDir, filename)
+      const existingContent = fs.existsSync(filePath)
+        ? fs.readFileSync(filePath, 'utf-8')
+        : null
 
-      // 检查是否需要更新
-      if (fs.existsSync(filePath)) {
-        const existingContent = fs.readFileSync(filePath, 'utf-8')
-        const newContent = noteToMarkdown(note)
-        if (existingContent === newContent) {
-          continue // 内容未变化，跳过
-        }
+      if (existingContent === markdown) {
+        skipped += 1
+        continue
       }
 
-      // 写入文件
-      const content = noteToMarkdown(note)
-      fs.writeFileSync(filePath, content, 'utf-8')
-      console.log(`[sync] ${note.title || '无标题'}`)
-      syncedCount++
+      fs.writeFileSync(filePath, markdown, 'utf-8')
+      written += 1
+      console.log(`[export] ${filename} <- ${extractTitle(note)}`)
     } catch (error) {
-      console.error(`[error] 同步笔记 "${note.title}" 失败:`, error.message)
+      const message = error instanceof Error ? error.message : String(error)
+      console.error(`[error] 导出笔记 "${extractTitle(note)}" 失败: ${message}`)
     }
   }
 
-  console.log(`[info] 同步完成：${syncedCount} 条笔记`)
+  console.log(`[info] 导出完成：写入 ${written} 条，跳过 ${skipped} 条`)
+  return { scanned: notes.length, written, skipped }
 }
 
-// 导出函数以便测试
-export { fetchNotes, noteToMarkdown, syncNotes }
+export {
+  buildConfig,
+  blinkoRequest,
+  buildNoteSnapshot,
+  computeSyncHash,
+  extractTitle,
+  fetchNotes,
+  normalizeTagName,
+  noteToMarkdown,
+  syncNotes,
+}
 
 const isDirectExecution = process.argv[1] && path.resolve(process.argv[1]) === __filename
 
@@ -140,12 +267,8 @@ async function main() {
     await syncNotes()
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
-    console.error('[fatal] 同步失败:', message)
-    if (!fs.existsSync(SYNC_DIR)) {
-      fs.mkdirSync(SYNC_DIR, { recursive: true })
-      console.log('[info] 已创建空白的 blinko-notes 目录')
-    }
-    process.exit(0)
+    console.error('[fatal] 导出失败:', message)
+    process.exitCode = 1
   }
 }
 

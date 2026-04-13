@@ -1,0 +1,12 @@
+[Unit]
+Description=Blinko mirror sync with WebDAV
+After=network-online.target info-hub.service
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+WorkingDirectory=/root/.hermes/apps/info-hub
+EnvironmentFile=-/root/.hermes/apps/info-hub/.env.server
+EnvironmentFile=-/etc/blinko-sync.env
+Environment=PATH=/root/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=/bin/bash /root/.hermes/apps/info-hub/deploy/linux/blinko-nutstore-sync.sh

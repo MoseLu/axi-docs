@@ -95,5 +95,14 @@ for src_path, title, tags in docs:
 PY
 
 install -m 0644 "$APP_DIR/deploy/linux/info-hub.service" "/etc/systemd/system/${SERVICE_NAME}.service"
+install -m 0644 "$APP_DIR/deploy/linux/blinko-sync.env.example" "/etc/blinko-sync.env.example"
+install -m 0644 "$APP_DIR/deploy/linux/blinko-mirror-sync.service" "/etc/systemd/system/blinko-mirror-sync.service"
+install -m 0644 "$APP_DIR/deploy/linux/blinko-mirror-sync.timer" "/etc/systemd/system/blinko-mirror-sync.timer"
 systemctl daemon-reload
 systemctl enable --now "${SERVICE_NAME}.service"
+
+if [ -f /etc/blinko-sync.env ]; then
+  systemctl enable --now blinko-mirror-sync.timer
+else
+  echo "[info] /etc/blinko-sync.env 不存在，已跳过启用 blinko-mirror-sync.timer"
+fi

@@ -17,16 +17,17 @@ agent-readable: true
 
 - 工作区根目录：`/Volumes/code/workspace/infra/axi-workspace-governance`
 - 治理仓库远端：`https://github.com/MoseLu/axi-workspace-governance.git`
-- 已登记条目：8
-- canonical 条目：8
-- active / active-* 条目：8
+- 已登记条目：13
+- canonical 条目：13
+- active / active-* 条目：13
 
 ## Section 统计
 
-- `infra`: 1
+- `infra`: 2
 - `projects`: 6
-- `shared`: 0
-- `tools`: 1
+- `products`: 1
+- `shared`: 2
+- `tools`: 2
 - `agent`: 0
 - `references`: 0
 

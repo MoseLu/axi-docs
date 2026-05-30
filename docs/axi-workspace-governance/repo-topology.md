@@ -24,6 +24,8 @@ agent-readable: true
 
 ## Infra
 
+- `../../infra/axi-registry` | Axi Local Registry | branch=`dev` | canonical=yes | compliance=`node-single-repo`
+  remote: https://github.com/MoseLu/axi-registry.git
 - `C:\Users\12081\.openclaw` | OpenClaw Gateway | branch=`-` | canonical=yes | compliance=`external-infra`
   remote: https://github.com/MoseLu/openclaw-gateway
 
@@ -43,11 +45,27 @@ agent-readable: true
 - `../../projects/sports-management-app` | 体育管理应用 | branch=`master` | canonical=yes | compliance=`polyrepo-mixed-stack`
   remote: https://github.com/MoseLu/sports-management-app.git
 
+## Products
+
+- `../../products/ielts-vocab` | IELTS Vocabulary | branch=`codex/bug-screenshot-shortcut` | canonical=yes | compliance=`node-monorepo-approved`
+  remote: https://github.com/MoseLu/ielts-vocab.git
+
+## Shared
+
+- `../../shared/axi-tauri-starter` | Axi Tauri Starter | branch=`dev` | canonical=yes | compliance=`template-reference`
+  remote: https://github.com/MoseLu/axi-tauri-starter.git
+- `../../shared/axi-ui` | Axi UI | branch=`dev` | canonical=yes | compliance=`node-monorepo-approved`
+  remote: https://github.com/MoseLu/axi-ui.git
+
 ## Tools
 
+- `../../tools/axi-proxy-companion` | Axi Proxy Companion | branch=`dev` | canonical=yes | compliance=`swift-tool`
+  remote: https://github.com/MoseLu/axi-proxy-companion.git
 - `../../tools/axi-video-downloader` | Axi Video Downloader | branch=`-` | canonical=yes | compliance=`python-tool`
 
 ## 已批准项目级 Monorepo
 
 - `../../projects/axi-workbench`
 - `../../projects/axi-docs`
+- `../../products/ielts-vocab`
+- `../../shared/axi-ui`

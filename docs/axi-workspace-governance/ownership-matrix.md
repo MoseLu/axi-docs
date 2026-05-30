@@ -24,10 +24,15 @@ agent-readable: true
 
 | Repo | Section | Lifecycle | Canonical | Remote |
 |---|---|---|---|---|
+| `../../infra/axi-registry` | infra | active-infra | yes | [link](https://github.com/MoseLu/axi-registry.git) |
 | `../../projects/axi-agent-platform` | projects | active-canonical | yes | [link](https://github.com/MoseLu/axi-agent-platform.git) |
 | `../../projects/axi-docs` | projects | active-canonical | yes | [link](https://github.com/MoseLu/axi-docs.git) |
 | `../../projects/axi-image-preview` | projects | active-canonical | yes | [link](https://github.com/MoseLu/axi-image-preview.git) |
 | `../../projects/axi-workbench` | projects | active-canonical | yes | [link](https://github.com/MoseLu/axi-workbench.git) |
+| `../../products/ielts-vocab` | products | active-product | yes | [link](https://github.com/MoseLu/ielts-vocab.git) |
+| `../../shared/axi-tauri-starter` | shared | active-shared-reference | yes | [link](https://github.com/MoseLu/axi-tauri-starter.git) |
+| `../../shared/axi-ui` | shared | active-shared-provider | yes | [link](https://github.com/MoseLu/axi-ui.git) |
+| `../../tools/axi-proxy-companion` | tools | active-tool | yes | [link](https://github.com/MoseLu/axi-proxy-companion.git) |
 | `../../tools/axi-video-downloader` | tools | active-tool | yes | - |
 
 ## libu_hr

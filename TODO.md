@@ -1,4 +1,4 @@
-# Info-Hub Project — 待办事项 (TODO)
+# Axi Docs Project — 待办事项 (TODO)
 
 > 代码审计日期: 2026-03-24
 > 审计范围: 前端 (React/Vite)、后端 (MCP Server)、配置、依赖、安全
@@ -8,7 +8,7 @@
 ## P0 — 紧急 (本周内必须修复)
 
 ### [SECURITY] 移除源码中硬编码的 JWT Token
-- **文件:** `info-hub/src/mcp/server.ts:227`, `info-hub/vite.config.plugin.ts:75`
+- **文件:** `app/src/mcp/server.ts:227`, `app/vite.config.plugin.ts:75`
 - **问题:** Blinko API Token 以明文 JWT 硬编码在源码中，有效期至 2027-03，任何有仓库访问权限的人可冒充 admin
 - **措施:**
   - [ ] 删除两处硬编码 token，改为 `process.env.BLINKO_TOKEN || ''`
@@ -16,20 +16,20 @@
   - [ ] 添加 pre-commit hook 检测 token/secret 泄露 (如 gitleaks)
 
 ### [SECURITY] Blinko API 代理缺少认证
-- **文件:** `info-hub/src/mcp/server.ts:1104-1108`
+- **文件:** `app/src/mcp/server.ts:1104-1108`
 - **问题:** `/api/*?source=blinko` 请求绕过 `authMiddleware`，任何人可枚举全部笔记
 - **措施:**
   - [ ] 在 `handleBlinkoApi` 调用前添加 `authMiddleware(req)` 检查
   - [ ] 确保速率限制覆盖此端点
 
 ### [BUG] server.ts 中存在重复的 switch case
-- **文件:** `info-hub/src/mcp/server.ts` — `case 'read'` 出现两次 (约 L1126 和 L1142)
+- **文件:** `app/src/mcp/server.ts` — `case 'read'` 出现两次 (约 L1126 和 L1142)
 - **问题:** 第二个 `case 'read'` 永远不会执行，属于死代码
 - **措施:**
   - [ ] 移除重复的 `case 'read'` 代码块
 
 ### [PERF] 将同步文件 I/O 改为异步
-- **文件:** `info-hub/src/mcp/server.ts` — 6处 `readFileSync` + 2处 `writeFileSync`
+- **文件:** `app/src/mcp/server.ts` — 6处 `readFileSync` + 2处 `writeFileSync`
 - **问题:** 同步 I/O 阻塞 HTTP 服务器事件循环，大型 Obsidian vault 下导致请求超时
 - **措施:**
   - [ ] 将 `readFileSync` → `fs.promises.readFile`
@@ -42,7 +42,7 @@
 ## P1 — 高优先级 (本迭代内修复)
 
 ### [SECURITY] CORS 配置过于宽松
-- **文件:** `info-hub/src/mcp/server.ts:1085`, `info-hub/vite.config.plugin.ts` 多处
+- **文件:** `app/src/mcp/server.ts:1085`, `app/vite.config.plugin.ts` 多处
 - **问题:** `Access-Control-Allow-Origin: *` 允许任意跨域请求访问敏感文档端点
 - **措施:**
   - [ ] 限定 `Access-Control-Allow-Origin` 为指定域名 (`process.env.ALLOWED_ORIGINS`)
@@ -50,7 +50,7 @@
   - [ ] 添加 `Access-Control-Max-Age: 86400` 减少预检请求
 
 ### [SECURITY] 路径穿越防护不完整
-- **文件:** `info-hub/src/mcp/server.ts:332-335`
+- **文件:** `app/src/mcp/server.ts:332-335`
 - **问题:** `path.normalize + startsWith` 不防范 symlink 攻击和 Windows 混合路径
 - **措施:**
   - [ ] 改用 `path.relative()` 并检查结果不以 `..` 开头
@@ -58,15 +58,15 @@
   - [ ] 白名单限制允许的文件扩展名 (仅 `.md`, `.markdown`)
 
 ### [ARCH] 抽取 Vite 插件与 Server 的重复逻辑
-- **文件:** `info-hub/vite.config.plugin.ts` vs `info-hub/src/mcp/server.ts`
+- **文件:** `app/vite.config.plugin.ts` vs `app/src/mcp/server.ts`
 - **问题:** 标签提取、文件扫描、搜索、图谱构建、Blinko 代理等逻辑完全重复 (~2000 行)
 - **措施:**
-  - [ ] 新建 `info-hub/src/lib/document-ops.ts` 共享模块
+  - [ ] 新建 `app/src/lib/document-ops.ts` 共享模块
   - [ ] 将文件扫描、标签提取、搜索、图谱构建等逻辑迁移到共享模块
   - [ ] Vite 插件和 MCP Server 均从共享模块导入
 
 ### [UX] 添加错误边界与用户错误反馈
-- **文件:** `info-hub/src/App.tsx`, `info-hub/src/components/KnowledgePanel.tsx`
+- **文件:** `app/src/App.tsx`, `app/src/components/KnowledgePanel.tsx`
 - **问题:** `catch` 块仅 `console.error` 或完全静默，用户无法得知请求失败
 - **措施:**
   - [ ] 创建 `ErrorBoundary` 组件包裹 App
@@ -75,7 +75,7 @@
   - [ ] 为失败操作提供重试按钮
 
 ### [SECURITY] 请求体大小无限制
-- **文件:** `info-hub/src/mcp/server.ts` — `for await (const chunk of req) body += chunk`
+- **文件:** `app/src/mcp/server.ts` — `for await (const chunk of req) body += chunk`
 - **问题:** POST body 无大小限制，可被利用为内存耗尽攻击
 - **措施:**
   - [ ] 添加 `MAX_BODY_SIZE` 常量 (如 10MB)
@@ -86,7 +86,7 @@
 ## P2 — 中优先级 (排入 Backlog)
 
 ### [BUG] 快速切换文件时的竞态条件
-- **文件:** `info-hub/src/App.tsx:49-69` — `loadFile` 函数
+- **文件:** `app/src/App.tsx:49-69` — `loadFile` 函数
 - **问题:** 快速点击多个文件时，旧请求的响应可能覆盖新请求的 UI 状态
 - **措施:**
   - [ ] 使用 `AbortController` 取消旧请求
@@ -94,7 +94,7 @@
   - [ ] 检查响应对应的文件路径是否仍为当前选中文件
 
 ### [PERF] React 组件缺少 memoization
-- **文件:** `info-hub/src/components/KnowledgeGraph.tsx`, `DocumentView.tsx`
+- **文件:** `app/src/components/KnowledgeGraph.tsx`, `DocumentView.tsx`
 - **问题:** 力导向图 tick 函数在每次 render 时重建；样式计算无缓存
 - **措施:**
   - [ ] `KnowledgeGraph` 组件添加 `React.memo()` 包裹
@@ -102,20 +102,20 @@
   - [ ] 考虑使用 `useTransition()` 处理渲染密集型更新
 
 ### [BUG] SearchResults 使用数组索引作为 React key
-- **文件:** `info-hub/src/components/SearchResults.tsx`
+- **文件:** `app/src/components/SearchResults.tsx`
 - **问题:** `key={i}` 在列表重新排序时导致 DOM 复用错误
 - **措施:**
   - [ ] 改为 `key={\`${result.sourceId}:${result.path}\`}`
 
 ### [SECURITY] 搜索查询存在 ReDoS 风险
-- **文件:** `info-hub/src/mcp/server.ts:470`
+- **文件:** `app/src/mcp/server.ts:470`
 - **问题:** 用户搜索输入被构造为正则表达式，可能触发指数级回溯
 - **措施:**
   - [ ] 将频率统计改为 `.split(lowerQuery).length - 1`
   - [ ] 添加查询长度限制 (最大 100 字符)
 
 ### [TYPE] TypeScript 类型安全性不足
-- **文件:** `info-hub/vite.config.plugin.ts:38`, `info-hub/src/types/index.ts`
+- **文件:** `app/vite.config.plugin.ts:38`, `app/src/types/index.ts`
 - **问题:** 存在 `as` 类型断言和过于宽松的 `unknown[]` 类型
 - **措施:**
   - [ ] 定义 `BlinkoFileItem extends FileItem` 代替类型断言
@@ -150,13 +150,13 @@
     ```
 
 ### [DX] 环境变量缺少启动时校验
-- **文件:** `info-hub/src/mcp/server.ts`, `info-hub/vite.config.plugin.ts`
+- **文件:** `app/src/mcp/server.ts`, `app/vite.config.plugin.ts`
 - **措施:**
   - [ ] 添加启动时检查 `ANTHROPIC_API_KEY` 等必选变量
   - [ ] 缺失时打印清晰警告而非静默降级
 
 ### [DEPS] 清理未使用的依赖
-- **文件:** `info-hub/package.json`
+- **文件:** `app/package.json`
 - **措施:**
   - [ ] 确认 `gray-matter` 是否使用，否则移除
   - [ ] 将 `chokidar` 移至 `devDependencies`（仅开发模式用）
@@ -173,7 +173,7 @@
 ### [OPS] 缺少生产部署基础设施
 - **措施:**
   - [ ] 创建 `Dockerfile` (多阶段构建: build → prod)
-  - [ ] 创建 `docker-compose.yml` (info-hub + blinko + reverse proxy)
+  - [ ] 创建 `docker-compose.yml` (axi-docs + blinko + reverse proxy)
   - [ ] 添加优雅关闭 (SIGTERM/SIGINT handler)
   - [ ] 添加结构化日志 (JSON 格式 + 时间戳)
   - [ ] 接入错误监控 (Sentry 或同类服务)

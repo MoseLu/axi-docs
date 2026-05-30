@@ -30,6 +30,5 @@ Accepted
 ## Consequences
 
 - 仓库命名会逐步收敛，而不是一次性大迁移
-- 新治理类仓库遵循统一模式，例如 `workspace-enterprise-governance`
+- 新治理类仓库遵循统一模式，例如 `axi-workspace-governance`
 - 现有产品仓库可保持稳定的外部地址和认知成本
-

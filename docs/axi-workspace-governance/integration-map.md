@@ -1,24 +1,24 @@
 ---
-id: reference-workspace-integration-map
-title: Enterprise Workspace Integration Map
+id: reference-axi-workspace-integration-map
+title: Axi Workspace Integration Map
 type: reference
 status: evergreen
 tags: [workspace, integration, contracts]
-created: 2026-04-01
-modified: 2026-04-01
+created: 2026-05-30
+modified: 2026-05-30
 agent-readable: true
 ---
 
-# Enterprise Workspace Integration Map
+# Axi Workspace Integration Map
 
-最后生成：2026-04-01
+最后生成：2026-05-30
 
 ## 跨仓协作契约
 
 | Channel | Source | Target | Contract |
 |---|---|---|---|
 | registry | `workspace.json` | `.workspace/registry.json` | 工作区注册清单生成，不人工维护 |
-| docs | `F:\enterprise-workspace\docs` | `F:\docs\project\docs\workspace-enterprise-governance` | 多仓索引文档镜像给个人文档站 / Info Hub |
+| docs | `/Volumes/code/workspace/infra/axi-workspace-governance/docs` | `/Volumes/code/workspace/projects/axi-docs/docs/axi-workspace-governance` | 多仓索引文档镜像给 Axi Docs |
 | package distribution | `shared/design-system` | Node 消费仓库 | 通过 Verdaccio 分发，不走 Git Submodule |
 | orchestration | `C:\Users\12081\.openclaw` | 工作区子项目 | 外部 canonical infra 编排入口 |
 
@@ -26,14 +26,13 @@ agent-readable: true
 
 | Repo | Canonical | Upstream |
 |---|---|---|
-| `projects/enterprise-project-automation-platform` | [link](https://github.com/MoseLu/enterprise-project-automation-platform.git) | [link](https://github.com/BellisGit/enterprise-project-automation-platform.git) |
-| `shared/design-system` | [link](https://github.com/MoseLu/design-system.git) | [link](https://github.com/BellisGit/design-system.git) |
+| `../../references/archives/axi-wave1-20260525/design-system` | [link](https://github.com/MoseLu/design-system.git) | [link](https://github.com/BellisGit/design-system.git) |
 
 ## 本地权威源（允许无远端）
 
-- `tools/video-downloader` | 视频下载工具 | compliance=`python-tool`
-- `agent/scripts` | Agent 脚本集合 | compliance=`agent-support`
-- `agent/termagent` | TermAgent | compliance=`agent-support`
+- `../../tools/axi-video-downloader` | Axi Video Downloader | compliance=`python-tool`
+- `../../references/archives/axi-wave2-20260525/agent-scripts` | Agent 脚本集合 | compliance=`agent-support`
+- `../../references/archives/axi-wave2-20260525/termagent` | TermAgent | compliance=`agent-support`
 
 ## 仓库命名策略
 

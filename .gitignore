@@ -6,8 +6,8 @@ node_modules/
 .env
 .env.local
 .env.*.local
-.info-hub-token
-info-hub/.info-hub-token
+.axi-docs-token
+app/.axi-docs-token
 
 # Build outputs
 dist/

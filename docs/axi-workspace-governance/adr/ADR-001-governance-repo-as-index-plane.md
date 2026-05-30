@@ -21,7 +21,7 @@ Accepted
 
 ## Decision
 
-选择 `F:\enterprise-workspace` 根治理仓库作为唯一多仓索引平面。
+选择 `/Volumes/code/workspace/infra/axi-workspace-governance` 根治理仓库作为唯一多仓索引平面。
 
 它承担以下职责：
 
@@ -36,4 +36,3 @@ Accepted
 - 工作区继续保持 `Polyrepo + 注册表 + 治理仓库` 模式，不建立工作区级 mega monorepo
 - 多仓索引和文档入口被收敛到同一个仓库
 - 其他业务仓库不再承担“总入口”职责
-

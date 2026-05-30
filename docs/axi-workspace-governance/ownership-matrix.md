@@ -19,9 +19,6 @@ agent-readable: true
 |---|---|---|---|---|
 | `../../projects/axi-notify` | projects | active-canonical | yes | [link](https://github.com/MoseLu/axi-notify.git) |
 | `../../projects/sports-management-app` | projects | active-product | yes | [link](https://github.com/MoseLu/sports-management-app.git) |
-| `../../references/archives/axi-wave1-20260525/quasar-mobile-app` | projects | archived-template | no | - |
-| `../../references/archives/axi-wave2-20260525/agent-desktop` | projects | archived-experiment | no | [link](https://github.com/MoseLu/agent-desktop.git) |
-| `../../references/archives/axi-wave3-20260525/btc-shopflow-monorepo` | projects | archived-skeleton-reference | no | [link](https://github.com/MoseLu/btc-shopflow-monorepo.git) |
 
 ## libu
 
@@ -38,11 +35,3 @@ agent-readable: true
 | Repo | Section | Lifecycle | Canonical | Remote |
 |---|---|---|---|---|
 | `C:\Users\12081\.openclaw` | infra | external-canonical | yes | [link](https://github.com/MoseLu/openclaw-gateway) |
-| `../../references/archives/axi-wave1-20260525/design-system` | shared | archived-reference | no | [link](https://github.com/MoseLu/design-system.git) |
-| `../../references/archives/axi-wave2-20260525/agent-scripts` | agent | archived-prototype | no | - |
-| `../../references/archives/axi-wave2-20260525/termagent` | agent | archived-prototype | no | - |
-| `../../references/archives/projects-cleanup-20260524-235336/enterprise-workspace/references/anthropics-skills` | references | reference | no | - |
-| `../../references/archives/projects-cleanup-20260524-235336/enterprise-workspace/references/claude-mem` | references | reference | no | - |
-| `../../references/archives/projects-cleanup-20260524-235336/enterprise-workspace/references/enterprise-automation-platform-archive` | references | archived-duplicate | no | [link](https://github.com/MoseLu/axi-workbench.git) |
-| `../../references/archives/projects-cleanup-20260524-235336/enterprise-workspace/references/enterprise-dev-platform` | references | reference | no | - |
-| `../../references/archives/projects-cleanup-20260524-235336/enterprise-workspace/references/enterprise-workspace-legacy` | references | legacy-reference | no | [link](https://github.com/MoseLu/enterprise-workspace.git) |

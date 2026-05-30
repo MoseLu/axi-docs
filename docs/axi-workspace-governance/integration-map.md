@@ -19,20 +19,16 @@ agent-readable: true
 |---|---|---|---|
 | registry | `workspace.json` | `.workspace/registry.json` | 工作区注册清单生成，不人工维护 |
 | docs | `/Volumes/code/workspace/infra/axi-workspace-governance/docs` | `/Volumes/code/workspace/projects/axi-docs/docs/axi-workspace-governance` | 多仓索引文档镜像给 Axi Docs |
-| package distribution | `shared/design-system` | Node 消费仓库 | 通过 Verdaccio 分发，不走 Git Submodule |
+| package distribution | `shared/axi-ui` -> `infra/axi-registry` | `@axi/*` Node 消费仓库 | 通过 Verdaccio 分发，不走 Git Submodule |
 | orchestration | `C:\Users\12081\.openclaw` | 工作区子项目 | 外部 canonical infra 编排入口 |
 
 ## Canonical / Upstream 对齐
 
-| Repo | Canonical | Upstream |
-|---|---|---|
-| `../../references/archives/axi-wave1-20260525/design-system` | [link](https://github.com/MoseLu/design-system.git) | [link](https://github.com/BellisGit/design-system.git) |
+- 当前没有登记 `upstream_remote` 的条目。
 
 ## 本地权威源（允许无远端）
 
 - `../../tools/axi-video-downloader` | Axi Video Downloader | compliance=`python-tool`
-- `../../references/archives/axi-wave2-20260525/agent-scripts` | Agent 脚本集合 | compliance=`agent-support`
-- `../../references/archives/axi-wave2-20260525/termagent` | TermAgent | compliance=`agent-support`
 
 ## 仓库命名策略
 

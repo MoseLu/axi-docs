@@ -2,6 +2,9 @@
   height: 100%;
   overflow: hidden;
   padding: var(--page-shell-padding);
+  padding-right: max(var(--page-shell-padding), env(safe-area-inset-right));
+  padding-bottom: max(var(--page-shell-padding), env(safe-area-inset-bottom));
+  padding-left: max(var(--page-shell-padding), env(safe-area-inset-left));
   display: grid;
   grid-template-columns: var(--document-sidebar-column) minmax(0, 1fr) var(--document-aside-column);
   gap: var(--page-shell-gap);
@@ -37,6 +40,7 @@
   letter-spacing: -0.05em;
   color: #f8fafc;
   margin: 8px 0 10px;
+  text-wrap: balance;
 }
 
 .document-detail-page__panel--summary p,
@@ -162,6 +166,7 @@
   display: flex;
   align-items: flex-start;
   gap: 12px;
+  text-decoration: none;
 }
 
 .document-detail-page__link svg,
@@ -205,6 +210,7 @@
 
 .document-detail-page__crumb {
   color: rgba(148, 163, 184, 0.9);
+  text-decoration: none;
 }
 
 .document-detail-page__crumb--current {
@@ -228,6 +234,7 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
+  text-decoration: none;
 }
 
 .document-detail-page__action--primary,
@@ -309,13 +316,17 @@
 }
 
 .workspace-empty-state--centered {
-  max-width: 720px;
+  max-width: 880px;
+  min-height: min(680px, 100%);
   margin: auto;
+  justify-content: center;
 }
 
 .standalone-route {
   min-height: 100%;
   display: flex;
+  align-items: center;
+  justify-content: center;
   padding: var(--page-shell-padding);
   background: var(--color-bg);
 }
@@ -323,6 +334,32 @@
 .workspace-empty-state__actions {
   flex-wrap: wrap;
   margin-top: 16px;
+}
+
+.workspace-empty-state__support {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.workspace-empty-state__hint {
+  padding: 16px 18px;
+  border-radius: 20px;
+  background: rgba(15, 23, 42, 0.58);
+  border: 1px solid rgba(125, 211, 252, 0.08);
+}
+
+.workspace-empty-state__hint strong {
+  display: block;
+  margin-bottom: 6px;
+  color: #f8fafc;
+  font-size: 14px;
+}
+
+.workspace-empty-state__hint span {
+  color: rgba(148, 163, 184, 0.82);
+  font-size: 13px;
+  line-height: 1.65;
 }
 
 .workspace-empty-state__action--ghost {

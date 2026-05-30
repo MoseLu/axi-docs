@@ -41,6 +41,29 @@
     padding-right: 0;
   }
 
+  .category-graph-page__graph-stage {
+    min-height: clamp(360px, 48vh, 460px);
+  }
+
+  .category-graph-page__graph-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+
+  .category-graph-page__drawer {
+    position: static;
+    width: 100%;
+    transform: none;
+    opacity: 1;
+    pointer-events: auto;
+    display: none;
+  }
+
+  .category-graph-page__drawer.is-open {
+    display: block;
+  }
+
 }
 
 @media (max-width: 1320px) {
@@ -88,8 +111,24 @@
     min-height: auto;
   }
 
+  .home-graph {
+    min-height: auto;
+  }
+
+  .command-center__home-shell {
+    min-height: auto;
+  }
+
+  .home-graph__canvas {
+    min-height: clamp(540px, 70vh, 760px);
+  }
+
   .command-center__right {
-    order: -1;
+    order: 0;
+  }
+
+  .command-center__support {
+    grid-template-columns: 1fr;
   }
 
   .command-center__metrics,
@@ -111,18 +150,20 @@
   .command-center {
     grid-template-columns: 1fr;
     min-height: auto;
+    overflow: visible;
+    border: none;
+    box-shadow: none;
+  }
+
+  .command-center--cockpit {
+    display: block;
   }
 
   .command-center__right {
-    min-height: 360px;
+    min-height: auto;
     grid-template-columns: 1fr;
-    order: -1;
-  }
-
-  .command-center__aside {
-    padding: var(--command-center-aside-padding-stacked);
-    border-left: none;
-    border-top: 1px solid rgba(125, 211, 252, 0.08);
+    order: 0;
+    margin-top: var(--layout-gap-lg);
   }
 
   .command-center__left {
@@ -134,6 +175,10 @@
   .command-center__metrics {
     grid-template-columns: repeat(3, 1fr);
     margin-top: 0;
+  }
+
+  .command-center__graph-shell--home .command-center__graph {
+    min-height: 0;
   }
 }
 
@@ -225,7 +270,20 @@
   .category-graph-page__metrics,
   .document-detail-page__metrics,
   .command-center__intel {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .search-page__workbench-controls {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .home-graph__shell {
+    padding: 18px;
+  }
+
+  .command-center__graph-overlay {
+    inset: 12px;
   }
 
 }
@@ -257,16 +315,114 @@
     padding-bottom: 4px;
   }
 
+  .header-source-pill {
+    display: none;
+  }
+
+  .header-nav__button,
+  .header-command-launcher,
+  .refresh-btn {
+    min-height: 38px;
+    padding-inline: 14px;
+  }
+
   .header-actions {
     justify-content: space-between;
   }
 
   .app-body {
     position: relative;
+    flex-direction: column;
   }
 
   .command-center__metrics {
     width: 100%;
+  }
+
+  .command-center__graph-shell--home {
+    padding: 0;
+  }
+
+  .command-center__graph-shell--home .command-center__graph {
+    min-height: 0;
+  }
+
+  .command-center__graph-overlay {
+    inset: 10px;
+  }
+
+  .command-center__actions--floating {
+    width: 100%;
+    max-width: none;
+    justify-content: flex-start;
+  }
+
+  .app-sidebar--command,
+  .app-sidebar--command.app-sidebar--expanded {
+    width: 100%;
+    border-right: none;
+    border-bottom: 1px solid rgba(125, 211, 252, 0.08);
+  }
+
+  .sidebar-rail {
+    width: 100%;
+    height: auto;
+    padding: 10px 16px 12px;
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    overflow-x: auto;
+  }
+
+  .sidebar-rail__group {
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .sidebar-rail__group--tools {
+    margin-top: 0;
+    margin-left: auto;
+  }
+
+  .source-tab--rail,
+  .sidebar-rail__button {
+    min-height: 44px;
+    padding: 10px 14px;
+    border-radius: 16px;
+    flex-direction: row;
+    gap: 8px;
+    min-width: max-content;
+  }
+
+  .source-tab--rail .source-tab-name,
+  .sidebar-rail__button span {
+    white-space: nowrap;
+    font-size: 12px;
+  }
+
+  .sidebar-rail__footer {
+    display: none;
+  }
+
+  .sidebar-panel {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    border-left: none;
+    border-top: 1px solid rgba(125, 211, 252, 0.08);
+    box-shadow: none;
+  }
+
+  .sidebar-panel__header {
+    padding-inline: 16px;
+  }
+
+  .sidebar-panel__body--tags {
+    max-height: 168px;
+  }
+
+  .sidebar-panel__body--files {
+    max-height: 280px;
   }
 
   .document-route__toolbar {
@@ -284,10 +440,17 @@
     grid-template-columns: 1fr;
   }
 
-  .command-center__dock-footer,
-  .command-center__quickstrip {
+  .command-center__quicklist {
+    grid-template-columns: 1fr;
+  }
+
+  .home-graph__actions,
+  .home-graph__states {
     width: 100%;
-    justify-content: flex-start;
+  }
+
+  .home-graph__canvas {
+    min-height: clamp(420px, 58vh, 620px);
   }
 
   .results-evidence__header,
@@ -307,6 +470,38 @@
   .category-graph-page__stats,
   .document-detail-page__stats {
     grid-template-columns: 1fr;
+  }
+
+  .category-graph-page__panel--summary .section-header__title h1,
+  .document-detail-page__panel--summary .section-header__title h1 {
+    font-size: clamp(26px, 9vw, 34px);
+    line-height: 1.08;
+  }
+
+  .category-graph-page__graph-stage {
+    min-height: clamp(280px, 42vh, 360px);
+  }
+
+  .workspace-empty-state__support {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 620px) {
+  .command-center__metrics,
+  .category-graph-page__metrics,
+  .document-detail-page__metrics,
+  .command-center__intel {
+    grid-template-columns: 1fr;
+  }
+
+  .home-graph__shell {
+    padding: 16px;
+  }
+
+  .home-graph__canvas {
+    min-height: clamp(360px, 54vh, 520px);
+    border-radius: 22px;
   }
 }
 

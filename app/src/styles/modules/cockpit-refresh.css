@@ -44,6 +44,7 @@
 
 .header-nav__button {
   color: var(--cockpit-text-muted);
+  text-decoration: none;
 }
 
 .header-nav__button.active {
@@ -134,6 +135,7 @@
   color: var(--cockpit-text);
   letter-spacing: -0.04em;
   line-height: 1.04;
+  text-wrap: balance;
 }
 
 .section-header__title h1 {
@@ -149,6 +151,7 @@
   color: var(--cockpit-text-muted);
   line-height: 1.72;
   max-width: 68ch;
+  text-wrap: pretty;
 }
 
 .section-header__aside,
@@ -262,11 +265,84 @@
   line-height: 1.65;
 }
 
+.home-graph {
+  min-height: min(980px, calc(100vh - var(--header-height) - 72px));
+}
+
+.home-graph__shell {
+  min-height: inherit;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 20px;
+}
+
+.home-graph__actions,
+.home-graph__states {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.home-graph__action,
+.home-graph__state-pill {
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  border: 1px solid rgba(74, 163, 255, 0.14);
+  background: rgba(10, 18, 31, 0.84);
+  color: #dcefff;
+  box-shadow: none;
+}
+
+.home-graph__action {
+  text-decoration: none;
+}
+
+.home-graph__action--primary {
+  background: linear-gradient(135deg, #2297ff, #3866ff);
+  border-color: transparent;
+  color: #ffffff;
+}
+
+.home-graph__state-pill {
+  min-height: 36px;
+  padding-inline: 14px;
+  color: var(--cockpit-text-muted);
+}
+
+.home-graph__state-pill svg {
+  width: 14px;
+  height: 14px;
+  color: rgba(110, 205, 255, 0.94);
+}
+
+.home-graph__canvas {
+  position: relative;
+  flex: 1;
+  min-height: clamp(620px, 78vh, 920px);
+  overflow: hidden;
+  border-radius: 28px;
+  border: 1px solid rgba(74, 163, 255, 0.16);
+  background:
+    radial-gradient(circle at top, rgba(32, 102, 180, 0.18), transparent 34%),
+    linear-gradient(180deg, rgba(6, 13, 24, 0.98), rgba(4, 9, 17, 0.98));
+}
+
+.home-graph__canvas .hero-knowledge-scene {
+  position: absolute;
+  inset: 0;
+}
+
 .command-center--cockpit {
   display: grid;
-  grid-template-columns: var(--command-center-cockpit-columns);
+  grid-template-columns: minmax(300px, 360px) minmax(0, 1fr);
   gap: var(--layout-gap-lg);
   min-height: min(960px, calc(100vh - var(--header-height) - 72px));
+  align-items: stretch;
 }
 
 .command-center__left {
@@ -348,16 +424,19 @@
 
 .command-center__quicklist {
   display: grid;
-  gap: 10px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .command-center__quickitem {
+  min-width: 0;
   padding: 14px 16px;
   border-radius: 18px;
   border: 1px solid rgba(74, 163, 255, 0.08);
   background: rgba(10, 18, 31, 0.88);
   text-align: left;
   color: inherit;
+  min-height: 96px;
 }
 
 .command-center__quickitem strong,
@@ -370,19 +449,40 @@
   margin-top: 4px;
   color: var(--cockpit-text-soft);
   font-size: 12px;
+  line-height: 1.55;
+  word-break: break-word;
 }
 
 .command-center__right {
   min-width: 0;
   display: grid;
-  grid-template-rows: minmax(0, 1fr) auto;
-  gap: 14px;
+  grid-template-columns: 1fr;
+  grid-template-rows: minmax(460px, 1fr) auto;
+  gap: 16px;
 }
 
 .command-center__graph-shell {
   min-height: 0;
   background: linear-gradient(180deg, rgba(8, 18, 33, 0.98), rgba(4, 10, 20, 0.96));
   border: 1px solid rgba(74, 163, 255, 0.18);
+}
+
+.command-center__home-shell {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  overflow: hidden;
+}
+
+.command-center__graph-shell--home {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  background: transparent;
 }
 
 .command-center__graph-header {
@@ -394,6 +494,55 @@
   border-radius: 24px;
   overflow: hidden;
   background: radial-gradient(circle at center, rgba(24, 49, 84, 0.24), rgba(3, 7, 15, 0.92) 72%);
+}
+
+.command-center__graph-shell--home .command-center__graph {
+  flex: 1;
+  min-height: 0;
+  height: 100%;
+  border-radius: 0;
+}
+
+.command-center__graph-overlay {
+  position: absolute;
+  inset: 14px;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 14px;
+  pointer-events: none;
+}
+
+.command-center__states--floating,
+.command-center__actions--floating {
+  pointer-events: auto;
+}
+
+.command-center__actions--floating {
+  align-self: flex-end;
+  justify-content: flex-end;
+  max-width: min(100%, 440px);
+}
+
+.command-center__states--floating {
+  max-width: min(100%, 760px);
+}
+
+.command-center__support {
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: stretch;
+}
+
+.command-center__support--solo {
+  grid-template-columns: 1fr;
+}
+
+.command-center__support-panel,
+.command-center__quickstrip {
+  min-height: 0;
 }
 
 .command-center__scrim {
@@ -436,6 +585,7 @@
 .command-center__action {
   border-radius: 999px;
   box-shadow: none;
+  text-decoration: none;
 }
 
 .results-evidence__grid {
@@ -469,6 +619,23 @@
   background: rgba(10, 18, 32, 0.88);
   border: 1px solid rgba(74, 163, 255, 0.08);
   box-shadow: none;
+}
+
+.category-graph-page__section-item,
+.category-graph-page__document-link,
+.document-detail-page__crumb,
+.document-detail-page__link {
+  text-decoration: none;
+}
+
+.search-page__result-button:hover,
+.category-graph-page__inline-action:hover,
+.document-detail-page__action:hover,
+.document-detail-page__crumb:hover,
+.document-detail-page__link:hover,
+.category-graph-page__section-item:hover,
+.category-graph-page__document-link:hover {
+  text-decoration: none;
 }
 
 .result-summary-grid {
@@ -625,10 +792,18 @@
   gap: var(--layout-gap-lg);
 }
 
+.search-page__layout--single {
+  grid-template-columns: minmax(0, 1fr);
+}
+
 .search-page__results,
 .search-page__preview-card {
   min-height: 0;
   overflow: hidden;
+}
+
+.search-page__preview {
+  min-height: 0;
 }
 
 .search-page__result-list,
@@ -643,6 +818,15 @@
 .search-page__result-card {
   padding: 16px 18px;
   cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  outline: none;
+}
+
+.search-page__result-card:focus-visible {
+  border-color: rgba(34, 211, 238, 0.44);
+  box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.16), 0 16px 34px rgba(14, 165, 233, 0.16);
 }
 
 .search-page__result-actions {
@@ -664,6 +848,10 @@
 .search-page__preview-card {
   display: flex;
   flex-direction: column;
+}
+
+.search-page__preview-hint {
+  margin-bottom: 6px;
 }
 
 .search-page__empty--preview {

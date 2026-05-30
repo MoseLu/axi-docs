@@ -140,6 +140,7 @@
     radial-gradient(circle at right top, rgba(59, 130, 246, 0.18), transparent 32%),
     radial-gradient(circle at center, transparent 0%, rgba(2, 6, 23, 0.1) 68%, rgba(2, 6, 23, 0.22) 100%);
   z-index: 1;
+  pointer-events: none;
 }
 
 .command-center__copy {

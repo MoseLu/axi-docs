@@ -1,6 +1,14 @@
 /* ─── Reset ──────────────────────────────────────────────────────────────────── */
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
+html {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+  color-scheme: dark;
+  background: var(--color-bg);
+}
+
 html, body, #root { height: 100%; width: 100%; overflow: hidden; }
 
 body {
@@ -12,6 +20,7 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  -webkit-tap-highlight-color: rgba(34, 211, 238, 0.18);
 }
 
 #root,
@@ -56,6 +65,12 @@ a { color: var(--color-primary); text-decoration: none; }
 a:hover { text-decoration: underline; }
 button { cursor: pointer; border: none; background: none; font-family: inherit; font-size: inherit; color: inherit; }
 input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
+a, button { touch-action: manipulation; }
+
+.markdown-body :is(h1, h2, h3, h4, h5, h6) {
+  scroll-margin-top: calc(var(--header-height) + 24px);
+  text-wrap: balance;
+}
 
 /* ─── App Layout ─────────────────────────────────────────────────────────────── */
 .app-layout { display: flex; flex-direction: column; height: 100%; }
@@ -391,7 +406,7 @@ input, textarea { font-family: inherit; font-size: inherit; color: inherit; }
   color: #8b8b8b; background: transparent;
   border: 1px solid #3d3d3d;
   cursor: pointer;
-  transition: all var(--transition);
+  transition: color var(--transition), border-color var(--transition), background-color var(--transition);
   white-space: nowrap;
 }
 .copy-btn:hover { color: #e5e5e5; border-color: #6d6d6d; background: #3d3d3d; }

@@ -1,5 +1,6 @@
 import { getKnowledgeCategoryLabel } from '../config/knowledgeRules'
 import { pageCopy } from '../config/pageCopy'
+import { formatDisplayDate } from '../lib/intl'
 import { formatKnowledgeItemTitle } from '../lib/knowledgeFormatter'
 import { DocSource, KnowledgeCatalog, KnowledgeCatalogSection, SearchResult, SelectedFile } from '../types'
 import { CompactEmptyState, MetricPill, RailPanel, SectionHeader } from './CockpitPrimitives'
@@ -247,7 +248,7 @@ export function ResultsEvidenceSection({
                         <div className="section-doc__desc">{summarizeText(item.description, 140) || item.path}</div>
                         <div className="section-doc__footer">
                           <span>{item.path}</span>
-                          {item.updated && <span>{new Date(item.updated).toLocaleDateString('zh-CN')}</span>}
+                          {item.updated && <span>{formatDisplayDate(item.updated, { year: 'numeric', month: '2-digit', day: '2-digit' })}</span>}
                         </div>
                       </button>
                     ))}

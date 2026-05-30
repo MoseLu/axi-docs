@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
+import { Link } from 'react-router-dom'
 import { pageCopy } from '../config/pageCopy'
 import { buildCategoryRoute } from '../lib/routes'
 import type { DocSource, KnowledgeCatalog, SearchResult, SelectedFile } from '../types'
 import { CompactEmptyState, PageShell, RailPanel, SectionHeader, SegmentedTabs } from './CockpitPrimitives'
 import { DocumentView } from './DocumentView'
 import { FileIcon, FolderIcon, SearchIcon } from './Icons'
+import { PreviewCard, type PreviewCardFact } from './PreviewCard'
 
 type SearchTab = 'all' | 'nodes' | 'docs'
 
@@ -23,8 +25,9 @@ interface SearchPageProps {
   onNavigateHome: () => void
   onSearch: (query: string) => void
   onPreviewItem: (sourceId: string, path: string) => void
-  onOpenItem: (sourceId: string, path: string) => void
-  onOpenGraphRoute: (route: string, sourceId: string, path: string) => void
+  onClearSelectedFile: () => void
+  getDocumentHref: (sourceId: string, path: string) => string
+  getGraphHref: (route: string, sourceId: string, path: string) => string
   onTagSelect: (tag: string | null) => void
   onWikiLink: (noteName: string) => void
 }
@@ -68,8 +71,9 @@ export function SearchPage({
   onNavigateHome,
   onSearch,
   onPreviewItem,
-  onOpenItem,
-  onOpenGraphRoute,
+  onClearSelectedFile,
+  getDocumentHref,
+  getGraphHref,
   onTagSelect,
   onWikiLink,
 }: SearchPageProps) {
@@ -100,6 +104,34 @@ export function SearchPage({
     return base.slice(0, visibleCount)
   }, [activeTab, categoryFilteredResults, documentResults, nodeResults, visibleCount])
 
+  const selectedResult = useMemo(() => {
+    if (!selectedFile) return null
+    return searchResults.find((result) => result.sourceId === selectedFile.sourceId && result.path === selectedFile.path) || null
+  }, [searchResults, selectedFile])
+
+  const activeCategoryLabel = useMemo(
+    () => catalog?.sections.find((section) => section.key === activeCategory)?.title || null,
+    [activeCategory, catalog?.sections],
+  )
+
+  const previewFacts = useMemo<PreviewCardFact[]>(() => {
+    if (!selectedResult) return []
+
+    const facts: PreviewCardFact[] = [
+      { label: '结果类型', value: summarizeResultType(selectedResult) },
+    ]
+
+    if (selectedResult.matchedBy?.length) {
+      facts.push({ label: '命中说明', value: selectedResult.matchedBy.join(' / ') })
+    }
+
+    if (activeCategoryLabel) {
+      facts.push({ label: '当前筛选', value: activeCategoryLabel })
+    }
+
+    return facts
+  }, [activeCategoryLabel, selectedResult])
+
   useEffect(() => {
     setVisibleCount(20)
   }, [activeCategory, activeTab, searchQuery])
@@ -124,6 +156,12 @@ export function SearchPage({
     return () => observer.disconnect()
   }, [activeTab, categoryFilteredResults.length, documentResults.length, nodeResults.length])
 
+  const resultsPanelId = 'search-results-panel'
+
+  const handleResultPreview = (sourceId: string, path: string) => {
+    onPreviewItem(sourceId, path)
+  }
+
   return (
     <PageShell className="search-page" compact>
       <div className="search-page__workbenchbar">
@@ -139,18 +177,21 @@ export function SearchPage({
             </div>
           )}
           description={pageCopy.search.description}
-          eyebrow={source.name}
-          meta={<span>{searching ? '搜索中...' : `结果 ${categoryFilteredResults.length} 条`}</span>}
+          eyebrow="全域检索"
+          meta={<span aria-live="polite">{searching ? '搜索中…' : `结果 ${categoryFilteredResults.length} 条`}</span>}
           title={<h1>{pageCopy.search.title}</h1>}
         />
         <div className="search-page__workbench-controls">
           <SegmentedTabs
+            ariaLabel="搜索结果类型"
+            idBase="search-results-tabs"
             items={[
               { value: 'all', label: '全部结果', badge: categoryFilteredResults.length },
               { value: 'nodes', label: '图谱节点', badge: nodeResults.length },
               { value: 'docs', label: '文档内容', badge: documentResults.length },
             ]}
             onChange={setActiveTab}
+            panelId={resultsPanelId}
             value={activeTab}
           />
         </div>
@@ -177,15 +218,30 @@ export function SearchPage({
         ))}
       </div>
 
-      <div className="search-page__layout">
-        <RailPanel className="search-page__results" tone="secondary">
+      <div className={`search-page__layout${selectedFile ? '' : ' search-page__layout--single'}`}>
+        <RailPanel
+          className="search-page__results"
+          id={resultsPanelId}
+          role="tabpanel"
+          aria-labelledby={`search-results-tabs-tab-${activeTab}`}
+          tone="secondary"
+        >
           <SectionHeader
             compact
             eyebrow="检索结果"
-            meta={<span>{searching ? '搜索中...' : `已显示 ${visibleResults.length} / ${activeTab === 'nodes' ? nodeResults.length : activeTab === 'docs' ? documentResults.length : categoryFilteredResults.length}`}</span>}
+            meta={<span aria-live="polite">{searching ? '搜索中…' : `已显示 ${visibleResults.length} / ${activeTab === 'nodes' ? nodeResults.length : activeTab === 'docs' ? documentResults.length : categoryFilteredResults.length}`}</span>}
             title={<strong>{searchQuery.trim() || pageCopy.search.queryIdle}</strong>}
             description={searchQuery.trim() ? '标题、正文、路径与标签命中会统一回收到这里。' : '支持检索文档标题、路径、标签、分类提示和正文内容。'}
           />
+
+          {searchQuery.trim() !== '' && visibleResults.length > 0 && !selectedFile && (
+            <CompactEmptyState
+              className="search-page__preview-hint"
+              icon={<FileIcon />}
+              title="结果列表已展开，等待锁定证据"
+              description="点击或按 Enter 预览结果；打开详情与进入图谱支持新标签页。"
+            />
+          )}
 
           {searchQuery.trim() === '' ? (
             <CompactEmptyState
@@ -208,8 +264,18 @@ export function SearchPage({
                 return (
                   <article
                     key={`${result.sourceId}:${result.path}`}
-                    className={`search-page__result-card${selectedFile?.path === result.path ? ' active' : ''}`}
-                    onClick={() => onPreviewItem(result.sourceId, result.path)}
+                    aria-label={`预览 ${result.title || result.name}`}
+                    aria-pressed={selectedFile?.path === result.path && selectedFile?.sourceId === result.sourceId}
+                    className={`search-page__result-card${selectedFile?.path === result.path && selectedFile?.sourceId === result.sourceId ? ' active' : ''}`}
+                    onClick={() => handleResultPreview(result.sourceId, result.path)}
+                    onKeyDown={(event) => {
+                      if (event.key === 'Enter' || event.key === ' ') {
+                        event.preventDefault()
+                        handleResultPreview(result.sourceId, result.path)
+                      }
+                    }}
+                    role="button"
+                    tabIndex={0}
                   >
                     <div className="search-page__result-topline">
                       <span>{summarizeResultType(result)}</span>
@@ -235,27 +301,21 @@ export function SearchPage({
                         预览证据
                       </button>
                       {primaryCategory && (
-                        <button
+                        <Link
                           className="search-page__result-button"
-                          onClick={(event) => {
-                            event.stopPropagation()
-                            onOpenGraphRoute(buildCategoryRoute(primaryCategory), result.sourceId, result.path)
-                          }}
-                          type="button"
+                          onClick={(event) => event.stopPropagation()}
+                          to={getGraphHref(buildCategoryRoute(primaryCategory), result.sourceId, result.path)}
                         >
                           进入图谱
-                        </button>
+                        </Link>
                       )}
-                      <button
+                      <Link
                         className="search-page__result-button search-page__result-button--primary"
-                        onClick={(event) => {
-                          event.stopPropagation()
-                          onOpenItem(result.sourceId, result.path)
-                        }}
-                        type="button"
+                        onClick={(event) => event.stopPropagation()}
+                        to={getDocumentHref(result.sourceId, result.path)}
                       >
                         打开文档
-                      </button>
+                      </Link>
                     </div>
 
                     {result.tags && result.tags.length > 0 && (
@@ -266,7 +326,7 @@ export function SearchPage({
                             className="search-page__tag"
                             onClick={(event) => {
                               event.stopPropagation()
-                              onTagSelect(tag)
+                              onSearch(`#${tag}`)
                             }}
                             type="button"
                           >
@@ -283,44 +343,57 @@ export function SearchPage({
           )}
         </RailPanel>
 
-        <aside className="search-page__preview">
-          <RailPanel className="search-page__preview-card" tone="primary">
-            <SectionHeader
-              compact
-              actions={selectedFile ? (
-                <button className="search-page__result-button search-page__result-button--primary" onClick={() => onOpenItem(selectedFile.sourceId, selectedFile.path)} type="button">
-                  打开详情
-                </button>
-              ) : null}
-              eyebrow="证据抽屉"
-              title={<strong>{selectedFile ? '原文证据' : '等待预览'}</strong>}
-              description={selectedFile ? '预览区会保留当前原文，方便在结果之间快速比对。' : '点击左侧结果即可把原文固定到这里。'}
-            />
-
-            {selectedFile ? (
-              <div className="search-page__preview-document">
-                <DocumentView
-                  content={fileContent}
-                  fileName={fileName}
-                  loading={fileLoading}
+        {selectedFile && (
+          <aside className="search-page__preview">
+            <RailPanel className="search-page__preview-card" tone="primary">
+              <div className="search-page__preview-stack">
+                <PreviewCard
+                  actions={(
+                    <>
+                      {selectedResult?.categories?.[0] && (
+                        <Link
+                          className="search-page__result-button"
+                          to={getGraphHref(buildCategoryRoute(selectedResult.categories[0]), selectedFile.sourceId, selectedFile.path)}
+                        >
+                          进入图谱
+                        </Link>
+                      )}
+                      <Link className="search-page__result-button search-page__result-button--primary" to={getDocumentHref(selectedFile.sourceId, selectedFile.path)}>
+                        打开详情
+                      </Link>
+                      <button className="search-page__result-button" onClick={onClearSelectedFile} type="button">
+                        关闭抽屉
+                      </button>
+                    </>
+                  )}
+                  categories={selectedResult?.categories || []}
+                  description={selectedResult?.description || selectedResult?.snippet || '预览区会保留当前原文，方便在结果之间快速比对。'}
+                  docType={selectedResult?.docType}
+                  facts={previewFacts}
                   onTagSelect={onTagSelect}
-                  onWikiLink={onWikiLink}
-                  selectedFile={selectedFile}
-                  showKnowledgePanel={false}
-                  source={source}
-                  variant="panel"
+                  path={selectedResult?.path || selectedFile.path}
+                  sourceName="知识文档"
+                  tags={selectedResult?.tags || []}
+                  title={selectedResult?.title || selectedResult?.name || selectedFile.path}
                 />
+
+                <div className="search-page__preview-document">
+                  <DocumentView
+                    content={fileContent}
+                    fileName={fileName}
+                    loading={fileLoading}
+                    onTagSelect={onTagSelect}
+                    onWikiLink={onWikiLink}
+                    selectedFile={selectedFile}
+                    showKnowledgePanel={false}
+                    source={source}
+                    variant="panel"
+                  />
+                </div>
               </div>
-            ) : (
-              <CompactEmptyState
-                className="search-page__empty search-page__empty--preview"
-                icon={<FileIcon />}
-                title="点击左侧结果即可固定预览"
-                description="预览区会保留原文内容，方便你在不同结果之间快速比对证据。"
-              />
-            )}
-          </RailPanel>
-        </aside>
+            </RailPanel>
+          </aside>
+        )}
       </div>
     </PageShell>
   )

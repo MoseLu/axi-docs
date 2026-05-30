@@ -1,4 +1,5 @@
-import type { HTMLAttributes, ReactNode } from 'react'
+import { useId, useRef } from 'react'
+import type { HTMLAttributes, KeyboardEvent, ReactNode } from 'react'
 
 function cx(...tokens: Array<string | false | null | undefined>) {
   return tokens.filter(Boolean).join(' ')
@@ -9,25 +10,25 @@ interface PrimitiveProps {
   className?: string
 }
 
-interface PageShellProps extends PrimitiveProps {
+interface PageShellProps extends PrimitiveProps, Omit<HTMLAttributes<HTMLElement>, 'children'> {
   compact?: boolean
 }
 
-export function PageShell({ children, className, compact = false }: PageShellProps) {
+export function PageShell({ children, className, compact = false, ...rest }: PageShellProps) {
   return (
-    <section className={cx('cockpit-shell', compact && 'cockpit-shell--compact', className)}>
+    <section className={cx('cockpit-shell', compact && 'cockpit-shell--compact', className)} {...rest}>
       {children}
     </section>
   )
 }
 
-interface RailPanelProps extends PrimitiveProps {
+interface RailPanelProps extends PrimitiveProps, Omit<HTMLAttributes<HTMLElement>, 'children'> {
   tone?: 'primary' | 'secondary' | 'ghost'
 }
 
-export function RailPanel({ children, className, tone = 'secondary' }: RailPanelProps) {
+export function RailPanel({ children, className, tone = 'secondary', ...rest }: RailPanelProps) {
   return (
-    <section className={cx('rail-panel', `rail-panel--${tone}`, className)}>
+    <section className={cx('rail-panel', `rail-panel--${tone}`, className)} {...rest}>
       {children}
     </section>
   )
@@ -87,10 +88,13 @@ export function MetricPill({ label, value, accent = 'blue', subtle }: MetricPill
 }
 
 interface SegmentedTabsProps<T extends string> {
-  items: Array<{ value: T; label: string; badge?: ReactNode }>
+  items: Array<{ value: T; label: string; badge?: ReactNode; panelId?: string }>
   value: T
   onChange: (value: T) => void
   className?: string
+  ariaLabel?: string
+  idBase?: string
+  panelId?: string
 }
 
 export function SegmentedTabs<T extends string>({
@@ -98,21 +102,75 @@ export function SegmentedTabs<T extends string>({
   value,
   onChange,
   className,
+  ariaLabel,
+  idBase,
+  panelId,
 }: SegmentedTabsProps<T>) {
+  const generatedId = useId().replace(/:/g, '')
+  const resolvedIdBase = idBase || `segmented-tabs-${generatedId}`
+  const tabRefs = useRef<Array<HTMLButtonElement | null>>([])
+
+  const focusTab = (index: number) => {
+    tabRefs.current[index]?.focus()
+  }
+
+  const moveFocus = (nextIndex: number) => {
+    const safeIndex = (nextIndex + items.length) % items.length
+    onChange(items[safeIndex].value)
+    focusTab(safeIndex)
+  }
+
+  const handleKeyDown = (event: KeyboardEvent<HTMLButtonElement>, index: number) => {
+    switch (event.key) {
+      case 'ArrowRight':
+      case 'ArrowDown':
+        event.preventDefault()
+        moveFocus(index + 1)
+        break
+      case 'ArrowLeft':
+      case 'ArrowUp':
+        event.preventDefault()
+        moveFocus(index - 1)
+        break
+      case 'Home':
+        event.preventDefault()
+        moveFocus(0)
+        break
+      case 'End':
+        event.preventDefault()
+        moveFocus(items.length - 1)
+        break
+      default:
+        break
+    }
+  }
+
   return (
-    <div className={cx('segmented-tabs', className)} role="tablist">
-      {items.map((item) => (
+    <div className={cx('segmented-tabs', className)} role="tablist" aria-label={ariaLabel}>
+      {items.map((item, index) => {
+        const isActive = item.value === value
+        const resolvedPanelId = item.panelId || panelId
+        return (
         <button
           key={item.value}
-          className={cx('segmented-tabs__item', item.value === value && 'active')}
+          ref={(node) => {
+            tabRefs.current[index] = node
+          }}
+          id={`${resolvedIdBase}-tab-${item.value}`}
+          aria-controls={resolvedPanelId}
+          aria-selected={isActive}
+          className={cx('segmented-tabs__item', isActive && 'active')}
           onClick={() => onChange(item.value)}
+          onKeyDown={(event) => handleKeyDown(event, index)}
           role="tab"
+          tabIndex={isActive ? 0 : -1}
           type="button"
         >
           <span>{item.label}</span>
           {item.badge !== undefined && <small>{item.badge}</small>}
         </button>
-      ))}
+        )
+      })}
     </div>
   )
 }

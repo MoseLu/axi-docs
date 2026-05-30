@@ -1,17 +1,17 @@
 ---
-name: info-hub-components
-description: Info-Hub 组件库的架构规则和开发指南
+name: axi-docs-components
+description: Axi Docs 组件库的架构规则和开发指南
 ---
 
-# Info-Hub Components AGENTS.md
+# Axi Docs Components AGENTS.md
 
-> 本文件定义 info-hub 组件库的架构规则。所有组件变更必须符合本文件的设计原则和模式。
+> 本文件定义 Axi Docs 组件库的架构规则。所有组件变更必须符合本文件的设计原则和模式。
 
 ---
 
 ## 组件库概述
 
-Info-Hub 组件库提供可复用的 UI 组件，用于构建文档浏览和知识图谱可视化界面。
+Axi Docs 组件库提供可复用的 UI 组件，用于构建文档浏览和知识图谱可视化界面。
 
 ---
 

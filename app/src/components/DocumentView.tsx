@@ -1,11 +1,14 @@
 import { useMemo, useState } from 'react'
+import { Link } from 'react-router-dom'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import rehypeHighlight from 'rehype-highlight'
 import { Components } from 'react-markdown'
 import { DocumentIcon, ClockIcon } from './Icons'
 import { KnowledgePanel } from './KnowledgePanel'
+import { formatDisplayDate } from '../lib/intl'
 import { formatKnowledgeDocumentTitle } from '../lib/knowledgeFormatter'
+import { buildSearchRoute } from '../lib/routes'
 import { DocSource, SelectedFile, Frontmatter } from '../types'
 
 interface DocumentViewProps {
@@ -106,7 +109,7 @@ function CopyButton({ text }: { text: string }) {
 }
 
 // Wiki link renderer
-function renderWikiLinks(text: string, onWikiLink: (name: string) => void): React.ReactNode {
+function renderWikiLinks(text: string, sourceId?: string): React.ReactNode {
   const wikiLinkRegex = /\[\[([^\]]+)\]\]/g
   const parts: React.ReactNode[] = []
   let lastIndex = 0
@@ -114,16 +117,16 @@ function renderWikiLinks(text: string, onWikiLink: (name: string) => void): Reac
   while ((match = wikiLinkRegex.exec(text)) !== null) {
     if (match.index > lastIndex) parts.push(text.slice(lastIndex, match.index))
     const [linkText, displayText] = match[1].split('|')
+    const noteName = linkText.trim()
     parts.push(
-      <button
+      <Link
         key={match.index}
         className="wiki-link"
-        onClick={() => onWikiLink(linkText.trim())}
-        title={`跳转到: ${linkText.trim()}`}
-        type="button"
+        title={`搜索相关知识: ${noteName}`}
+        to={buildSearchRoute(noteName, sourceId)}
       >
         {displayText || linkText}
-      </button>
+      </Link>
     )
     lastIndex = match.index + match[0].length
   }
@@ -131,10 +134,10 @@ function renderWikiLinks(text: string, onWikiLink: (name: string) => void): Reac
   return parts.length === 1 && typeof parts[0] === 'string' ? parts[0] : parts
 }
 
-function processChildren(children: React.ReactNode, onWikiLink: (name: string) => void): React.ReactNode {
-  if (typeof children === 'string') return renderWikiLinks(children, onWikiLink)
+function processChildren(children: React.ReactNode, sourceId?: string): React.ReactNode {
+  if (typeof children === 'string') return renderWikiLinks(children, sourceId)
   if (Array.isArray(children)) return children.map((child, i) =>
-    typeof child === 'string' ? <span key={i}>{renderWikiLinks(child, onWikiLink)}</span> : child
+    typeof child === 'string' ? <span key={i}>{renderWikiLinks(child, sourceId)}</span> : child
   )
   return children
 }
@@ -166,10 +169,11 @@ export function DocumentView({
   }, [content])
 
   const handleNavigate = (path: string) => onWikiLink(path)
+  const wikiLinkSourceId = selectedFile?.sourceId || source?.id
 
   const components: Components = useMemo(() => ({
-    p({ children }) { return <p>{processChildren(children, onWikiLink)}</p> },
-    li({ children }) { return <li>{processChildren(children, onWikiLink)}</li> },
+    p({ children }) { return <p>{processChildren(children, wikiLinkSourceId)}</p> },
+    li({ children }) { return <li>{processChildren(children, wikiLinkSourceId)}</li> },
     pre({ children }) {
       const codeEl = Array.isArray(children) ? children[0] : children
       const className = (codeEl as React.ReactElement)?.props?.className || ''
@@ -206,7 +210,7 @@ export function DocumentView({
       const id = headingId(children)
       return <h4 id={id}><a href={`#${id}`} className="heading-anchor" aria-hidden="true">#</a>{children}</h4>
     },
-  }), [onWikiLink])
+  }), [wikiLinkSourceId])
 
   if (!selectedFile) {
     return (
@@ -277,7 +281,7 @@ export function DocumentView({
             {date && (
               <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 980, fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>
                 <ClockIcon />
-                {new Date(date).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}
+                {formatDisplayDate(date)}
               </div>
             )}
           </div>

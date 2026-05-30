@@ -1,5 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { DocumentView } from './DocumentView'
+import { SegmentedTabs } from './CockpitPrimitives'
 import {
   formatKnowledgeBranchPath,
   formatKnowledgeItemTitle,
@@ -115,17 +116,19 @@ export function KnowledgeExplorer({
         </div>
 
         <div className="knowledge-explorer__toolbar">
-          <div className="knowledge-explorer__modes" role="tablist" aria-label="图谱视图模式">
-            <button className={`knowledge-explorer__mode${view === 'tree' ? ' active' : ''}`} onClick={() => onViewChange('tree')} type="button">
-              树构
-            </button>
-            <button className={`knowledge-explorer__mode${view === 'path' ? ' active' : ''}`} onClick={() => onViewChange('path')} type="button">
-              路径
-            </button>
-            <button className={`knowledge-explorer__mode${view === 'islands' ? ' active' : ''}`} onClick={() => onViewChange('islands')} type="button">
-              孤岛
-            </button>
-          </div>
+          <SegmentedTabs
+            ariaLabel="图谱视图模式"
+            className="knowledge-explorer__modes"
+            idBase="knowledge-explorer-view-tabs"
+            items={[
+              { value: 'tree', label: '树构' },
+              { value: 'path', label: '路径' },
+              { value: 'islands', label: '孤岛' },
+            ]}
+            onChange={onViewChange}
+            panelId="knowledge-explorer-stage"
+            value={view}
+          />
 
           <div className="knowledge-explorer__pills">
             {searchQuery.trim() && (
@@ -145,7 +148,13 @@ export function KnowledgeExplorer({
       </div>
 
       <div className="knowledge-explorer__body">
-        <div className="knowledge-explorer__stage" ref={stageRef}>
+        <div
+          className="knowledge-explorer__stage"
+          id="knowledge-explorer-stage"
+          ref={stageRef}
+          role="tabpanel"
+          aria-labelledby={`knowledge-explorer-view-tabs-tab-${view}`}
+        >
           <Suspense
             fallback={(
               <div className="hero-knowledge-scene__fallback">

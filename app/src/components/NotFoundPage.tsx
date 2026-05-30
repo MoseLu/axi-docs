@@ -17,9 +17,19 @@ export function NotFoundPage({
 }: NotFoundPageProps) {
   return (
     <div className="workspace-empty-state workspace-empty-state--centered">
-      <div className="workspace-empty-state__eyebrow">404</div>
+      <div className="workspace-empty-state__eyebrow">404 / Route Recovery</div>
       <h2>{title}</h2>
       <p>{description}</p>
+      <div className="workspace-empty-state__support">
+        <div className="workspace-empty-state__hint">
+          <strong>优先恢复路径</strong>
+          <span>返回首页重新进入当前上下文，确保数据源、分类和文档路由重新同步。</span>
+        </div>
+        <div className="workspace-empty-state__hint">
+          <strong>如果链接来自分享</strong>
+          <span>打开搜索页，用文档标题、节点名或路径关键词重新定位对应知识点。</span>
+        </div>
+      </div>
       <div className="workspace-empty-state__actions">
         <button className="workspace-empty-state__action" onClick={onPrimaryAction} type="button">
           {primaryLabel}

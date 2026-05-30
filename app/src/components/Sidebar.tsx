@@ -102,19 +102,19 @@ export function Sidebar({
         )}
 
         <div className="sidebar-rail__footer">
-          <span className="sidebar-rail__eyebrow">Source</span>
-          <strong>{currentSource?.name || 'Info Hub'}</strong>
+          <span className="sidebar-rail__eyebrow">数据源</span>
+          <strong>{currentSource?.name || 'Axi Docs'}</strong>
           {activeTag && <span className="sidebar-rail__hint">#{formatKnowledgeTagLabel(activeTag)}</span>}
         </div>
       </div>
 
       {!isBlinko && activePanel && (
         <div className="sidebar-panel">
-          <div className="sidebar-panel__header">
-            <div>
-              <span className="sidebar-panel__eyebrow">{currentSource?.name || 'Knowledge Source'}</span>
-              <strong>{activePanel === 'tags' ? '标签过滤' : '文件结构'}</strong>
-            </div>
+            <div className="sidebar-panel__header">
+              <div>
+                <span className="sidebar-panel__eyebrow">{currentSource?.name || '当前知识库'}</span>
+                <strong>{activePanel === 'tags' ? '标签过滤' : '文件结构'}</strong>
+              </div>
             <button
               className="sidebar-panel__close"
               onClick={() => setActivePanel(null)}

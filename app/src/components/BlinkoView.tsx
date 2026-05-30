@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { scanKnowledgeSource as loadKnowledgeSourceDirectory } from '../lib/knowledgeClient'
+import { formatDisplayDate } from '../lib/intl'
 import { BlinkoNote } from '../types'
 import { ClockIcon, TagIcon, GridIcon } from './Icons'
 import ReactMarkdown from 'react-markdown'
@@ -30,7 +31,7 @@ function formatTime(dateStr: string): string {
   if (hours < 1) return `${Math.floor(diff / 60000)}分钟前`
   if (hours < 24) return `${Math.floor(hours)}小时前`
   if (hours < 24 * 7) return `${Math.floor(hours / 24)}天前`
-  return d.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' })
+  return formatDisplayDate(d, { month: 'short', day: 'numeric' })
 }
 
 function BlinkoCard({ item, onClick }: { item: BlinkoListItem; onClick: () => void }) {
@@ -163,7 +164,7 @@ function BlinkoErrorState({ message }: { message: string }) {
       <div>
         <p className="empty-state-text">{message}</p>
         <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)', marginTop: 'var(--spacing-3)' }}>
-          Blinko 是 Info Hub 的伴生项目，提供闪念笔记功能。
+          Blinko 是 Axi Docs 的伴生项目，提供闪念笔记功能。
         </p>
         <code style={{ fontSize: 'var(--font-size-xs)', background: 'var(--color-bg-secondary)', padding: 'var(--spacing-1) var(--spacing-3)', borderRadius: 'var(--radius-xs)', display: 'inline-block', marginTop: 'var(--spacing-3)' }}>
           http://localhost:1111

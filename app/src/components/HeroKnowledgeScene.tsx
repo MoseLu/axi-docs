@@ -12,6 +12,8 @@ interface HeroKnowledgeSceneProps {
   mode: 'focus' | 'global' | 'tree'
   onNavigate: (path: string) => void
   onTagSelect?: (tag: string) => void
+  chrome?: 'hero' | 'cockpit' | 'minimal'
+  layout?: 'hero' | 'dock' | 'workspace'
 }
 
 export function HeroKnowledgeScene({
@@ -20,6 +22,8 @@ export function HeroKnowledgeScene({
   mode,
   onNavigate,
   onTagSelect,
+  chrome = 'hero',
+  layout = 'hero',
 }: HeroKnowledgeSceneProps) {
   const sceneRef = useRef<HTMLDivElement | null>(null)
   const [viewport, setViewport] = useState({ width: 1200, height: 720 })
@@ -79,10 +83,10 @@ export function HeroKnowledgeScene({
           )}
         >
           <GlobalGraph
-            chrome="hero"
+            chrome={chrome}
             focusPath={focusPath}
             height={viewport.height}
-            layout="hero"
+            layout={layout}
             mode={mode}
             onNavigate={onNavigate}
             onTagSelect={onTagSelect}
@@ -90,7 +94,7 @@ export function HeroKnowledgeScene({
             width={viewport.width}
           />
         </Suspense>
-      ) : (
+      ) : chrome === 'hero' ? (
         <div className="hero-knowledge-scene__poster" aria-hidden="true">
           <div className="hero-knowledge-scene__poster-grid" />
           <div className="hero-knowledge-scene__poster-orbit hero-knowledge-scene__poster-orbit--one" />
@@ -99,6 +103,11 @@ export function HeroKnowledgeScene({
             <strong>{pageCopy.graph.heroPosterTitle}</strong>
             <span>{pageCopy.graph.heroPosterDescription}</span>
           </div>
+        </div>
+      ) : (
+        <div className="hero-knowledge-scene__fallback">
+          <div className="spinner" />
+          <span>{pageCopy.graph.loading}</span>
         </div>
       )}
     </div>

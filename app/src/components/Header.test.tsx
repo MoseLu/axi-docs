@@ -1,0 +1,106 @@
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
+import { Header } from './Header'
+
+const mocks = vi.hoisted(() => ({
+  getKnowledgeSearchSuggestions: vi.fn(),
+}))
+
+vi.mock('../lib/knowledgeClient', () => ({
+  getKnowledgeSearchSuggestions: mocks.getKnowledgeSearchSuggestions,
+}))
+
+vi.mock('./Icons', () => ({
+  SearchIcon: () => <span data-testid="search-icon">🔍</span>,
+  BookIcon: () => <span data-testid="book-icon">📖</span>,
+  FileIcon: () => <span data-testid="file-icon">📄</span>,
+  TagIcon: () => <span data-testid="tag-icon">🏷️</span>,
+}))
+
+describe('Header', () => {
+  const defaultProps = {
+    homeHref: '/',
+    onSearchChange: vi.fn(),
+    onSearchSubmit: vi.fn(),
+    onSuggestionSelect: vi.fn(),
+    pageMode: 'home' as const,
+    searchQuery: '',
+    searching: false,
+  }
+
+  const renderHeader = (props = {}) => render(
+    <MemoryRouter>
+      <Header {...defaultProps} {...props} />
+    </MemoryRouter>,
+  )
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
+  })
+
+  it('renders brand and global search input', () => {
+    renderHeader()
+    expect(screen.getByText('Axi Docs')).toBeInTheDocument()
+    expect(screen.getByLabelText('全局搜索')).toBeInTheDocument()
+  })
+
+  it('debounces live search updates on the search page', async () => {
+    const onSearchChange = vi.fn()
+    renderHeader({ onSearchChange, pageMode: 'search' })
+
+    fireEvent.change(screen.getByLabelText('全局搜索'), { target: { value: 'graph' } })
+
+    expect(onSearchChange).not.toHaveBeenCalled()
+    await waitFor(() => expect(onSearchChange).toHaveBeenCalledWith('graph'))
+  })
+
+  it('submits the current query on Enter', () => {
+    const onSearchSubmit = vi.fn()
+    renderHeader({ onSearchSubmit })
+
+    const input = screen.getByLabelText('全局搜索')
+    fireEvent.change(input, { target: { value: '知识空间' } })
+    fireEvent.keyDown(input, { key: 'Enter' })
+
+    expect(onSearchSubmit).toHaveBeenCalledWith('知识空间')
+  })
+
+  it('clears the current search on Escape when suggestions are closed', async () => {
+    const onSearchChange = vi.fn()
+    renderHeader({ onSearchChange, pageMode: 'search', searchQuery: '已有检索' })
+
+    const input = screen.getByLabelText('全局搜索')
+    fireEvent.keyDown(input, { key: 'Escape' })
+
+    expect(screen.getByDisplayValue('')).toBeInTheDocument()
+    expect(onSearchChange).toHaveBeenCalledWith('')
+  })
+
+  it('shows and selects suggestions', async () => {
+    const onSuggestionSelect = vi.fn()
+    mocks.getKnowledgeSearchSuggestions.mockResolvedValue([
+      {
+        kind: 'tag',
+        label: '#知识图谱',
+        query: '#知识图谱',
+        meta: '12 篇文档',
+      },
+    ])
+
+    renderHeader({ onSuggestionSelect })
+
+    const input = screen.getByLabelText('全局搜索')
+    fireEvent.focus(input)
+    fireEvent.change(input, { target: { value: '知识' } })
+
+    const suggestion = await screen.findByRole('option', { name: /知识图谱/i })
+    fireEvent.mouseDown(suggestion)
+
+    expect(onSuggestionSelect).toHaveBeenCalledWith(expect.objectContaining({
+      kind: 'tag',
+      query: '#知识图谱',
+    }))
+  })
+})

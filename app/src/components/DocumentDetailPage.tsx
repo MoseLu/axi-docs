@@ -1,10 +1,12 @@
-import { buildCategoryRoute } from '../lib/routes'
+import { Link } from 'react-router-dom'
 import { pageCopy } from '../config/pageCopy'
+import { formatDisplayDate } from '../lib/intl'
 import {
   formatKnowledgeDocumentTitle,
   formatKnowledgeItemTitle,
   formatKnowledgeTagLabel,
 } from '../lib/knowledgeFormatter'
+import { buildDocumentRoute, buildSearchRoute } from '../lib/routes'
 import type { DocSource, KnowledgeCatalogItem, SelectedFile } from '../types'
 import { CompactEmptyState, MetricPill, PageShell, RailPanel, SectionHeader } from './CockpitPrimitives'
 import { ClockIcon, FileIcon, FolderIcon, SearchIcon, TagIcon } from './Icons'
@@ -18,14 +20,11 @@ interface DocumentDetailPageProps {
   fileContent: string | null
   fileName: string
   fileLoading: boolean
-  categoryKey: string
   categoryTitle: string
   categoryDescription: string
   documentSiblings: KnowledgeCatalogItem[]
+  graphHref: string
   relatedItems: KnowledgeCatalogItem[]
-  onReturnToGraph: (route: string, sourceId: string, path: string) => void
-  onOpenItem: (sourceId: string, path: string) => void
-  onOpenSearch: (query: string) => void
   onTagSelect: (tag: string | null) => void
   onWikiLink: (noteName: string) => void
 }
@@ -41,14 +40,11 @@ export function DocumentDetailPage({
   fileContent,
   fileName,
   fileLoading,
-  categoryKey,
   categoryTitle,
   categoryDescription,
   documentSiblings,
+  graphHref,
   relatedItems,
-  onReturnToGraph,
-  onOpenItem,
-  onOpenSearch,
   onTagSelect,
   onWikiLink,
 }: DocumentDetailPageProps) {
@@ -62,8 +58,9 @@ export function DocumentDetailPage({
   const resolvedTags = selectedCatalogItem?.tags || []
   const resolvedTechStack = selectedCatalogItem?.techStack || []
   const updatedLabel = selectedCatalogItem?.updated
-    ? new Date(selectedCatalogItem.updated).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })
+    ? formatDisplayDate(selectedCatalogItem.updated)
     : null
+  const relatedSearchHref = buildSearchRoute(resolvedRawTitle.replace(/\.md$/i, ''), selectedFile.sourceId)
 
   return (
     <PageShell className="document-detail-page" compact>
@@ -105,33 +102,31 @@ export function DocumentDetailPage({
           />
           <div className="document-detail-page__link-list">
             {documentSiblings.map((item) => (
-              <button
+              <Link
                 key={`${item.sourceId}:${item.path}`}
                 className={`document-detail-page__link${item.path === selectedFile.path ? ' active' : ''}`}
-                onClick={() => onOpenItem(item.sourceId, item.path)}
-                type="button"
+                to={buildDocumentRoute({ sourceId: item.sourceId, path: item.path })}
               >
                 <FileIcon />
                 <div>
                   <strong>{documentTitle(item)}</strong>
                   <span>{item.path}</span>
                 </div>
-                </button>
-              ))}
-            </div>
+              </Link>
+            ))}
+          </div>
         </RailPanel>
       </aside>
 
       <section className="document-detail-page__main">
         <div className="document-detail-page__toolbar">
           <div className="document-detail-page__breadcrumbs">
-            <button
+            <Link
               className="document-detail-page__crumb"
-              onClick={() => onReturnToGraph(buildCategoryRoute(categoryKey), selectedFile.sourceId, selectedFile.path)}
-              type="button"
+              to={graphHref}
             >
               {categoryTitle}
-            </button>
+            </Link>
             <span>/</span>
             <span className="document-detail-page__crumb document-detail-page__crumb--current">
               {resolvedDisplayTitle}
@@ -139,21 +134,19 @@ export function DocumentDetailPage({
           </div>
 
           <div className="document-detail-page__toolbar-actions">
-            <button
+            <Link
               className="document-detail-page__action document-detail-page__action--primary"
-              onClick={() => onReturnToGraph(buildCategoryRoute(categoryKey), selectedFile.sourceId, selectedFile.path)}
-              type="button"
+              to={graphHref}
             >
               返回分类图谱
-            </button>
-            <button
+            </Link>
+            <Link
               className="document-detail-page__action"
-              onClick={() => onOpenSearch(resolvedRawTitle.replace(/\.md$/i, ''))}
-              type="button"
+              to={relatedSearchHref}
             >
               <SearchIcon />
               <span>搜索相似内容</span>
-            </button>
+            </Link>
           </div>
         </div>
 
@@ -238,18 +231,17 @@ export function DocumentDetailPage({
           {relatedItems.length > 0 ? (
             <div className="document-detail-page__link-list">
               {relatedItems.map((item) => (
-                <button
+                <Link
                   key={`${item.sourceId}:${item.path}:recommend`}
                   className="document-detail-page__link"
-                  onClick={() => onOpenItem(item.sourceId, item.path)}
-                  type="button"
+                  to={buildDocumentRoute({ sourceId: item.sourceId, path: item.path })}
                 >
                   <FolderIcon />
                   <div>
                     <strong>{documentTitle(item)}</strong>
                     <span>{item.path}</span>
                   </div>
-                </button>
+                </Link>
               ))}
             </div>
           ) : (

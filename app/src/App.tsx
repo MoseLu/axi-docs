@@ -1,8 +1,6 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
 import { Route, Routes, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Header } from './components/Header'
-import { Sidebar } from './components/Sidebar'
-import { BlinkoView } from './components/BlinkoView'
 import { CategoryGraphPage } from './components/CategoryGraphPage'
 import { DocumentDetailPage } from './components/DocumentDetailPage'
 import { ErrorBoundary } from './components/ErrorBoundary'
@@ -12,13 +10,12 @@ import { SearchPage } from './components/SearchPage'
 import { KNOWLEDGE_CATEGORY_ORDER, getKnowledgeCategoryMeta, normalizeKnowledgeCategoryKey } from './config/knowledgeRules'
 import {
   getKnowledgeCatalog as loadKnowledgeCatalog,
-  invalidateKnowledgeClientCache,
   listKnowledgeSources as loadKnowledgeSources,
   readKnowledgeFile as loadKnowledgeFileContent,
-  searchKnowledge as searchKnowledgeDocuments,
+  searchKnowledgeAll as searchKnowledgeDocuments,
 } from './lib/knowledgeClient'
 import { buildCategoryRoute, buildDocumentRoute, decodeDocumentId, encodeDocumentId, normalizeCategoryRoute } from './lib/routes'
-import { DocSource, KnowledgeCatalog, KnowledgeCatalogItem, SearchResult, SelectedFile } from './types'
+import { DocSource, KnowledgeCatalog, KnowledgeCatalogItem, SearchResult, SearchSuggestion, SelectedFile } from './types'
 
 type PageMode = 'home' | 'category' | 'search' | 'document'
 type ParamUpdates = Record<string, string | null | undefined>
@@ -47,10 +44,9 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
 
   const [sources, setSources] = useState<DocSource[]>([])
   const [activeSource, setActiveSource] = useState(searchParams.get('source') || routeDocument?.sourceId || 'obsidian')
-  const [selectedFile, setSelectedFile] = useState<SelectedFile | null>(previewDocument)
+  const [selectedFile, setSelectedFile] = useState<SelectedFile | null>(() => (pageMode === 'document' ? null : previewDocument))
   const [fileContent, setFileContent] = useState<string | null>(null)
   const [fileName, setFileName] = useState('')
-  const [refreshKey, setRefreshKey] = useState(0)
   const [loading, setLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState(urlSearchQuery)
   const [searchResults, setSearchResults] = useState<SearchResult[] | null>(null)
@@ -62,6 +58,22 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
   const [searchActiveCategory, setSearchActiveCategory] = useState<string | null>(null)
   const abortRef = useRef<AbortController | null>(null)
   const searchAbortRef = useRef<AbortController | null>(null)
+
+  const effectiveSelectedFile = pageMode === 'document' ? routeDocument : selectedFile
+  const currentSource = useMemo(
+    () => sources.find((source) => source.id === activeSource) || null,
+    [activeSource, sources],
+  )
+  const primaryWorkspaceSource = useMemo(
+    () => sources.find((source) => source.enabled && source.type === 'local')
+      || sources.find((source) => source.enabled)
+      || null,
+    [sources],
+  )
+  const workspaceSource = useMemo(() => {
+    if (pageMode === 'document') return currentSource || primaryWorkspaceSource
+    return currentSource?.type === 'local' ? currentSource : primaryWorkspaceSource
+  }, [currentSource, pageMode, primaryWorkspaceSource])
 
   const syncParams = useCallback((updates: ParamUpdates, replace = true) => {
     const next = new URLSearchParams(searchParams)
@@ -75,7 +87,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
     setSearchParams(next, { replace })
   }, [searchParams, setSearchParams])
 
-  const navigateWithParams = useCallback((pathname: string, updates?: ParamUpdates, replace = false) => {
+  const buildLocation = useCallback((pathname: string, updates?: ParamUpdates) => {
     const next = new URLSearchParams(searchParams)
     Object.entries(updates || {}).forEach(([key, value]) => {
       if (value === null || value === undefined || value === '') {
@@ -85,11 +97,20 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
       }
     })
     const search = next.toString()
-    navigate({
+    return {
       pathname,
       search: search ? `?${search}` : '',
-    }, { replace })
-  }, [navigate, searchParams])
+    }
+  }, [searchParams])
+
+  const buildHref = useCallback((pathname: string, updates?: ParamUpdates) => {
+    const location = buildLocation(pathname, updates)
+    return `${location.pathname}${location.search}`
+  }, [buildLocation])
+
+  const navigateWithParams = useCallback((pathname: string, updates?: ParamUpdates, replace = false) => {
+    navigate(buildLocation(pathname, updates), { replace })
+  }, [buildLocation, navigate])
 
   const fetchSources = useCallback(async () => {
     try {
@@ -182,7 +203,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
 
     setSearching(true)
     try {
-      const results = await searchKnowledgeDocuments(activeSource, normalizedQuery, activeTag)
+      const results = await searchKnowledgeDocuments(normalizedQuery)
       if (controller.signal.aborted) return
       setSearchResults(results)
     } catch (error) {
@@ -194,7 +215,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
         setSearching(false)
       }
     }
-  }, [activeSource, activeTag])
+  }, [])
 
   useEffect(() => {
     void fetchSources()
@@ -212,47 +233,50 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
       }
     }
 
-    const currentDoc = selectedFile ? `${selectedFile.sourceId}:${selectedFile.path}` : null
-    const nextDoc = previewDocument ? `${previewDocument.sourceId}:${previewDocument.path}` : null
-    if (currentDoc !== nextDoc) {
-      setSelectedFile(previewDocument)
+    if (pageMode !== 'document') {
+      const currentDoc = selectedFile ? `${selectedFile.sourceId}:${selectedFile.path}` : null
+      const nextDoc = previewDocument ? `${previewDocument.sourceId}:${previewDocument.path}` : null
+      if (currentDoc !== nextDoc) {
+        setSelectedFile(previewDocument)
+      }
     }
-  }, [activeSource, activeTag, previewDocument, searchParams, searchQuery, selectedFile, urlSearchQuery])
+  }, [activeSource, activeTag, pageMode, previewDocument, searchParams, searchQuery, selectedFile, urlSearchQuery])
 
   useEffect(() => {
-    if (!selectedFile) {
+    if (!effectiveSelectedFile) {
       abortRef.current?.abort()
       setFileContent(null)
       setFileName('')
       setLoading(false)
       return
     }
-    void loadFile(selectedFile.sourceId, selectedFile.path)
-  }, [loadFile, refreshKey, selectedFile?.path, selectedFile?.sourceId])
+    void loadFile(effectiveSelectedFile.sourceId, effectiveSelectedFile.path)
+  }, [effectiveSelectedFile, loadFile])
 
   useEffect(() => {
-    const currentSource = routeDocument?.sourceId || activeSource
-    if (currentSource === 'blinko') {
+    const catalogSourceId = pageMode === 'document'
+      ? routeDocument?.sourceId || activeSource
+      : workspaceSource?.id
+    if (!catalogSourceId || catalogSourceId === 'blinko') {
       setCatalog(null)
       setCatalogError(null)
       setCatalogLoading(false)
       return
     }
-    void loadCatalog(currentSource)
-  }, [activeSource, loadCatalog, refreshKey, routeDocument?.sourceId])
+    void loadCatalog(catalogSourceId)
+  }, [activeSource, loadCatalog, pageMode, routeDocument?.sourceId, workspaceSource?.id])
 
   useEffect(() => {
     if (pageMode === 'document') return
     void runSearch(searchQuery)
-  }, [activeSource, activeTag, pageMode, refreshKey, runSearch, searchQuery])
+  }, [pageMode, runSearch, searchQuery])
 
-  const currentSource = sources.find((source) => source.id === activeSource)
   const catalogItems = useMemo(() => flattenCatalogItems(catalog), [catalog])
   const selectedCatalogItem = useMemo(
-    () => selectedFile
-      ? catalogItems.find((item) => item.sourceId === selectedFile.sourceId && item.path === selectedFile.path) || null
+    () => effectiveSelectedFile
+      ? catalogItems.find((item) => item.sourceId === effectiveSelectedFile.sourceId && item.path === effectiveSelectedFile.path) || null
       : null,
-    [catalogItems, selectedFile],
+    [catalogItems, effectiveSelectedFile],
   )
   const defaultCategoryKey = useMemo(() => {
     const explicitCategory = routeCategory
@@ -277,13 +301,6 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
     if (!primaryCategory) return []
     return catalog?.sections.find((section) => section.key === primaryCategory)?.items.slice(0, 10) || []
   }, [catalog?.sections, selectedCatalogItem?.categories])
-  const contextLabel = useMemo(() => {
-    if (pageMode === 'category' && categorySection) return categorySection.title
-    if (pageMode === 'search') return searchQuery.trim() ? `搜索：${searchQuery}` : '全局搜索'
-    if (pageMode === 'document') return selectedCatalogItem?.title || fileName || currentSource?.name || '文档详情'
-    return currentSource?.name || activeSource
-  }, [activeSource, categorySection, currentSource?.name, fileName, pageMode, searchQuery, selectedCatalogItem?.title])
-
   const handleNavigateHome = useCallback(() => {
     navigateWithParams('/', {
       q: null,
@@ -297,7 +314,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
   }, [navigateWithParams])
 
   const handleNavigateCategory = useCallback(() => {
-    const targetSource = currentSource?.type === 'local' ? currentSource.id : 'obsidian'
+    const targetSource = workspaceSource?.id || 'obsidian'
     navigateWithParams(
       buildCategoryRoute(defaultCategoryKey),
       {
@@ -311,7 +328,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
         view: 'tree',
       },
     )
-  }, [currentSource?.id, currentSource?.type, defaultCategoryKey, navigateWithParams])
+  }, [defaultCategoryKey, navigateWithParams, workspaceSource?.id])
 
   const handleNavigateSearch = useCallback(() => {
     navigateWithParams('/search', {
@@ -351,26 +368,6 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
     )
   }, [navigateWithParams])
 
-  const handleOpenCategoryRoute = useCallback((route: string) => {
-    navigateWithParams(route, {
-      source: activeSource,
-      doc: null,
-      node: null,
-      branch: null,
-      view: 'tree',
-    })
-  }, [activeSource, navigateWithParams])
-
-  const handleOpenGraphResult = useCallback((route: string, sourceId: string, path: string) => {
-    navigateWithParams(route, {
-      source: sourceId,
-      doc: encodeDocumentId({ sourceId, path }),
-      node: path,
-      branch: null,
-      view: 'tree',
-    })
-  }, [navigateWithParams])
-
   const handlePreviewCategoryItem = useCallback((sourceId: string, path: string) => {
     const nextFile = { sourceId, path }
     setSelectedFile(nextFile)
@@ -396,55 +393,6 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
     }, false)
   }, [pageMode, searchParams, syncParams])
 
-  const handleSourceChange = useCallback((sourceId: string) => {
-    setActiveSource(sourceId)
-    setSelectedFile(null)
-    setFileContent(null)
-    setFileName('')
-    setSearchResults(null)
-    setActiveTag(null)
-    setCatalog(null)
-    setCatalogError(null)
-
-    const targetSource = sourceId
-    if (pageMode === 'category' && sourceId === 'blinko') {
-      navigateWithParams('/', {
-        source: targetSource,
-        q: null,
-        keyword: null,
-        tag: null,
-        doc: null,
-        branch: null,
-        node: null,
-        view: null,
-      })
-      return
-    }
-
-    if (pageMode === 'document') {
-      navigateWithParams('/', {
-        source: targetSource,
-        q: null,
-        keyword: null,
-        tag: null,
-        doc: null,
-        branch: null,
-        node: null,
-        view: null,
-      })
-      return
-    }
-
-    syncParams({
-      source: targetSource,
-      tag: null,
-      doc: null,
-      branch: null,
-      node: null,
-      view: pageMode === 'category' ? 'tree' : null,
-    }, false)
-  }, [navigateWithParams, pageMode, syncParams])
-
   const handleSearch = useCallback((query: string) => {
     setSearchQuery(query)
     setSelectedFile(null)
@@ -466,11 +414,33 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
     }, false)
   }, [pageMode, syncParams])
 
-  const handleRefresh = useCallback(() => {
-    invalidateKnowledgeClientCache()
-    setRefreshKey((current) => current + 1)
-    void fetchSources()
-  }, [fetchSources])
+  const handleSearchSubmit = useCallback((query: string) => {
+    const normalizedQuery = query.trim()
+    setActiveTag(null)
+    setSearchActiveCategory(null)
+    setSearchQuery(normalizedQuery)
+    setSelectedFile(null)
+    setFileContent(null)
+    setFileName('')
+
+    navigateWithParams('/search', {
+      keyword: normalizedQuery || null,
+      q: null,
+      tag: null,
+      doc: null,
+      branch: null,
+      node: null,
+      view: null,
+    }, pageMode === 'search')
+  }, [navigateWithParams, pageMode])
+
+  const handleSuggestionSelect = useCallback((suggestion: SearchSuggestion) => {
+    if (suggestion.kind === 'document' && suggestion.sourceId && suggestion.path) {
+      handleOpenDocument(suggestion.sourceId, suggestion.path)
+      return
+    }
+    handleSearchSubmit(suggestion.query)
+  }, [handleOpenDocument, handleSearchSubmit])
 
   const handleTagSelect = useCallback((tag: string | null) => {
     setActiveTag(tag)
@@ -498,44 +468,87 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
   }, [activeSource, handleSearch, navigateWithParams, pageMode])
 
   const invalidCategoryRoute = pageMode === 'category' && !routeCategory
-  const isBlinkoFeed = activeSource === 'blinko' && !selectedFile && pageMode === 'home'
-  const showCategoryUnavailable = pageMode === 'category' && currentSource?.type !== 'local'
-  const showSearchUnavailable = pageMode === 'search' && currentSource?.type !== 'local'
-  const showsWorkspaceSidebar = pageMode === 'home'
   const documentCategoryKey = normalizeKnowledgeCategoryKey(selectedCatalogItem?.categories[0] || '')
   const documentCategoryMeta = documentCategoryKey ? getKnowledgeCategoryMeta(documentCategoryKey) : null
+  const categoryTargetSource = workspaceSource?.id || 'obsidian'
+  const homeHref = useMemo(() => buildHref('/', {
+    q: null,
+    keyword: null,
+    tag: null,
+    doc: null,
+    branch: null,
+    node: null,
+    view: null,
+  }), [buildHref])
+  const categoryHref = useMemo(() => buildHref(
+    buildCategoryRoute(defaultCategoryKey),
+    {
+      source: categoryTargetSource,
+      q: null,
+      keyword: null,
+      tag: null,
+      doc: null,
+      branch: null,
+      node: null,
+      view: 'tree',
+    },
+  ), [buildHref, categoryTargetSource, defaultCategoryKey])
+  const getDocumentHref = useCallback((sourceId: string, path: string) => buildDocumentRoute({ sourceId, path }), [])
+  const getCategoryHref = useCallback((route: string) => buildHref(route, {
+    source: categoryTargetSource,
+    doc: null,
+    node: null,
+    branch: null,
+    view: 'tree',
+  }), [buildHref, categoryTargetSource])
+  const getGraphHref = useCallback((route: string, sourceId: string, path: string) => buildHref(route, {
+    source: sourceId,
+    doc: encodeDocumentId({ sourceId, path }),
+    node: path,
+    branch: null,
+    view: 'tree',
+  }), [buildHref])
+  const documentGraphHref = useMemo(() => {
+    if (!effectiveSelectedFile) return categoryHref
+
+    return buildHref(
+      buildCategoryRoute(documentCategoryKey || defaultCategoryKey),
+      {
+        source: effectiveSelectedFile.sourceId,
+        doc: encodeDocumentId(effectiveSelectedFile),
+        node: effectiveSelectedFile.path,
+        branch: null,
+        view: 'tree',
+      },
+    )
+  }, [buildHref, categoryHref, defaultCategoryKey, documentCategoryKey, effectiveSelectedFile])
+
+  const handleSkipToMain = useCallback((event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault()
+    const main = document.getElementById('app-main-content')
+    if (!main) return
+    main.focus()
+    main.scrollIntoView({ block: 'start' })
+  }, [])
 
   return (
     <div className={`app-layout app-layout--${pageMode}`}>
+      <a className="skip-link" href="#app-main-content" onClick={handleSkipToMain}>
+        跳到主内容
+      </a>
       <Header
-        contextLabel={contextLabel}
-        onNavigateCategory={handleNavigateCategory}
-        onNavigateHome={handleNavigateHome}
-        onNavigateSearch={handleNavigateSearch}
-        onRefresh={handleRefresh}
-        onSearch={handleSearch}
+        homeHref={homeHref}
+        onSearchChange={handleSearch}
+        onSearchSubmit={handleSearchSubmit}
+        onSuggestionSelect={handleSuggestionSelect}
         pageMode={pageMode}
         searchQuery={searchQuery}
         searching={searching}
       />
       <div className="app-body">
-        {showsWorkspaceSidebar && (
-          <Sidebar
-            activeSource={activeSource}
-            activeTag={activeTag}
-            onFileSelect={handleOpenPreview}
-            onSourceChange={handleSourceChange}
-            onTagSelect={handleTagSelect}
-            refreshKey={refreshKey}
-            selectedFile={selectedFile}
-            sources={sources}
-          />
-        )}
-        <main className={`app-main app-main--${pageMode}`}>
+        <main className={`app-main app-main--${pageMode}`} id="app-main-content" tabIndex={-1}>
           <ErrorBoundary>
-            {isBlinkoFeed ? (
-              <BlinkoView onNoteSelect={handleOpenDocument} refreshKey={refreshKey} />
-            ) : invalidCategoryRoute ? (
+            {invalidCategoryRoute ? (
               <div className="workspace-empty-state">
                 <div className="workspace-empty-state__eyebrow">Category Route</div>
                 <h2>当前分类路由不存在</h2>
@@ -544,43 +557,22 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
                   返回首页
                 </button>
               </div>
-            ) : showCategoryUnavailable ? (
-              <div className="workspace-empty-state">
-                <div className="workspace-empty-state__eyebrow">Category Graph</div>
-                <h2>当前数据源暂不支持分类图谱</h2>
-                <p>分类图谱仅对本地知识库开放。你可以切回 Obsidian，或先在首页浏览与检索当前内容。</p>
-                <button className="workspace-empty-state__action" onClick={handleNavigateHome}>
-                  返回首页
-                </button>
-              </div>
-            ) : showSearchUnavailable ? (
-              <div className="workspace-empty-state">
-                <div className="workspace-empty-state__eyebrow">Search</div>
-                <h2>当前数据源暂不支持全局搜索</h2>
-                <p>请切换到本地知识库后再执行全局搜索，或返回首页继续浏览现有知识内容。</p>
-                <button className="workspace-empty-state__action" onClick={handleNavigateHome}>
-                  返回首页
-                </button>
-              </div>
             ) : pageMode === 'document' ? (
-              selectedFile ? (
+              effectiveSelectedFile ? (
                 <DocumentDetailPage
                   categoryDescription={documentCategoryMeta?.description || '当前文档所属分类的上下文与延伸阅读。'}
-                  categoryKey={documentCategoryKey || defaultCategoryKey}
                   categoryTitle={documentCategoryMeta?.title || '相关知识点'}
                   documentSiblings={documentSiblings}
                   fileContent={fileContent}
                   fileLoading={loading}
                   fileName={fileName}
-                  onOpenItem={handleOpenDocument}
-                  onOpenSearch={(query) => navigateWithParams('/search', { keyword: query, source: selectedFile.sourceId })}
-                  onReturnToGraph={handleOpenGraphResult}
+                  graphHref={documentGraphHref}
                   onTagSelect={handleTagSelect}
                   onWikiLink={handleWikiLink}
                   relatedItems={relatedItems}
                   selectedCatalogItem={selectedCatalogItem}
-                  selectedFile={selectedFile}
-                  source={currentSource || { id: selectedFile.sourceId, name: selectedFile.sourceId, path: '', enabled: true, type: 'local' }}
+                  selectedFile={effectiveSelectedFile}
+                  source={currentSource || { id: effectiveSelectedFile.sourceId, name: effectiveSelectedFile.sourceId, path: '', enabled: true, type: 'local' }}
                 />
               ) : (
                 <NotFoundPage
@@ -598,21 +590,22 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
                 fileLoading={loading}
                 fileName={fileName}
                 onNavigateHome={handleNavigateHome}
-                onOpenGraphRoute={handleOpenGraphResult}
-                onOpenItem={handleOpenDocument}
+                onClearSelectedFile={handleClearSelectedFile}
                 onPreviewItem={handleOpenPreview}
                 onSearch={handleSearch}
                 onSetActiveCategory={setSearchActiveCategory}
+                getDocumentHref={getDocumentHref}
+                getGraphHref={getGraphHref}
                 onTagSelect={handleTagSelect}
                 onWikiLink={handleWikiLink}
                 searchQuery={searchQuery}
                 searchResults={searchResults || []}
                 searching={searching}
                 selectedFile={selectedFile}
-                source={currentSource || { id: activeSource, name: activeSource, path: '', enabled: true, type: 'local' }}
+                source={workspaceSource || currentSource || { id: 'obsidian', name: '知识文档', path: '', enabled: true, type: 'local' }}
               />
             ) : pageMode === 'category' ? (
-              currentSource ? (
+              workspaceSource ? (
                 <CategoryGraphPage
                   activeTag={activeTag}
                   catalog={catalog}
@@ -620,12 +613,13 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
                   fileContent={fileContent}
                   fileLoading={loading}
                   fileName={fileName}
+                  getCategoryHref={getCategoryHref}
+                  getDocumentHref={getDocumentHref}
+                  homeHref={homeHref}
                   onBranchChange={(branch) => syncParams({ view: searchParams.get('view') || 'tree', branch, node: searchParams.get('node') }, false)}
-                  onNavigateHome={handleNavigateHome}
                   onNodeChange={(node) => syncParams({ view: searchParams.get('view') || 'tree', branch: searchParams.get('branch'), node }, false)}
                   onOpenItem={handleOpenDocument}
                   onPreviewItem={handlePreviewCategoryItem}
-                  onSelectCategoryRoute={handleOpenCategoryRoute}
                   onTagSelect={handleTagSelect}
                   onViewChange={(view) => syncParams({ view, branch: searchParams.get('branch'), node: searchParams.get('node') }, false)}
                   onWikiLink={handleWikiLink}
@@ -633,7 +627,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
                   selectedBranch={searchParams.get('branch')}
                   selectedFile={selectedFile}
                   selectedNodeId={searchParams.get('node')}
-                  source={currentSource}
+                  source={workspaceSource}
                   view={((searchParams.get('view') === 'path' || searchParams.get('view') === 'islands')
                     ? searchParams.get('view')
                     : 'tree') as 'tree' | 'path' | 'islands'}
@@ -641,9 +635,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
               ) : (
                 <div className="loading"><div className="spinner" /></div>
               )
-            ) : activeSource === 'blinko' ? (
-              <BlinkoView onNoteSelect={handleOpenDocument} refreshKey={refreshKey} />
-            ) : currentSource ? (
+            ) : workspaceSource ? (
               <KnowledgeWorkbench
                 activeTag={activeTag}
                 catalog={catalog}
@@ -664,7 +656,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
                 searchResults={searchResults}
                 searching={searching}
                 selectedFile={selectedFile}
-                source={currentSource}
+                source={workspaceSource}
               />
             ) : (
               <div className="loading"><div className="spinner" /></div>

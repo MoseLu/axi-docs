@@ -27,10 +27,10 @@ agent-readable: true
 
 | Repo | Section | Lifecycle | Canonical | Remote |
 |---|---|---|---|---|
-| `../../projects/axi-agent-platform` | projects | active-canonical | yes | [link](https://github.com/MoseLu/ai-agent-platform.git) |
+| `../../projects/axi-agent-platform` | projects | active-canonical | yes | [link](https://github.com/MoseLu/axi-agent-platform.git) |
 | `../../projects/axi-docs` | projects | active-canonical | yes | [link](https://github.com/MoseLu/axi-docs.git) |
 | `../../projects/axi-image-preview` | projects | active-canonical | yes | [link](https://github.com/MoseLu/axi-image-preview.git) |
-| `../../projects/axi-workbench` | projects | active-canonical | yes | [link](https://github.com/MoseLu/enterprise-project-automation-platform.git) |
+| `../../projects/axi-workbench` | projects | active-canonical | yes | [link](https://github.com/MoseLu/axi-workbench.git) |
 | `../../tools/axi-video-downloader` | tools | active-tool | yes | - |
 
 ## libu_hr
@@ -43,6 +43,6 @@ agent-readable: true
 | `../../references/archives/axi-wave2-20260525/termagent` | agent | archived-prototype | no | - |
 | `../../references/archives/projects-cleanup-20260524-235336/enterprise-workspace/references/anthropics-skills` | references | reference | no | - |
 | `../../references/archives/projects-cleanup-20260524-235336/enterprise-workspace/references/claude-mem` | references | reference | no | - |
-| `../../references/archives/projects-cleanup-20260524-235336/enterprise-workspace/references/enterprise-automation-platform-archive` | references | archived-duplicate | no | [link](https://github.com/MoseLu/enterprise-project-automation-platform.git) |
+| `../../references/archives/projects-cleanup-20260524-235336/enterprise-workspace/references/enterprise-automation-platform-archive` | references | archived-duplicate | no | [link](https://github.com/MoseLu/axi-workbench.git) |
 | `../../references/archives/projects-cleanup-20260524-235336/enterprise-workspace/references/enterprise-dev-platform` | references | reference | no | - |
 | `../../references/archives/projects-cleanup-20260524-235336/enterprise-workspace/references/enterprise-workspace-legacy` | references | legacy-reference | no | [link](https://github.com/MoseLu/enterprise-workspace.git) |

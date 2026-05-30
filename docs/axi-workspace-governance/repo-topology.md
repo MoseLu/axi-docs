@@ -30,7 +30,7 @@ agent-readable: true
 ## Projects
 
 - `../../projects/axi-agent-platform` | Axi Agent Platform | branch=`master` | canonical=yes | compliance=`polyrepo-mixed-stack`
-  remote: https://github.com/MoseLu/ai-agent-platform.git
+  remote: https://github.com/MoseLu/axi-agent-platform.git
 - `../../projects/axi-docs` | Axi Docs | branch=`dev` | canonical=yes | compliance=`node-single-repo`
   remote: https://github.com/MoseLu/axi-docs.git
 - `../../projects/axi-image-preview` | Axi Image Preview | branch=`dev` | canonical=yes | compliance=`node-single-repo`
@@ -38,7 +38,7 @@ agent-readable: true
 - `../../projects/axi-notify` | Axi Notify / Mobile | branch=`dev` | canonical=yes | compliance=`android-fullstack`
   remote: https://github.com/MoseLu/axi-notify.git
 - `../../projects/axi-workbench` | Axi Workbench | branch=`dev` | canonical=yes | compliance=`node-monorepo-approved`
-  remote: https://github.com/MoseLu/enterprise-project-automation-platform.git
+  remote: https://github.com/MoseLu/axi-workbench.git
   upstream: https://github.com/BellisGit/enterprise-project-automation-platform.git
 - `../../projects/sports-management-app` | 体育管理应用 | branch=`master` | canonical=yes | compliance=`polyrepo-mixed-stack`
   remote: https://github.com/MoseLu/sports-management-app.git
@@ -68,7 +68,7 @@ agent-readable: true
 - `../../references/archives/projects-cleanup-20260524-235336/enterprise-workspace/references/anthropics-skills` | Anthropic Skills 参考 | branch=`-` | canonical=no | compliance=`reference`
 - `../../references/archives/projects-cleanup-20260524-235336/enterprise-workspace/references/claude-mem` | Claude Memory 参考 | branch=`-` | canonical=no | compliance=`reference`
 - `../../references/archives/projects-cleanup-20260524-235336/enterprise-workspace/references/enterprise-automation-platform-archive` | 企业自动化平台归档副本 | branch=`-` | canonical=no | compliance=`archived-reference`
-  remote: https://github.com/MoseLu/enterprise-project-automation-platform.git
+  remote: https://github.com/MoseLu/axi-workbench.git
 - `../../references/archives/projects-cleanup-20260524-235336/enterprise-workspace/references/enterprise-dev-platform` | 企业开发平台参考 | branch=`-` | canonical=no | compliance=`reference`
 - `../../references/archives/projects-cleanup-20260524-235336/enterprise-workspace/references/enterprise-workspace-legacy` | 企业工作空间历史参考 | branch=`-` | canonical=no | compliance=`legacy-reference`
   remote: https://github.com/MoseLu/enterprise-workspace.git

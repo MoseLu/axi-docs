@@ -65,7 +65,7 @@ type LocalFileEntry = {
 const localSourceIndexCache = new Map<string, LocalSourceIndex>()
 
 function parseExtraSources(): DocSource[] {
-  const raw = process.env.INFO_HUB_EXTRA_SOURCES_JSON?.trim()
+  const raw = process.env.AXI_DOCS_EXTRA_SOURCES_JSON?.trim()
   if (!raw) return []
 
   try {

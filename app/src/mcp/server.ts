@@ -953,7 +953,7 @@ function getToolSchemas() {
 
 export function createServer() {
   const server = new Server(
-    { name: 'info-hub-mcp', version: '1.0.0' },
+    { name: 'axi-docs-mcp', version: '1.0.0' },
     { capabilities: { tools: {} } },
   )
 
@@ -1094,7 +1094,7 @@ export function createServer() {
 
 // ─── Token 管理 ──────────────────────────────────────────────────────────────
 
-const TOKEN_FILE = path.resolve(process.cwd(), '.info-hub-token')
+const TOKEN_FILE = path.resolve(process.cwd(), '.axi-docs-token')
 
 function loadOrCreateToken(): string {
   // 1. 优先使用环境变量
@@ -1109,7 +1109,7 @@ function loadOrCreateToken(): string {
   // 3. 首次运行：生成强随机 token 并持久化
   const newToken = crypto.randomBytes(32).toString('hex')
   fs.writeFileSync(TOKEN_FILE, newToken, { mode: 0o600 }) // 仅 owner 可读
-  console.error('[info-hub-mcp] 首次运行，已生成访问 token 并保存至:', TOKEN_FILE)
+  console.error('[axi-docs-mcp] 首次运行，已生成访问 token 并保存至:', TOKEN_FILE)
   return newToken
 }
 
@@ -1170,7 +1170,7 @@ function recordAuthFailure(ip: string): void {
   rec.count++
   if (rec.count >= MAX_FAILURES) {
     rec.until = Date.now() + LOCKOUT_MS
-    console.error(`[info-hub-mcp] IP ${ip} 认证失败 ${rec.count} 次，锁定 5 分钟`)
+    console.error(`[axi-docs-mcp] IP ${ip} 认证失败 ${rec.count} 次，锁定 5 分钟`)
   }
   authFailures.set(ip, rec)
 }
@@ -1224,7 +1224,7 @@ async function startHttpServer(port: number) {
       if (!authMiddleware(req)) {
         res.writeHead(401, {
           'Content-Type': 'application/json',
-          'WWW-Authenticate': 'Bearer realm="info-hub-mcp"',
+          'WWW-Authenticate': 'Bearer realm="axi-docs-mcp"',
         })
         res.end(JSON.stringify({ jsonrpc: '2.0', error: { code: -32001, message: 'Unauthorized' }, id: null }))
         return
@@ -1251,7 +1251,7 @@ async function startHttpServer(port: number) {
             result: {
               protocolVersion: '2024-11-05',
               capabilities: { tools: {} },
-              serverInfo: { name: 'info-hub-mcp', version: '1.0.0' },
+              serverInfo: { name: 'axi-docs-mcp', version: '1.0.0' },
             },
           }
           res.end(JSON.stringify(response))
@@ -1477,11 +1477,11 @@ async function startHttpServer(port: number) {
   // BIND_ADDRESS 可绑定到指定网卡，例如 Tailscale IP (100.x.x.x) 或仅本机 (127.0.0.1)
   const bindAddress = process.env.BIND_ADDRESS || '0.0.0.0'
   httpServer.listen(port, bindAddress, () => {
-    console.error(`[info-hub-mcp] HTTP 服务已启动: http://${bindAddress}:${port}`)
-    console.error(`[info-hub-mcp] 健康检查: http://${bindAddress}:${port}/health`)
-    console.error(`[info-hub-mcp] 访问 token: ${AUTH_TOKEN}`)
-    console.error(`[info-hub-mcp] MCP JSON-RPC: http://${bindAddress}:${port}/mcp`)
-    console.error(`[info-hub-mcp] REST API:     http://${bindAddress}:${port}/api/scan`)
+    console.error(`[axi-docs-mcp] HTTP 服务已启动: http://${bindAddress}:${port}`)
+    console.error(`[axi-docs-mcp] 健康检查: http://${bindAddress}:${port}/health`)
+    console.error(`[axi-docs-mcp] 访问 token: ${AUTH_TOKEN}`)
+    console.error(`[axi-docs-mcp] MCP JSON-RPC: http://${bindAddress}:${port}/mcp`)
+    console.error(`[axi-docs-mcp] REST API:     http://${bindAddress}:${port}/api/scan`)
   })
 
   return httpServer
@@ -1650,7 +1650,7 @@ const HOME_PAGE = `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<title>info-hub MCP</title>
+<title>Axi Docs MCP</title>
 <style>
   body { font-family: system-ui; max-width: 720px; margin: 60px auto; padding: 0 20px; background: #fafafa; }
   h1 { color: #333; }
@@ -1664,11 +1664,11 @@ const HOME_PAGE = `<!DOCTYPE html>
 </style>
 </head>
 <body>
-<h1>info-hub MCP Server <span class="tag">HTTP</span></h1>
+<h1>Axi Docs MCP Server <span class="tag">HTTP</span></h1>
 <p>Obsidian 知识库 MCP 服务（HTTP 传输模式），支持 MCP JSON-RPC 和 REST API 两种调用方式。</p>
 
 <div class="note">
-  <strong>认证方式：</strong>所有需要认证的请求需带 <code>Authorization: Bearer &lt;token&gt;</code> 请求头或 <code>?token=...</code> 查询参数。Token 在服务启动日志中显示，或查看 <code>.info-hub-token</code> 文件。
+  <strong>认证方式：</strong>所有需要认证的请求需带 <code>Authorization: Bearer &lt;token&gt;</code> 请求头或 <code>?token=...</code> 查询参数。Token 在服务启动日志中显示，或查看 <code>.axi-docs-token</code> 文件。
 </div>
 
 <h2>可用工具 / REST 端点</h2>
@@ -1683,7 +1683,7 @@ const HOME_PAGE = `<!DOCTYPE html>
 </table>
 
 <h2>使用示例</h2>
-<pre>TOKEN=$(cat .info-hub-token)
+<pre>TOKEN=$(cat .axi-docs-token)
 
 curl -H "Authorization: Bearer $TOKEN" "http://localhost:3010/api/scan"
 
@@ -1699,7 +1699,7 @@ curl -X POST -H "Authorization: Bearer $TOKEN" \\
 <p>在 <code>~/.claude/settings.json</code> 中添加：</p>
 <pre>{
   "allowedMcpServers": [{
-    "serverName": "info-hub-remote",
+    "serverName": "axi-docs-remote",
     "serverUrl": "http://你的服务器地址:3010/mcp"
   }]
 }</pre>
@@ -1718,11 +1718,11 @@ async function main() {
     const transport = new StdioServerTransport()
     const server = createServer()
     await server.connect(transport)
-    console.error('[info-hub-mcp] 已启动，stdio 模式')
+  console.error('[axi-docs-mcp] 已启动，stdio 模式')
   }
 }
 
 main().catch((e) => {
-  console.error('[info-hub-mcp] 启动失败:', e)
+  console.error('[axi-docs-mcp] 启动失败:', e)
   process.exit(1)
 })

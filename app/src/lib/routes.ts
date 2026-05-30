@@ -68,6 +68,22 @@ export function buildDocumentRoute(file: SelectedFile): string {
   return `/doc/${encodeDocumentId(file)}`
 }
 
+export function buildSearchRoute(keyword: string, sourceId?: string | null): string {
+  const params = new URLSearchParams()
+  const normalizedKeyword = keyword.trim()
+
+  if (normalizedKeyword) {
+    params.set('keyword', normalizedKeyword)
+  }
+
+  if (sourceId) {
+    params.set('source', sourceId)
+  }
+
+  const search = params.toString()
+  return search ? `/search?${search}` : '/search'
+}
+
 export function normalizeCategoryRoute(categoryId?: string | null, subId?: string | null): KnowledgeCategoryKey | null {
   const nested = subId ? normalizeKnowledgeCategoryKey(subId) : null
   if (nested) return nested

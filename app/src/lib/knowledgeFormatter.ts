@@ -13,7 +13,7 @@ const BRANCH_LABELS = new Map([
   ['workflow', '工作流'],
   ['tools', '工具'],
   ['ADR', '架构决策'],
-  ['info-hub', '文档中心'],
+  ['axi-docs', '文档中心'],
   ['ielts-vocab', '雅思词汇'],
 ])
 

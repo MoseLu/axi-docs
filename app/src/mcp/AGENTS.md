@@ -1,17 +1,17 @@
 ---
-name: info-hub-mcp
-description: Info-Hub MCP 服务器的架构规则和开发指南
+name: axi-docs-mcp
+description: Axi Docs MCP 服务器的架构规则和开发指南
 ---
 
-# Info-Hub MCP Server AGENTS.md
+# Axi Docs MCP Server AGENTS.md
 
-> 本文件定义 Info-Hub MCP (Model Context Protocol) 服务器的架构规则。所有 MCP 相关代码变更必须符合本文件的设计原则。
+> 本文件定义 Axi Docs MCP (Model Context Protocol) 服务器的架构规则。所有 MCP 相关代码变更必须符合本文件的设计原则。
 
 ---
 
 ## MCP 服务器概述
 
-Info-Hub MCP 服务器实现 MCP 协议，为 Claude Code 和其他 AI 工具提供文档访问能力。
+Axi Docs MCP 服务器实现 MCP 协议，为 Claude Code 和其他 AI 工具提供文档访问能力。
 
 ---
 
@@ -68,7 +68,7 @@ src/mcp/
 // server.ts
 const server = new Server(
   {
-    name: "info-hub-mcp",
+    name: "axi-docs-mcp",
     version: "1.0.0",
   },
   {
@@ -436,25 +436,25 @@ describe('MCP Server Integration', () => {
 
 ```bash
 # MCP 模式（stdio）
-npm run mcp
+pnpm mcp
 
 # HTTP 模式
-npm run mcp:http
+pnpm mcp:http
 ```
 
 ### 测试
 
 ```bash
-npm test              # 监听模式
-npm run test:run      # 单次运行
-npm run test:coverage # 覆盖率报告
+pnpm test             # 监听模式
+pnpm test:run         # 单次运行
+pnpm test:coverage    # 覆盖率报告
 ```
 
 ### 调试
 
 ```bash
 # 启动 HTTP 服务器
-npm run mcp:http
+pnpm mcp:http
 
 # 测试端点
 curl http://localhost:3010/health

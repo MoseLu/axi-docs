@@ -39,8 +39,8 @@ describe('sources configuration', () => {
       expect(blinko?.type).toBe('local')
     })
 
-    it('should have workspace-governance source configured', () => {
-      const workspace = docSources.find(s => s.id === 'workspace-governance')
+    it('should have axi-workspace-governance source configured', () => {
+      const workspace = docSources.find(s => s.id === 'axi-workspace-governance')
       expect(workspace).toBeDefined()
       expect(workspace?.enabled).toBe(true)
       expect(workspace?.type).toBe('local')

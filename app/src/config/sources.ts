@@ -20,14 +20,14 @@ export const docSources: DocSource[] = [
   {
     id: 'blinko-notes',
     name: 'Blinko 闪念笔记 (同步)',
-    path: 'F:/docs/project/info-hub/blinko-notes/',
+    path: 'F:/docs/project/app/blinko-notes/',
     enabled: true,
     type: 'local',
   },
   {
-    id: 'workspace-governance',
-    name: 'Enterprise Workspace Governance',
-    path: 'F:/docs/project/docs/workspace-enterprise-governance/',
+    id: 'axi-workspace-governance',
+    name: 'Axi Workspace Governance',
+    path: 'F:/docs/project/docs/axi-workspace-governance/',
     enabled: true,
     type: 'local',
   },

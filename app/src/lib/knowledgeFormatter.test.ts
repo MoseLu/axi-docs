@@ -18,7 +18,7 @@ describe('knowledge formatter', () => {
   it('keeps branch and tag labels metadata-driven', () => {
     expect(formatKnowledgeTagLabel('#前端')).toBe('前端')
     expect(formatKnowledgeBranchLabel('2026')).toBe('2026年')
-    expect(formatKnowledgeBranchPath('20-Projects/info-hub/ADR')).toBe('项目 / 文档中心 / 架构决策')
+    expect(formatKnowledgeBranchPath('20-Projects/axi-docs/ADR')).toBe('项目 / 文档中心 / 架构决策')
   })
 
   it('formats generic items and graph nodes with explicit graph titles', () => {

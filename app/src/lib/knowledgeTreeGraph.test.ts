@@ -19,28 +19,28 @@ describe('knowledge tree graph', () => {
   it('does not return the selected branch as its own child root', () => {
     const tree = buildKnowledgeTree([
       createNote('20-Projects/OVERVIEW.md'),
-      createNote('20-Projects/info-hub/OVERVIEW.md'),
-      createNote('20-Projects/info-hub/ADR/ADR-001.md'),
+      createNote('20-Projects/axi-docs/OVERVIEW.md'),
+      createNote('20-Projects/axi-docs/ADR/ADR-001.md'),
     ])
 
     const selected = resolveSelectedTree(tree, '20-Projects')
 
     expect(selected.currentBranch?.pathKey).toBe('20-Projects')
-    expect(selected.roots.map((branch) => branch.pathKey)).toEqual(['20-Projects/info-hub'])
+    expect(selected.roots.map((branch) => branch.pathKey)).toEqual(['20-Projects/axi-docs'])
     expect(selected.roots.some((branch) => branch.pathKey === '20-Projects')).toBe(false)
     expect(selected.looseNotes.map((note) => note.path)).toEqual(['20-Projects/OVERVIEW.md'])
   })
 
   it('surfaces a focused branch notes directly under the graph root anchor', () => {
     const tree = buildKnowledgeTree([
-      createNote('20-Projects/info-hub/OVERVIEW.md', 'current'),
-      createNote('20-Projects/info-hub/ADR/ADR-001.md'),
-      createNote('20-Projects/info-hub/ADR/ADR-002.md'),
+      createNote('20-Projects/axi-docs/OVERVIEW.md', 'current'),
+      createNote('20-Projects/axi-docs/ADR/ADR-001.md'),
+      createNote('20-Projects/axi-docs/ADR/ADR-002.md'),
     ])
 
-    const selected = resolveSelectedTree(tree, '20-Projects/info-hub')
+    const selected = resolveSelectedTree(tree, '20-Projects/axi-docs')
 
-    expect(selected.roots.map((branch) => branch.pathKey)).toEqual(['20-Projects/info-hub/ADR'])
-    expect(selected.looseNotes.map((note) => note.path)).toEqual(['20-Projects/info-hub/OVERVIEW.md'])
+    expect(selected.roots.map((branch) => branch.pathKey)).toEqual(['20-Projects/axi-docs/ADR'])
+    expect(selected.looseNotes.map((note) => note.path)).toEqual(['20-Projects/axi-docs/OVERVIEW.md'])
   })
 })

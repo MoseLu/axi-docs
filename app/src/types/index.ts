@@ -129,6 +129,15 @@ export interface SearchResult {
   matchedBy?: string[]
 }
 
+export interface SearchSuggestion {
+  kind: 'document' | 'tag'
+  label: string
+  query: string
+  sourceId?: string
+  path?: string
+  meta?: string
+}
+
 export interface SearchMatch {
   line: number
   text: string

@@ -45,7 +45,7 @@ describe('knowledge classification rules', () => {
 
 describe('knowledge base local index', () => {
   const originalObsidianPath = process.env.OBSIDIAN_PATH
-  const originalExtraSources = process.env.INFO_HUB_EXTRA_SOURCES_JSON
+  const originalExtraSources = process.env.AXI_DOCS_EXTRA_SOURCES_JSON
   let tempDir = ''
 
   afterEach(async () => {
@@ -56,9 +56,9 @@ describe('knowledge base local index', () => {
       process.env.OBSIDIAN_PATH = originalObsidianPath
     }
     if (originalExtraSources === undefined) {
-      delete process.env.INFO_HUB_EXTRA_SOURCES_JSON
+      delete process.env.AXI_DOCS_EXTRA_SOURCES_JSON
     } else {
-      process.env.INFO_HUB_EXTRA_SOURCES_JSON = originalExtraSources
+      process.env.AXI_DOCS_EXTRA_SOURCES_JSON = originalExtraSources
     }
     if (tempDir) {
       await fs.promises.rm(tempDir, { recursive: true, force: true })
@@ -67,7 +67,7 @@ describe('knowledge base local index', () => {
   })
 
   it('reindexes changed markdown files when the file timestamp changes', async () => {
-    tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'info-hub-kb-'))
+    tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'axi-docs-kb-'))
     process.env.OBSIDIAN_PATH = tempDir
 
     const filePath = path.join(tempDir, 'playbook.md')
@@ -124,7 +124,7 @@ describe('knowledge base local index', () => {
   })
 
   it('admits documents with standard frontmatter even when graph metadata is omitted', async () => {
-    tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'info-hub-kb-fallback-'))
+    tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'axi-docs-kb-fallback-'))
     process.env.OBSIDIAN_PATH = tempDir
 
     await fs.promises.writeFile(path.join(tempDir, 'context.md'), [
@@ -152,7 +152,7 @@ describe('knowledge base local index', () => {
   })
 
   it('blocks documents from the library when IQC metadata is missing', async () => {
-    tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'info-hub-kb-iqc-'))
+    tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'axi-docs-kb-iqc-'))
     process.env.OBSIDIAN_PATH = tempDir
 
     await fs.promises.writeFile(path.join(tempDir, 'invalid.md'), [
@@ -168,13 +168,13 @@ describe('knowledge base local index', () => {
     expect(searchResults).toHaveLength(0)
   })
 
-  it('supports extra local sources from INFO_HUB_EXTRA_SOURCES_JSON', async () => {
-    tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'info-hub-kb-extra-'))
+  it('supports extra local sources from AXI_DOCS_EXTRA_SOURCES_JSON', async () => {
+    tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'axi-docs-kb-extra-'))
     const extraDir = path.join(tempDir, 'hermes-system')
     await fs.promises.mkdir(extraDir, { recursive: true })
 
     process.env.OBSIDIAN_PATH = path.join(tempDir, 'primary')
-    process.env.INFO_HUB_EXTRA_SOURCES_JSON = JSON.stringify([
+    process.env.AXI_DOCS_EXTRA_SOURCES_JSON = JSON.stringify([
       {
         id: 'hermes-system',
         name: 'Hermes System',

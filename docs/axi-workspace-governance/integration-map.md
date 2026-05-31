@@ -4,14 +4,14 @@ title: Axi Workspace Integration Map
 type: reference
 status: evergreen
 tags: [workspace, integration, contracts]
-created: 2026-05-30
-modified: 2026-05-30
+created: 2026-05-31
+modified: 2026-05-31
 agent-readable: true
 ---
 
 # Axi Workspace Integration Map
 
-最后生成：2026-05-30
+最后生成：2026-05-31
 
 ## 跨仓协作契约
 

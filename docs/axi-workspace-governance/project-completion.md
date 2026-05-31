@@ -4,18 +4,18 @@ title: Axi Workspace Project Completion
 type: reference
 status: evergreen
 tags: [workspace, completion, status]
-created: 2026-05-30
-modified: 2026-05-30
+created: 2026-05-31
+modified: 2026-05-31
 agent-readable: true
 ---
 
 # Axi Workspace Project Completion
 
-最后生成：2026-05-30
+最后生成：2026-05-31
 
 ## 摘要
 
-- 已登记项目：26
+- 已登记项目：27
 - Axi 项目：14
 - 完成：1
 - 可用及以上：7
@@ -65,6 +65,7 @@ agent-readable: true
 | `image2prompt` | 未评估 | 低 | legacy | docs:legacy<br>verify:test -f README.md \| test -f manifest.json<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
 | `minimax-tokenplan` | 未评估 | 低 | missing | verify:/Users/mose/.cc-connect/bin/minimax-tokenplan tools<br>health:/Users/mose/.cc-connect/bin/minimax-tokenplan tools<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
 | `ollama-local` | 未评估 | 低 | missing | verify:/Users/mose/.cc-connect/bin/ollama-local embed --model mxbai-embed-large:latest --text smoke<br>health:/Users/mose/.cc-connect/bin/ollama-local models<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
+| `opencodex` | 未评估 | 低 | legacy | docs:legacy<br>verify:test -f README.md \| test -f package.json \| test -f scripts/build-macos-app.sh<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
 | `sports-management` | 未评估 | 低 | legacy | docs:legacy<br>verify:pnpm test<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
 | `sub2api` | 未评估 | 低 | legacy | docs:legacy<br>verify:test -d .<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
 

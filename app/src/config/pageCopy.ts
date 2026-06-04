@@ -3,6 +3,7 @@ export const pageCopy = {
     brandPrimary: 'Axi Docs',
     brandSecondary: 'Knowledge Hub',
     defaultContext: '知识总览',
+    searchLabel: '搜索',
     searchPlaceholder: '搜索标签、标题或文档',
     commandSearchIdle: '搜索知识库',
   },

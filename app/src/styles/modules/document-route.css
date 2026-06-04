@@ -62,15 +62,16 @@
   height: var(--axi-doc-vp-nav-height);
   flex: 1;
   margin-left: 0;
-  padding: 0 32px;
+  padding: 0 24px;
   justify-content: flex-start;
   gap: 16px;
 }
 
 .app-layout--document .header-search--global {
-  flex: 0 1 260px;
-  width: min(260px, 28vw);
-  max-width: 260px;
+  flex: 0 0 160px;
+  width: 160px;
+  min-width: 0;
+  max-width: 160px;
   margin-right: auto;
   border: 0;
   background: transparent;

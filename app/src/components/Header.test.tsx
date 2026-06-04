@@ -42,6 +42,8 @@ describe('Header', () => {
   it('renders brand and global search input', () => {
     renderHeader()
     expect(screen.getByText('Axi Docs')).toBeInTheDocument()
+    expect(screen.getByText('搜索')).toBeInTheDocument()
+    expect(screen.queryByText('搜索标签、标题或文档')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: '全局搜索' })).toBeInTheDocument()
   })
 

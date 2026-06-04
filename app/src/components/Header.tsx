@@ -344,7 +344,7 @@ export function Header({
                 <SearchIcon />
               )}
             </span>
-            <span className="header-search__trigger-text">{pageCopy.header.searchPlaceholder}</span>
+            <span className="header-search__trigger-text">{pageCopy.header.searchLabel}</span>
             <kbd>⌘K</kbd>
           </button>
         </div>

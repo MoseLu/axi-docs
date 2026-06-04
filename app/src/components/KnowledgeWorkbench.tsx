@@ -15,6 +15,7 @@ type ExplorerView = 'tree' | 'path' | 'islands'
 
 interface KnowledgeWorkbenchProps {
   source: DocSource
+  sources: DocSource[]
   catalog: KnowledgeCatalog | null
   catalogLoading: boolean
   catalogError: string | null
@@ -28,6 +29,7 @@ interface KnowledgeWorkbenchProps {
   activeTag: string | null
   pageMode: 'home' | 'explorer'
   onOpenItem: (sourceId: string, path: string) => void
+  onSourceSelect: (sourceId: string) => void
   onTagSelect: (tag: string | null) => void
   onSearch: (query: string) => void
   onWikiLink: (noteName: string) => void
@@ -43,6 +45,7 @@ function normalizeExplorerView(value: string | null): ExplorerView {
 
 export function KnowledgeWorkbench({
   source,
+  sources,
   catalog,
   searchQuery,
   searchResults,
@@ -53,6 +56,7 @@ export function KnowledgeWorkbench({
   activeTag,
   pageMode,
   onOpenItem,
+  onSourceSelect,
   onTagSelect,
   onWikiLink,
   onNavigateHome,
@@ -112,14 +116,17 @@ export function KnowledgeWorkbench({
     <div className="knowledge-workbench knowledge-workbench--home">
       <HomeCommandCenter
         activeTag={activeTag}
+        catalog={catalog}
         graphFocusPath={graphFocusPath}
         onClearSelectedFile={onClearSelectedFile}
         onOpenExplorer={onNavigateExplorer}
         onOpenItem={onOpenItem}
+        onSourceSelect={onSourceSelect}
         onTagSelect={onTagSelect}
         searchQuery={searchQuery}
         selectedFile={selectedFile}
         source={source}
+        sources={sources}
       />
     </div>
   )

@@ -7,9 +7,37 @@ export interface DocSource {
   path: string
   enabled: boolean
   type: 'local' | 'api'
+  kind?: 'markdown-vault' | 'skill-library' | 'workspace-registry' | 'api-notes'
+  adapter?: 'markdown' | 'skills' | 'workspace' | 'api'
+  audience?: Array<'agent' | 'human'>
+  readOnly?: boolean
   apiUrl?: string
   apiToken?: string
   icon?: 'obsidian' | 'blinko' | 'folder'
+}
+
+export type DocumentSourceConfig = Required<
+  Pick<DocSource, 'id' | 'name' | 'kind' | 'path' | 'adapter' | 'enabled' | 'audience' | 'readOnly'>
+> & Pick<DocSource, 'description' | 'type' | 'apiUrl' | 'apiToken' | 'icon'>
+
+export interface NormalizedDocument {
+  sourceId: string
+  path: string
+  title: string
+  description?: string
+  docType?: string
+  tags: string[]
+  categories: string[]
+  updated?: string
+  raw: string
+  body: string
+  frontmatter: Frontmatter
+}
+
+export interface DocumentSourceAdapter {
+  listDocuments(source: DocSource): Promise<NormalizedDocument[]>
+  readDocument(source: DocSource, documentPath: string): Promise<string | null>
+  search?(source: DocSource, query: string, filterTag?: string | null): Promise<SearchResult[]>
 }
 
 // ─── File / Document Types ────────────────────────────────────────────────────

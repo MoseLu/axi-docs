@@ -341,6 +341,22 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
     })
   }, [navigateWithParams, searchQuery])
 
+  const handleSelectSource = useCallback((sourceId: string) => {
+    if (sourceId !== activeSource) {
+      setActiveSource(sourceId)
+    }
+    setSelectedFile(null)
+    setFileContent(null)
+    setFileName('')
+    syncParams({
+      source: sourceId,
+      doc: null,
+      tag: null,
+      branch: null,
+      node: null,
+    }, false)
+  }, [activeSource, syncParams])
+
   const handleOpenPreview = useCallback((sourceId: string, path: string) => {
     const nextFile = { sourceId, path }
     setSelectedFile(nextFile)
@@ -649,6 +665,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
                 onNavigateHome={handleNavigateHome}
                 onOpenItem={handleOpenPreview}
                 onSearch={handleSearch}
+                onSourceSelect={handleSelectSource}
                 onTagSelect={handleTagSelect}
                 onWikiLink={handleWikiLink}
                 pageMode="home"
@@ -657,6 +674,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
                 searching={searching}
                 selectedFile={selectedFile}
                 source={workspaceSource}
+                sources={sources}
               />
             ) : (
               <div className="loading"><div className="spinner" /></div>

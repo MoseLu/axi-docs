@@ -5,6 +5,26 @@
 
 ---
 
+## 当前路线 — Axi Knowledge Hub
+
+> 更新日期: 2026-06-04
+
+### 已推进
+
+- [x] 将 Axi Docs 定位为多文档库 Knowledge Hub，而不是单一 Markdown 站点
+- [x] 新增文档项目 registry 与 adapter 概念
+- [x] 首批接入 workspace registry、Axi Skills、Obsidian、Blinko
+- [x] 为 `axi-skills` 保留原生 `SKILL.md` 格式，通过 adapter 生成 Web/MCP 可用索引
+- [x] MCP 新增 `axi_docs_*` 语义化工具
+
+### 下一轮重点
+
+- [ ] 把 `axi-skills` 以 `sources/axi-skills` 子库/submodule 形式纳入 `axi-docs` 仓库工作流
+- [ ] 继续打磨 Web 文档阅读页的左侧树、右侧 TOC 和项目详情页体验
+- [ ] 将旧审计清单逐项复核为“已修/仍需修/已被新架构替代”
+
+---
+
 ## P0 — 紧急 (本周内必须修复)
 
 ### [SECURITY] 移除源码中硬编码的 JWT Token

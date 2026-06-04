@@ -137,6 +137,10 @@ interface DocSource {
   enabled: boolean
   description?: string
   type?: 'local' | 'api'
+  kind?: string
+  adapter?: string
+  audience?: string[]
+  readOnly?: boolean
   apiUrl?: string
   apiToken?: string
   icon?: string
@@ -152,6 +156,10 @@ function sanitizeSource(source: DocSource) {
     enabled: source.enabled,
     description: source.description,
     type: source.type,
+    kind: source.kind,
+    adapter: source.adapter,
+    audience: source.audience,
+    readOnly: source.readOnly,
     apiUrl: source.apiUrl,
     icon: source.icon,
   }
@@ -880,6 +888,63 @@ function getToolSchemas() {
         required: ['query'],
       },
     },
+    {
+      name: 'axi_docs_list_sources',
+      description: '列出 Axi Docs 已接入的文档项目/source，适合 agent 先判断可用知识库。',
+      inputSchema: { type: 'object', properties: {} },
+    },
+    {
+      name: 'axi_docs_search',
+      description: '跨 Axi Docs 全部文档库搜索，返回摘要化结果和 source/path。',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          query: { type: 'string', description: '搜索关键词（必填）' },
+          source: { type: 'string', description: '可选 source id；不填则跨库搜索' },
+          tag: { type: 'string', description: '按标签过滤（可选）' },
+        },
+        required: ['query'],
+      },
+    },
+    {
+      name: 'axi_docs_read',
+      description: '读取 Axi Docs 中指定 source/path 的文档原文。',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          source: { type: 'string', description: 'source id（必填）' },
+          path: { type: 'string', description: '文档相对路径（必填）' },
+        },
+        required: ['source', 'path'],
+      },
+    },
+    {
+      name: 'axi_docs_skill_search',
+      description: '专门搜索 Axi Skills 技能库，返回匹配技能的 name/description/path。',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          query: { type: 'string', description: '技能名、触发词或描述关键词（必填）' },
+        },
+        required: ['query'],
+      },
+    },
+    {
+      name: 'axi_docs_workspace_status',
+      description: '返回 Axi 工作区项目概览、文档数量和最近项目入口。',
+      inputSchema: { type: 'object', properties: {} },
+    },
+    {
+      name: 'axi_docs_project_summary',
+      description: '按项目名或 id 返回 workspace 项目摘要，包含路径、状态和验证入口。',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          project: { type: 'string', description: '项目名、slug 或路径片段（必填）' },
+        },
+        required: ['project'],
+      },
+    },
     // ── Blinko 工具 ──────────────────────────────────────────────────────────────
     {
       name: 'blinko_list_notes',
@@ -1076,6 +1141,50 @@ export function createServer() {
           return {
             content: [{ type: 'text', text: JSON.stringify(results, null, 2) }],
           }
+        }
+
+        case 'axi_docs_list_sources': {
+          return {
+            content: [{ type: 'text', text: JSON.stringify(knowledgeBase.getDocumentSourceRegistrySummary().map(sanitizeSource), null, 2) }],
+          }
+        }
+
+        case 'axi_docs_search': {
+          const query = args?.query as string
+          const source = args?.source as string | undefined
+          const tag = args?.tag as string | undefined
+          if (!query) return { content: [{ type: 'text', text: '错误: query 参数必填' }], isError: true }
+          const results = source
+            ? await knowledgeBase.searchKnowledge(source, query, tag)
+            : await knowledgeBase.searchKnowledgeAll(query, tag)
+          return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] }
+        }
+
+        case 'axi_docs_read': {
+          const source = args?.source as string
+          const filePath = args?.path as string
+          if (!source || !filePath) return { content: [{ type: 'text', text: '错误: source 和 path 参数必填' }], isError: true }
+          const content = await knowledgeBase.readKnowledgeFile(source, filePath)
+          if (content === null) return { content: [{ type: 'text', text: `文件不存在: ${source}:${filePath}` }], isError: true }
+          return { content: [{ type: 'text', text: content }] }
+        }
+
+        case 'axi_docs_skill_search': {
+          const query = args?.query as string
+          if (!query) return { content: [{ type: 'text', text: '错误: query 参数必填' }], isError: true }
+          return { content: [{ type: 'text', text: JSON.stringify(await knowledgeBase.searchKnowledge('axi-skills', query), null, 2) }] }
+        }
+
+        case 'axi_docs_workspace_status': {
+          return { content: [{ type: 'text', text: JSON.stringify(await knowledgeBase.getWorkspaceStatus(), null, 2) }] }
+        }
+
+        case 'axi_docs_project_summary': {
+          const project = args?.project as string
+          if (!project) return { content: [{ type: 'text', text: '错误: project 参数必填' }], isError: true }
+          const summary = await knowledgeBase.getProjectSummary(project)
+          if (!summary) return { content: [{ type: 'text', text: `未找到项目: ${project}` }], isError: true }
+          return { content: [{ type: 'text', text: JSON.stringify(summary, null, 2) }] }
         }
 
         default:
@@ -1551,6 +1660,42 @@ async function handleToolCall(name: string, args: Record<string, unknown>) {
       const tag = args.tag as string | undefined
       if (!query) return { content: [{ type: 'text', text: '错误: query 参数必填' }], isError: true }
       return { content: [{ type: 'text', text: JSON.stringify(await knowledgeBase.searchKnowledge(source, query, tag), null, 2) }] }
+    }
+    case 'axi_docs_list_sources': {
+      return { content: [{ type: 'text', text: JSON.stringify(knowledgeBase.getDocumentSourceRegistrySummary().map(sanitizeSource), null, 2) }] }
+    }
+    case 'axi_docs_search': {
+      const query = args.query as string
+      const source = args.source as string | undefined
+      const tag = args.tag as string | undefined
+      if (!query) return { content: [{ type: 'text', text: '错误: query 参数必填' }], isError: true }
+      const results = source
+        ? await knowledgeBase.searchKnowledge(source, query, tag)
+        : await knowledgeBase.searchKnowledgeAll(query, tag)
+      return { content: [{ type: 'text', text: JSON.stringify(results, null, 2) }] }
+    }
+    case 'axi_docs_read': {
+      const source = args.source as string
+      const filePath = args.path as string
+      if (!source || !filePath) return { content: [{ type: 'text', text: '错误: source 和 path 参数必填' }], isError: true }
+      const content = await knowledgeBase.readKnowledgeFile(source, filePath)
+      if (content === null) return { content: [{ type: 'text', text: `文件不存在: ${source}:${filePath}` }], isError: true }
+      return { content: [{ type: 'text', text: content }] }
+    }
+    case 'axi_docs_skill_search': {
+      const query = args.query as string
+      if (!query) return { content: [{ type: 'text', text: '错误: query 参数必填' }], isError: true }
+      return { content: [{ type: 'text', text: JSON.stringify(await knowledgeBase.searchKnowledge('axi-skills', query), null, 2) }] }
+    }
+    case 'axi_docs_workspace_status': {
+      return { content: [{ type: 'text', text: JSON.stringify(await knowledgeBase.getWorkspaceStatus(), null, 2) }] }
+    }
+    case 'axi_docs_project_summary': {
+      const project = args.project as string
+      if (!project) return { content: [{ type: 'text', text: '错误: project 参数必填' }], isError: true }
+      const summary = await knowledgeBase.getProjectSummary(project)
+      if (!summary) return { content: [{ type: 'text', text: `未找到项目: ${project}` }], isError: true }
+      return { content: [{ type: 'text', text: JSON.stringify(summary, null, 2) }] }
     }
     // ── Blinko 工具 ───────────────────────────────────────────────────────────
     case 'blinko_list_notes': {

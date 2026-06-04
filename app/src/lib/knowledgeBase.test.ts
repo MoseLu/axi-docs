@@ -3,11 +3,15 @@ import os from 'os'
 import path from 'path'
 import { afterEach, describe, expect, it } from 'vitest'
 import { classifyKnowledgeCategories } from '../config/knowledgeRules'
+import { getDocumentSourceRegistry, validateDocumentSourceRegistry } from '../config/documentSources'
 import {
   __clearKnowledgeBaseCacheForTests,
+  getProjectSummary,
   getKnowledgeCatalog,
   listKnowledgeSources,
+  readKnowledgeFile,
   searchKnowledge,
+  searchKnowledgeAll,
 } from './knowledgeBase'
 
 describe('knowledge classification rules', () => {
@@ -46,6 +50,8 @@ describe('knowledge classification rules', () => {
 describe('knowledge base local index', () => {
   const originalObsidianPath = process.env.OBSIDIAN_PATH
   const originalExtraSources = process.env.AXI_DOCS_EXTRA_SOURCES_JSON
+  const originalAxiSkillsPath = process.env.AXI_SKILLS_PATH
+  const originalWorkspaceGovernancePath = process.env.AXI_WORKSPACE_GOVERNANCE_PATH
   let tempDir = ''
 
   afterEach(async () => {
@@ -59,6 +65,16 @@ describe('knowledge base local index', () => {
       delete process.env.AXI_DOCS_EXTRA_SOURCES_JSON
     } else {
       process.env.AXI_DOCS_EXTRA_SOURCES_JSON = originalExtraSources
+    }
+    if (originalAxiSkillsPath === undefined) {
+      delete process.env.AXI_SKILLS_PATH
+    } else {
+      process.env.AXI_SKILLS_PATH = originalAxiSkillsPath
+    }
+    if (originalWorkspaceGovernancePath === undefined) {
+      delete process.env.AXI_WORKSPACE_GOVERNANCE_PATH
+    } else {
+      process.env.AXI_WORKSPACE_GOVERNANCE_PATH = originalWorkspaceGovernancePath
     }
     if (tempDir) {
       await fs.promises.rm(tempDir, { recursive: true, force: true })
@@ -190,5 +206,91 @@ describe('knowledge base local index', () => {
     expect(hermesSource).toBeDefined()
     expect(hermesSource?.path).toBe(extraDir)
     expect(hermesSource?.type).toBe('local')
+  })
+
+  it('validates the document source registry shape', () => {
+    const registry = getDocumentSourceRegistry()
+    expect(validateDocumentSourceRegistry(registry)).toEqual([])
+    expect(validateDocumentSourceRegistry([
+      { id: 'dup', adapter: 'markdown', enabled: true },
+      { id: 'dup', adapter: 'skills', enabled: true },
+      { id: 'bad', adapter: 'unknown' as never, enabled: true },
+    ])).toContain('duplicate source id: dup')
+  })
+
+  it('indexes Axi Skills SKILL.md files without Obsidian frontmatter', async () => {
+    tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'axi-docs-skills-'))
+    const skillDir = path.join(tempDir, 'skills', 'deep-init-pro')
+    await fs.promises.mkdir(skillDir, { recursive: true })
+    process.env.AXI_SKILLS_PATH = tempDir
+
+    await fs.promises.writeFile(path.join(skillDir, 'SKILL.md'), [
+      '---',
+      'name: deep-init-pro',
+      'description: Generate layered project docs for agents.',
+      '---',
+      '# Deep Init Pro',
+      '',
+      'Use this to create PARADIGM and ARCHITECTURE docs.',
+    ].join('\n'), 'utf-8')
+
+    const catalog = await getKnowledgeCatalog('axi-skills')
+    expect(catalog.totalDocs).toBe(1)
+    expect(catalog.sections.some((section) => section.key === 'standards')).toBe(true)
+
+    const results = await searchKnowledge('axi-skills', 'deep-init-pro')
+    expect(results[0]?.path).toBe('skills/deep-init-pro/SKILL.md')
+
+    const allResults = await searchKnowledgeAll('deep-init-pro')
+    expect(allResults.some((result) => result.sourceId === 'axi-skills')).toBe(true)
+
+    const raw = await readKnowledgeFile('axi-skills', 'skills/deep-init-pro/SKILL.md')
+    expect(raw).toContain('name: deep-init-pro')
+  })
+
+  it('handles missing skill descriptions and nested skill paths', async () => {
+    tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'axi-docs-skills-nested-'))
+    const nestedSkillDir = path.join(tempDir, 'skills', 'vendor', 'nested-skill')
+    await fs.promises.mkdir(nestedSkillDir, { recursive: true })
+    process.env.AXI_SKILLS_PATH = tempDir
+
+    await fs.promises.writeFile(path.join(nestedSkillDir, 'SKILL.md'), [
+      '---',
+      'name: nested-skill',
+      '---',
+      '# Nested Skill',
+      '',
+      'A nested skill entrypoint.',
+    ].join('\n'), 'utf-8')
+
+    const results = await searchKnowledge('axi-skills', 'nested skill')
+    expect(results.some((result) => result.path === 'skills/vendor/nested-skill/SKILL.md')).toBe(true)
+    expect(results[0]?.description).toBeTruthy()
+  })
+
+  it('indexes workspace project status from WORKSPACE_INDEX.md', async () => {
+    tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'axi-docs-workspace-'))
+    const workspaceRoot = tempDir
+    const governanceRoot = path.join(workspaceRoot, 'infra', 'axi-workspace-governance')
+    await fs.promises.mkdir(path.join(governanceRoot, 'docs'), { recursive: true })
+    process.env.AXI_WORKSPACE_GOVERNANCE_PATH = governanceRoot
+
+    await fs.promises.writeFile(path.join(workspaceRoot, 'WORKSPACE_INDEX.md'), [
+      '# Workspace Index',
+      '',
+      '| Project | Path | Purpose | Stack | Status | Authoritative docs | Common verification | Notes |',
+      '| --- | --- | --- | --- | --- | --- | --- | --- |',
+      '| Axi Docs | `/workspace/projects/axi-docs` | Documentation hub | React, TypeScript | active | `TODO.md` | `pnpm --dir app verify` | Canonical docs project |',
+    ].join('\n'), 'utf-8')
+
+    await fs.promises.writeFile(path.join(governanceRoot, 'docs', 'project-catalog.md'), '# Catalog\n', 'utf-8')
+
+    const catalog = await getKnowledgeCatalog('workspace')
+    expect(catalog.totalDocs).toBeGreaterThanOrEqual(2)
+    expect(catalog.sections.some((section) => section.key === 'projects')).toBe(true)
+
+    const summary = await getProjectSummary('axi-docs')
+    expect(summary?.title).toBe('Axi Docs')
+    expect(summary?.description).toContain('Documentation hub')
   })
 })

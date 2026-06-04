@@ -2,6 +2,10 @@ import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
 import {
+  getDocumentSourceRegistry,
+  validateDocumentSourceRegistry,
+} from '../config/documentSources'
+import {
   classifyKnowledgeCategories,
   getKnowledgeCategoryMeta,
   getKnowledgeCategoryQueryHints,
@@ -15,14 +19,14 @@ import {
   GraphData,
   KnowledgeCatalog,
   KnowledgeCatalogItem,
+  NormalizedDocument,
   SearchResult,
   StaticKnowledgeDocument,
 } from '../types'
 
-const DEFAULT_OBSIDIAN_PATH = 'F:/docs/obsidian/'
-const DEFAULT_BLINKO_URL = 'http://localhost:1111'
 const SUPPORTED_EXTENSIONS = new Set(['.md', '.markdown'])
 const EXCLUDED_NAMES = new Set(['.git', 'node_modules', '.obsidian', '.trash', '.DS_Store'])
+const DEFAULT_BLINKO_URL = 'http://localhost:1111'
 const INLINE_TAG_REGEX = /(^|\s)#([\p{L}\p{N}_/-]+)/gu
 const WIKILINK_REGEX = /\[\[([^\]|#]+)(?:\|[^\]]+)?\]\]/g
 
@@ -82,6 +86,9 @@ function parseExtraSources(): DocSource[] {
         const type = source.type === 'api' ? 'api' : source.type === 'local' ? 'local' : null
         if (!id || !name || !type) return []
 
+        const adapter = source.adapter === 'skills' || source.adapter === 'workspace' || source.adapter === 'api'
+          ? source.adapter
+          : 'markdown'
         const normalized: DocSource = {
           id,
           name,
@@ -89,6 +96,16 @@ function parseExtraSources(): DocSource[] {
           path: typeof source.path === 'string' ? source.path : '',
           enabled: source.enabled !== false,
           type,
+          adapter,
+          kind: adapter === 'skills'
+            ? 'skill-library'
+            : adapter === 'workspace'
+              ? 'workspace-registry'
+              : type === 'api'
+                ? 'api-notes'
+                : 'markdown-vault',
+          audience: ['agent', 'human'],
+          readOnly: source.readOnly === true,
           apiUrl: typeof source.apiUrl === 'string' ? source.apiUrl : undefined,
           apiToken: typeof source.apiToken === 'string' ? source.apiToken : undefined,
           icon: source.icon === 'obsidian' || source.icon === 'blinko' || source.icon === 'folder'
@@ -202,7 +219,7 @@ function extractRawTitle(frontmatter: Frontmatter, body: string, fallbackName: s
 
 function extractDescription(frontmatter: Frontmatter, body: string): string | undefined {
   if (typeof frontmatter.description === 'string' && frontmatter.description.trim()) {
-    return frontmatter.description.trim()
+    return truncateText(frontmatter.description.trim())
   }
   const plain = body
     .replace(/^#.+$/gm, '')
@@ -212,7 +229,14 @@ function extractDescription(frontmatter: Frontmatter, body: string): string | un
     .replace(/\s+/g, ' ')
     .trim()
   if (!plain) return undefined
-  return plain.slice(0, 140)
+  return truncateText(plain, 140)
+}
+
+function truncateText(value: string | undefined, maxLength = 480): string | undefined {
+  if (!value) return undefined
+  const normalized = value.replace(/\s+/g, ' ').trim()
+  if (normalized.length <= maxLength) return normalized
+  return `${normalized.slice(0, Math.max(0, maxLength - 3)).trimEnd()}...`
 }
 
 function extractTechStack(frontmatter: Frontmatter, tags: string[]): string[] {
@@ -224,35 +248,21 @@ function extractTechStack(frontmatter: Frontmatter, tags: string[]): string[] {
 }
 
 function createSourceMap(): SourceMap {
-  const sources: DocSource[] = [
-    {
-      id: 'obsidian',
-      name: 'Obsidian 知识库',
-      description: '长期沉淀的结构化知识与项目文档',
-      path: process.env.OBSIDIAN_PATH || DEFAULT_OBSIDIAN_PATH,
-      enabled: true,
-      type: 'local',
-      icon: 'obsidian',
-    },
-    {
-      id: 'blinko',
-      name: 'Blinko 闪念',
-      description: '短期灵感、碎片记录与快速捕捉',
-      path: '',
-      enabled: true,
-      type: 'api',
-      apiUrl: process.env.BLINKO_URL || DEFAULT_BLINKO_URL,
-      apiToken: process.env.BLINKO_TOKEN || '',
-      icon: 'blinko',
-    },
-    ...parseExtraSources(),
-  ]
+  const sources: DocSource[] = [...getDocumentSourceRegistry(), ...parseExtraSources()]
+  const registryErrors = validateDocumentSourceRegistry(sources)
+  if (registryErrors.length > 0) {
+    console.warn(`[axi-docs] source registry warnings: ${registryErrors.join('; ')}`)
+  }
   const deduped = new Map<string, DocSource>()
   for (const source of sources) {
     if (!source.enabled) continue
     deduped.set(source.id, source)
   }
   return deduped
+}
+
+export function getDocumentSourceRegistrySummary(): DocSource[] {
+  return listKnowledgeSources()
 }
 
 export function listKnowledgeSources(): DocSource[] {
@@ -322,6 +332,356 @@ async function parseLocalDocumentFromFile(
     tags: sourceTags,
   })
   return item
+}
+
+function createVirtualParsedDocument(input: NormalizedDocument & {
+  name?: string
+  rawTitle?: string
+  status?: string
+  graphTitle?: string
+  aliases?: string[]
+  sourceTags?: string[]
+  techStack?: string[]
+}): ParsedDocument {
+  const fileName = input.name || path.basename(input.path).replace(/\.(md|markdown)$/i, '')
+  const rawTitle = input.rawTitle || input.title
+  const sourceTags = [...new Set(input.sourceTags || input.tags)]
+  const graphTitle = input.graphTitle || input.title
+  return {
+    sourceId: input.sourceId,
+    path: normalizeSlashes(input.path),
+    name: fileName,
+    title: input.title,
+    rawTitle,
+    description: input.description,
+    docType: input.docType,
+    status: input.status,
+    tags: input.tags,
+    rawTags: sourceTags,
+    categories: input.categories,
+    techStack: input.techStack || extractTechStack(input.frontmatter, sourceTags),
+    updated: input.updated,
+    graphTitle,
+    raw: input.raw,
+    body: input.body,
+    frontmatter: input.frontmatter,
+    aliases: [...new Set([rawTitle, graphTitle, ...(input.aliases || [])].filter(Boolean))],
+    sourceTags,
+    intakeIssues: [],
+  }
+}
+
+function buildSkillDocument(source: DocSource, relativePath: string, stat: fs.Stats, raw: string): ParsedDocument {
+  const parsed = parseMarkdownDocument(raw)
+  const frontmatter = parsed.data as Frontmatter
+  const skillDir = path.basename(path.dirname(relativePath))
+  const skillName = typeof frontmatter.name === 'string' && frontmatter.name.trim()
+    ? frontmatter.name.trim()
+    : skillDir
+  const description = truncateText(
+    typeof frontmatter.description === 'string' && frontmatter.description.trim()
+      ? frontmatter.description
+      : extractDescription(frontmatter, parsed.content),
+  ) || 'No frontmatter description'
+  const tags = ['技能', 'Agent', 'Axi Skills', skillName]
+  const body = parsed.content || raw
+  return createVirtualParsedDocument({
+    sourceId: source.id,
+    path: normalizeSlashes(relativePath),
+    name: skillName,
+    title: skillName,
+    rawTitle: skillName,
+    description,
+    docType: 'skill',
+    status: typeof frontmatter.status === 'string' ? frontmatter.status : 'active',
+    tags,
+    categories: ['standards', 'resources'],
+    updated: stat.mtime.toISOString(),
+    raw,
+    body,
+    frontmatter: {
+      ...frontmatter,
+      id: `${source.id}:${skillName}`,
+      title: skillName,
+      type: 'skill',
+      status: typeof frontmatter.status === 'string' ? frontmatter.status : 'active',
+      tags,
+      description,
+      modified: stat.mtime.toISOString(),
+      'graph-title': skillName,
+      'graph-tags': ['技能', 'Agent'],
+    },
+    aliases: [skillDir, skillName],
+    sourceTags: tags,
+  })
+}
+
+async function collectSkillDocuments(source: DocSource): Promise<ParsedDocument[]> {
+  const rootPath = path.normalize(source.path)
+  const skillsRoot = path.join(rootPath, 'skills')
+  const documents: ParsedDocument[] = []
+
+  async function walk(dirPath: string): Promise<void> {
+    let entries: fs.Dirent[]
+    try {
+      entries = await fs.promises.readdir(dirPath, { withFileTypes: true })
+    } catch {
+      return
+    }
+
+    for (const entry of entries) {
+      if (isExcludedName(entry.name)) continue
+      const fullPath = path.join(dirPath, entry.name)
+      if (entry.isDirectory()) {
+        await walk(fullPath)
+        continue
+      }
+      if (!entry.isFile() || entry.name !== 'SKILL.md') continue
+      const stat = await fs.promises.stat(fullPath)
+      const raw = await fs.promises.readFile(fullPath, 'utf-8')
+      const relativePath = normalizeSlashes(path.relative(rootPath, fullPath))
+      documents.push(buildSkillDocument(source, relativePath, stat, raw))
+    }
+  }
+
+  await walk(skillsRoot)
+  const indexPath = path.join(rootPath, 'docs', 'SKILL_INDEX.md')
+  if (fs.existsSync(indexPath)) {
+    const stat = await fs.promises.stat(indexPath)
+    const raw = await fs.promises.readFile(indexPath, 'utf-8')
+    const body = parseMarkdownDocument(raw).content
+    documents.push(createVirtualParsedDocument({
+      sourceId: source.id,
+      path: 'docs/SKILL_INDEX.md',
+      name: 'SKILL_INDEX',
+      title: 'Axi Skills Index',
+      rawTitle: 'Axi Skills Index',
+      description: 'Generated index of all Axi skill entrypoints.',
+      docType: 'index',
+      status: 'active',
+      tags: ['技能', '索引', 'Agent'],
+      categories: ['indexes', 'standards'],
+      updated: stat.mtime.toISOString(),
+      raw,
+      body,
+      frontmatter: {
+        id: 'axi-skills-index',
+        title: 'Axi Skills Index',
+        type: 'index',
+        status: 'active',
+        tags: ['技能', '索引', 'Agent'],
+        modified: stat.mtime.toISOString(),
+        'graph-title': 'Axi Skills Index',
+        'graph-tags': ['技能', '索引'],
+      },
+      aliases: ['skill index', 'skills index'],
+      sourceTags: ['skills', 'index', 'agent'],
+    }))
+  }
+  return documents.sort((left, right) => left.title.localeCompare(right.title, 'zh-CN') || left.path.localeCompare(right.path))
+}
+
+function splitMarkdownTableRow(line: string): string[] {
+  return line
+    .trim()
+    .replace(/^\||\|$/g, '')
+    .split('|')
+    .map((cell) => cell.trim().replace(/^`|`$/g, '').replace(/\\\|/g, '|'))
+}
+
+function stripMarkdownLinks(value: string): string {
+  return value
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1')
+    .replace(/`([^`]+)`/g, '$1')
+    .trim()
+}
+
+function buildWorkspaceProjectDocument(source: DocSource, row: string[], updated: string): ParsedDocument | null {
+  const [name, projectPath, purpose, stack, status, docs, verification, notes] = row
+  if (!name || !projectPath || name === 'Project' || /^-+$/.test(name)) return null
+  const cleanName = stripMarkdownLinks(name)
+  const cleanPath = stripMarkdownLinks(projectPath)
+  const id = cleanName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || cleanPath.replace(/[^a-z0-9]+/gi, '-')
+  const title = cleanName
+  const body = [
+    `# ${title}`,
+    '',
+    `- Path: \`${cleanPath}\``,
+    `- Status: ${stripMarkdownLinks(status || 'unknown')}`,
+    `- Stack: ${stripMarkdownLinks(stack || 'unknown')}`,
+    `- Authoritative docs: ${stripMarkdownLinks(docs || '')}`,
+    `- Common verification: \`${stripMarkdownLinks(verification || '')}\``,
+    '',
+    '## Purpose',
+    '',
+    stripMarkdownLinks(purpose || ''),
+    '',
+    notes ? '## Notes' : '',
+    notes ? stripMarkdownLinks(notes) : '',
+  ].filter(Boolean).join('\n')
+  const raw = buildFrontmatter({
+    id: `workspace-${id}`,
+    title,
+    type: 'project',
+    status: stripMarkdownLinks(status || 'active'),
+    tags: ['Axi Workspace', '项目', stripMarkdownLinks(status || 'active')],
+    created: updated,
+    modified: updated,
+    'graph-title': title,
+    'graph-tags': ['项目', 'Workspace'],
+    path: cleanPath,
+    stack: stripMarkdownLinks(stack || ''),
+    verification: stripMarkdownLinks(verification || ''),
+  }) + body
+
+  return createVirtualParsedDocument({
+    sourceId: source.id,
+    path: `projects/${id}.md`,
+    name: id,
+    title,
+    rawTitle: title,
+    description: stripMarkdownLinks(purpose || notes || ''),
+    docType: 'project',
+    status: stripMarkdownLinks(status || 'active'),
+    tags: ['项目', 'Workspace', stripMarkdownLinks(status || 'active')],
+    categories: ['projects', 'architecture', 'standards'],
+    updated,
+    raw,
+    body,
+    frontmatter: parseMarkdownDocument(raw).data as Frontmatter,
+    aliases: [cleanPath, title],
+    sourceTags: ['project', 'workspace', stripMarkdownLinks(status || 'active')],
+  })
+}
+
+async function collectWorkspaceDocuments(source: DocSource): Promise<ParsedDocument[]> {
+  const workspaceRoot = path.resolve(source.path, '../..')
+  const workspaceIndexPath = path.join(workspaceRoot, 'WORKSPACE_INDEX.md')
+  const catalogPath = path.join(source.path, 'docs', 'project-catalog.md')
+  const documents: ParsedDocument[] = []
+  const updated = new Date().toISOString()
+
+  let indexText = ''
+  try {
+    indexText = await fs.promises.readFile(workspaceIndexPath, 'utf-8')
+  } catch {
+    indexText = ''
+  }
+
+  const projectRows = indexText
+    .split('\n')
+    .filter((line) => line.startsWith('|') && !line.includes('| ---'))
+    .map(splitMarkdownTableRow)
+    .filter((row) => row.length >= 7)
+    .map((row) => buildWorkspaceProjectDocument(source, row, updated))
+    .filter((document): document is ParsedDocument => Boolean(document))
+
+  documents.push(...projectRows)
+
+  if (fs.existsSync(catalogPath)) {
+    const stat = await fs.promises.stat(catalogPath)
+    const raw = await fs.promises.readFile(catalogPath, 'utf-8')
+    documents.push(createVirtualParsedDocument({
+      sourceId: source.id,
+      path: 'governance/project-catalog.md',
+      name: 'project-catalog',
+      title: 'Workspace Project Catalog',
+      rawTitle: 'Workspace Project Catalog',
+      description: 'Generated readable catalog for Axi workspace projects.',
+      docType: 'index',
+      status: 'active',
+      tags: ['索引', '项目', 'Workspace'],
+      categories: ['indexes', 'projects'],
+      updated: stat.mtime.toISOString(),
+      raw,
+      body: parseMarkdownDocument(raw).content,
+      frontmatter: {
+        id: 'workspace-project-catalog',
+        title: 'Workspace Project Catalog',
+        type: 'index',
+        status: 'active',
+        tags: ['索引', '项目', 'Workspace'],
+        modified: stat.mtime.toISOString(),
+        'graph-title': 'Workspace Project Catalog',
+        'graph-tags': ['索引', '项目'],
+      },
+      aliases: ['project-catalog', 'workspace catalog'],
+      sourceTags: ['index', 'project', 'workspace'],
+    }))
+  }
+
+  if (fs.existsSync(workspaceIndexPath)) {
+    const stat = await fs.promises.stat(workspaceIndexPath)
+    documents.push(createVirtualParsedDocument({
+      sourceId: source.id,
+      path: 'WORKSPACE_INDEX.md',
+      name: 'WORKSPACE_INDEX',
+      title: 'Axi Workspace Index',
+      rawTitle: 'Axi Workspace Index',
+      description: 'Canonical workspace-level project map for Codex.',
+      docType: 'index',
+      status: 'active',
+      tags: ['索引', '项目', 'Workspace'],
+      categories: ['indexes', 'projects'],
+      updated: stat.mtime.toISOString(),
+      raw: indexText,
+      body: parseMarkdownDocument(indexText).content,
+      frontmatter: {
+        id: 'axi-workspace-index',
+        title: 'Axi Workspace Index',
+        type: 'index',
+        status: 'active',
+        tags: ['索引', '项目', 'Workspace'],
+        modified: stat.mtime.toISOString(),
+        'graph-title': 'Axi Workspace Index',
+        'graph-tags': ['索引', '项目'],
+      },
+      aliases: ['WORKSPACE_INDEX', 'workspace index'],
+      sourceTags: ['index', 'project', 'workspace'],
+    }))
+  }
+
+  const axiSkillsPath = path.resolve(workspaceRoot, 'shared', 'axi-skills')
+  if (fs.existsSync(axiSkillsPath) && !documents.some((document) => document.title === 'Axi Skills')) {
+    documents.push(createVirtualParsedDocument({
+      sourceId: source.id,
+      path: 'projects/axi-skills.md',
+      name: 'axi-skills',
+      title: 'Axi Skills',
+      rawTitle: 'Axi Skills',
+      description: 'Shared version-controlled skill tree for Axi agents.',
+      docType: 'project',
+      status: 'active',
+      tags: ['项目', '技能', 'Workspace'],
+      categories: ['projects', 'standards'],
+      updated,
+      raw: buildFrontmatter({
+        id: 'workspace-axi-skills',
+        title: 'Axi Skills',
+        type: 'project',
+        status: 'active',
+        tags: ['项目', '技能', 'Workspace'],
+        modified: updated,
+        'graph-title': 'Axi Skills',
+        'graph-tags': ['项目', '技能'],
+      }) + `# Axi Skills\n\nPath: \`${axiSkillsPath}\`\n\nShared version-controlled skill tree for Axi agents.`,
+      body: `# Axi Skills\n\nPath: \`${axiSkillsPath}\`\n\nShared version-controlled skill tree for Axi agents.`,
+      frontmatter: {
+        id: 'workspace-axi-skills',
+        title: 'Axi Skills',
+        type: 'project',
+        status: 'active',
+        tags: ['项目', '技能', 'Workspace'],
+        modified: updated,
+        'graph-title': 'Axi Skills',
+        'graph-tags': ['项目', '技能'],
+      },
+      aliases: ['axi-skills', axiSkillsPath],
+      sourceTags: ['project', 'skills', 'workspace'],
+    }))
+  }
+
+  return documents.sort((left, right) => left.title.localeCompare(right.title, 'zh-CN'))
 }
 
 async function collectLocalMarkdownFiles(sourceRoot: string): Promise<LocalFileEntry[]> {
@@ -401,7 +761,47 @@ function buildLocalSourceIndex(
   }
 }
 
+function buildVirtualSourceIndex(source: DocSource, rootPath: string, documents: ParsedDocument[]): LocalSourceIndex {
+  const files = new Map<string, IndexedLocalFile>()
+  const now = new Date().toISOString()
+
+  for (const document of documents) {
+    files.set(document.path, {
+      relativePath: document.path,
+      fullPath: path.join(rootPath, document.path),
+      mtimeMs: Date.parse(document.updated || now) || Date.now(),
+      document,
+    })
+  }
+
+  return buildLocalSourceIndex(source, rootPath, files, documents, [])
+}
+
+async function getSpecializedSourceIndex(source: DocSource): Promise<LocalSourceIndex | null> {
+  const rootPath = path.normalize(source.path)
+  const cachedIndex = localSourceIndexCache.get(source.id)
+
+  if (source.adapter === 'skills') {
+    if (cachedIndex?.rootPath === rootPath) return cachedIndex
+    const index = buildVirtualSourceIndex(source, rootPath, await collectSkillDocuments(source))
+    localSourceIndexCache.set(source.id, index)
+    return index
+  }
+
+  if (source.adapter === 'workspace') {
+    if (cachedIndex?.rootPath === rootPath) return cachedIndex
+    const index = buildVirtualSourceIndex(source, rootPath, await collectWorkspaceDocuments(source))
+    localSourceIndexCache.set(source.id, index)
+    return index
+  }
+
+  return null
+}
+
 async function getLocalSourceIndex(source: DocSource): Promise<LocalSourceIndex> {
+  const specializedIndex = await getSpecializedSourceIndex(source)
+  if (specializedIndex) return specializedIndex
+
   const rootPath = path.normalize(source.path)
   const cachedIndex = localSourceIndexCache.get(source.id)
   const previousFiles = cachedIndex && cachedIndex.rootPath === rootPath
@@ -473,6 +873,39 @@ export function __clearKnowledgeBaseCacheForTests(): void {
   localSourceIndexCache.clear()
 }
 
+export async function getWorkspaceStatus() {
+  const catalog = await getKnowledgeCatalog('workspace')
+  return {
+    sourceId: 'workspace',
+    totalProjects: catalog.sections
+      .flatMap((section) => section.items)
+      .filter((item) => item.docType === 'project').length,
+    totalDocs: catalog.totalDocs,
+    generatedAt: catalog.generatedAt,
+    recentProjects: catalog.recentDocs.filter((item) => item.docType === 'project').slice(0, 8),
+    sections: catalog.sections.map((section) => ({
+      key: section.key,
+      title: section.title,
+      count: section.count,
+    })),
+  }
+}
+
+export async function getProjectSummary(projectId: string) {
+  const normalized = projectId.trim().toLowerCase()
+  const catalog = await getKnowledgeCatalog('workspace')
+  const items = catalog.sections.flatMap((section) => section.items)
+  return items.find((item) => (
+    item.docType === 'project'
+    && (
+      item.name.toLowerCase() === normalized
+      || item.title.toLowerCase() === normalized
+      || item.path.toLowerCase().includes(normalized)
+      || item.description?.toLowerCase().includes(normalized)
+    )
+  )) || null
+}
+
 function createSnippet(body: string, query: string): string {
   if (!body.trim()) return ''
   const normalizedBody = body.replace(/\s+/g, ' ')
@@ -483,6 +916,47 @@ function createSnippet(body: string, query: string): string {
   const start = Math.max(0, index - 70)
   const end = Math.min(normalizedBody.length, index + query.length + 110)
   return `${start > 0 ? '…' : ''}${normalizedBody.slice(start, end)}${end < normalizedBody.length ? '…' : ''}`
+}
+
+function toKnowledgeCatalogItem(document: ParsedDocument): KnowledgeCatalogItem {
+  return {
+    sourceId: document.sourceId,
+    path: document.path,
+    name: document.name,
+    title: document.title,
+    rawTitle: document.rawTitle,
+    description: document.description,
+    docType: document.docType,
+    status: document.status,
+    tags: [...document.tags],
+    rawTags: [...(document.rawTags || [])],
+    categories: [...document.categories],
+    techStack: [...document.techStack],
+    updated: document.updated,
+    graphTitle: document.graphTitle,
+  }
+}
+
+function sanitizeStaticFrontmatter(source: DocSource, document: ParsedDocument): Frontmatter {
+  if (source.adapter !== 'skills') return document.frontmatter
+
+  return {
+    id: typeof document.frontmatter.id === 'string' ? document.frontmatter.id : `${source.id}:${document.name}`,
+    title: document.title,
+    type: document.docType || 'skill',
+    status: document.status || 'active',
+    tags: document.tags,
+    modified: document.updated,
+    description: truncateText(document.description),
+    sourcePath: document.path,
+    'graph-title': document.graphTitle || document.title,
+    'graph-tags': ['技能', 'Agent'],
+  }
+}
+
+function buildFileItemFrontmatter(source: DocSource, document: ParsedDocument): Frontmatter {
+  if (source.adapter === 'skills') return sanitizeStaticFrontmatter(source, document)
+  return document.frontmatter
 }
 
 function matchesQuery(text: string, tokens: string[]): boolean {
@@ -548,6 +1022,14 @@ export async function scanKnowledgeSource(sourceId: string, dirPath?: string, fi
         tags: note.tags || [],
         blinkoData: note,
       }))
+  }
+
+  if (source.adapter === 'skills' || source.adapter === 'workspace') {
+    const directoryIndex = await getKnowledgeDirectoryIndex(source.id)
+    const directoryKey = (dirPath || '').replace(/^\/+|\/+$/g, '')
+    const entries = directoryIndex[directoryKey] || []
+    if (!filterTag) return entries
+    return entries.filter((entry) => entry.type === 'directory' || entry.tags?.includes(filterTag))
   }
 
   const basePath = resolveLocalPath(source, dirPath || '')
@@ -624,6 +1106,11 @@ export async function readKnowledgeFile(sourceId: string, filePath: string): Pro
     return detail.content || detail.contentText || null
   }
 
+  if (source.adapter === 'skills' || source.adapter === 'workspace') {
+    const index = await getLocalSourceIndex(source)
+    return index.byPath.get(normalizeSlashes(filePath))?.raw || null
+  }
+
   const fullPath = resolveLocalPath(source, filePath)
   if (!fullPath || !fs.existsSync(fullPath) || !isSupportedFile(fullPath)) return null
   try {
@@ -638,6 +1125,7 @@ export async function readKnowledgeFile(sourceId: string, filePath: string): Pro
 export async function writeKnowledgeFile(sourceId: string, filePath: string, content: string) {
   const source = getSource(sourceId)
   if (!source) return { success: false, path: '', error: `未知文档源: ${sourceId}` }
+  if (source.readOnly) return { success: false, path: filePath, error: '当前文档源是只读索引' }
   if (source.type !== 'local') return { success: false, path: '', error: '当前文档源不支持写入' }
   if (!isSupportedFile(filePath)) {
     return { success: false, path: filePath, error: '仅支持写入 Markdown 文件' }
@@ -789,6 +1277,21 @@ export async function searchKnowledge(sourceId: string, query: string, filterTag
   return results.sort((left, right) => right.score - left.score).slice(0, 30)
 }
 
+export async function searchKnowledgeAll(query: string, filterTag?: string | null): Promise<SearchResult[]> {
+  const sources = listKnowledgeSources()
+  const results = await Promise.all(sources.map(async (source) => {
+    try {
+      return await searchKnowledge(source.id, query, filterTag)
+    } catch {
+      return []
+    }
+  }))
+  return results
+    .flat()
+    .sort((left, right) => right.score - left.score)
+    .slice(0, 60)
+}
+
 function sortCatalogItems(items: KnowledgeCatalogItem[]): KnowledgeCatalogItem[] {
   return [...items].sort((left, right) => {
     const leftDate = Date.parse(left.updated || '')
@@ -850,7 +1353,9 @@ export async function getKnowledgeCatalog(sourceId: string): Promise<KnowledgeCa
   const index = await getLocalSourceIndex(source)
   const sections = KNOWLEDGE_CATEGORY_ORDER
     .map((key) => {
-      const items = sortCatalogItems(index.documents.filter((document) => document.categories.includes(key)))
+      const items = sortCatalogItems(index.documents
+        .filter((document) => document.categories.includes(key))
+        .map(toKnowledgeCatalogItem))
       if (items.length === 0) return null
       const meta = getKnowledgeCategoryMeta(key)
       return {
@@ -869,7 +1374,7 @@ export async function getKnowledgeCatalog(sourceId: string): Promise<KnowledgeCa
     totalTags: index.tags.length,
     generatedAt: index.builtAt,
     topTags: index.tags.slice(0, 20),
-    recentDocs: sortCatalogItems(index.documents).slice(0, 8),
+    recentDocs: sortCatalogItems(index.documents.map(toKnowledgeCatalogItem)).slice(0, 8),
     sections,
   }
 }
@@ -894,11 +1399,40 @@ export async function getKnowledgeDocuments(sourceId: string): Promise<StaticKno
     techStack: [...document.techStack],
     updated: document.updated,
     graphTitle: document.graphTitle,
-    content: document.raw,
-    frontmatter: document.frontmatter,
+    content: createStaticDocumentContent(source, document),
+    frontmatter: sanitizeStaticFrontmatter(source, document),
     aliases: [...document.aliases],
     sourceTags: [...document.sourceTags],
   }))
+}
+
+function createStaticDocumentContent(source: DocSource, document: ParsedDocument): string {
+  if (source.adapter !== 'skills') return document.raw
+
+  const excerpt = document.body.replace(/\s+$/g, '').slice(0, 1200)
+  return buildFrontmatter({
+    id: document.frontmatter.id || `${source.id}:${document.name}`,
+    title: document.title,
+    type: document.docType || 'skill',
+    status: document.status || 'active',
+    tags: document.tags,
+    modified: document.updated,
+    description: truncateText(document.description),
+    sourcePath: document.path,
+    'graph-title': document.graphTitle || document.title,
+    'graph-tags': ['技能', 'Agent'],
+  }) + [
+    `# ${document.title}`,
+    '',
+    document.description || 'No frontmatter description.',
+    '',
+    `Source path: \`${document.path}\``,
+    '',
+    '## Excerpt',
+    '',
+    excerpt,
+    document.body.length > excerpt.length ? '\n\n> Static Web preview is truncated. Use MCP `axi_docs_read` for the full skill source.' : '',
+  ].join('\n')
 }
 
 export async function getKnowledgeDirectoryIndex(sourceId: string): Promise<Record<string, FileItem[]>> {
@@ -964,7 +1498,7 @@ export async function getKnowledgeDirectoryIndex(sourceId: string): Promise<Reco
         tags: [...document.tags],
         rawTags: [...document.sourceTags],
         graphTitle: document.graphTitle,
-        frontmatter: document.frontmatter,
+        frontmatter: buildFileItemFrontmatter(source, document),
       })
       directoryChildren.set(parentDirectory, parentChildren)
     }

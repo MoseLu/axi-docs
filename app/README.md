@@ -1,6 +1,16 @@
-# Axi Docs - 文档同步与查看平台
+# Axi Docs - Axi Knowledge Hub
 
-> 基于 Vite + React 的文档站点，用于同步和查看本地文档（Obsidian/Blinko）
+> 基于 Vite + React 的多文档库知识中枢，用于给人浏览 Axi 工作区文档，也通过 MCP 给 agent 提供项目、技能和知识库参考。
+
+## 当前定位
+
+Axi Docs 不是单一 Markdown 站点，而是多个文档项目的统一索引层：
+
+- **Web**: Dashboard + VitePress-like 文档阅读页 + 搜索 + 图谱
+- **MCP**: 面向 agent 的 source 列表、跨库搜索、原文读取、workspace 状态和项目摘要
+- **文档项目**: Workspace registry、Axi Skills、Obsidian、Blinko
+
+`axi-skills` 作为独立仓库保持原生 `skills/**/SKILL.md` 结构，Axi Docs 通过 `skills` adapter 解析，不要求技能文件改成 Obsidian frontmatter。
 
 ## 技术栈
 
@@ -14,10 +24,12 @@
 
 | 源 | 类型 | 说明 |
 |----|------|------|
+| Axi Workspace | 本地 registry | 工作区项目状态、路径、验证命令、治理目录 |
+| Axi Skills | 本地 skill library | 共享 agent 技能库，读取 `skills/**/SKILL.md` |
 | Obsidian | 本地目录 | 本地 Obsidian Vault |
 | Blinko | API | 闪念笔记 & 灵感捕捉 |
 
-可在 `src/config/sources.ts` 中配置多个文档源。
+主文档项目 registry 在 `src/config/documentSources.ts`，旧 `src/config/sources.ts` 仅保留兼容入口。
 
 ## 快速开始
 
@@ -84,6 +96,8 @@ MCP_HTTP_PORT=3010 BIND_ADDRESS=0.0.0.0 pnpm mcp:http
 | `BLINKO_TOKEN` | 条件 | Blinko API Token（Blinko 开启认证时必填） |
 | `OBSIDIAN_PATH` | 条件 | Obsidian Vault 路径（本地开发时需要） |
 | `AXI_DOCS_EXTRA_SOURCES_JSON` | 否 | 追加本地/API 知识源的 JSON 数组，可用于挂载 Hermes 目录 |
+| `AXI_SKILLS_PATH` | 否 | Axi Skills 仓库路径，默认 `/Volumes/code/workspace/shared/axi-skills` |
+| `AXI_WORKSPACE_GOVERNANCE_PATH` | 否 | workspace governance 仓库路径 |
 
 ### Token 优先级
 
@@ -108,6 +122,17 @@ pnpm test               # 运行测试
 pnpm mcp                # 运行 MCP 服务器
 pnpm mcp:http           # MCP HTTP 模式
 ```
+
+## MCP 语义化工具
+
+保留旧 `obsidian_*` 工具，同时新增 Axi Docs 统一工具：
+
+- `axi_docs_list_sources`
+- `axi_docs_search`
+- `axi_docs_read`
+- `axi_docs_skill_search`
+- `axi_docs_workspace_status`
+- `axi_docs_project_summary`
 
 ## 运维规范
 

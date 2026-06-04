@@ -62,6 +62,10 @@ function sanitizeSource(source: DocSource): DocSource {
     path: '',
     enabled: source.enabled,
     type: 'local',
+    kind: source.kind,
+    adapter: source.adapter,
+    audience: source.audience,
+    readOnly: source.readOnly,
     icon: source.icon,
   }
 }
@@ -254,6 +258,10 @@ function createDocsApiMiddleware() {
           name: source.name,
           description: source.description,
           type: source.type,
+          kind: source.kind,
+          adapter: source.adapter,
+          audience: source.audience,
+          readOnly: source.readOnly,
           enabled: source.enabled,
           icon: source.icon,
         })))

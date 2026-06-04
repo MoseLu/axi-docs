@@ -48,162 +48,189 @@ export function HomeCommandCenter({
 
   return (
     <PageShell className="axi-docs-home" compact>
-      <main className="axi-docs-home__content" id="overview">
-        <section className="axi-docs-home__hero">
-          <span className="axi-docs-home__eyebrow">Axi Docs</span>
-          <h1>React 体系的专业文档站</h1>
-          <p>
-            把 workspace 文档、Axi Skills 和长期知识库整理成可阅读、可搜索、可被 agent 调用的统一文档站。
-            首页优先服务阅读路径，知识图谱和多源检索作为进阶能力进入。
-          </p>
-          <div className="axi-docs-home__actions">
-            <button className="axi-docs-home__primary-action" onClick={onOpenExplorer} type="button">
-              开始阅读 {currentSourceName}
+      <aside className="axi-docs-home__sidebar" aria-label="侧边栏导航">
+        <nav className="axi-docs-home__sidebar-section" aria-label="简介">
+          <button className="axi-docs-home__sidebar-toggle" type="button">
+            <span>简介</span>
+            <span aria-hidden="true">⌄</span>
+          </button>
+          <a className="axi-docs-home__nav-link" href="#what-is-axi-docs">什么是 Axi Docs？</a>
+          <a className="axi-docs-home__nav-link active" href="#quick-start">快速开始</a>
+          <a className="axi-docs-home__nav-link" href="#search-results">搜索结果</a>
+          <a className="axi-docs-home__nav-link" href="#next-steps">下一步</a>
+        </nav>
+
+        <nav className="axi-docs-home__sidebar-section" aria-label="文档库">
+          <button className="axi-docs-home__sidebar-toggle" type="button">
+            <span>文档库</span>
+            <span aria-hidden="true">⌄</span>
+          </button>
+          {sources.map((item) => (
+            <button
+              key={item.id}
+              className={`axi-docs-home__source-link${item.id === source.id ? ' active' : ''}`}
+              onClick={() => onSourceSelect(item.id)}
+              type="button"
+            >
+              <span>{item.name}</span>
+              <small>{item.kind || item.adapter || item.type}</small>
             </button>
-            {skillSource && (
-              <button className="axi-docs-home__secondary-action" onClick={() => onOpenItem('axi-skills', 'docs/SKILL_INDEX.md')} type="button">
-                查看 Axi Skills
-              </button>
-            )}
-          </div>
-        </section>
+          ))}
+        </nav>
 
-        <section className="axi-docs-home__feature-grid" aria-label="核心能力">
-          <article>
-            <span>01</span>
-            <h2>Docs-first 阅读流</h2>
-            <p>清晰标题、稳定导航、正文优先布局和页内目录，让文档站先像文档站。</p>
-          </article>
-          <article>
-            <span>02</span>
-            <h2>多源知识入口</h2>
-            <p>保留 workspace、skills、Obsidian 等来源，但把它们组织成可浏览的文档库。</p>
-          </article>
-          <article>
-            <span>03</span>
-            <h2>Agent-ready</h2>
-            <p>MCP 读取、搜索和项目摘要继续服务 agent，不挤占人的阅读主路径。</p>
-          </article>
-        </section>
+        <nav className="axi-docs-home__sidebar-section" aria-label="推荐路径">
+          <button className="axi-docs-home__sidebar-toggle" type="button">
+            <span>推荐路径</span>
+            <span aria-hidden="true">⌄</span>
+          </button>
+          {primarySections.length > 0 ? primarySections.map((section) => (
+            <button key={section.key} className="axi-docs-home__nav-card" onClick={onOpenExplorer} type="button">
+              <span>{section.title}</span>
+              <small>{section.count} 篇文档</small>
+            </button>
+          )) : (
+            <button className="axi-docs-home__nav-card" onClick={onOpenExplorer} type="button">
+              <span>浏览当前文档库</span>
+              <small>{currentSourceName}</small>
+            </button>
+          )}
+        </nav>
+      </aside>
 
-        <section className="axi-docs-home__section" id="quick-start">
-          <div className="axi-docs-home__section-heading">
-            <span>Quick Start</span>
-            <h2>从当前文档库开始</h2>
-          </div>
-          <div className="axi-docs-home__code-card">
-            <code>pnpm dev</code>
-            <p>本地启动 React 文档站，使用顶部搜索、推荐阅读路径或右侧来源入口进入具体文档。</p>
-          </div>
-        </section>
+      <main className="axi-docs-home__content">
+        <article className="axi-docs-home__doc" id="overview">
+          <h1>快速开始</h1>
 
-        {normalizedSearchQuery && (
-          <section className="axi-docs-home__section axi-docs-home__section--search-results" aria-live="polite">
-            <div className="axi-docs-home__section-heading">
-              <span>Search</span>
-              <h2>“{normalizedSearchQuery}” 的匹配文档</h2>
+          <section className="axi-docs-home__section" id="what-is-axi-docs">
+            <h2>什么是 Axi Docs？</h2>
+            <p>
+              Axi Docs 是一个基于 React 的专业文档站，把 workspace 文档、Axi Skills 和长期知识库整理成统一入口。
+              它的首要目标是让人可以像阅读 VitePress 文档一样浏览内容，同时保留搜索、知识图谱和 Agent 调用能力。
+            </p>
+          </section>
+
+          <section className="axi-docs-home__section" id="quick-start">
+            <h2>快速开始</h2>
+            <p>
+              当前已接入 <strong>{currentSourceName}</strong>。可以从左侧文档库切换来源，使用顶部搜索定位文档，
+              或直接进入目录树浏览项目、规范和技能说明。
+            </p>
+            <div className="axi-docs-home__package-tabs" aria-label="运行命令">
+              <span className="active">pnpm</span>
+              <span>npm</span>
+              <span>yarn</span>
+              <span>bun</span>
             </div>
-            {searching ? (
-              <div className="axi-docs-home__code-card">
-                <p>正在检索文档库...</p>
-              </div>
-            ) : visibleSearchResults.length > 0 ? (
-              <div className="axi-docs-home__recent-list">
-                {visibleSearchResults.map((item) => (
+            <div className="axi-docs-home__code-card">
+              <code>$ pnpm dev</code>
+            </div>
+            <div className="axi-docs-home__callout">
+              <strong>注意</strong>
+              <p>
+                首页不再作为营销页使用。默认阅读路径应保持为文档结构：左侧目录、中央正文、右侧页面导航。
+              </p>
+            </div>
+          </section>
+
+          <section className="axi-docs-home__section" id="file-structure">
+            <h2>文档结构</h2>
+            <p>文档站当前把内容分成三类入口：</p>
+            <ul>
+              <li><strong>文档库</strong>：workspace、skills、Obsidian 等来源的真实文档。</li>
+              <li><strong>阅读路径</strong>：按分类、项目知识、架构决策和编码规范组织的导航。</li>
+              <li><strong>搜索结果</strong>：从标题、中文描述、路径、标签和正文中映射出的候选文档。</li>
+            </ul>
+          </section>
+
+          <section className="axi-docs-home__section" id="search-results" aria-live="polite">
+            <h2>{normalizedSearchQuery ? `“${normalizedSearchQuery}” 的匹配文档` : '搜索文档'}</h2>
+            {normalizedSearchQuery ? (
+              searching ? (
+                <div className="axi-docs-home__code-card">
+                  <p>正在检索文档库...</p>
+                </div>
+              ) : visibleSearchResults.length > 0 ? (
+                <div className="axi-docs-home__result-list">
+                  {visibleSearchResults.map((item) => (
+                    <button key={`${item.sourceId}:${item.path}`} onClick={() => onOpenItem(item.sourceId, item.path)} type="button">
+                      <strong>{item.title || item.name}</strong>
+                      <span>{item.description || item.snippet || item.path}</span>
+                      <small>{item.path}</small>
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <div className="axi-docs-home__code-card">
+                  <p>没有找到匹配文档。换一个关键词，或从下方推荐阅读路径继续浏览。</p>
+                </div>
+              )
+            ) : (
+              <p>按 <kbd>⌘K</kbd> 或点击顶部搜索框，输入标题、中文描述、路径或标签即可搜索。</p>
+            )}
+          </section>
+
+          <section className="axi-docs-home__section" id="next-steps">
+            <h2>下一步</h2>
+            <ul>
+              <li>
+                需要按目录阅读时，点击
+                {' '}
+                <button className="axi-docs-home__inline-action" onClick={onOpenExplorer} type="button">打开文档库目录</button>
+                。
+              </li>
+              {skillSource && (
+                <li>
+                  需要查看 Agent 工作流时，打开
+                  {' '}
+                  <button className="axi-docs-home__inline-action" onClick={() => onOpenItem('axi-skills', 'docs/SKILL_INDEX.md')} type="button">Axi Skills 索引</button>
+                  。
+                </li>
+              )}
+              {featuredDocs.length > 0 && (
+                <li>最近更新包括 {featuredDocs.slice(0, 3).map((item) => item.title).join('、')}。</li>
+              )}
+            </ul>
+          </section>
+
+          {featuredDocs.length > 0 && (
+            <section className="axi-docs-home__section" id="recent-docs">
+              <h2>最近更新</h2>
+              <div className="axi-docs-home__result-list">
+                {featuredDocs.map((item) => (
                   <button key={`${item.sourceId}:${item.path}`} onClick={() => onOpenItem(item.sourceId, item.path)} type="button">
-                    <strong>{item.title || item.name}</strong>
-                    <span>{item.description || item.snippet || item.path}</span>
+                    <strong>{item.title}</strong>
+                    <span>{item.description || item.path}</span>
+                    <small>{item.path}</small>
                   </button>
                 ))}
               </div>
-            ) : (
-              <div className="axi-docs-home__code-card">
-                <p>没有找到匹配文档。换一个关键词，或从下方推荐阅读路径继续浏览。</p>
-              </div>
-            )}
-          </section>
-        )}
+            </section>
+          )}
 
-        <section className="axi-docs-home__section" id="guides">
-          <div className="axi-docs-home__section-heading">
-            <span>Guides</span>
-            <h2>推荐阅读路径</h2>
+          <div className="axi-docs-home__footer-nav" aria-label="分页器">
+            <button onClick={onOpenExplorer} type="button">
+              <span>下一页</span>
+              <strong>文档库目录</strong>
+            </button>
           </div>
-          <div className="axi-docs-home__guide-list">
-            {primarySections.length > 0 ? primarySections.map((section) => (
-              <button
-                key={section.key}
-                onClick={onOpenExplorer}
-                type="button"
-              >
-                <strong>{section.title}</strong>
-                <span>{section.description}</span>
-                <small>{section.count} 篇文档</small>
-              </button>
-            )) : (
-              <>
-                <button onClick={onOpenExplorer} type="button">
-                  <strong>浏览当前文档库</strong>
-                  <span>打开目录树、路径视图和知识分类，定位可以继续阅读的文档。</span>
-                  <small>{currentSourceName}</small>
-                </button>
-                {skillSource && (
-                  <button onClick={() => onOpenItem('axi-skills', 'docs/SKILL_INDEX.md')} type="button">
-                    <strong>Axi Skills 指南</strong>
-                    <span>进入技能索引，查看 agent 工作流和可复用操作说明。</span>
-                    <small>skill-library</small>
-                  </button>
-                )}
-              </>
-            )}
-          </div>
-        </section>
-
-        {featuredDocs.length > 0 && (
-          <section className="axi-docs-home__section">
-            <div className="axi-docs-home__section-heading">
-              <span>Recent</span>
-              <h2>最近更新</h2>
-            </div>
-            <div className="axi-docs-home__recent-list">
-              {featuredDocs.map((item) => (
-                <button key={`${item.sourceId}:${item.path}`} onClick={() => onOpenItem(item.sourceId, item.path)} type="button">
-                  <strong>{item.title}</strong>
-                  <span>{item.description || item.path}</span>
-                </button>
-              ))}
-            </div>
-          </section>
-        )}
+        </article>
       </main>
 
       <aside className="axi-docs-home__outline" aria-label="页面导航">
         <div className="axi-docs-home__outline-card">
-          <span className="axi-docs-home__nav-label">On this page</span>
-          <a href="#overview">总览</a>
+          <span className="axi-docs-home__nav-label">页面导航</span>
+          <a href="#what-is-axi-docs">什么是 Axi Docs？</a>
           <a href="#quick-start">快速开始</a>
-          <a href="#guides">推荐阅读路径</a>
-          <a href="#sources">文档库</a>
+          <a href="#file-structure">文档结构</a>
+          <a href="#search-results">搜索文档</a>
+          <a href="#next-steps">下一步</a>
         </div>
 
         <div className="axi-docs-home__outline-card" id="sources">
-          <span className="axi-docs-home__nav-label">Current source</span>
+          <span className="axi-docs-home__nav-label">当前来源</span>
           <strong>{currentSourceName}</strong>
           <p>{source.description || '当前文档库已经接入 Axi Docs。'}</p>
           {recentProjects.length > 0 && <small>{recentProjects.length} 个近期项目入口</small>}
-          <div className="axi-docs-home__source-list">
-            {sources.map((item) => (
-              <button
-                key={item.id}
-                className={`axi-docs-home__source-link${item.id === source.id ? ' active' : ''}`}
-                onClick={() => onSourceSelect(item.id)}
-                type="button"
-              >
-                <span>{item.name}</span>
-                <small>{item.kind || item.adapter || item.type}</small>
-              </button>
-            ))}
-          </div>
         </div>
       </aside>
     </PageShell>

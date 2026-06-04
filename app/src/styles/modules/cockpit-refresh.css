@@ -79,6 +79,11 @@
   gap: var(--page-shell-gap-compact);
 }
 
+.cockpit-shell.axi-docs-home {
+  display: grid;
+  gap: 0;
+}
+
 .rail-panel {
   min-height: 0;
   display: flex;

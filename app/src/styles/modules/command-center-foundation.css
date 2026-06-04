@@ -190,6 +190,7 @@ body {
   inset: 0;
   z-index: 90;
   display: flex;
+  align-items: flex-start;
   justify-content: center;
   padding: 74px 18px 24px;
   background: rgba(0, 0, 0, 0.62);
@@ -198,9 +199,9 @@ body {
 
 .header-search-modal__panel {
   width: min(640px, 100%);
-  max-height: min(720px, calc(100vh - 98px));
+  max-height: min(560px, calc(100vh - 98px));
   display: grid;
-  grid-template-rows: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto auto auto;
   overflow: hidden;
   border: 1px solid var(--axi-doc-vp-c-divider, rgba(74, 85, 104, 0.42));
   border-radius: 12px;
@@ -229,6 +230,7 @@ body {
   padding: 0;
   border: 0;
   border-radius: 0;
+  outline: 0;
   background: transparent;
   color: var(--axi-doc-vp-c-text-1, #f8fafc);
   font-size: 15px;
@@ -237,7 +239,13 @@ body {
 
 .header-search-modal__field .header-search-input:focus {
   border: 0;
+  outline: 0;
   box-shadow: none;
+}
+
+.header-search-modal__field .header-search-input:focus-visible {
+  outline: 0 !important;
+  outline-offset: 0;
 }
 
 .header-search-modal__field .search-clear-btn {
@@ -257,7 +265,8 @@ body {
 .header-search-modal .header-search__panel {
   position: static;
   display: block;
-  min-height: 180px;
+  min-height: 0;
+  max-height: min(420px, calc(100vh - 176px));
   overflow: auto;
   padding: 10px;
   border: 0;
@@ -282,7 +291,7 @@ body {
 
 .header-search-modal__empty {
   display: grid;
-  min-height: 118px;
+  min-height: 124px;
   place-items: center;
   color: var(--axi-doc-vp-c-text-3, rgba(148, 163, 184, 0.86));
   font-size: 14px;

@@ -20,7 +20,6 @@ vi.mock('./Icons', () => ({
 
 describe('Header', () => {
   const defaultProps = {
-    homeHref: '/',
     onSearchChange: vi.fn(),
     onSearchSubmit: vi.fn(),
     onSuggestionSelect: vi.fn(),
@@ -29,8 +28,8 @@ describe('Header', () => {
     searching: false,
   }
 
-  const renderHeader = (props = {}) => render(
-    <MemoryRouter>
+  const renderHeader = (props = {}, route = '/') => render(
+    <MemoryRouter initialEntries={[route]}>
       <Header {...defaultProps} {...props} />
     </MemoryRouter>,
   )
@@ -44,6 +43,15 @@ describe('Header', () => {
     renderHeader()
     expect(screen.getByText('Axi Docs')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '全局搜索' })).toBeInTheDocument()
+  })
+
+  it('keeps the guide route separate from source navigation', () => {
+    renderHeader({ pageMode: 'home' }, '/?source=workspace')
+
+    expect(screen.getByRole('link', { name: '返回首页' })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: '指南' })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: '指南' })).not.toHaveClass('active')
+    expect(screen.getByRole('link', { name: '工作区' })).toHaveClass('active')
   })
 
   it('debounces live search updates on the search page', async () => {

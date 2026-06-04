@@ -1,13 +1,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { getKnowledgeSearchSuggestions } from '../lib/knowledgeClient'
 import type { SearchSuggestion } from '../types'
 import { pageCopy } from '../config/pageCopy'
 import { BookIcon, FileIcon, SearchIcon, TagIcon } from './Icons'
 
 interface HeaderProps {
-  homeHref: string
   onSearchChange: (query: string) => void
   onSearchSubmit: (query: string) => void
   onSuggestionSelect: (suggestion: SearchSuggestion) => void
@@ -22,7 +21,6 @@ function SuggestionIcon({ kind }: Pick<SearchSuggestion, 'kind'>) {
 }
 
 export function Header({
-  homeHref,
   onSearchChange,
   onSearchSubmit,
   onSuggestionSelect,
@@ -30,6 +28,7 @@ export function Header({
   searchQuery,
   searching,
 }: HeaderProps) {
+  const location = useLocation()
   const [inputValue, setInputValue] = useState(searchQuery)
   const [navOpen, setNavOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
@@ -41,6 +40,8 @@ export function Header({
   const suggestionRequestRef = useRef(0)
 
   const trimmedInput = inputValue.trim()
+  const activeSource = new URLSearchParams(location.search).get('source')
+  const guideHref = '/'
   const documentSuggestions = suggestions.filter((suggestion) => suggestion.kind === 'document')
   const tagSuggestions = suggestions.filter((suggestion) => suggestion.kind === 'tag')
 
@@ -194,9 +195,9 @@ export function Header({
   }
 
   const topNavItems = [
-    { label: '指南', to: homeHref, active: pageMode === 'home' || pageMode === 'document' },
-    { label: '技能库', to: '/?source=axi-skills', active: false },
-    { label: '工作区', to: '/?source=workspace', active: false },
+    { label: '指南', to: guideHref, active: pageMode === 'document' || (pageMode === 'home' && !activeSource) },
+    { label: '技能库', to: '/?source=axi-skills', active: pageMode === 'home' && activeSource === 'axi-skills' },
+    { label: '工作区', to: '/?source=workspace', active: pageMode === 'home' && activeSource === 'workspace' },
   ]
 
   const searchModal = searchOpen ? createPortal(
@@ -319,7 +320,7 @@ export function Header({
 
   return (
     <header className="app-header app-header--command">
-      <Link aria-label="返回首页" className="app-logo" to={homeHref}>
+      <Link aria-label="返回首页" className="app-logo" to={guideHref}>
         <BookIcon />
         <div className="app-logo__copy">
           <span>{pageCopy.header.brandPrimary}</span>

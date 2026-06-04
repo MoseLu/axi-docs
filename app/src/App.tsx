@@ -524,7 +524,6 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
         跳到主内容
       </a>
       <Header
-        homeHref={homeHref}
         onSearchChange={handleSearch}
         onSearchSubmit={handleSearchSubmit}
         onSuggestionSelect={handleSuggestionSelect}

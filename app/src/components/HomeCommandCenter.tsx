@@ -48,31 +48,6 @@ export function HomeCommandCenter({
 
   return (
     <PageShell className="axi-docs-home" compact>
-      <aside className="axi-docs-home__sidebar" aria-label="文档导航">
-        <div className="axi-docs-home__sidebar-block">
-          <span className="axi-docs-home__nav-label">Getting Started</span>
-          <a className="axi-docs-home__nav-link active" href="#overview">总览</a>
-          <a className="axi-docs-home__nav-link" href="#quick-start">快速开始</a>
-          <a className="axi-docs-home__nav-link" href="#guides">指南</a>
-          <a className="axi-docs-home__nav-link" href="#sources">文档库</a>
-        </div>
-
-        <div className="axi-docs-home__sidebar-block">
-          <span className="axi-docs-home__nav-label">Sources</span>
-          {sources.map((item) => (
-            <button
-              key={item.id}
-              className={`axi-docs-home__source-link${item.id === source.id ? ' active' : ''}`}
-              onClick={() => onSourceSelect(item.id)}
-              type="button"
-            >
-              <span>{item.name}</span>
-              <small>{item.kind || item.adapter || item.type}</small>
-            </button>
-          ))}
-        </div>
-      </aside>
-
       <main className="axi-docs-home__content" id="overview">
         <section className="axi-docs-home__hero">
           <span className="axi-docs-home__eyebrow">Axi Docs</span>
@@ -118,7 +93,7 @@ export function HomeCommandCenter({
           </div>
           <div className="axi-docs-home__code-card">
             <code>pnpm dev</code>
-            <p>本地启动 React 文档站，使用顶部搜索或左侧来源导航进入具体文档。</p>
+            <p>本地启动 React 文档站，使用顶部搜索、推荐阅读路径或右侧来源入口进入具体文档。</p>
           </div>
         </section>
 
@@ -216,6 +191,19 @@ export function HomeCommandCenter({
           <strong>{currentSourceName}</strong>
           <p>{source.description || '当前文档库已经接入 Axi Docs。'}</p>
           {recentProjects.length > 0 && <small>{recentProjects.length} 个近期项目入口</small>}
+          <div className="axi-docs-home__source-list">
+            {sources.map((item) => (
+              <button
+                key={item.id}
+                className={`axi-docs-home__source-link${item.id === source.id ? ' active' : ''}`}
+                onClick={() => onSourceSelect(item.id)}
+                type="button"
+              >
+                <span>{item.name}</span>
+                <small>{item.kind || item.adapter || item.type}</small>
+              </button>
+            ))}
+          </div>
         </div>
       </aside>
     </PageShell>

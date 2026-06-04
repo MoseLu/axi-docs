@@ -57,7 +57,7 @@ const catalog: KnowledgeCatalog = {
 }
 
 describe('HomeCommandCenter', () => {
-  it('renders a docs-first landing page with guide navigation', () => {
+  it('renders a docs-first landing page without the old left rail', () => {
     render(
       <HomeCommandCenter
         activeTag={null}
@@ -75,15 +75,15 @@ describe('HomeCommandCenter', () => {
       />,
     )
 
-    const docsNav = screen.getByLabelText('文档导航')
-
     expect(screen.getByRole('heading', { name: 'React 体系的专业文档站' })).toBeInTheDocument()
-    expect(within(docsNav).getByRole('link', { name: '快速开始' })).toBeInTheDocument()
+    expect(screen.queryByLabelText('文档导航')).not.toBeInTheDocument()
+    expect(screen.queryByText('Getting Started')).not.toBeInTheDocument()
+    expect(within(screen.getByLabelText('页面导航')).getByRole('link', { name: '快速开始' })).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: '推荐阅读路径' })).toBeInTheDocument()
     expect(screen.queryByText('PROJECTS')).not.toBeInTheDocument()
   })
 
-  it('keeps source selection actionable from the docs sidebar', () => {
+  it('keeps source selection actionable from the source card', () => {
     const onSourceSelect = vi.fn()
     render(
       <HomeCommandCenter
@@ -102,7 +102,7 @@ describe('HomeCommandCenter', () => {
       />,
     )
 
-    fireEvent.click(within(screen.getByLabelText('文档导航')).getByRole('button', { name: /Axi Skills/i }))
+    fireEvent.click(within(screen.getByLabelText('页面导航')).getByRole('button', { name: /Axi Skills/i }))
 
     expect(onSourceSelect).toHaveBeenCalledWith('axi-skills')
   })

@@ -114,37 +114,18 @@
   max-width: var(--axi-doc-vp-layout-max-width);
   margin: 0 auto;
   display: grid;
-  grid-template-columns: var(--axi-doc-vp-sidebar-width) minmax(0, 1fr) var(--axi-doc-vp-aside-width);
+  grid-template-columns: minmax(0, 1fr) var(--axi-doc-vp-aside-width);
   gap: 0;
   color: var(--axi-doc-vp-c-text-1);
   background: var(--axi-doc-vp-c-bg);
 }
 
-.axi-docs-home__sidebar,
 .axi-docs-home__outline {
   position: sticky;
   top: var(--axi-doc-vp-nav-height);
   align-self: start;
   height: calc(100vh - var(--axi-doc-vp-nav-height));
   overflow: auto;
-}
-
-.axi-docs-home__sidebar {
-  padding: 24px 20px 40px;
-  border-right: 1px solid var(--axi-doc-vp-c-divider);
-  background: var(--axi-doc-vp-c-bg-alt);
-}
-
-.axi-docs-home__sidebar-block {
-  display: grid;
-  gap: 4px;
-  padding-bottom: 22px;
-  margin-bottom: 20px;
-  border-bottom: 1px solid var(--axi-doc-vp-c-divider);
-}
-
-.axi-docs-home__sidebar-block:last-child {
-  border-bottom: 0;
 }
 
 .axi-docs-home__nav-label {
@@ -155,26 +136,12 @@
   font-weight: 700;
 }
 
-.axi-docs-home__nav-link,
 .axi-docs-home__source-link {
   min-height: 32px;
   border-radius: 8px;
   color: var(--axi-doc-vp-c-text-2);
   font-size: 14px;
   line-height: 1.4;
-  text-decoration: none;
-}
-
-.axi-docs-home__nav-link {
-  display: flex;
-  align-items: center;
-  padding: 0 12px;
-}
-
-.axi-docs-home__nav-link:hover,
-.axi-docs-home__nav-link.active {
-  color: var(--axi-doc-vp-c-brand-1);
-  background: var(--axi-doc-vp-c-brand-soft);
   text-decoration: none;
 }
 
@@ -423,6 +390,11 @@
   color: var(--axi-doc-vp-c-text-3);
 }
 
+.axi-docs-home__source-list {
+  display: grid;
+  gap: 4px;
+}
+
 @media (min-width: 1440px) {
   .app-layout--home .app-logo {
     margin-left: calc((100vw - var(--axi-doc-vp-layout-max-width)) / 2);
@@ -435,7 +407,7 @@
 
 @media (max-width: 1180px) {
   .axi-docs-home {
-    grid-template-columns: var(--axi-doc-vp-sidebar-width) minmax(0, 1fr);
+    grid-template-columns: minmax(0, 1fr);
   }
 
   .axi-docs-home__outline {
@@ -461,24 +433,6 @@
 
   .axi-docs-home {
     display: block;
-  }
-
-  .axi-docs-home__sidebar {
-    position: static;
-    height: auto;
-    padding: 18px 20px;
-    border-right: 0;
-    border-bottom: 1px solid var(--axi-doc-vp-c-divider);
-  }
-
-  .axi-docs-home__sidebar-block:first-child {
-    display: none;
-  }
-
-  .axi-docs-home__source-link {
-    display: inline-grid;
-    width: auto;
-    margin-right: 8px;
   }
 
   .axi-docs-home__content {

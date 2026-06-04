@@ -135,8 +135,8 @@ export function HomeCommandCenter({
           <section className="axi-docs-home__section" id="quick-start">
             <h2>快速开始</h2>
             <p>
-              当前已接入 <strong>{currentSourceName}</strong>。可以从左侧文档库切换来源，使用顶部搜索定位文档，
-              或直接进入目录树浏览项目、规范和技能说明。
+              Axi Docs 的默认入口是指南页，不等同于某一个文档来源。先按左侧目录理解文档站结构，
+              再通过顶部搜索、文档库目录或右侧来源卡片进入具体 workspace、skills 和知识库内容。
             </p>
             <div className="axi-docs-home__package-tabs" aria-label="运行命令">
               <span className="active">pnpm</span>

@@ -79,6 +79,7 @@ describe('HomeCommandCenter', () => {
     expect(screen.queryByRole('heading', { name: 'React 体系的专业文档站' })).not.toBeInTheDocument()
     expect(within(screen.getByLabelText('侧边栏导航')).getByRole('link', { name: '快速开始' })).toBeInTheDocument()
     expect(within(screen.getByLabelText('页面导航')).getByRole('link', { name: '快速开始' })).toBeInTheDocument()
+    expect(within(document.querySelector('#quick-start') as HTMLElement).queryByText('Axi Workspace')).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: '文档结构' })).toBeInTheDocument()
     expect(screen.queryByText('PROJECTS')).not.toBeInTheDocument()
   })

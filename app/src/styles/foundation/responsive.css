@@ -45,6 +45,19 @@
     min-height: clamp(360px, 48vh, 460px);
   }
 
+  .document-detail-page {
+    grid-template-columns: 248px minmax(0, 1fr);
+  }
+
+  .document-detail-page__sidebar {
+    overflow: auto;
+    padding-right: 20px;
+  }
+
+  .document-detail-page__aside {
+    display: none;
+  }
+
   .category-graph-page__graph-stack {
     display: flex;
     flex-direction: column;
@@ -101,6 +114,14 @@
   .document-detail-page {
     height: auto;
     overflow: auto;
+  }
+
+  .document-detail-page {
+    grid-template-columns: 1fr;
+  }
+
+  .document-detail-page__sidebar {
+    display: none;
   }
 
   .search-page__preview-card {
@@ -434,6 +455,18 @@
   .document-detail-page__panel-header {
     flex-direction: column;
     align-items: flex-start;
+  }
+
+  .document-detail-page__toolbar {
+    padding: 14px 20px;
+  }
+
+  .document-detail-page__reader .doc-header {
+    padding: 34px 24px 14px;
+  }
+
+  .document-detail-page__reader .doc-body {
+    padding: 8px 24px 72px;
   }
 
   .command-center__intel {

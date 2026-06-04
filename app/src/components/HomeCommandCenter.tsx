@@ -1,5 +1,8 @@
+import { useState } from 'react'
 import { DocSource, KnowledgeCatalog, SearchResult, SelectedFile } from '../types'
 import { PageShell } from './CockpitPrimitives'
+
+type SidebarSectionId = 'intro' | 'sources' | 'routes'
 
 export interface QuickKnowledgeItemLike {
   sourceId: string
@@ -45,54 +48,74 @@ export function HomeCommandCenter({
   const currentSourceName = source.name || '当前文档库'
   const normalizedSearchQuery = searchQuery.trim()
   const visibleSearchResults = (searchResults || []).slice(0, 8)
+  const [openSections, setOpenSections] = useState<Record<SidebarSectionId, boolean>>({
+    intro: true,
+    sources: true,
+    routes: true,
+  })
+  const toggleSection = (sectionId: SidebarSectionId) => {
+    setOpenSections((current) => ({ ...current, [sectionId]: !current[sectionId] }))
+  }
 
   return (
     <PageShell className="axi-docs-home" compact>
       <aside className="axi-docs-home__sidebar" aria-label="侧边栏导航">
         <nav className="axi-docs-home__sidebar-section" aria-label="简介">
-          <button className="axi-docs-home__sidebar-toggle" type="button">
+          <button aria-expanded={openSections.intro} className="axi-docs-home__sidebar-toggle" onClick={() => toggleSection('intro')} type="button">
             <span>简介</span>
-            <span aria-hidden="true">⌄</span>
+            <span aria-hidden="true" className="axi-docs-home__sidebar-caret">⌄</span>
           </button>
-          <a className="axi-docs-home__nav-link" href="#what-is-axi-docs">什么是 Axi Docs？</a>
-          <a className="axi-docs-home__nav-link active" href="#quick-start">快速开始</a>
-          <a className="axi-docs-home__nav-link" href="#search-results">搜索结果</a>
-          <a className="axi-docs-home__nav-link" href="#next-steps">下一步</a>
+          {openSections.intro && (
+            <div className="axi-docs-home__sidebar-items">
+              <a className="axi-docs-home__nav-link" href="#what-is-axi-docs">什么是 Axi Docs？</a>
+              <a className="axi-docs-home__nav-link active" href="#quick-start">快速开始</a>
+              <a className="axi-docs-home__nav-link" href="#search-results">搜索结果</a>
+              <a className="axi-docs-home__nav-link" href="#next-steps">下一步</a>
+            </div>
+          )}
         </nav>
 
         <nav className="axi-docs-home__sidebar-section" aria-label="文档库">
-          <button className="axi-docs-home__sidebar-toggle" type="button">
+          <button aria-expanded={openSections.sources} className="axi-docs-home__sidebar-toggle" onClick={() => toggleSection('sources')} type="button">
             <span>文档库</span>
-            <span aria-hidden="true">⌄</span>
+            <span aria-hidden="true" className="axi-docs-home__sidebar-caret">⌄</span>
           </button>
-          {sources.map((item) => (
-            <button
-              key={item.id}
-              className={`axi-docs-home__source-link${item.id === source.id ? ' active' : ''}`}
-              onClick={() => onSourceSelect(item.id)}
-              type="button"
-            >
-              <span>{item.name}</span>
-              <small>{item.kind || item.adapter || item.type}</small>
-            </button>
-          ))}
+          {openSections.sources && (
+            <div className="axi-docs-home__sidebar-items">
+              {sources.map((item) => (
+                <button
+                  key={item.id}
+                  className={`axi-docs-home__source-link${item.id === source.id ? ' active' : ''}`}
+                  onClick={() => onSourceSelect(item.id)}
+                  type="button"
+                >
+                  <span>{item.name}</span>
+                  <small>{item.kind || item.adapter || item.type}</small>
+                </button>
+              ))}
+            </div>
+          )}
         </nav>
 
         <nav className="axi-docs-home__sidebar-section" aria-label="推荐路径">
-          <button className="axi-docs-home__sidebar-toggle" type="button">
+          <button aria-expanded={openSections.routes} className="axi-docs-home__sidebar-toggle" onClick={() => toggleSection('routes')} type="button">
             <span>推荐路径</span>
-            <span aria-hidden="true">⌄</span>
+            <span aria-hidden="true" className="axi-docs-home__sidebar-caret">⌄</span>
           </button>
-          {primarySections.length > 0 ? primarySections.map((section) => (
-            <button key={section.key} className="axi-docs-home__nav-card" onClick={onOpenExplorer} type="button">
-              <span>{section.title}</span>
-              <small>{section.count} 篇文档</small>
-            </button>
-          )) : (
-            <button className="axi-docs-home__nav-card" onClick={onOpenExplorer} type="button">
-              <span>浏览当前文档库</span>
-              <small>{currentSourceName}</small>
-            </button>
+          {openSections.routes && (
+            <div className="axi-docs-home__sidebar-items">
+              {primarySections.length > 0 ? primarySections.map((section) => (
+                <button key={section.key} className="axi-docs-home__nav-card" onClick={onOpenExplorer} type="button">
+                  <span>{section.title}</span>
+                  <small>{section.count} 篇文档</small>
+                </button>
+              )) : (
+                <button className="axi-docs-home__nav-card" onClick={onOpenExplorer} type="button">
+                  <span>浏览当前文档库</span>
+                  <small>{currentSourceName}</small>
+                </button>
+              )}
+            </div>
           )}
         </nav>
       </aside>

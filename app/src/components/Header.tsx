@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { getKnowledgeSearchSuggestions } from '../lib/knowledgeClient'
 import type { SearchSuggestion } from '../types'
 import { pageCopy } from '../config/pageCopy'
-import { BookIcon, FileIcon, SearchIcon, TagIcon } from './Icons'
+import { BookIcon, FileIcon, GitHubIcon, SearchIcon, TagIcon, ThemeIcon } from './Icons'
 
 interface HeaderProps {
   onSearchChange: (query: string) => void
@@ -29,6 +29,9 @@ export function Header({
   searching,
 }: HeaderProps) {
   const location = useLocation()
+  const [themeMode, setThemeMode] = useState<'dark' | 'light'>(() => (
+    window.localStorage.getItem('axi-docs-theme') === 'light' ? 'light' : 'dark'
+  ))
   const [inputValue, setInputValue] = useState(searchQuery)
   const [navOpen, setNavOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
@@ -44,6 +47,11 @@ export function Header({
   const guideHref = '/'
   const documentSuggestions = suggestions.filter((suggestion) => suggestion.kind === 'document')
   const tagSuggestions = suggestions.filter((suggestion) => suggestion.kind === 'tag')
+
+  useEffect(() => {
+    document.documentElement.dataset.axiDocsTheme = themeMode
+    window.localStorage.setItem('axi-docs-theme', themeMode)
+  }, [themeMode])
 
   useEffect(() => {
     if (!searchOpen) setInputValue(searchQuery)
@@ -324,7 +332,6 @@ export function Header({
         <BookIcon />
         <div className="app-logo__copy">
           <span>{pageCopy.header.brandPrimary}</span>
-          <small>{pageCopy.header.brandSecondary}</small>
         </div>
       </Link>
 
@@ -363,6 +370,26 @@ export function Header({
                 </Link>
               ))}
             </nav>
+            <div className="header-vp-tools" aria-label="站点工具">
+              <button
+                aria-label={themeMode === 'dark' ? '切换浅色样式' : '切换深色样式'}
+                className="header-vp-tool header-vp-tool--theme"
+                onClick={() => setThemeMode((current) => (current === 'dark' ? 'light' : 'dark'))}
+                type="button"
+              >
+                <ThemeIcon />
+              </button>
+              <span className="header-vp-separator" aria-hidden="true" />
+              <a
+                aria-label="GitHub"
+                className="header-vp-tool"
+                href="https://github.com/axiomaticworld/axi-docs"
+                rel="noreferrer"
+                target="_blank"
+              >
+                <GitHubIcon />
+              </a>
+            </div>
             <button
               aria-expanded={navOpen}
               aria-label={navOpen ? '关闭导航菜单' : '打开导航菜单'}

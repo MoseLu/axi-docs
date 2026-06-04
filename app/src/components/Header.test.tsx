@@ -15,7 +15,9 @@ vi.mock('./Icons', () => ({
   SearchIcon: () => <span data-testid="search-icon">🔍</span>,
   BookIcon: () => <span data-testid="book-icon">📖</span>,
   FileIcon: () => <span data-testid="file-icon">📄</span>,
+  GitHubIcon: () => <span data-testid="github-icon">GitHub</span>,
   TagIcon: () => <span data-testid="tag-icon">🏷️</span>,
+  ThemeIcon: () => <span data-testid="theme-icon">Theme</span>,
 }))
 
 describe('Header', () => {
@@ -36,15 +38,29 @@ describe('Header', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    window.localStorage.clear()
+    document.documentElement.removeAttribute('data-axi-docs-theme')
     mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
   })
 
   it('renders brand and global search input', () => {
     renderHeader()
     expect(screen.getByText('Axi Docs')).toBeInTheDocument()
+    expect(screen.queryByText('Knowledge Hub')).not.toBeInTheDocument()
     expect(screen.getByText('搜索')).toBeInTheDocument()
     expect(screen.queryByText('搜索标签、标题或文档')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: '全局搜索' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '切换浅色样式' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'GitHub' })).toHaveAttribute('href', 'https://github.com/axiomaticworld/axi-docs')
+  })
+
+  it('toggles the docs theme mode', () => {
+    renderHeader()
+
+    fireEvent.click(screen.getByRole('button', { name: '切换浅色样式' }))
+
+    expect(document.documentElement.dataset.axiDocsTheme).toBe('light')
+    expect(screen.getByRole('button', { name: '切换深色样式' })).toBeInTheDocument()
   })
 
   it('keeps the guide route separate from source navigation', () => {

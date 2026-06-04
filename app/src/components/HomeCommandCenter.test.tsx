@@ -107,6 +107,36 @@ describe('HomeCommandCenter', () => {
     expect(onSourceSelect).toHaveBeenCalledWith('axi-skills')
   })
 
+  it('collapses and expands sidebar groups for real', () => {
+    render(
+      <HomeCommandCenter
+        activeTag={null}
+        catalog={catalog}
+        graphFocusPath={null}
+        onClearSelectedFile={vi.fn()}
+        onOpenExplorer={vi.fn()}
+        onOpenItem={vi.fn()}
+        onSourceSelect={vi.fn()}
+        onTagSelect={vi.fn()}
+        searchQuery=""
+        selectedFile={null}
+        source={sources[0]}
+        sources={sources}
+      />,
+    )
+
+    const intro = screen.getByRole('button', { name: '简介' })
+    fireEvent.click(intro)
+
+    expect(intro).toHaveAttribute('aria-expanded', 'false')
+    expect(within(screen.getByLabelText('简介')).queryByRole('link', { name: '快速开始' })).not.toBeInTheDocument()
+
+    fireEvent.click(intro)
+
+    expect(intro).toHaveAttribute('aria-expanded', 'true')
+    expect(within(screen.getByLabelText('简介')).getByRole('link', { name: '快速开始' })).toBeInTheDocument()
+  })
+
   it('shows inline search results as a document section', () => {
     const onOpenItem = vi.fn()
     const searchResults: SearchResult[] = [

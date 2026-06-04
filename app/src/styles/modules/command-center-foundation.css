@@ -199,9 +199,10 @@ body {
 
 .header-search-modal__panel {
   width: min(640px, 100%);
+  height: min(520px, calc(100vh - 98px));
   max-height: min(560px, calc(100vh - 98px));
   display: grid;
-  grid-template-rows: auto auto auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   overflow: hidden;
   border: 1px solid var(--axi-doc-vp-c-divider, rgba(74, 85, 104, 0.42));
   border-radius: 12px;
@@ -266,8 +267,8 @@ body {
   position: static;
   display: block;
   min-height: 0;
-  max-height: min(420px, calc(100vh - 176px));
   overflow: auto;
+  scrollbar-gutter: stable;
   padding: 10px;
   border: 0;
   border-radius: 0;
@@ -291,10 +292,49 @@ body {
 
 .header-search-modal__empty {
   display: grid;
-  min-height: 124px;
-  place-items: center;
+  min-height: 100%;
+  align-content: center;
+  gap: 18px;
   color: var(--axi-doc-vp-c-text-3, rgba(148, 163, 184, 0.86));
   font-size: 14px;
+  text-align: center;
+}
+
+.header-search-modal__empty p {
+  margin: 0;
+}
+
+.header-search-modal__shortcuts {
+  display: grid;
+  gap: 8px;
+  width: min(420px, 100%);
+  margin: 0 auto;
+}
+
+.header-search-modal__shortcuts button {
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.025);
+  color: var(--axi-doc-vp-c-text-1, #f8fafc);
+  text-align: left;
+}
+
+.header-search-modal__shortcuts button:hover,
+.header-search-modal__shortcuts button:focus-visible {
+  border-color: rgba(168, 177, 255, 0.28);
+  background: var(--axi-doc-vp-c-brand-soft, rgba(100, 108, 255, 0.16));
+}
+
+.header-search-modal__shortcuts strong {
+  font-size: 13px;
+}
+
+.header-search-modal__shortcuts small {
+  color: var(--axi-doc-vp-c-text-3, rgba(148, 163, 184, 0.86));
+  font-size: 12px;
 }
 
 .header-search-modal__footer {

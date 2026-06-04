@@ -201,6 +201,11 @@ export function Header({
     { label: '工作区', to: '/?source=workspace', active: false },
     { label: '搜索', to: '/search', active: pageMode === 'search' },
   ]
+  const emptySearchShortcuts = [
+    { label: 'Axi Workspace', meta: '工作区项目索引', query: 'workspace' },
+    { label: 'Axi Skills', meta: '共享技能库', query: 'skills' },
+    { label: 'Axi Docs', meta: '当前文档站项目', query: 'axi docs' },
+  ]
 
   const searchModal = searchOpen ? createPortal(
     <div
@@ -294,7 +299,22 @@ export function Header({
 
           {!trimmedInput && (
             <div className="header-search-modal__empty">
-              输入关键词后会显示文档、路径和标签建议。
+              <p>输入关键词后会显示文档、路径和标签建议。</p>
+              <div className="header-search-modal__shortcuts">
+                {emptySearchShortcuts.map((shortcut) => (
+                  <button
+                    key={shortcut.query}
+                    onMouseDown={(event) => {
+                      event.preventDefault()
+                      submitSearch(shortcut.query)
+                    }}
+                    type="button"
+                  >
+                    <strong>{shortcut.label}</strong>
+                    <small>{shortcut.meta}</small>
+                  </button>
+                ))}
+              </div>
             </div>
           )}
 

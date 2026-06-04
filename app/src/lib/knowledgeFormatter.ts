@@ -217,6 +217,10 @@ export function formatKnowledgeDocumentDescription(item: {
     : item.sourceId === 'axi-skills'
       ? '技能库'
       : '知识库'
+  if (description) {
+    return truncateText(`${sourceLabel}${docTypeLabel}摘要：${description}`)
+  }
+
   return truncateText([
     `${sourceLabel}中的${docTypeLabel}，用于说明「${title || '未命名文档'}」的背景、用途与关联上下文。`,
   ].filter(Boolean).join(' '))

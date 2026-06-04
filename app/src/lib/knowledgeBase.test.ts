@@ -242,7 +242,8 @@ describe('knowledge base local index', () => {
     const results = await searchKnowledge('axi-skills', 'deep-init-pro')
     expect(results[0]?.path).toBe('skills/deep-init-pro/SKILL.md')
     expect(results[0]?.title).toContain('技能')
-    expect(results[0]?.description).toContain('技能库')
+    expect(results[0]?.description).toContain('技能用途')
+    expect(results[0]?.description).toContain('Generate layered project docs for agents')
 
     const allResults = await searchKnowledgeAll('deep-init-pro')
     expect(allResults.some((result) => result.sourceId === 'axi-skills')).toBe(true)
@@ -294,6 +295,8 @@ describe('knowledge base local index', () => {
 
     const summary = await getProjectSummary('axi-docs')
     expect(summary?.title).toBe('Axi 文档站')
-    expect(summary?.description).toContain('工作区')
+    expect(summary?.description).toContain('用途：Axi 文档中心')
+    expect(summary?.description).toContain('技术栈：React, TypeScript')
+    expect(summary?.description).toContain('验证：pnpm --dir app verify')
   })
 })

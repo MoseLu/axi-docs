@@ -407,11 +407,12 @@ function buildSkillDocument(source: DocSource, relativePath: string, stat: fs.St
   const skillName = typeof frontmatter.name === 'string' && frontmatter.name.trim()
     ? frontmatter.name.trim()
     : skillDir
-  const description = truncateText(
+  const sourceDescription = truncateText(
     typeof frontmatter.description === 'string' && frontmatter.description.trim()
       ? frontmatter.description
       : extractDescription(frontmatter, parsed.content),
   ) || 'No frontmatter description'
+  const description = `技能用途：${sourceDescription}`
   const tags = ['技能', 'Agent', 'Axi Skills', skillName]
   const body = parsed.content || raw
   return createVirtualParsedDocument({
@@ -485,7 +486,7 @@ async function collectSkillDocuments(source: DocSource): Promise<ParsedDocument[
       name: 'SKILL_INDEX',
       title: 'Axi Skills Index',
       rawTitle: 'Axi Skills Index',
-      description: 'Generated index of all Axi skill entrypoints.',
+      description: '用途：汇总 Axi skill 入口。范围：skills/**/SKILL.md。对象：agent 可调用技能索引',
       docType: 'index',
       status: 'active',
       tags: ['技能', '索引', 'Agent'],
@@ -525,42 +526,87 @@ function stripMarkdownLinks(value: string): string {
     .trim()
 }
 
+const WORKSPACE_PURPOSE_OVERRIDES = new Map([
+  ['Axi Docs', 'Axi 文档中心，用于浏览多源文档、查看知识图谱、同步文档并通过 MCP 提供文档访问。'],
+  ['Axi Image Preview', 'Axi 图片与壁纸预览应用，用于视觉参考、悬停详情和图库交互实验。'],
+  ['Axi Local Registry', '本地 Verdaccio 注册表，用于发布和安装 @axi/* 运行时包。'],
+  ['Axi Notify / Mobile', 'Axi 通知与移动端工作区，用于 relay、Android 客户端、事件收件箱和移动工作台。'],
+  ['Axi Proxy Companion', 'macOS 代理伴侣工具，用于控制和检查本地代理后端。'],
+  ['Axi Skills', 'Axi agents 共享技能树，用于沉淀可版本化、可复用的 agent 技能入口。'],
+  ['Axi Tauri Starter', 'Tauri 2 桌面壳模板，用于复用桌面 shell 形态和缓存启动流程。'],
+  ['Axi UI', 'Axi 共享 UI 包，用于品牌 token、核心组件、仪表盘壳、设置页和插件运行时。'],
+  ['Axi Video Downloader', '本地视频下载工具，用于视频抓取、任务管理和下载链路验证。'],
+  ['Axi Workspace Governance', 'Axi 工作区治理索引，用于项目目录、拓扑、所有权和 ADR 入口管理。'],
+  ['Axi Agent Platform', 'Axi agent 平台工作区，用于 agent 运行、任务编排和平台能力沉淀。'],
+  ['Workspace DevServices', '工作区本地服务清单，用于 PM2 服务配置、仪表盘路由、飞书告警和 NATAPP 入口。'],
+  ['Workspace Relationship Graph', '工作区项目关系图，用于记录 provider、consumer、contract 和 shared-resource 关系。'],
+])
+
+function resolveWorkspacePurpose(cleanName: string, fallbackPurpose: string, fallbackNotes: string): string {
+  return WORKSPACE_PURPOSE_OVERRIDES.get(cleanName) || fallbackPurpose || fallbackNotes
+}
+
+function joinChineseFacts(facts: Array<[string, string | undefined]>): string {
+  return facts
+    .map(([label, value]) => {
+      const cleaned = stripMarkdownLinks(value || '').replace(/[。.!！?？]+$/u, '')
+      return cleaned ? `${label}：${cleaned}` : ''
+    })
+    .filter(Boolean)
+    .join('。')
+}
+
 function buildWorkspaceProjectDocument(source: DocSource, row: string[], updated: string): ParsedDocument | null {
   const [name, projectPath, purpose, stack, status, docs, verification, notes] = row
   if (!name || !projectPath || name === 'Project' || /^-+$/.test(name)) return null
   const cleanName = stripMarkdownLinks(name)
   const cleanPath = stripMarkdownLinks(projectPath)
+  const cleanStatus = stripMarkdownLinks(status || 'active')
+  const cleanStack = stripMarkdownLinks(stack || '')
+  const cleanDocs = stripMarkdownLinks(docs || '')
+  const cleanVerification = stripMarkdownLinks(verification || '')
+  const cleanPurpose = stripMarkdownLinks(purpose || '')
+  const cleanNotes = stripMarkdownLinks(notes || '')
+  const purposeSummary = resolveWorkspacePurpose(cleanName, cleanPurpose, cleanNotes)
   const id = cleanName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || cleanPath.replace(/[^a-z0-9]+/gi, '-')
   const title = cleanName
+  const description = joinChineseFacts([
+    ['用途', purposeSummary],
+    ['状态', cleanStatus],
+    ['技术栈', cleanStack],
+    ['验证', cleanVerification],
+    ['文档', cleanDocs],
+  ])
   const body = [
     `# ${title}`,
     '',
     `- Path: \`${cleanPath}\``,
-    `- Status: ${stripMarkdownLinks(status || 'unknown')}`,
-    `- Stack: ${stripMarkdownLinks(stack || 'unknown')}`,
-    `- Authoritative docs: ${stripMarkdownLinks(docs || '')}`,
-    `- Common verification: \`${stripMarkdownLinks(verification || '')}\``,
+    `- Status: ${cleanStatus}`,
+    `- Stack: ${cleanStack || 'unknown'}`,
+    `- Authoritative docs: ${cleanDocs}`,
+    `- Common verification: \`${cleanVerification}\``,
     '',
     '## Purpose',
     '',
-    stripMarkdownLinks(purpose || ''),
+    cleanPurpose,
     '',
     notes ? '## Notes' : '',
-    notes ? stripMarkdownLinks(notes) : '',
+    notes ? cleanNotes : '',
   ].filter(Boolean).join('\n')
   const raw = buildFrontmatter({
     id: `workspace-${id}`,
     title,
     type: 'project',
-    status: stripMarkdownLinks(status || 'active'),
-    tags: ['Axi Workspace', '项目', stripMarkdownLinks(status || 'active')],
+    status: cleanStatus,
+    tags: ['Axi Workspace', '项目', cleanStatus],
     created: updated,
     modified: updated,
     'graph-title': title,
     'graph-tags': ['项目', 'Workspace'],
     path: cleanPath,
-    stack: stripMarkdownLinks(stack || ''),
-    verification: stripMarkdownLinks(verification || ''),
+    stack: cleanStack,
+    verification: cleanVerification,
+    description,
   }) + body
 
   return createVirtualParsedDocument({
@@ -569,17 +615,17 @@ function buildWorkspaceProjectDocument(source: DocSource, row: string[], updated
     name: id,
     title,
     rawTitle: title,
-    description: stripMarkdownLinks(purpose || notes || ''),
+    description,
     docType: 'project',
-    status: stripMarkdownLinks(status || 'active'),
-    tags: ['项目', 'Workspace', stripMarkdownLinks(status || 'active')],
+    status: cleanStatus,
+    tags: ['项目', 'Workspace', cleanStatus],
     categories: ['projects', 'architecture', 'standards'],
     updated,
     raw,
     body,
     frontmatter: parseMarkdownDocument(raw).data as Frontmatter,
     aliases: [cleanPath, title],
-    sourceTags: ['project', 'workspace', stripMarkdownLinks(status || 'active')],
+    sourceTags: ['project', 'workspace', cleanStatus],
   })
 }
 
@@ -616,7 +662,7 @@ async function collectWorkspaceDocuments(source: DocSource): Promise<ParsedDocum
       name: 'project-catalog',
       title: 'Workspace Project Catalog',
       rawTitle: 'Workspace Project Catalog',
-      description: 'Generated readable catalog for Axi workspace projects.',
+      description: '用途：工作区项目可读目录。范围：Axi workspace projects。对象：项目治理和入口导航',
       docType: 'index',
       status: 'active',
       tags: ['索引', '项目', 'Workspace'],
@@ -647,7 +693,7 @@ async function collectWorkspaceDocuments(source: DocSource): Promise<ParsedDocum
       name: 'WORKSPACE_INDEX',
       title: 'Axi Workspace Index',
       rawTitle: 'Axi Workspace Index',
-      description: 'Canonical workspace-level project map for Codex.',
+      description: '用途：工作区级项目地图。范围：Codex 本地 workspace。对象：项目定位、路径解析和治理入口',
       docType: 'index',
       status: 'active',
       tags: ['索引', '项目', 'Workspace'],
@@ -678,7 +724,7 @@ async function collectWorkspaceDocuments(source: DocSource): Promise<ParsedDocum
       name: 'axi-skills',
       title: 'Axi Skills',
       rawTitle: 'Axi Skills',
-      description: 'Shared version-controlled skill tree for Axi agents.',
+      description: '用途：Axi agents 共享技能树。位置：shared/axi-skills。对象：可版本化、可复用的 agent 技能入口',
       docType: 'project',
       status: 'active',
       tags: ['项目', '技能', 'Workspace'],

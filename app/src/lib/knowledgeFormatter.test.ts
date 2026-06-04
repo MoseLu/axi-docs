@@ -27,7 +27,7 @@ describe('knowledge formatter', () => {
       description: 'Generate image preview workflows.',
       docType: 'project',
       sourceId: 'workspace',
-    })).toContain('项目文档')
+    })).toBe('工作区项目文档摘要：Generate image preview workflows.')
   })
 
   it('keeps branch and tag labels metadata-driven', () => {

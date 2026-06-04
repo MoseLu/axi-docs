@@ -11,7 +11,7 @@ export const pageCopy = {
     title: '直接进入知识关系图谱',
     description: '首页只保留全局关系视图，先看节点、连接和分支，再决定是否进入分类导航或打开原文。',
     actionPrimary: '打开分类图谱',
-    actionSecondary: '进入搜索页',
+    actionSecondary: '使用顶部搜索',
     commandLabel: '搜索知识库',
     commandPlaceholder: '搜索问题、组件、规范、ADR、排障记录',
     metrics: ['知识文档', '经验层级', '高频标签'],
@@ -33,11 +33,6 @@ export const pageCopy = {
     summaryTab: '关系摘要',
     previewTab: '原文预览',
     readingTab: '延伸阅读',
-  },
-  search: {
-    title: '全局搜索工作台',
-    description: '直接进入检索、筛选、预览和跳转，不再保留大 Hero 区。',
-    queryIdle: '输入关键词开始搜索',
   },
   document: {
     description: '阅读完整文档内容，并沿着目录、相关节点与推荐路线继续深入。',

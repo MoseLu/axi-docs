@@ -73,7 +73,7 @@ export function buildSearchRoute(keyword: string, sourceId?: string | null): str
   const normalizedKeyword = keyword.trim()
 
   if (normalizedKeyword) {
-    params.set('keyword', normalizedKeyword)
+    params.set('q', normalizedKeyword)
   }
 
   if (sourceId) {
@@ -81,7 +81,7 @@ export function buildSearchRoute(keyword: string, sourceId?: string | null): str
   }
 
   const search = params.toString()
-  return search ? `/search?${search}` : '/search'
+  return search ? `/?${search}` : '/'
 }
 
 export function normalizeCategoryRoute(categoryId?: string | null, subId?: string | null): KnowledgeCategoryKey | null {
@@ -118,6 +118,20 @@ export function buildBrowserPathFromLegacyHashRoute(
 
   const routePath = location.hash.slice(1)
   const routerBase = normalizeRouterBasename(basename) || ''
+  if (routePath === '/search' || routePath.startsWith('/search?')) {
+    const legacySearch = new URLSearchParams(routePath.split('?')[1] || '')
+    const query = legacySearch.get('keyword') || legacySearch.get('q') || ''
+    const source = legacySearch.get('source') || ''
+    const next = new URLSearchParams()
+
+    if (query) next.set('q', query)
+    if (source) next.set('source', source)
+
+    const search = next.toString()
+    const homePath = routerBase ? `${routerBase}/` : '/'
+    return search ? `${homePath}?${search}` : homePath
+  }
+
   const basePrefixedPath = routerBase && !routePath.startsWith(`${routerBase}/`) && routePath !== routerBase
     ? `${routerBase}${routePath}`
     : routePath

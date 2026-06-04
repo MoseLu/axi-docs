@@ -1,12 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
-import { Route, Routes, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Navigate, Route, Routes, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Header } from './components/Header'
 import { CategoryGraphPage } from './components/CategoryGraphPage'
 import { DocumentDetailPage } from './components/DocumentDetailPage'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { KnowledgeWorkbench } from './components/KnowledgeWorkbench'
 import { NotFoundPage } from './components/NotFoundPage'
-import { SearchPage } from './components/SearchPage'
 import { KNOWLEDGE_CATEGORY_ORDER, getKnowledgeCategoryMeta, normalizeKnowledgeCategoryKey } from './config/knowledgeRules'
 import {
   getKnowledgeCatalog as loadKnowledgeCatalog,
@@ -17,7 +16,7 @@ import {
 import { buildCategoryRoute, buildDocumentRoute, decodeDocumentId, encodeDocumentId, normalizeCategoryRoute } from './lib/routes'
 import { DocSource, KnowledgeCatalog, KnowledgeCatalogItem, SearchResult, SearchSuggestion, SelectedFile } from './types'
 
-type PageMode = 'home' | 'category' | 'search' | 'document'
+type PageMode = 'home' | 'category' | 'document'
 type ParamUpdates = Record<string, string | null | undefined>
 
 function flattenCatalogItems(catalog: KnowledgeCatalog | null): KnowledgeCatalogItem[] {
@@ -38,9 +37,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
   const previewDocument = pageMode === 'document'
     ? routeDocument
     : decodeDocumentId(searchParams.get('doc') || '')
-  const urlSearchQuery = pageMode === 'search'
-    ? searchParams.get('keyword') || ''
-    : searchParams.get('q') || ''
+  const urlSearchQuery = searchParams.get('q') || searchParams.get('keyword') || ''
 
   const [sources, setSources] = useState<DocSource[]>([])
   const [activeSource, setActiveSource] = useState(searchParams.get('source') || routeDocument?.sourceId || 'workspace')
@@ -55,7 +52,6 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
   const [catalog, setCatalog] = useState<KnowledgeCatalog | null>(null)
   const [catalogLoading, setCatalogLoading] = useState(false)
   const [catalogError, setCatalogError] = useState<string | null>(null)
-  const [searchActiveCategory, setSearchActiveCategory] = useState<string | null>(null)
   const abortRef = useRef<AbortController | null>(null)
   const searchAbortRef = useRef<AbortController | null>(null)
 
@@ -330,17 +326,6 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
     )
   }, [defaultCategoryKey, navigateWithParams, workspaceSource?.id])
 
-  const handleNavigateSearch = useCallback(() => {
-    navigateWithParams('/search', {
-      keyword: searchQuery.trim() ? searchQuery : null,
-      q: null,
-      doc: null,
-      branch: null,
-      node: null,
-      view: null,
-    })
-  }, [navigateWithParams, searchQuery])
-
   const handleSelectSource = useCallback((sourceId: string) => {
     if (sourceId !== activeSource) {
       setActiveSource(sourceId)
@@ -415,40 +400,32 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
     setFileContent(null)
     setFileName('')
 
-    if (pageMode === 'search') {
-      syncParams({
-        keyword: query.trim() ? query : null,
-        doc: null,
-      }, false)
-      return
-    }
-
     syncParams({
       q: query.trim() ? query : null,
+      keyword: null,
       doc: null,
       node: null,
     }, false)
-  }, [pageMode, syncParams])
+  }, [syncParams])
 
   const handleSearchSubmit = useCallback((query: string) => {
     const normalizedQuery = query.trim()
     setActiveTag(null)
-    setSearchActiveCategory(null)
     setSearchQuery(normalizedQuery)
     setSelectedFile(null)
     setFileContent(null)
     setFileName('')
 
-    navigateWithParams('/search', {
-      keyword: normalizedQuery || null,
-      q: null,
+    navigateWithParams('/', {
+      q: normalizedQuery || null,
+      keyword: null,
       tag: null,
       doc: null,
       branch: null,
       node: null,
       view: null,
-    }, pageMode === 'search')
-  }, [navigateWithParams, pageMode])
+    })
+  }, [navigateWithParams])
 
   const handleSuggestionSelect = useCallback((suggestion: SearchSuggestion) => {
     if (suggestion.kind === 'document' && suggestion.sourceId && suggestion.path) {
@@ -473,8 +450,9 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
 
   const handleWikiLink = useCallback((noteName: string) => {
     if (pageMode === 'document') {
-      navigateWithParams('/search', {
-        keyword: noteName,
+      navigateWithParams('/', {
+        q: noteName,
+        keyword: null,
         source: activeSource,
         doc: null,
       })
@@ -517,13 +495,6 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
     branch: null,
     view: 'tree',
   }), [buildHref, categoryTargetSource])
-  const getGraphHref = useCallback((route: string, sourceId: string, path: string) => buildHref(route, {
-    source: sourceId,
-    doc: encodeDocumentId({ sourceId, path }),
-    node: path,
-    branch: null,
-    view: 'tree',
-  }), [buildHref])
   const documentGraphHref = useMemo(() => {
     if (!effectiveSelectedFile) return categoryHref
 
@@ -592,34 +563,12 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
                 />
               ) : (
                 <NotFoundPage
-                  description="当前文档链接无法解析到有效内容。你可以返回首页重新打开文档，或直接去搜索页重新定位知识点。"
+                  description="当前文档链接无法解析到有效内容。你可以返回首页重新打开文档，或通过顶部搜索重新定位知识点。"
                   onPrimaryAction={handleNavigateHome}
-                  onSecondaryAction={handleNavigateSearch}
+                  onSecondaryAction={handleNavigateCategory}
                   title="文档不存在或链接已失效"
                 />
               )
-            ) : pageMode === 'search' ? (
-              <SearchPage
-                activeCategory={searchActiveCategory}
-                catalog={catalog}
-                fileContent={fileContent}
-                fileLoading={loading}
-                fileName={fileName}
-                onNavigateHome={handleNavigateHome}
-                onClearSelectedFile={handleClearSelectedFile}
-                onPreviewItem={handleOpenPreview}
-                onSearch={handleSearch}
-                onSetActiveCategory={setSearchActiveCategory}
-                getDocumentHref={getDocumentHref}
-                getGraphHref={getGraphHref}
-                onTagSelect={handleTagSelect}
-                onWikiLink={handleWikiLink}
-                searchQuery={searchQuery}
-                searchResults={searchResults || []}
-                searching={searching}
-                selectedFile={selectedFile}
-                source={workspaceSource || currentSource || { id: 'obsidian', name: '知识文档', path: '', enabled: true, type: 'local' }}
-              />
             ) : pageMode === 'category' ? (
               workspaceSource ? (
                 <CategoryGraphPage
@@ -692,13 +641,25 @@ function RouteFallback() {
   return (
     <div className="standalone-route">
       <NotFoundPage
-        description="当前页面路径没有匹配到任何文档页面。请返回首页，或进入搜索页重新定位内容。"
+        description="当前页面路径没有匹配到任何文档页面。请返回首页重新定位内容。"
         onPrimaryAction={() => navigate('/')}
-        onSecondaryAction={() => navigate('/search')}
+        onSecondaryAction={() => navigate('/')}
         title="页面不存在"
       />
     </div>
   )
+}
+
+function LegacySearchRedirect() {
+  const [searchParams] = useSearchParams()
+  const next = new URLSearchParams()
+  const query = searchParams.get('keyword') || searchParams.get('q') || ''
+  const source = searchParams.get('source') || ''
+
+  if (query) next.set('q', query)
+  if (source) next.set('source', source)
+
+  return <Navigate replace to={{ pathname: '/', search: next.toString() ? `?${next}` : '' }} />
 }
 
 function App() {
@@ -708,7 +669,7 @@ function App() {
       <Route path="/nodes/:categoryId" element={<HubPage pageMode="category" />} />
       <Route path="/nodes/:categoryId/sub/:subId" element={<HubPage pageMode="category" />} />
       <Route path="/doc/:docId" element={<HubPage pageMode="document" />} />
-      <Route path="/search" element={<HubPage pageMode="search" />} />
+      <Route path="/search" element={<LegacySearchRedirect />} />
       <Route path="*" element={<RouteFallback />} />
     </Routes>
   )

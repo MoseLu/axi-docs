@@ -49,6 +49,7 @@ export function KnowledgeWorkbench({
   catalog,
   searchQuery,
   searchResults,
+  searching,
   selectedFile,
   fileContent,
   fileName,
@@ -123,7 +124,9 @@ export function KnowledgeWorkbench({
         onOpenItem={onOpenItem}
         onSourceSelect={onSourceSelect}
         onTagSelect={onTagSelect}
+        searching={searching}
         searchQuery={searchQuery}
+        searchResults={searchResults}
         selectedFile={selectedFile}
         source={source}
         sources={sources}

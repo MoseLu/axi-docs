@@ -1,4 +1,4 @@
-import { DocSource, KnowledgeCatalog, SelectedFile } from '../types'
+import { DocSource, KnowledgeCatalog, SearchResult, SelectedFile } from '../types'
 import { PageShell } from './CockpitPrimitives'
 
 export interface QuickKnowledgeItemLike {
@@ -14,6 +14,8 @@ interface HomeCommandCenterProps {
   source: DocSource
   sources: DocSource[]
   catalog: KnowledgeCatalog | null
+  searchResults?: SearchResult[] | null
+  searching?: boolean
   searchQuery: string
   activeTag: string | null
   selectedFile: SelectedFile | null
@@ -29,6 +31,9 @@ export function HomeCommandCenter({
   source,
   sources,
   catalog,
+  searchResults,
+  searching = false,
+  searchQuery,
   onOpenExplorer,
   onOpenItem,
   onSourceSelect,
@@ -38,6 +43,8 @@ export function HomeCommandCenter({
   const primarySections = catalog?.sections.slice(0, 4) || []
   const featuredDocs = catalog?.recentDocs.slice(0, 4) || []
   const currentSourceName = source.name || '当前文档库'
+  const normalizedSearchQuery = searchQuery.trim()
+  const visibleSearchResults = (searchResults || []).slice(0, 8)
 
   return (
     <PageShell className="axi-docs-home" compact>
@@ -114,6 +121,33 @@ export function HomeCommandCenter({
             <p>本地启动 React 文档站，使用顶部搜索或左侧来源导航进入具体文档。</p>
           </div>
         </section>
+
+        {normalizedSearchQuery && (
+          <section className="axi-docs-home__section axi-docs-home__section--search-results" aria-live="polite">
+            <div className="axi-docs-home__section-heading">
+              <span>Search</span>
+              <h2>“{normalizedSearchQuery}” 的匹配文档</h2>
+            </div>
+            {searching ? (
+              <div className="axi-docs-home__code-card">
+                <p>正在检索文档库...</p>
+              </div>
+            ) : visibleSearchResults.length > 0 ? (
+              <div className="axi-docs-home__recent-list">
+                {visibleSearchResults.map((item) => (
+                  <button key={`${item.sourceId}:${item.path}`} onClick={() => onOpenItem(item.sourceId, item.path)} type="button">
+                    <strong>{item.title || item.name}</strong>
+                    <span>{item.description || item.snippet || item.path}</span>
+                  </button>
+                ))}
+              </div>
+            ) : (
+              <div className="axi-docs-home__code-card">
+                <p>没有找到匹配文档。换一个关键词，或从下方推荐阅读路径继续浏览。</p>
+              </div>
+            )}
+          </section>
+        )}
 
         <section className="axi-docs-home__section" id="guides">
           <div className="axi-docs-home__section-heading">

@@ -13,7 +13,7 @@ function locationLike(pathname: string, search = '', hash = ''): Pick<Location, 
 
 describe('route helpers', () => {
   it('builds application routes without hash fragments', () => {
-    expect(buildSearchRoute('axi', 'workspace')).toBe('/search?keyword=axi&source=workspace')
+    expect(buildSearchRoute('axi', 'workspace')).toBe('/?q=axi&source=workspace')
     expect(buildCategoryRoute('guide')).toBe('/nodes/guide')
     expect(buildDocumentRoute({ sourceId: 'workspace', path: 'projects/axi-docs.md' })).toMatch(/^\/doc\//u)
   })
@@ -31,11 +31,11 @@ describe('route helpers', () => {
     )).toBe('/')
     expect(buildBrowserPathFromLegacyHashRoute(
       locationLike('/', '', '#/search?keyword=axi'),
-    )).toBe('/search?keyword=axi')
+    )).toBe('/?q=axi')
     expect(buildBrowserPathFromLegacyHashRoute(
       locationLike('/docs/', '', '#/search?keyword=axi'),
       '/docs/',
-    )).toBe('/docs/search?keyword=axi')
+    )).toBe('/docs/?q=axi')
   })
 
   it('keeps normal document anchors untouched', () => {

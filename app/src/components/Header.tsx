@@ -159,9 +159,7 @@ export function Header({
     setInputValue('')
     setSuggestions([])
     setActiveIndex(-1)
-    if (pageMode === 'search') {
-      onSearchChange('')
-    }
+    onSearchChange('')
   }
 
   const pickSuggestion = (suggestion: SearchSuggestion) => {
@@ -199,7 +197,6 @@ export function Header({
     { label: '指南', to: homeHref, active: pageMode === 'home' || pageMode === 'document' },
     { label: '技能库', to: '/?source=axi-skills', active: false },
     { label: '工作区', to: '/?source=workspace', active: false },
-    { label: '搜索', to: '/search', active: pageMode === 'search' },
   ]
 
   const searchModal = searchOpen ? createPortal(
@@ -287,7 +284,7 @@ export function Header({
               </span>
               <span className="header-search__suggestion-copy">
                 <strong>搜索全部：{trimmedInput}</strong>
-                <small>进入全局搜索工作台</small>
+                <small>在首页收起式展示匹配文档</small>
               </span>
             </button>
 
@@ -340,7 +337,7 @@ export function Header({
             type="button"
           >
             <span className="search-icon-wrap" data-testid="search-icon-wrap">
-              {searching && pageMode === 'search' ? (
+              {searching ? (
                 <span className="search-spinner" />
               ) : (
                 <SearchIcon />

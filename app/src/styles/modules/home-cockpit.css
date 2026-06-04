@@ -8,6 +8,489 @@
   min-height: 520px;
 }
 
+.app-layout--home,
+.app-main--home {
+  --axi-doc-vp-c-bg: #1b1b1f;
+  --axi-doc-vp-c-bg-alt: #161618;
+  --axi-doc-vp-c-bg-soft: #202127;
+  --axi-doc-vp-c-divider: #2e2e32;
+  --axi-doc-vp-c-border: #3c3f44;
+  --axi-doc-vp-c-text-1: #dfdfd6;
+  --axi-doc-vp-c-text-2: #98989f;
+  --axi-doc-vp-c-text-3: #6a6a71;
+  --axi-doc-vp-c-brand-1: #a8b1ff;
+  --axi-doc-vp-c-brand-2: #bcc2ff;
+  --axi-doc-vp-c-brand-soft: rgba(100, 108, 255, 0.16);
+  --axi-doc-vp-layout-max-width: 1440px;
+  --axi-doc-vp-nav-height: 64px;
+  --axi-doc-vp-sidebar-width: 272px;
+  --axi-doc-vp-aside-width: 224px;
+  --header-height: var(--axi-doc-vp-nav-height);
+}
+
+.app-layout--home {
+  background: var(--axi-doc-vp-c-bg);
+}
+
+.app-layout--home .app-header--command {
+  position: sticky;
+  top: 0;
+  z-index: 30;
+  height: var(--axi-doc-vp-nav-height);
+  min-height: var(--axi-doc-vp-nav-height);
+  gap: 0;
+  padding: 0;
+  border-bottom: 1px solid var(--axi-doc-vp-c-divider);
+  background: rgba(27, 27, 31, 0.96);
+  box-shadow: none;
+  backdrop-filter: blur(12px);
+}
+
+.app-layout--home .app-logo {
+  width: var(--axi-doc-vp-sidebar-width);
+  height: var(--axi-doc-vp-nav-height);
+  padding: 0 32px;
+  color: var(--axi-doc-vp-c-text-1);
+  border-bottom: 1px solid var(--axi-doc-vp-c-divider);
+}
+
+.app-layout--home .app-logo svg {
+  color: var(--axi-doc-vp-c-brand-1);
+}
+
+.app-layout--home .app-logo__copy span {
+  color: var(--axi-doc-vp-c-text-1);
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.app-layout--home .app-logo__copy small {
+  color: var(--axi-doc-vp-c-text-3);
+}
+
+.app-layout--home .header-actions {
+  min-width: 0;
+  height: var(--axi-doc-vp-nav-height);
+  flex: 1;
+  margin-left: 0;
+  padding: 0 32px;
+  justify-content: flex-end;
+  gap: 16px;
+}
+
+.app-layout--home .header-search--global {
+  width: min(300px, 30vw);
+  max-width: 300px;
+  border: 0;
+  background: transparent;
+}
+
+.app-layout--home .header-search--global .header-search-input {
+  height: 40px;
+  border-color: var(--axi-doc-vp-c-divider);
+  border-radius: 8px;
+  background: var(--axi-doc-vp-c-bg-soft);
+  color: var(--axi-doc-vp-c-text-1);
+  font-size: 13px;
+}
+
+.app-layout--home .header-search--global .header-search-input:focus {
+  border-color: var(--axi-doc-vp-c-brand-1);
+  box-shadow: 0 0 0 2px var(--axi-doc-vp-c-brand-soft);
+}
+
+.app-main--home {
+  background: var(--axi-doc-vp-c-bg);
+}
+
+.knowledge-workbench--home {
+  overflow: auto;
+  padding: 0;
+  background: var(--axi-doc-vp-c-bg);
+}
+
+.axi-docs-home {
+  min-height: 100%;
+  max-width: var(--axi-doc-vp-layout-max-width);
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: var(--axi-doc-vp-sidebar-width) minmax(0, 1fr) var(--axi-doc-vp-aside-width);
+  gap: 0;
+  color: var(--axi-doc-vp-c-text-1);
+  background: var(--axi-doc-vp-c-bg);
+}
+
+.axi-docs-home__sidebar,
+.axi-docs-home__outline {
+  position: sticky;
+  top: var(--axi-doc-vp-nav-height);
+  align-self: start;
+  height: calc(100vh - var(--axi-doc-vp-nav-height));
+  overflow: auto;
+}
+
+.axi-docs-home__sidebar {
+  padding: 24px 20px 40px;
+  border-right: 1px solid var(--axi-doc-vp-c-divider);
+  background: var(--axi-doc-vp-c-bg-alt);
+}
+
+.axi-docs-home__sidebar-block {
+  display: grid;
+  gap: 4px;
+  padding-bottom: 22px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--axi-doc-vp-c-divider);
+}
+
+.axi-docs-home__sidebar-block:last-child {
+  border-bottom: 0;
+}
+
+.axi-docs-home__nav-label {
+  display: block;
+  margin-bottom: 8px;
+  color: var(--axi-doc-vp-c-text-1);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.axi-docs-home__nav-link,
+.axi-docs-home__source-link {
+  min-height: 32px;
+  border-radius: 8px;
+  color: var(--axi-doc-vp-c-text-2);
+  font-size: 14px;
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+.axi-docs-home__nav-link {
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+}
+
+.axi-docs-home__nav-link:hover,
+.axi-docs-home__nav-link.active {
+  color: var(--axi-doc-vp-c-brand-1);
+  background: var(--axi-doc-vp-c-brand-soft);
+  text-decoration: none;
+}
+
+.axi-docs-home__source-link {
+  display: grid;
+  gap: 2px;
+  width: 100%;
+  padding: 9px 12px;
+  border: 0;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+
+.axi-docs-home__source-link span {
+  color: inherit;
+  font-weight: 600;
+}
+
+.axi-docs-home__source-link small {
+  color: var(--axi-doc-vp-c-text-3);
+  font-size: 11px;
+  text-transform: uppercase;
+}
+
+.axi-docs-home__source-link:hover,
+.axi-docs-home__source-link.active {
+  color: var(--axi-doc-vp-c-brand-1);
+  background: var(--axi-doc-vp-c-bg-soft);
+}
+
+.axi-docs-home__content {
+  min-width: 0;
+  padding: 48px 56px 80px;
+}
+
+.axi-docs-home__hero {
+  padding-bottom: 42px;
+  border-bottom: 1px solid var(--axi-doc-vp-c-divider);
+}
+
+.axi-docs-home__eyebrow,
+.axi-docs-home__section-heading span {
+  color: var(--axi-doc-vp-c-brand-1);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.axi-docs-home__hero h1 {
+  max-width: 760px;
+  margin: 14px 0 18px;
+  color: var(--axi-doc-vp-c-text-1);
+  font-size: clamp(40px, 5.4vw, 72px);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  text-wrap: balance;
+}
+
+.axi-docs-home__hero p {
+  max-width: 720px;
+  margin: 0;
+  color: var(--axi-doc-vp-c-text-2);
+  font-size: 18px;
+  line-height: 1.72;
+}
+
+.axi-docs-home__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.axi-docs-home__primary-action,
+.axi-docs-home__secondary-action {
+  min-height: 42px;
+  border-radius: 999px;
+  padding: 0 20px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.16s, border-color 0.16s, color 0.16s;
+}
+
+.axi-docs-home__primary-action {
+  border: 1px solid transparent;
+  background: var(--axi-doc-vp-c-brand-1);
+  color: #101014;
+}
+
+.axi-docs-home__primary-action:hover {
+  background: var(--axi-doc-vp-c-brand-2);
+}
+
+.axi-docs-home__secondary-action {
+  border: 1px solid var(--axi-doc-vp-c-divider);
+  background: var(--axi-doc-vp-c-bg-soft);
+  color: var(--axi-doc-vp-c-text-1);
+}
+
+.axi-docs-home__secondary-action:hover {
+  border-color: var(--axi-doc-vp-c-brand-1);
+  color: var(--axi-doc-vp-c-brand-1);
+}
+
+.axi-docs-home__feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  padding: 32px 0 18px;
+}
+
+.axi-docs-home__feature-grid article,
+.axi-docs-home__code-card,
+.axi-docs-home__guide-list button,
+.axi-docs-home__recent-list button,
+.axi-docs-home__outline-card {
+  border: 1px solid var(--axi-doc-vp-c-divider);
+  border-radius: 12px;
+  background: var(--axi-doc-vp-c-bg-soft);
+}
+
+.axi-docs-home__feature-grid article {
+  padding: 20px;
+}
+
+.axi-docs-home__feature-grid article span {
+  color: var(--axi-doc-vp-c-brand-1);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.axi-docs-home__feature-grid h2 {
+  margin: 12px 0 10px;
+  color: var(--axi-doc-vp-c-text-1);
+  font-size: 18px;
+  letter-spacing: -0.02em;
+}
+
+.axi-docs-home__feature-grid p,
+.axi-docs-home__code-card p,
+.axi-docs-home__guide-list span,
+.axi-docs-home__recent-list span,
+.axi-docs-home__outline-card p {
+  margin: 0;
+  color: var(--axi-doc-vp-c-text-2);
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.axi-docs-home__section {
+  padding: 32px 0 0;
+}
+
+.axi-docs-home__section-heading {
+  display: grid;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.axi-docs-home__section-heading h2 {
+  margin: 0;
+  color: var(--axi-doc-vp-c-text-1);
+  font-size: 28px;
+  letter-spacing: -0.03em;
+}
+
+.axi-docs-home__code-card {
+  display: grid;
+  gap: 10px;
+  padding: 18px 20px;
+}
+
+.axi-docs-home__code-card code {
+  display: block;
+  width: fit-content;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #111113;
+  color: var(--axi-doc-vp-c-brand-1);
+  font-family: var(--font-family-mono);
+}
+
+.axi-docs-home__guide-list,
+.axi-docs-home__recent-list {
+  display: grid;
+  gap: 12px;
+}
+
+.axi-docs-home__guide-list {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.axi-docs-home__guide-list button,
+.axi-docs-home__recent-list button {
+  display: grid;
+  gap: 8px;
+  padding: 18px 20px;
+  color: var(--axi-doc-vp-c-text-1);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 0.16s, background 0.16s;
+}
+
+.axi-docs-home__guide-list button:hover,
+.axi-docs-home__recent-list button:hover {
+  border-color: var(--axi-doc-vp-c-brand-1);
+}
+
+.axi-docs-home__guide-list strong,
+.axi-docs-home__recent-list strong,
+.axi-docs-home__outline-card strong {
+  color: var(--axi-doc-vp-c-text-1);
+  font-size: 16px;
+}
+
+.axi-docs-home__guide-list small {
+  color: var(--axi-doc-vp-c-text-3);
+  font-size: 12px;
+}
+
+.axi-docs-home__outline {
+  padding: 48px 24px 40px 0;
+}
+
+.axi-docs-home__outline-card {
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background: transparent;
+}
+
+.axi-docs-home__outline-card a {
+  color: var(--axi-doc-vp-c-text-2);
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.axi-docs-home__outline-card a:hover {
+  color: var(--axi-doc-vp-c-brand-1);
+  text-decoration: none;
+}
+
+.axi-docs-home__outline-card small {
+  color: var(--axi-doc-vp-c-text-3);
+}
+
+@media (min-width: 1440px) {
+  .app-layout--home .app-logo {
+    margin-left: calc((100vw - var(--axi-doc-vp-layout-max-width)) / 2);
+  }
+
+  .app-layout--home .header-actions {
+    margin-right: calc((100vw - var(--axi-doc-vp-layout-max-width)) / 2);
+  }
+}
+
+@media (max-width: 1180px) {
+  .axi-docs-home {
+    grid-template-columns: var(--axi-doc-vp-sidebar-width) minmax(0, 1fr);
+  }
+
+  .axi-docs-home__outline {
+    display: none;
+  }
+}
+
+@media (max-width: 860px) {
+  .app-layout--home .app-logo {
+    width: auto;
+    min-width: 0;
+    padding: 0 18px;
+    border-bottom: 0;
+  }
+
+  .app-layout--home .header-actions {
+    padding: 0 16px;
+  }
+
+  .app-layout--home .header-search--global {
+    width: min(240px, 48vw);
+  }
+
+  .axi-docs-home {
+    display: block;
+  }
+
+  .axi-docs-home__sidebar {
+    position: static;
+    height: auto;
+    padding: 18px 20px;
+    border-right: 0;
+    border-bottom: 1px solid var(--axi-doc-vp-c-divider);
+  }
+
+  .axi-docs-home__sidebar-block:first-child {
+    display: none;
+  }
+
+  .axi-docs-home__source-link {
+    display: inline-grid;
+    width: auto;
+    margin-right: 8px;
+  }
+
+  .axi-docs-home__content {
+    padding: 36px 24px 64px;
+  }
+
+  .axi-docs-home__feature-grid,
+  .axi-docs-home__guide-list {
+    grid-template-columns: 1fr;
+  }
+}
+
 .command-center__left {
   display: flex;
   flex-direction: column;

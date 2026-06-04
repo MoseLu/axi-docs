@@ -1,6 +1,5 @@
 import { DocSource, KnowledgeCatalog, SelectedFile } from '../types'
-import { PageShell, RailPanel } from './CockpitPrimitives'
-import { HeroKnowledgeScene } from './HeroKnowledgeScene'
+import { PageShell } from './CockpitPrimitives'
 
 export interface QuickKnowledgeItemLike {
   sourceId: string
@@ -30,128 +29,160 @@ export function HomeCommandCenter({
   source,
   sources,
   catalog,
-  searchQuery,
-  selectedFile,
-  onTagSelect,
   onOpenExplorer,
   onOpenItem,
   onSourceSelect,
-  graphFocusPath,
 }: HomeCommandCenterProps) {
-  const graphMode = selectedFile ? 'focus' : searchQuery.trim() ? 'global' : 'tree'
-  const projectCount = catalog?.sections
-    .flatMap((section) => section.items)
-    .filter((item) => item.docType === 'project').length || 0
   const recentProjects = catalog?.recentDocs.filter((item) => item.docType === 'project').slice(0, 5) || []
   const skillSource = sources.find((item) => item.id === 'axi-skills')
-  const sourceLabel = source.kind === 'workspace-registry'
-    ? 'Workspace'
-    : source.kind === 'skill-library'
-      ? 'Skills'
-      : source.name
-  const metrics = [
-    { label: 'Sources', value: sources.length, helper: '已接入文档库' },
-    { label: 'Projects', value: projectCount, helper: '工作区项目' },
-    { label: 'Documents', value: catalog?.totalDocs || 0, helper: sourceLabel },
-  ]
+  const primarySections = catalog?.sections.slice(0, 4) || []
+  const featuredDocs = catalog?.recentDocs.slice(0, 4) || []
+  const currentSourceName = source.name || '当前文档库'
 
   return (
-    <PageShell className="command-center__home-shell axi-hub-home" compact>
-      <section className="axi-hub-home__main">
-        <div className="axi-hub-home__hero-copy">
-          <span className="axi-hub-home__eyebrow">Axi Knowledge Hub</span>
-          <h1>工作区文档、技能库和 Agent 参考入口</h1>
+    <PageShell className="axi-docs-home" compact>
+      <aside className="axi-docs-home__sidebar" aria-label="文档导航">
+        <div className="axi-docs-home__sidebar-block">
+          <span className="axi-docs-home__nav-label">Getting Started</span>
+          <a className="axi-docs-home__nav-link active" href="#overview">总览</a>
+          <a className="axi-docs-home__nav-link" href="#quick-start">快速开始</a>
+          <a className="axi-docs-home__nav-link" href="#guides">指南</a>
+          <a className="axi-docs-home__nav-link" href="#sources">文档库</a>
+        </div>
+
+        <div className="axi-docs-home__sidebar-block">
+          <span className="axi-docs-home__nav-label">Sources</span>
+          {sources.map((item) => (
+            <button
+              key={item.id}
+              className={`axi-docs-home__source-link${item.id === source.id ? ' active' : ''}`}
+              onClick={() => onSourceSelect(item.id)}
+              type="button"
+            >
+              <span>{item.name}</span>
+              <small>{item.kind || item.adapter || item.type}</small>
+            </button>
+          ))}
+        </div>
+      </aside>
+
+      <main className="axi-docs-home__content" id="overview">
+        <section className="axi-docs-home__hero">
+          <span className="axi-docs-home__eyebrow">Axi Docs</span>
+          <h1>React 体系的专业文档站</h1>
           <p>
-            统一索引 workspace 项目、Axi Skills、Obsidian 与 Blinko。给人看是文档门户，给 agent 用是可检索、可读取的 MCP 知识源。
+            把 workspace 文档、Axi Skills 和长期知识库整理成可阅读、可搜索、可被 agent 调用的统一文档站。
+            首页优先服务阅读路径，知识图谱和多源检索作为进阶能力进入。
           </p>
-          <div className="axi-hub-home__hero-actions">
-            <button className="axi-hub-home__primary-action" onClick={onOpenExplorer} type="button">
-              浏览当前文档库
+          <div className="axi-docs-home__actions">
+            <button className="axi-docs-home__primary-action" onClick={onOpenExplorer} type="button">
+              开始阅读 {currentSourceName}
             </button>
             {skillSource && (
-              <button className="axi-hub-home__ghost-action" onClick={() => onOpenItem('axi-skills', 'docs/SKILL_INDEX.md')} type="button">
-                打开技能目录
+              <button className="axi-docs-home__secondary-action" onClick={() => onOpenItem('axi-skills', 'docs/SKILL_INDEX.md')} type="button">
+                查看 Axi Skills
               </button>
             )}
           </div>
-        </div>
+        </section>
 
-        <div className="axi-hub-home__metrics">
-          {metrics.map((metric) => (
-            <div key={metric.label} className="axi-hub-home__metric-card">
-              <span>{metric.label}</span>
-              <strong>{metric.value}</strong>
-              <small>{metric.helper}</small>
-            </div>
-          ))}
-        </div>
+        <section className="axi-docs-home__feature-grid" aria-label="核心能力">
+          <article>
+            <span>01</span>
+            <h2>Docs-first 阅读流</h2>
+            <p>清晰标题、稳定导航、正文优先布局和页内目录，让文档站先像文档站。</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h2>多源知识入口</h2>
+            <p>保留 workspace、skills、Obsidian 等来源，但把它们组织成可浏览的文档库。</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h2>Agent-ready</h2>
+            <p>MCP 读取、搜索和项目摘要继续服务 agent，不挤占人的阅读主路径。</p>
+          </article>
+        </section>
 
-        <section className="axi-hub-home__library-panel">
-          <div className="axi-hub-home__section-heading">
-            <span>Libraries</span>
-            <strong>文档库入口</strong>
+        <section className="axi-docs-home__section" id="quick-start">
+          <div className="axi-docs-home__section-heading">
+            <span>Quick Start</span>
+            <h2>从当前文档库开始</h2>
           </div>
-          <div className="axi-hub-home__sources">
-            {sources.map((item) => (
-              <button
-                key={item.id}
-                className={`axi-hub-home__source-card${item.id === source.id ? ' active' : ''}`}
-                onClick={() => onSourceSelect(item.id)}
-                type="button"
-              >
-                <span className="axi-hub-home__source-kind">{item.kind || item.adapter || item.type}</span>
-                <strong>{item.name}</strong>
-                <small>{item.description || item.id}</small>
-              </button>
-            ))}
+          <div className="axi-docs-home__code-card">
+            <code>pnpm dev</code>
+            <p>本地启动 React 文档站，使用顶部搜索或左侧来源导航进入具体文档。</p>
           </div>
         </section>
-      </section>
 
-      <aside className="axi-hub-home__side">
-        <RailPanel className="axi-hub-home__panel" tone="secondary">
-          <div className="axi-hub-home__section-heading">
-            <span>Workspace</span>
-            <h2>近期项目入口</h2>
+        <section className="axi-docs-home__section" id="guides">
+          <div className="axi-docs-home__section-heading">
+            <span>Guides</span>
+            <h2>推荐阅读路径</h2>
           </div>
-          <div className="axi-hub-home__list">
-            {recentProjects.length > 0 ? recentProjects.map((item) => (
-              <button key={`${item.sourceId}:${item.path}`} onClick={() => onOpenItem(item.sourceId, item.path)} type="button">
-                <strong>{item.title}</strong>
-                <span>{item.description || item.path}</span>
+          <div className="axi-docs-home__guide-list">
+            {primarySections.length > 0 ? primarySections.map((section) => (
+              <button
+                key={section.key}
+                onClick={onOpenExplorer}
+                type="button"
+              >
+                <strong>{section.title}</strong>
+                <span>{section.description}</span>
+                <small>{section.count} 篇文档</small>
               </button>
-            )) : <p>workspace catalog 正在生成或暂无项目数据。</p>}
+            )) : (
+              <>
+                <button onClick={onOpenExplorer} type="button">
+                  <strong>浏览当前文档库</strong>
+                  <span>打开目录树、路径视图和知识分类，定位可以继续阅读的文档。</span>
+                  <small>{currentSourceName}</small>
+                </button>
+                {skillSource && (
+                  <button onClick={() => onOpenItem('axi-skills', 'docs/SKILL_INDEX.md')} type="button">
+                    <strong>Axi Skills 指南</strong>
+                    <span>进入技能索引，查看 agent 工作流和可复用操作说明。</span>
+                    <small>skill-library</small>
+                  </button>
+                )}
+              </>
+            )}
           </div>
-        </RailPanel>
+        </section>
 
-        <RailPanel className="axi-hub-home__panel axi-hub-home__panel--skill" tone="secondary">
-          <div className="axi-hub-home__section-heading">
-            <span>Agent</span>
-            <h2>Axi Skills 子库</h2>
-          </div>
-          <p>{skillSource?.description || '共享技能库 source 尚未可用。'}</p>
-          {skillSource && (
-            <button className="axi-hub-home__open-skill" onClick={() => onOpenItem('axi-skills', 'docs/SKILL_INDEX.md')} type="button">
-              打开技能索引
-            </button>
-          )}
-        </RailPanel>
+        {featuredDocs.length > 0 && (
+          <section className="axi-docs-home__section">
+            <div className="axi-docs-home__section-heading">
+              <span>Recent</span>
+              <h2>最近更新</h2>
+            </div>
+            <div className="axi-docs-home__recent-list">
+              {featuredDocs.map((item) => (
+                <button key={`${item.sourceId}:${item.path}`} onClick={() => onOpenItem(item.sourceId, item.path)} type="button">
+                  <strong>{item.title}</strong>
+                  <span>{item.description || item.path}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+      </main>
 
-        <RailPanel className="axi-hub-home__graph-card" tone="ghost">
-          <div className="axi-hub-home__section-heading">
-            <span>Map</span>
-            <h2>知识图谱</h2>
-          </div>
-          <div className="command-center__graph">
-            <HeroKnowledgeScene
-              focusPath={graphFocusPath}
-              mode={graphMode}
-              onNavigate={(path) => onOpenItem(source.id, path)}
-              onTagSelect={onTagSelect}
-              sourceId={source.id}
-            />
-          </div>
-        </RailPanel>
+      <aside className="axi-docs-home__outline" aria-label="页面导航">
+        <div className="axi-docs-home__outline-card">
+          <span className="axi-docs-home__nav-label">On this page</span>
+          <a href="#overview">总览</a>
+          <a href="#quick-start">快速开始</a>
+          <a href="#guides">推荐阅读路径</a>
+          <a href="#sources">文档库</a>
+        </div>
+
+        <div className="axi-docs-home__outline-card" id="sources">
+          <span className="axi-docs-home__nav-label">Current source</span>
+          <strong>{currentSourceName}</strong>
+          <p>{source.description || '当前文档库已经接入 Axi Docs。'}</p>
+          {recentProjects.length > 0 && <small>{recentProjects.length} 个近期项目入口</small>}
+        </div>
       </aside>
     </PageShell>
   )

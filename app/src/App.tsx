@@ -43,7 +43,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
     : searchParams.get('q') || ''
 
   const [sources, setSources] = useState<DocSource[]>([])
-  const [activeSource, setActiveSource] = useState(searchParams.get('source') || routeDocument?.sourceId || 'obsidian')
+  const [activeSource, setActiveSource] = useState(searchParams.get('source') || routeDocument?.sourceId || 'workspace')
   const [selectedFile, setSelectedFile] = useState<SelectedFile | null>(() => (pageMode === 'document' ? null : previewDocument))
   const [fileContent, setFileContent] = useState<string | null>(null)
   const [fileName, setFileName] = useState('')

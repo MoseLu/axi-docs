@@ -44,7 +44,7 @@ export function Header({
   }, [searchQuery])
 
   useEffect(() => {
-    if (pageMode !== 'document') {
+    if (pageMode === 'category') {
       setNavOpen(false)
       document.documentElement.classList.remove('axi-doc-nav-open')
       return undefined
@@ -123,9 +123,9 @@ export function Header({
     onSuggestionSelect(suggestion)
   }
 
-  const documentNavItems = [
-    { label: '指南', to: homeHref, active: pageMode === 'home' },
-    { label: '技能库', to: '/?source=axi-skills', active: pageMode === 'document' },
+  const topNavItems = [
+    { label: '指南', to: homeHref, active: pageMode === 'home' || pageMode === 'document' },
+    { label: '技能库', to: '/?source=axi-skills', active: false },
     { label: '工作区', to: '/?source=workspace', active: false },
     { label: '搜索', to: '/search', active: pageMode === 'search' },
   ]
@@ -247,10 +247,10 @@ export function Header({
           )}
         </div>
 
-        {pageMode === 'document' && (
+        {pageMode !== 'category' && (
           <>
             <nav aria-label="顶部导航" className="header-vp-nav">
-              {documentNavItems.map((item) => (
+              {topNavItems.map((item) => (
                 <Link
                   key={item.label}
                   className={`header-vp-nav__link${item.active ? ' active' : ''}`}
@@ -276,10 +276,10 @@ export function Header({
         )}
       </div>
 
-      {pageMode === 'document' && navOpen && (
+      {pageMode !== 'category' && navOpen && (
         <div className="header-vp-screen">
           <nav aria-label="移动端顶部导航">
-            {documentNavItems.map((item) => (
+            {topNavItems.map((item) => (
               <Link
                 key={`${item.label}:screen`}
                 className={`header-vp-screen__link${item.active ? ' active' : ''}`}

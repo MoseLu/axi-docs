@@ -43,14 +43,15 @@ describe('Header', () => {
   it('renders brand and global search input', () => {
     renderHeader()
     expect(screen.getByText('Axi Docs')).toBeInTheDocument()
-    expect(screen.getByLabelText('全局搜索')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '全局搜索' })).toBeInTheDocument()
   })
 
   it('debounces live search updates on the search page', async () => {
     const onSearchChange = vi.fn()
     renderHeader({ onSearchChange, pageMode: 'search' })
 
-    fireEvent.change(screen.getByLabelText('全局搜索'), { target: { value: 'graph' } })
+    fireEvent.click(screen.getByRole('button', { name: '全局搜索' }))
+    fireEvent.change(screen.getByLabelText('搜索文档或标签'), { target: { value: 'graph' } })
 
     expect(onSearchChange).not.toHaveBeenCalled()
     await waitFor(() => expect(onSearchChange).toHaveBeenCalledWith('graph'))
@@ -60,22 +61,25 @@ describe('Header', () => {
     const onSearchSubmit = vi.fn()
     renderHeader({ onSearchSubmit })
 
-    const input = screen.getByLabelText('全局搜索')
+    fireEvent.click(screen.getByRole('button', { name: '全局搜索' }))
+
+    const input = screen.getByLabelText('搜索文档或标签')
     fireEvent.change(input, { target: { value: '知识空间' } })
     fireEvent.keyDown(input, { key: 'Enter' })
 
     expect(onSearchSubmit).toHaveBeenCalledWith('知识空间')
   })
 
-  it('clears the current search on Escape when suggestions are closed', async () => {
-    const onSearchChange = vi.fn()
-    renderHeader({ onSearchChange, pageMode: 'search', searchQuery: '已有检索' })
+  it('opens with the global shortcut and closes on Escape', async () => {
+    renderHeader()
 
-    const input = screen.getByLabelText('全局搜索')
+    fireEvent.keyDown(window, { key: 'k', metaKey: true })
+    expect(screen.getByRole('dialog')).toBeInTheDocument()
+
+    const input = screen.getByLabelText('搜索文档或标签')
     fireEvent.keyDown(input, { key: 'Escape' })
 
-    expect(screen.getByDisplayValue('')).toBeInTheDocument()
-    expect(onSearchChange).toHaveBeenCalledWith('')
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
   })
 
   it('shows and selects suggestions', async () => {
@@ -91,8 +95,8 @@ describe('Header', () => {
 
     renderHeader({ onSuggestionSelect })
 
-    const input = screen.getByLabelText('全局搜索')
-    fireEvent.focus(input)
+    fireEvent.click(screen.getByRole('button', { name: '全局搜索' }))
+    const input = screen.getByLabelText('搜索文档或标签')
     fireEvent.change(input, { target: { value: '知识' } })
 
     const suggestion = await screen.findByRole('option', { name: /知识图谱/i })

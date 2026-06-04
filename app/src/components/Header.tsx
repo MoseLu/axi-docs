@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { Link } from 'react-router-dom'
 import { getKnowledgeSearchSuggestions } from '../lib/knowledgeClient'
 import type { SearchSuggestion } from '../types'
@@ -31,17 +32,21 @@ export function Header({
 }: HeaderProps) {
   const [inputValue, setInputValue] = useState(searchQuery)
   const [navOpen, setNavOpen] = useState(false)
+  const [searchOpen, setSearchOpen] = useState(false)
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([])
-  const [suggestionsOpen, setSuggestionsOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(-1)
   const inputRef = useRef<HTMLInputElement | null>(null)
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const suggestionDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const suggestionRequestRef = useRef(0)
 
+  const trimmedInput = inputValue.trim()
+  const documentSuggestions = suggestions.filter((suggestion) => suggestion.kind === 'document')
+  const tagSuggestions = suggestions.filter((suggestion) => suggestion.kind === 'tag')
+
   useEffect(() => {
-    setInputValue(searchQuery)
-  }, [searchQuery])
+    if (!searchOpen) setInputValue(searchQuery)
+  }, [searchOpen, searchQuery])
 
   useEffect(() => {
     if (pageMode === 'category') {
@@ -55,6 +60,43 @@ export function Header({
       document.documentElement.classList.remove('axi-doc-nav-open')
     }
   }, [navOpen, pageMode])
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('axi-search-open', searchOpen)
+    return () => {
+      document.documentElement.classList.remove('axi-search-open')
+    }
+  }, [searchOpen])
+
+  useEffect(() => {
+    if (!searchOpen) return undefined
+
+    const focusTimer = window.setTimeout(() => inputRef.current?.focus(), 0)
+    return () => window.clearTimeout(focusTimer)
+  }, [searchOpen])
+
+  useEffect(() => {
+    const handleGlobalSearchShortcut = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null
+      const isEditable = target?.tagName === 'INPUT'
+        || target?.tagName === 'TEXTAREA'
+        || target?.isContentEditable
+
+      if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === 'k') {
+        event.preventDefault()
+        setSearchOpen(true)
+        return
+      }
+
+      if (!isEditable && event.key === '/') {
+        event.preventDefault()
+        setSearchOpen(true)
+      }
+    }
+
+    window.addEventListener('keydown', handleGlobalSearchShortcut)
+    return () => window.removeEventListener('keydown', handleGlobalSearchShortcut)
+  }, [])
 
   useEffect(() => {
     if (pageMode !== 'search') return undefined
@@ -73,34 +115,41 @@ export function Header({
   useEffect(() => {
     if (suggestionDebounceRef.current) clearTimeout(suggestionDebounceRef.current)
 
-    const trimmed = inputValue.trim()
-    if (!trimmed) {
+    if (!searchOpen || !trimmedInput) {
       setSuggestions([])
-      setSuggestionsOpen(false)
       setActiveIndex(-1)
       return undefined
     }
 
     const requestId = ++suggestionRequestRef.current
     suggestionDebounceRef.current = setTimeout(async () => {
-      const next = await getKnowledgeSearchSuggestions(trimmed)
+      const next = await getKnowledgeSearchSuggestions(trimmedInput)
       if (requestId !== suggestionRequestRef.current) return
 
       setSuggestions(next)
       setActiveIndex(next.length > 0 ? 0 : -1)
-      setSuggestionsOpen(next.length > 0)
     }, 120)
 
     return () => {
       if (suggestionDebounceRef.current) clearTimeout(suggestionDebounceRef.current)
     }
-  }, [inputValue])
+  }, [searchOpen, trimmedInput])
+
+  const closeSearch = () => {
+    setSearchOpen(false)
+    setSuggestions([])
+    setActiveIndex(-1)
+  }
+
+  const openSearch = () => {
+    setInputValue(searchQuery)
+    setSearchOpen(true)
+  }
 
   const submitSearch = (value: string) => {
     const nextValue = value.trim()
     if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current)
-    setSuggestionsOpen(false)
-    setActiveIndex(-1)
+    closeSearch()
     onSearchSubmit(nextValue)
   }
 
@@ -109,7 +158,6 @@ export function Header({
     if (suggestionDebounceRef.current) clearTimeout(suggestionDebounceRef.current)
     setInputValue('')
     setSuggestions([])
-    setSuggestionsOpen(false)
     setActiveIndex(-1)
     if (pageMode === 'search') {
       onSearchChange('')
@@ -118,9 +166,33 @@ export function Header({
 
   const pickSuggestion = (suggestion: SearchSuggestion) => {
     setInputValue(suggestion.query)
-    setSuggestionsOpen(false)
-    setActiveIndex(-1)
+    closeSearch()
     onSuggestionSelect(suggestion)
+  }
+
+  const renderSuggestion = (suggestion: SearchSuggestion) => {
+    const suggestionIndex = suggestions.indexOf(suggestion)
+    return (
+      <button
+        key={`${suggestion.kind}:${suggestion.path || suggestion.label}`}
+        aria-selected={suggestionIndex === activeIndex}
+        className={`header-search__suggestion${suggestionIndex === activeIndex ? ' active' : ''}`}
+        onMouseDown={(event) => {
+          event.preventDefault()
+          pickSuggestion(suggestion)
+        }}
+        role="option"
+        type="button"
+      >
+        <span className="header-search__suggestion-icon">
+          <SuggestionIcon kind={suggestion.kind} />
+        </span>
+        <span className="header-search__suggestion-copy">
+          <strong>{suggestion.label}</strong>
+          {suggestion.meta && <small>{suggestion.meta}</small>}
+        </span>
+      </button>
+    )
   }
 
   const topNavItems = [
@@ -129,6 +201,127 @@ export function Header({
     { label: '工作区', to: '/?source=workspace', active: false },
     { label: '搜索', to: '/search', active: pageMode === 'search' },
   ]
+
+  const searchModal = searchOpen ? createPortal(
+    <div
+      aria-modal="true"
+      className="header-search-modal"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) closeSearch()
+      }}
+      role="dialog"
+    >
+      <div className="header-search-modal__panel">
+        <div className="header-search-modal__field">
+          <SearchIcon />
+          <input
+            ref={inputRef}
+            id="header-search-input"
+            aria-autocomplete="list"
+            aria-controls="header-search-suggestions"
+            aria-expanded={suggestions.length > 0}
+            aria-label="搜索文档或标签"
+            className="header-search-input"
+            placeholder="搜索文档、路径、标签，或直接回车搜索"
+            type="text"
+            value={inputValue}
+            onChange={(event) => setInputValue(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'ArrowDown' && suggestions.length > 0) {
+                event.preventDefault()
+                setActiveIndex((current) => {
+                  const next = current < 0 ? 0 : current + 1
+                  return next >= suggestions.length ? 0 : next
+                })
+              }
+
+              if (event.key === 'ArrowUp' && suggestions.length > 0) {
+                event.preventDefault()
+                setActiveIndex((current) => {
+                  if (current <= 0) return suggestions.length - 1
+                  return current - 1
+                })
+              }
+
+              if (event.key === 'Enter') {
+                event.preventDefault()
+                if (activeIndex >= 0 && suggestions[activeIndex]) {
+                  pickSuggestion(suggestions[activeIndex])
+                  return
+                }
+                submitSearch(inputValue)
+              }
+
+              if (event.key === 'Escape') {
+                event.preventDefault()
+                closeSearch()
+              }
+            }}
+          />
+          {inputValue && (
+            <button
+              aria-label="清除搜索"
+              className="search-clear-btn"
+              onClick={clearSearch}
+              type="button"
+            >
+              ×
+            </button>
+          )}
+        </div>
+
+        <div className="header-search__panel" id="header-search-suggestions" role="listbox">
+          {trimmedInput && (
+            <button
+              aria-selected={activeIndex === -1}
+              className="header-search__suggestion header-search__suggestion--submit"
+              onMouseDown={(event) => {
+                event.preventDefault()
+                submitSearch(inputValue)
+              }}
+              role="option"
+              type="button"
+            >
+              <span className="header-search__suggestion-icon">
+                <SearchIcon />
+              </span>
+              <span className="header-search__suggestion-copy">
+                <strong>搜索全部：{trimmedInput}</strong>
+                <small>进入全局搜索工作台</small>
+              </span>
+            </button>
+          )}
+
+          {!trimmedInput && (
+            <div className="header-search-modal__empty">
+              输入关键词后会显示文档、路径和标签建议。
+            </div>
+          )}
+
+          {documentSuggestions.length > 0 && (
+            <div className="header-search__group">
+              <span>文档</span>
+              {documentSuggestions.map(renderSuggestion)}
+            </div>
+          )}
+
+          {tagSuggestions.length > 0 && (
+            <div className="header-search__group">
+              <span>标签</span>
+              {tagSuggestions.map(renderSuggestion)}
+            </div>
+          )}
+        </div>
+
+        <div className="header-search-modal__footer">
+          <span><kbd>↑</kbd><kbd>↓</kbd> 导航</span>
+          <span><kbd>Enter</kbd> 选择</span>
+          <span><kbd>Esc</kbd> 关闭</span>
+        </div>
+      </div>
+    </div>,
+    document.body,
+  ) : null
 
   return (
     <header className="app-header app-header--command">
@@ -142,7 +335,13 @@ export function Header({
 
       <div className="header-actions">
         <div className="header-search header-search--global">
-          <label className="header-search__field" htmlFor="header-search-input">
+          <button
+            aria-keyshortcuts="Meta+K Control+K"
+            aria-label="全局搜索"
+            className="header-search__trigger"
+            onClick={openSearch}
+            type="button"
+          >
             <span className="search-icon-wrap" data-testid="search-icon-wrap">
               {searching && pageMode === 'search' ? (
                 <span className="search-spinner" />
@@ -150,101 +349,9 @@ export function Header({
                 <SearchIcon />
               )}
             </span>
-            <input
-              ref={inputRef}
-              id="header-search-input"
-              aria-autocomplete="list"
-              aria-expanded={suggestionsOpen}
-              aria-label="全局搜索"
-              aria-controls="header-search-suggestions"
-              className="header-search-input"
-              type="text"
-              placeholder={pageCopy.header.searchPlaceholder}
-              value={inputValue}
-              onBlur={() => {
-                window.setTimeout(() => {
-                  setSuggestionsOpen(false)
-                }, 120)
-              }}
-              onChange={(event) => setInputValue(event.target.value)}
-              onFocus={() => {
-                if (suggestions.length > 0) setSuggestionsOpen(true)
-              }}
-              onKeyDown={(event) => {
-                if (event.key === 'ArrowDown' && suggestions.length > 0) {
-                  event.preventDefault()
-                  setSuggestionsOpen(true)
-                  setActiveIndex((current) => {
-                    const next = current < 0 ? 0 : current + 1
-                    return next >= suggestions.length ? 0 : next
-                  })
-                }
-
-                if (event.key === 'ArrowUp' && suggestions.length > 0) {
-                  event.preventDefault()
-                  setSuggestionsOpen(true)
-                  setActiveIndex((current) => {
-                    if (current <= 0) return suggestions.length - 1
-                    return current - 1
-                  })
-                }
-
-                if (event.key === 'Enter') {
-                  event.preventDefault()
-                  if (suggestionsOpen && activeIndex >= 0 && suggestions[activeIndex]) {
-                    pickSuggestion(suggestions[activeIndex])
-                    return
-                  }
-                  submitSearch(inputValue)
-                }
-
-                if (event.key === 'Escape') {
-                  event.preventDefault()
-                  if (suggestionsOpen) {
-                    setSuggestionsOpen(false)
-                    return
-                  }
-                  clearSearch()
-                }
-              }}
-            />
-            {inputValue && (
-              <button
-                aria-label="清除搜索"
-                className="search-clear-btn"
-                onClick={clearSearch}
-                type="button"
-              >
-                ×
-              </button>
-            )}
-          </label>
-
-          {suggestionsOpen && suggestions.length > 0 && (
-            <div className="header-search__panel" id="header-search-suggestions" role="listbox">
-              {suggestions.map((suggestion, index) => (
-                <button
-                  key={`${suggestion.kind}:${suggestion.path || suggestion.label}`}
-                  aria-selected={index === activeIndex}
-                  className={`header-search__suggestion${index === activeIndex ? ' active' : ''}`}
-                  onMouseDown={(event) => {
-                    event.preventDefault()
-                    pickSuggestion(suggestion)
-                  }}
-                  role="option"
-                  type="button"
-                >
-                  <span className="header-search__suggestion-icon">
-                    <SuggestionIcon kind={suggestion.kind} />
-                  </span>
-                  <span className="header-search__suggestion-copy">
-                    <strong>{suggestion.label}</strong>
-                    {suggestion.meta && <small>{suggestion.meta}</small>}
-                  </span>
-                </button>
-              ))}
-            </div>
-          )}
+            <span className="header-search__trigger-text">{pageCopy.header.searchPlaceholder}</span>
+            <kbd>⌘K</kbd>
+          </button>
         </div>
 
         {pageMode !== 'category' && (
@@ -292,6 +399,8 @@ export function Header({
           </nav>
         </div>
       )}
+
+      {searchModal}
     </header>
   )
 }

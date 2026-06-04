@@ -13,6 +13,10 @@ import {
 } from '../config/knowledgeRules'
 import { normalizeStringArray, runKnowledgeIntake } from './knowledgeIntake'
 import {
+  formatKnowledgeDocumentDescription,
+  formatKnowledgeDocumentTitle,
+} from './knowledgeFormatter'
+import {
   DocSource,
   FileItem,
   Frontmatter,
@@ -304,13 +308,22 @@ async function parseLocalDocumentFromFile(
     return null
   }
   const techStack = extractTechStack(frontmatter, sourceTags)
+  const title = formatKnowledgeDocumentTitle(rawTitle, relativePath, intake.graphTitle)
+  const description = formatKnowledgeDocumentDescription({
+    title,
+    rawTitle,
+    path: relativePath,
+    description: extractDescription(frontmatter, body),
+    docType: typeof frontmatter.type === 'string' ? frontmatter.type : undefined,
+    sourceId: source.id,
+  })
   const item: ParsedDocument = {
     sourceId: source.id,
     path: normalizeSlashes(relativePath),
     name: fileName,
-    title: intake.graphTitle,
+    title,
     rawTitle,
-    description: extractDescription(frontmatter, body),
+    description,
     docType: typeof frontmatter.type === 'string' ? frontmatter.type : undefined,
     status: typeof frontmatter.status === 'string' ? frontmatter.status : undefined,
     tags: intake.graphTags,
@@ -318,11 +331,11 @@ async function parseLocalDocumentFromFile(
     categories: [],
     techStack,
     updated: normalizeDate(frontmatter.modified) || normalizeDate(frontmatter.updated) || stat.mtime.toISOString(),
-    graphTitle: intake.graphTitle,
+    graphTitle: title,
     raw,
     body,
     frontmatter,
-    aliases: [...new Set([rawTitle, intake.graphTitle, ...aliases].filter(Boolean))],
+    aliases: [...new Set([rawTitle, intake.graphTitle, title, ...aliases].filter(Boolean))],
     sourceTags,
     intakeIssues: intake.issues.map((issue) => issue.message),
   }
@@ -346,14 +359,30 @@ function createVirtualParsedDocument(input: NormalizedDocument & {
   const fileName = input.name || path.basename(input.path).replace(/\.(md|markdown)$/i, '')
   const rawTitle = input.rawTitle || input.title
   const sourceTags = [...new Set(input.sourceTags || input.tags)]
-  const graphTitle = input.graphTitle || input.title
+  const title = formatKnowledgeDocumentTitle(input.title || rawTitle, input.path, input.graphTitle)
+  const description = formatKnowledgeDocumentDescription({
+    title,
+    rawTitle,
+    name: fileName,
+    path: input.path,
+    description: input.description,
+    docType: input.docType,
+    sourceId: input.sourceId,
+  })
+  const graphTitle = title
+  const frontmatter = {
+    ...input.frontmatter,
+    title,
+    description,
+    'graph-title': graphTitle,
+  }
   return {
     sourceId: input.sourceId,
     path: normalizeSlashes(input.path),
     name: fileName,
-    title: input.title,
+    title,
     rawTitle,
-    description: input.description,
+    description,
     docType: input.docType,
     status: input.status,
     tags: input.tags,
@@ -364,8 +393,8 @@ function createVirtualParsedDocument(input: NormalizedDocument & {
     graphTitle,
     raw: input.raw,
     body: input.body,
-    frontmatter: input.frontmatter,
-    aliases: [...new Set([rawTitle, graphTitle, ...(input.aliases || [])].filter(Boolean))],
+    frontmatter,
+    aliases: [...new Set([rawTitle, input.title, graphTitle, ...(input.aliases || [])].filter(Boolean))],
     sourceTags,
     intakeIssues: [],
   }

@@ -160,7 +160,8 @@ describe('knowledge base local index', () => {
 
     const catalog = await getKnowledgeCatalog('obsidian')
     expect(catalog.totalDocs).toBe(1)
-    expect(catalog.recentDocs[0]?.title).toBe('Current Context')
+    expect(catalog.recentDocs[0]?.title).toBe('当前上下文')
+    expect(catalog.recentDocs[0]?.description).toContain('概念文档')
     expect(catalog.recentDocs[0]?.tags).toEqual(['vault', 'context', 'current'])
 
     const searchResults = await searchKnowledge('obsidian', 'current context')
@@ -240,6 +241,8 @@ describe('knowledge base local index', () => {
 
     const results = await searchKnowledge('axi-skills', 'deep-init-pro')
     expect(results[0]?.path).toBe('skills/deep-init-pro/SKILL.md')
+    expect(results[0]?.title).toContain('技能')
+    expect(results[0]?.description).toContain('技能库')
 
     const allResults = await searchKnowledgeAll('deep-init-pro')
     expect(allResults.some((result) => result.sourceId === 'axi-skills')).toBe(true)
@@ -290,7 +293,7 @@ describe('knowledge base local index', () => {
     expect(catalog.sections.some((section) => section.key === 'projects')).toBe(true)
 
     const summary = await getProjectSummary('axi-docs')
-    expect(summary?.title).toBe('Axi Docs')
-    expect(summary?.description).toContain('Documentation hub')
+    expect(summary?.title).toBe('Axi 文档站')
+    expect(summary?.description).toContain('工作区')
   })
 })

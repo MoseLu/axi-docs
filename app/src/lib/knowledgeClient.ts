@@ -326,7 +326,7 @@ export async function getKnowledgeSearchSuggestions(query: string): Promise<Sear
         query: document.title,
         sourceId: document.sourceId,
         path: document.path,
-        meta: document.path,
+        meta: document.description ? `${document.description} · ${document.path}` : document.path,
         score,
       })
     }

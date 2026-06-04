@@ -94,3 +94,34 @@ export function buildCategoryRoute(categoryId: string, subId?: string | null): s
   if (subId) return `/nodes/${categoryId}/sub/${subId}`
   return `/nodes/${categoryId}`
 }
+
+export function normalizeRouterBasename(base: string | undefined): string | undefined {
+  const normalized = (base || '').trim()
+  if (!normalized || normalized === '/' || normalized === './') return undefined
+
+  try {
+    const url = new URL(normalized)
+    const pathname = url.pathname.replace(/\/$/u, '')
+    return pathname && pathname !== '/' ? pathname : undefined
+  } catch {
+    const pathname = normalized.startsWith('/') ? normalized : `/${normalized}`
+    const withoutTrailingSlash = pathname.replace(/\/$/u, '')
+    return withoutTrailingSlash && withoutTrailingSlash !== '/' ? withoutTrailingSlash : undefined
+  }
+}
+
+export function buildBrowserPathFromLegacyHashRoute(
+  location: Pick<Location, 'hash' | 'pathname' | 'search'>,
+  basename?: string,
+): string | null {
+  if (!location.hash.startsWith('#/')) return null
+
+  const routePath = location.hash.slice(1)
+  const routerBase = normalizeRouterBasename(basename) || ''
+  const basePrefixedPath = routerBase && !routePath.startsWith(`${routerBase}/`) && routePath !== routerBase
+    ? `${routerBase}${routePath}`
+    : routePath
+  const outerSearch = location.search && !routePath.includes('?') ? location.search : ''
+
+  return `${basePrefixedPath}${outerSearch}`
+}

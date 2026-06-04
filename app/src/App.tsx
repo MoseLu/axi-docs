@@ -692,7 +692,7 @@ function RouteFallback() {
   return (
     <div className="standalone-route">
       <NotFoundPage
-        description="当前哈希路由没有匹配到任何页面。请返回首页，或进入搜索页重新定位内容。"
+        description="当前页面路径没有匹配到任何文档页面。请返回首页，或进入搜索页重新定位内容。"
         onPrimaryAction={() => navigate('/')}
         onSecondaryAction={() => navigate('/search')}
         title="页面不存在"

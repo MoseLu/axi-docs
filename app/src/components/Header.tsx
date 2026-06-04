@@ -30,6 +30,7 @@ export function Header({
   searching,
 }: HeaderProps) {
   const [inputValue, setInputValue] = useState(searchQuery)
+  const [navOpen, setNavOpen] = useState(false)
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([])
   const [suggestionsOpen, setSuggestionsOpen] = useState(false)
   const [activeIndex, setActiveIndex] = useState(-1)
@@ -41,6 +42,19 @@ export function Header({
   useEffect(() => {
     setInputValue(searchQuery)
   }, [searchQuery])
+
+  useEffect(() => {
+    if (pageMode !== 'document') {
+      setNavOpen(false)
+      document.documentElement.classList.remove('axi-doc-nav-open')
+      return undefined
+    }
+
+    document.documentElement.classList.toggle('axi-doc-nav-open', navOpen)
+    return () => {
+      document.documentElement.classList.remove('axi-doc-nav-open')
+    }
+  }, [navOpen, pageMode])
 
   useEffect(() => {
     if (pageMode !== 'search') return undefined
@@ -108,6 +122,13 @@ export function Header({
     setActiveIndex(-1)
     onSuggestionSelect(suggestion)
   }
+
+  const documentNavItems = [
+    { label: '指南', to: homeHref, active: pageMode === 'home' },
+    { label: '技能库', to: '/?source=axi-skills', active: pageMode === 'document' },
+    { label: '工作区', to: '/?source=workspace', active: false },
+    { label: '搜索', to: '/search', active: pageMode === 'search' },
+  ]
 
   return (
     <header className="app-header app-header--command">
@@ -225,7 +246,52 @@ export function Header({
             </div>
           )}
         </div>
+
+        {pageMode === 'document' && (
+          <>
+            <nav aria-label="顶部导航" className="header-vp-nav">
+              {documentNavItems.map((item) => (
+                <Link
+                  key={item.label}
+                  className={`header-vp-nav__link${item.active ? ' active' : ''}`}
+                  onClick={() => setNavOpen(false)}
+                  to={item.to}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+            <button
+              aria-expanded={navOpen}
+              aria-label={navOpen ? '关闭导航菜单' : '打开导航菜单'}
+              className={`header-vp-menu${navOpen ? ' active' : ''}`}
+              onClick={() => setNavOpen((current) => !current)}
+              type="button"
+            >
+              <span />
+              <span />
+              <span />
+            </button>
+          </>
+        )}
       </div>
+
+      {pageMode === 'document' && navOpen && (
+        <div className="header-vp-screen">
+          <nav aria-label="移动端顶部导航">
+            {documentNavItems.map((item) => (
+              <Link
+                key={`${item.label}:screen`}
+                className={`header-vp-screen__link${item.active ? ' active' : ''}`}
+                onClick={() => setNavOpen(false)}
+                to={item.to}
+              >
+                {item.label}
+              </Link>
+            ))}
+          </nav>
+        </div>
+      )}
     </header>
   )
 }

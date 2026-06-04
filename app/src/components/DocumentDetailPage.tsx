@@ -1,13 +1,12 @@
 import { Link } from 'react-router-dom'
 import { formatDisplayDate } from '../lib/intl'
 import {
-  formatKnowledgeDocumentTitle,
   formatKnowledgeItemTitle,
   formatKnowledgeTagLabel,
 } from '../lib/knowledgeFormatter'
-import { buildDocumentRoute, buildSearchRoute } from '../lib/routes'
+import { buildDocumentRoute } from '../lib/routes'
 import type { DocSource, KnowledgeCatalogItem, SelectedFile } from '../types'
-import { ClockIcon, FileIcon, SearchIcon } from './Icons'
+import { ClockIcon, FileIcon } from './Icons'
 import { DocumentView } from './DocumentView'
 import { TableOfContents } from './TableOfContents'
 
@@ -41,22 +40,14 @@ export function DocumentDetailPage({
   categoryTitle,
   categoryDescription,
   documentSiblings,
-  graphHref,
   relatedItems,
   onTagSelect,
   onWikiLink,
 }: DocumentDetailPageProps) {
-  const rawTitle = selectedCatalogItem?.rawTitle || fileName || selectedFile.path
-  const displayTitle = formatKnowledgeDocumentTitle(
-    selectedCatalogItem?.title || rawTitle,
-    selectedCatalogItem?.path || selectedFile.path,
-    selectedCatalogItem?.graphTitle,
-  )
   const tags = selectedCatalogItem?.tags || []
   const updatedLabel = selectedCatalogItem?.updated
     ? formatDisplayDate(selectedCatalogItem.updated)
     : null
-  const relatedSearchHref = buildSearchRoute(rawTitle.replace(/\.md$/i, ''), selectedFile.sourceId)
 
   return (
     <div className="document-detail-page">
@@ -108,20 +99,6 @@ export function DocumentDetailPage({
       </aside>
 
       <main className="document-detail-page__main">
-        <div className="document-detail-page__toolbar">
-          <div className="document-detail-page__breadcrumbs">
-            <Link to="/">文档库</Link>
-            <span>/</span>
-            <Link to={graphHref}>{categoryTitle}</Link>
-            <span>/</span>
-            <strong>{displayTitle}</strong>
-          </div>
-          <Link className="document-detail-page__search-link" to={relatedSearchHref}>
-            <SearchIcon />
-            搜索相关内容
-          </Link>
-        </div>
-
         <div className="document-detail-page__reader">
           <DocumentView
             content={fileContent}

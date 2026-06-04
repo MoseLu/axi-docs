@@ -201,11 +201,6 @@ export function Header({
     { label: '工作区', to: '/?source=workspace', active: false },
     { label: '搜索', to: '/search', active: pageMode === 'search' },
   ]
-  const emptySearchShortcuts = [
-    { label: 'Axi Workspace', meta: '工作区项目索引', query: 'workspace' },
-    { label: 'Axi Skills', meta: '共享技能库', query: 'skills' },
-    { label: 'Axi Docs', meta: '当前文档站项目', query: 'axi docs' },
-  ]
 
   const searchModal = searchOpen ? createPortal(
     <div
@@ -216,7 +211,7 @@ export function Header({
       }}
       role="dialog"
     >
-      <div className="header-search-modal__panel">
+      <div className={`header-search-modal__panel${trimmedInput ? ' header-search-modal__panel--with-results' : ''}`}>
         <div className="header-search-modal__field">
           <SearchIcon />
           <input
@@ -275,8 +270,8 @@ export function Header({
           )}
         </div>
 
-        <div className="header-search__panel" id="header-search-suggestions" role="listbox">
-          {trimmedInput && (
+        {trimmedInput && (
+          <div className="header-search__panel" id="header-search-suggestions" role="listbox">
             <button
               aria-selected={activeIndex === -1}
               className="header-search__suggestion header-search__suggestion--submit"
@@ -295,48 +290,30 @@ export function Header({
                 <small>进入全局搜索工作台</small>
               </span>
             </button>
-          )}
 
-          {!trimmedInput && (
-            <div className="header-search-modal__empty">
-              <p>输入关键词后会显示文档、路径和标签建议。</p>
-              <div className="header-search-modal__shortcuts">
-                {emptySearchShortcuts.map((shortcut) => (
-                  <button
-                    key={shortcut.query}
-                    onMouseDown={(event) => {
-                      event.preventDefault()
-                      submitSearch(shortcut.query)
-                    }}
-                    type="button"
-                  >
-                    <strong>{shortcut.label}</strong>
-                    <small>{shortcut.meta}</small>
-                  </button>
-                ))}
+            {documentSuggestions.length > 0 && (
+              <div className="header-search__group">
+                <span>文档</span>
+                {documentSuggestions.map(renderSuggestion)}
               </div>
-            </div>
-          )}
+            )}
 
-          {documentSuggestions.length > 0 && (
-            <div className="header-search__group">
-              <span>文档</span>
-              {documentSuggestions.map(renderSuggestion)}
-            </div>
-          )}
-
-          {tagSuggestions.length > 0 && (
-            <div className="header-search__group">
-              <span>标签</span>
-              {tagSuggestions.map(renderSuggestion)}
-            </div>
-          )}
-        </div>
+            {tagSuggestions.length > 0 && (
+              <div className="header-search__group">
+                <span>标签</span>
+                {tagSuggestions.map(renderSuggestion)}
+              </div>
+            )}
+          </div>
+        )}
 
         <div className="header-search-modal__footer">
-          <span><kbd>↑</kbd><kbd>↓</kbd> 导航</span>
-          <span><kbd>Enter</kbd> 选择</span>
-          <span><kbd>Esc</kbd> 关闭</span>
+          <div className="header-search-modal__keys">
+            <span><kbd>↑</kbd><kbd>↓</kbd> 导航</span>
+            <span><kbd>Enter</kbd> 选择</span>
+            <span><kbd>Esc</kbd> 关闭</span>
+          </div>
+          <span className="header-search-modal__brand">由 Axi Knowledge 提供</span>
         </div>
       </div>
     </div>,

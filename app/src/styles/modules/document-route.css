@@ -91,15 +91,22 @@
 .header-vp-nav {
   display: none;
   align-items: center;
+  flex: 0 0 auto;
   gap: 22px;
   height: var(--axi-doc-vp-nav-height);
+  min-width: max-content;
 }
 
 .header-vp-nav__link {
+  display: inline-flex;
+  align-items: center;
+  height: var(--axi-doc-vp-nav-height);
   color: var(--axi-doc-vp-c-text-2);
   font-size: 13px;
   font-weight: 500;
+  line-height: 1;
   text-decoration: none;
+  white-space: nowrap;
 }
 
 .header-vp-nav__link:hover,

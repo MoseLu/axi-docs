@@ -141,6 +141,7 @@ interface DocSource {
   adapter?: string
   audience?: string[]
   readOnly?: boolean
+  organizationHint?: string
   apiUrl?: string
   apiToken?: string
   icon?: string
@@ -160,9 +161,19 @@ function sanitizeSource(source: DocSource) {
     adapter: source.adapter,
     audience: source.audience,
     readOnly: source.readOnly,
+    organizationHint: source.organizationHint,
     apiUrl: source.apiUrl,
     icon: source.icon,
   }
+}
+
+async function searchSkillLibraries(query: string) {
+  const skillSourceIds = ['axi-skills', 'dbskill'].filter((sourceId) => docSources.some((source) => source.id === sourceId && source.enabled))
+  const results = await Promise.all(skillSourceIds.map(async (sourceId) => knowledgeBase.searchKnowledge(sourceId, query)))
+  return results
+    .flat()
+    .sort((left, right) => right.score - left.score)
+    .slice(0, 40)
 }
 
 // ─── 安全限制 ─────────────────────────────────────────────────────────────────
@@ -920,7 +931,7 @@ function getToolSchemas() {
     },
     {
       name: 'axi_docs_skill_search',
-      description: '专门搜索 Axi Skills 技能库，返回匹配技能的 name/description/path。',
+      description: '专门搜索 Axi Skills 和 dbskill 技能库，返回匹配技能的 name/description/path。',
       inputSchema: {
         type: 'object',
         properties: {
@@ -1172,7 +1183,7 @@ export function createServer() {
         case 'axi_docs_skill_search': {
           const query = args?.query as string
           if (!query) return { content: [{ type: 'text', text: '错误: query 参数必填' }], isError: true }
-          return { content: [{ type: 'text', text: JSON.stringify(await knowledgeBase.searchKnowledge('axi-skills', query), null, 2) }] }
+          return { content: [{ type: 'text', text: JSON.stringify(await searchSkillLibraries(query), null, 2) }] }
         }
 
         case 'axi_docs_workspace_status': {
@@ -1680,7 +1691,7 @@ async function handleToolCall(name: string, args: Record<string, unknown>) {
     case 'axi_docs_skill_search': {
       const query = args.query as string
       if (!query) return { content: [{ type: 'text', text: '错误: query 参数必填' }], isError: true }
-      return { content: [{ type: 'text', text: JSON.stringify(await knowledgeBase.searchKnowledge('axi-skills', query), null, 2) }] }
+      return { content: [{ type: 'text', text: JSON.stringify(await searchSkillLibraries(query), null, 2) }] }
     }
     case 'axi_docs_workspace_status': {
       return { content: [{ type: 'text', text: JSON.stringify(await knowledgeBase.getWorkspaceStatus(), null, 2) }] }

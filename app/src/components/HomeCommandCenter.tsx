@@ -73,12 +73,15 @@ export function HomeCommandCenter({
   guidePageId = 'getting-started',
 }: HomeCommandCenterProps) {
   const isGuideDocSet = docSet === 'guide'
+  const isSkillsDocSet = docSet === 'skills'
   const recentProjects = catalog?.recentDocs.filter((item) => item.docType === 'project').slice(0, 5) || []
   const skillSource = sources.find((item) => item.id === 'axi-skills')
+  const dbskillSource = sources.find((item) => item.id === 'dbskill')
   const primarySections = useMemo(() => {
     const seen = new Set<string>()
+    const sectionLimit = isSkillsDocSet ? 12 : 4
 
-    return (catalog?.sections.slice(0, 4) || [])
+    return (catalog?.sections.slice(0, sectionLimit) || [])
       .map((section) => ({
         ...section,
         items: section.items.filter((item) => {
@@ -89,7 +92,7 @@ export function HomeCommandCenter({
         }),
       }))
       .filter((section) => section.items.length > 0)
-  }, [catalog?.sections])
+  }, [catalog?.sections, isSkillsDocSet])
   const featuredDocs = catalog?.recentDocs.slice(0, 4) || []
   const explicitSource = activeSourceId ? sources.find((item) => item.id === activeSourceId) || null : null
   const currentSourceName = explicitSource?.name || source.name || '当前文档库'
@@ -109,16 +112,18 @@ export function HomeCommandCenter({
   const renderCatalogSidebarSection = (section: NonNullable<KnowledgeCatalog['sections']>[number]) => {
     const sectionId = `catalog:${section.key}`
     const open = isSectionOpen(sectionId)
+    const itemLimit = isSkillsDocSet ? 24 : 12
 
     return (
       <nav key={section.key} className="axi-docs-home__sidebar-section" aria-label={section.title}>
         <button aria-expanded={open} className="axi-docs-home__sidebar-toggle" onClick={() => toggleSection(sectionId)} type="button">
           <span>{section.title}</span>
+          {isSkillsDocSet && <small>{section.count}</small>}
           <span aria-hidden="true" className="axi-docs-home__sidebar-caret">⌄</span>
         </button>
         {open && (
           <div className="axi-docs-home__sidebar-items">
-            {section.items.slice(0, 12).map((item) => (
+            {section.items.slice(0, itemLimit).map((item) => (
               <button
                 key={`${item.sourceId}:${item.path}`}
                 className={`axi-docs-home__sidebar-link${item.sourceId === activeSourceId && item.path === selectedFile?.path ? ' active' : ''}`}
@@ -129,6 +134,12 @@ export function HomeCommandCenter({
                 {item.title || item.name}
               </button>
             ))}
+            {section.items.length > itemLimit && (
+              <button className="axi-docs-home__nav-card" onClick={onOpenExplorer} type="button">
+                <span>{guideLocale === 'zh' ? '查看本组全部技能' : 'Browse This Group'}</span>
+                <small>{section.items.length - itemLimit} {guideLocale === 'zh' ? '个技能未在侧栏展开' : 'more skills hidden in the sidebar'}</small>
+              </button>
+            )}
             {section.items.length === 0 && (
               <button className="axi-docs-home__nav-card" onClick={onOpenExplorer} type="button">
                 <span>{guideLocale === 'zh' ? '浏览目录' : 'Browse Directory'}</span>
@@ -195,6 +206,32 @@ export function HomeCommandCenter({
             <section className="axi-docs-home__section" id="doc-set-overview">
               <h2>{guideLocale === 'zh' ? '文档集概览' : 'Docs Overview'}</h2>
               <p>{source.description || (guideLocale === 'zh' ? '当前顶级导航对应的文档集。左侧显示该文档集内部目录。' : 'This top-level navigation item maps to the document set shown in the left sidebar.')}</p>
+              {isSkillsDocSet && catalog && (
+                <div className="axi-docs-home__stats-grid" aria-label="技能库统计">
+                  <div>
+                    <strong>{catalog.totalDocs}</strong>
+                    <span>{guideLocale === 'zh' ? '个已索引条目' : 'indexed entries'}</span>
+                  </div>
+                  <div>
+                    <strong>{catalog.sections.length}</strong>
+                    <span>{guideLocale === 'zh' ? '个能力分组' : 'capability groups'}</span>
+                  </div>
+                  <div>
+                    <strong>{dbskillSource ? 'dbskill' : 'family'}</strong>
+                    <span>{guideLocale === 'zh' ? '组织方式' : 'organization'}</span>
+                  </div>
+                </div>
+              )}
+              {isSkillsDocSet && dbskillSource && (
+                <div className="axi-docs-home__callout">
+                  <strong>{guideLocale === 'zh' ? '组织基线' : 'Organization baseline'}</strong>
+                  <p>
+                    {guideLocale === 'zh'
+                      ? '技能库保留 Axi Skills 的 700+ 实际技能入口，同时按最新 dbskill 的工具箱思路拆成能力分组；dbskill 自身也作为独立来源接入，可通过全局搜索检索 dbs 方法、知识包和内容工程模板。'
+                      : 'The Skills collection keeps the 700+ Axi Skills entries while grouping them with the latest dbskill toolbox model. dbskill is also connected as a standalone source for DBS methods, knowledge packs, and content-engineering templates.'}
+                  </p>
+                </div>
+              )}
               {primarySections.length > 0 && (
                 <div className="axi-docs-home__result-list">
                   {primarySections.map((section) => (

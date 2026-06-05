@@ -224,7 +224,11 @@ describe('knowledge base local index', () => {
   it('validates the document source registry shape', () => {
     const registry = getDocumentSourceRegistry()
     expect(validateDocumentSourceRegistry(registry)).toEqual([])
-    expect(registry.find((source) => source.id === 'dbskill-content-assets')?.skillNames).toEqual(['dbs-content-system'])
+    const dbskillSource = registry.find((source) => source.id === 'dbskill')
+    expect(dbskillSource?.skillNames).toBeUndefined()
+    expect(dbskillSource?.includeSkillAssets).toBe(true)
+    expect(dbskillSource?.includeSupportDocs).toBe(true)
+    expect(dbskillSource?.organizationHint).toBe('dbskill')
     expect(validateDocumentSourceRegistry([
       { id: 'dup', adapter: 'markdown', enabled: true },
       { id: 'dup', adapter: 'skills', enabled: true },
@@ -250,7 +254,7 @@ describe('knowledge base local index', () => {
 
     const catalog = await getKnowledgeCatalog('axi-skills')
     expect(catalog.totalDocs).toBe(1)
-    expect(catalog.sections.some((section) => section.key === 'standards')).toBe(true)
+    expect(catalog.sections.some((section) => section.key === 'skills-agent-workflows')).toBe(true)
 
     const results = await searchKnowledge('axi-skills', 'deep-init-pro')
     expect(results[0]?.path).toBe('skills/deep-init-pro/SKILL.md')
@@ -265,7 +269,7 @@ describe('knowledge base local index', () => {
     expect(raw).toContain('name: deep-init-pro')
   })
 
-  it('indexes only the dbskill content asset workflow by default', async () => {
+  it('indexes dbskill as a full organized skill library', async () => {
     tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'axi-docs-dbskill-'))
     process.env.DBSKILL_PATH = tempDir
 
@@ -298,18 +302,28 @@ describe('knowledge base local index', () => {
       '# dbs-diagnosis',
     ].join('\n'), 'utf-8')
 
-    const catalog = await getKnowledgeCatalog('dbskill-content-assets')
-    expect(catalog.totalDocs).toBe(2)
+    await fs.promises.writeFile(path.join(tempDir, 'README.md'), [
+      '# dbskill',
+      '',
+      'dontbesilent 商业诊断工具箱。',
+    ].join('\n'), 'utf-8')
+
+    const catalog = await getKnowledgeCatalog('dbskill')
+    expect(catalog.totalDocs).toBe(4)
     expect(catalog.recentDocs.some((doc) => doc.path === 'skills/dbs-content-system/SKILL.md')).toBe(true)
     expect(catalog.recentDocs.some((doc) => doc.path === 'skills/dbs-content-system/templates/主题地图模板.md')).toBe(true)
+    expect(catalog.recentDocs.some((doc) => doc.path === 'skills/dbs-diagnosis/SKILL.md')).toBe(true)
+    expect(catalog.sections.some((section) => section.key === 'dbskill-content-engineering')).toBe(true)
+    expect(catalog.sections.some((section) => section.key === 'dbskill-diagnosis')).toBe(true)
+    expect(catalog.sections.some((section) => section.key === 'skill-support-docs')).toBe(true)
 
-    const contentResults = await searchKnowledge('dbskill-content-assets', '内容资产')
+    const contentResults = await searchKnowledge('dbskill', '内容资产')
     expect(contentResults.some((result) => result.path === 'skills/dbs-content-system/SKILL.md')).toBe(true)
-    const templateResults = await searchKnowledge('dbskill-content-assets', '主题地图')
+    const templateResults = await searchKnowledge('dbskill', '主题地图')
     expect(templateResults.some((result) => result.path === 'skills/dbs-content-system/templates/主题地图模板.md')).toBe(true)
 
-    const diagnosisResults = await searchKnowledge('dbskill-content-assets', '商业模式诊断')
-    expect(diagnosisResults).toHaveLength(0)
+    const diagnosisResults = await searchKnowledge('dbskill', '商业模式诊断')
+    expect(diagnosisResults.some((result) => result.path === 'skills/dbs-diagnosis/SKILL.md')).toBe(true)
   })
 
   it('handles missing skill descriptions and nested skill paths', async () => {

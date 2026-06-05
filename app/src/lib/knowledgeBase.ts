@@ -113,6 +113,11 @@ function parseExtraSources(): DocSource[] {
           skillNames: Array.isArray(source.skillNames)
             ? source.skillNames.filter((skillName): skillName is string => typeof skillName === 'string' && skillName.trim().length > 0)
             : undefined,
+          includeSkillAssets: source.includeSkillAssets === true,
+          includeSupportDocs: source.includeSupportDocs === true,
+          organizationHint: source.organizationHint === 'dbskill' || source.organizationHint === 'skill-families'
+            ? source.organizationHint
+            : undefined,
           apiUrl: typeof source.apiUrl === 'string' ? source.apiUrl : undefined,
           apiToken: typeof source.apiToken === 'string' ? source.apiToken : undefined,
           icon: source.icon === 'obsidian' || source.icon === 'blinko' || source.icon === 'folder'
@@ -403,6 +408,119 @@ function createVirtualParsedDocument(input: NormalizedDocument & {
   }
 }
 
+type SkillFamilyDefinition = {
+  key: string
+  title: string
+  description: string
+  match: string[]
+}
+
+const DB_SKILL_FAMILIES: SkillFamilyDefinition[] = [
+  {
+    key: 'dbskill-content-engineering',
+    title: '内容工程与发布',
+    description: '内容结构化、标题、开头、内容资产系统和发布前检查。',
+    match: ['dbs-content-system', 'dbs-content', 'dbs-hook', 'dbs-xhs-title', 'dbs-ai-check'],
+  },
+  {
+    key: 'dbskill-diagnosis',
+    title: 'dbs 诊断与判断',
+    description: '商业诊断、对标、内容诊断、目标澄清和概念拆解工具。',
+    match: ['dbs-diagnosis', 'dbs-benchmark', 'dbs-slowisfast', 'dbs-action', 'dbs-deconstruct', 'dbs-goal'],
+  },
+  {
+    key: 'dbskill-decision-state',
+    title: '决策与状态管理',
+    description: '决策系统、存档、恢复和多次诊断报告。',
+    match: ['dbs-decision', 'dbs-save', 'dbs-restore', 'dbs-report'],
+  },
+  {
+    key: 'dbskill-learning-dialogue',
+    title: '学习与多角色对话',
+    description: '交互式学习、好问题生成和聊天室式多视角讨论。',
+    match: ['dbs-learning', 'dbs-good-question', 'dbs-chatroom', 'dbs-chatroom-austrian'],
+  },
+  {
+    key: 'dbskill-agent-infra',
+    title: 'Agent 工作台',
+    description: 'Agent 工作台迁移和跨宿主一致性整理。',
+    match: ['dbs-agent-migration'],
+  },
+]
+
+const AXI_SKILL_FAMILIES: SkillFamilyDefinition[] = [
+  {
+    key: 'skills-agent-workflows',
+    title: 'Agent 工作流',
+    description: '面向 agent 调度、记忆、浏览器、自动化和多角色协作的技能。',
+    match: ['agent', 'agents', 'agentic', 'agentmemory', 'autopilot', 'ralph', 'ralplan', 'team', 'swarm', 'browser', 'memory', 'workflow', 'automation', 'omx'],
+  },
+  {
+    key: 'skills-engineering',
+    title: '工程实现与架构',
+    description: '代码实现、架构、后端、前端、移动端、测试和调试技能。',
+    match: ['dev', 'debug', 'test', 'testing', 'frontend', 'backend', 'fullstack', 'api', 'architecture', 'android', 'expo', 'flutter', 'django', 'fastapi', 'golang', 'csharp', 'cpp', 'typescript', 'react', 'nextjs', 'database'],
+  },
+  {
+    key: 'skills-cloud-devops',
+    title: '云服务与交付',
+    description: '部署、CI/CD、云平台、容器、GitHub 和发布治理技能。',
+    match: ['deploy', 'deployment', 'cloudflare', 'vercel', 'netlify', 'render', 'docker', 'circleci', 'github', 'git', 'ci', 'release', 'ops'],
+  },
+  {
+    key: 'skills-content-design',
+    title: '内容、设计与文档',
+    description: '写作、内容资产、品牌、设计、演示文稿和文档生产技能。',
+    match: ['content', 'article', 'writing', 'writer', 'brand', 'design', 'figma', 'canva', 'slides', 'presentation', 'ppt', 'doc', 'docs', 'documentation', 'pdf', 'image', 'video'],
+  },
+  {
+    key: 'skills-data-research',
+    title: '研究、数据与模型',
+    description: '外部研究、数据集、生物医学、模型训练和检索技能。',
+    match: ['research', 'data', 'dataset', 'huggingface', 'hf', 'model', 'eval', 'benchmark', 'bio', 'gene', 'gwas', 'clinical', 'chem', 'ontology', 'scraper'],
+  },
+  {
+    key: 'skills-tools-platforms',
+    title: '工具与平台连接',
+    description: 'CLI、Google、邮件、日历、浏览器、第三方平台和集成工具技能。',
+    match: ['cli', 'google', 'gmail', 'calendar', 'drive', 'sheets', 'slack', 'notion', 'outlook', 'chrome', 'mcp', 'plugin', 'connector', 'tool'],
+  },
+  {
+    key: 'skills-business-ops',
+    title: '业务与运营',
+    description: '业务运营、支付、客户、市场、治理和团队流程技能。',
+    match: ['business', 'ops', 'payment', 'billing', 'customer', 'marketing', 'sales', 'finance', 'governance', 'management', 'project'],
+  },
+]
+
+function normalizeSkillToken(value: string): string {
+  return value.trim().toLowerCase()
+}
+
+function getSkillKey(document: Pick<ParsedDocument, 'name' | 'path' | 'aliases'>): string {
+  return normalizeSkillToken(document.name || document.aliases[0] || path.basename(path.dirname(document.path)))
+}
+
+function getSkillFamily(document: ParsedDocument, definitions: SkillFamilyDefinition[]): SkillFamilyDefinition | null {
+  const searchText = normalizeSkillToken([
+    document.name,
+    document.title,
+    document.path,
+    document.description || '',
+    ...(document.aliases || []),
+    ...(document.tags || []),
+  ].join(' '))
+  const skillKey = getSkillKey(document)
+
+  return definitions.find((family) => family.match.some((token) => {
+    const normalizedToken = normalizeSkillToken(token)
+    return skillKey === normalizedToken
+      || skillKey.startsWith(`${normalizedToken}-`)
+      || skillKey.startsWith(`${normalizedToken}:`)
+      || searchText.includes(normalizedToken)
+  })) || null
+}
+
 function buildSkillDocument(source: DocSource, relativePath: string, stat: fs.Stats, raw: string): ParsedDocument {
   const parsed = parseMarkdownDocument(raw)
   const frontmatter = parsed.data as Frontmatter
@@ -416,7 +534,10 @@ function buildSkillDocument(source: DocSource, relativePath: string, stat: fs.St
       : extractDescription(frontmatter, parsed.content),
   ) || 'No frontmatter description'
   const description = `技能用途：${sourceDescription}`
-  const tags = ['技能', 'Agent', source.name, skillName]
+  const family = source.organizationHint === 'dbskill'
+    ? DB_SKILL_FAMILIES.find((item) => item.match.includes(skillName))
+    : null
+  const tags = ['技能', 'Agent', source.name, skillName, ...(family ? [family.title] : [])]
   const body = parsed.content || raw
   return createVirtualParsedDocument({
     sourceId: source.id,
@@ -524,6 +645,54 @@ async function collectSelectedSkillAssets(
   return documents
 }
 
+async function collectSkillSupportDocuments(source: DocSource, rootPath: string): Promise<ParsedDocument[]> {
+  if (!source.includeSupportDocs) return []
+
+  const supportRoots = ['README.md', 'docs', '知识库']
+  const documents: ParsedDocument[] = []
+
+  async function addFile(fullPath: string): Promise<void> {
+    if (!isSupportedFile(fullPath)) return
+    const stat = await fs.promises.stat(fullPath)
+    const raw = await fs.promises.readFile(fullPath, 'utf-8')
+    const relativePath = normalizeSlashes(path.relative(rootPath, fullPath))
+    documents.push(buildSkillAssetDocument(source, source.id, relativePath, stat, raw))
+  }
+
+  async function walk(fullPath: string): Promise<void> {
+    let stat: fs.Stats
+    try {
+      stat = await fs.promises.stat(fullPath)
+    } catch {
+      return
+    }
+
+    if (stat.isFile()) {
+      await addFile(fullPath)
+      return
+    }
+    if (!stat.isDirectory()) return
+
+    let entries: fs.Dirent[]
+    try {
+      entries = await fs.promises.readdir(fullPath, { withFileTypes: true })
+    } catch {
+      return
+    }
+
+    for (const entry of entries) {
+      if (isExcludedName(entry.name)) continue
+      await walk(path.join(fullPath, entry.name))
+    }
+  }
+
+  for (const supportRoot of supportRoots) {
+    await walk(path.join(rootPath, supportRoot))
+  }
+
+  return documents
+}
+
 async function collectSkillDocuments(source: DocSource): Promise<ParsedDocument[]> {
   const rootPath = path.normalize(source.path)
   const skillsRoot = path.join(rootPath, 'skills')
@@ -552,7 +721,7 @@ async function collectSkillDocuments(source: DocSource): Promise<ParsedDocument[
       const document = buildSkillDocument(source, relativePath, stat, raw)
       if (allowedSkillNames.size === 0 || allowedSkillNames.has(document.name.toLowerCase())) {
         documents.push(document)
-        if (allowedSkillNames.size > 0) {
+        if (allowedSkillNames.size > 0 || source.includeSkillAssets) {
           documents.push(...await collectSelectedSkillAssets(source, path.dirname(fullPath), document.name, rootPath))
         }
       }
@@ -560,6 +729,7 @@ async function collectSkillDocuments(source: DocSource): Promise<ParsedDocument[
   }
 
   await walk(skillsRoot)
+  documents.push(...await collectSkillSupportDocuments(source, rootPath))
   const indexPath = path.join(rootPath, 'docs', 'SKILL_INDEX.md')
   if (allowedSkillNames.size === 0 && fs.existsSync(indexPath)) {
     const stat = await fs.promises.stat(indexPath)
@@ -1463,6 +1633,69 @@ function sortCatalogItems(items: KnowledgeCatalogItem[]): KnowledgeCatalogItem[]
   })
 }
 
+function buildFallbackSkillFamily(document: ParsedDocument): SkillFamilyDefinition {
+  const skillKey = getSkillKey(document)
+  const namespace = skillKey.includes(':')
+    ? skillKey.split(':')[0]
+    : skillKey.split('-')[0]
+  const title = namespace ? `${namespace} 其他技能` : '其他技能'
+
+  return {
+    key: `skills-${namespace || 'other'}`,
+    title,
+    description: `${title}，按 skill 名称前缀自动归组。`,
+    match: [namespace || 'other'],
+  }
+}
+
+function buildSkillCatalogSections(source: DocSource, documents: ParsedDocument[]): KnowledgeCatalog['sections'] {
+  const skillDocs = documents.filter((document) => document.docType === 'skill')
+  const supportDocs = documents.filter((document) => document.docType !== 'skill')
+  const definitions = source.organizationHint === 'dbskill' ? DB_SKILL_FAMILIES : AXI_SKILL_FAMILIES
+  const grouped = new Map<string, { definition: SkillFamilyDefinition, items: KnowledgeCatalogItem[] }>()
+
+  for (const document of skillDocs) {
+    const definition = getSkillFamily(document, definitions) || buildFallbackSkillFamily(document)
+    if (!grouped.has(definition.key)) {
+      grouped.set(definition.key, { definition, items: [] })
+    }
+    grouped.get(definition.key)!.items.push(toKnowledgeCatalogItem(document))
+  }
+
+  const orderedKeys = definitions.map((definition) => definition.key)
+  const sections = [...grouped.values()]
+    .sort((left, right) => {
+      const leftOrder = orderedKeys.indexOf(left.definition.key)
+      const rightOrder = orderedKeys.indexOf(right.definition.key)
+      if (leftOrder !== -1 || rightOrder !== -1) {
+        if (leftOrder === -1) return 1
+        if (rightOrder === -1) return -1
+        return leftOrder - rightOrder
+      }
+      if (right.items.length !== left.items.length) return right.items.length - left.items.length
+      return left.definition.title.localeCompare(right.definition.title, 'zh-CN')
+    })
+    .map(({ definition, items }) => ({
+      key: definition.key,
+      title: definition.title,
+      description: definition.description,
+      count: items.length,
+      items: sortCatalogItems(items),
+    }))
+
+  if (supportDocs.length > 0) {
+    sections.push({
+      key: 'skill-support-docs',
+      title: source.organizationHint === 'dbskill' ? 'dbskill 知识包与模板' : '技能库附属文档',
+      description: 'README、知识包、模板、脚手架和其他可复用支持文档。',
+      count: supportDocs.length,
+      items: sortCatalogItems(supportDocs.map(toKnowledgeCatalogItem)),
+    })
+  }
+
+  return sections
+}
+
 export async function getKnowledgeCatalog(sourceId: string): Promise<KnowledgeCatalog> {
   const source = getSource(sourceId)
   if (!source) {
@@ -1511,22 +1744,24 @@ export async function getKnowledgeCatalog(sourceId: string): Promise<KnowledgeCa
   }
 
   const index = await getLocalSourceIndex(source)
-  const sections = KNOWLEDGE_CATEGORY_ORDER
-    .map((key) => {
-      const items = sortCatalogItems(index.documents
-        .filter((document) => document.categories.includes(key))
-        .map(toKnowledgeCatalogItem))
-      if (items.length === 0) return null
-      const meta = getKnowledgeCategoryMeta(key)
-      return {
-        key,
-        title: meta.title,
-        description: meta.description,
-        count: items.length,
-        items,
-      }
-    })
-    .filter(Boolean) as KnowledgeCatalog['sections']
+  const sections = source.kind === 'skill-library'
+    ? buildSkillCatalogSections(source, index.documents)
+    : KNOWLEDGE_CATEGORY_ORDER
+      .map((key) => {
+        const items = sortCatalogItems(index.documents
+          .filter((document) => document.categories.includes(key))
+          .map(toKnowledgeCatalogItem))
+        if (items.length === 0) return null
+        const meta = getKnowledgeCategoryMeta(key)
+        return {
+          key,
+          title: meta.title,
+          description: meta.description,
+          count: items.length,
+          items,
+        }
+      })
+      .filter(Boolean) as KnowledgeCatalog['sections']
 
   return {
     sourceId: source.id,

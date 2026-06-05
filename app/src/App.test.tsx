@@ -232,7 +232,7 @@ describe('App document route', () => {
     expect(screen.getByRole('link', { name: '技能库' })).toHaveAttribute('href', '/zh/skills')
     expect(screen.getByRole('link', { name: '技能库' })).toHaveClass('active')
     const sidebar = screen.getByLabelText('侧边栏导航')
-    expect(await within(sidebar).findByRole('button', { name: 'Frontend' })).toBeInTheDocument()
+    expect(await within(sidebar).findByText('Frontend')).toBeInTheDocument()
     expect(await within(sidebar).findByRole('button', { name: 'Frontend Dev' })).toBeInTheDocument()
     expect(within(sidebar).queryByText('Frontend workflow skill')).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: '快速开始' })).not.toBeInTheDocument()

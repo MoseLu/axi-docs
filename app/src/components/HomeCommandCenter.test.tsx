@@ -176,7 +176,7 @@ describe('HomeCommandCenter', () => {
     )
 
     expect(screen.getByRole('heading', { name: 'Axi Skills', level: 1 })).toBeInTheDocument()
-    expect(within(screen.getByLabelText('侧边栏导航')).getByRole('button', { name: 'Frontend' })).toBeInTheDocument()
+    expect(within(screen.getByLabelText('侧边栏导航')).getByText('Frontend')).toBeInTheDocument()
     const frontendSection = screen.getByLabelText('Frontend')
     expect(within(frontendSection).getByRole('button', { name: 'Frontend Dev' })).toHaveAttribute('title', 'Frontend workflow skill')
     expect(within(frontendSection).queryByText('Frontend workflow skill')).not.toBeInTheDocument()

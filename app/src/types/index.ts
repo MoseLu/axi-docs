@@ -12,6 +12,9 @@ export interface DocSource {
   audience?: Array<'agent' | 'human'>
   readOnly?: boolean
   skillNames?: string[]
+  includeSkillAssets?: boolean
+  includeSupportDocs?: boolean
+  organizationHint?: 'dbskill' | 'skill-families'
   apiUrl?: string
   apiToken?: string
   icon?: 'obsidian' | 'blinko' | 'folder'
@@ -19,7 +22,7 @@ export interface DocSource {
 
 export type DocumentSourceConfig = Required<
   Pick<DocSource, 'id' | 'name' | 'kind' | 'path' | 'adapter' | 'enabled' | 'audience' | 'readOnly'>
-> & Pick<DocSource, 'description' | 'type' | 'skillNames' | 'apiUrl' | 'apiToken' | 'icon'>
+> & Pick<DocSource, 'description' | 'type' | 'skillNames' | 'includeSkillAssets' | 'includeSupportDocs' | 'organizationHint' | 'apiUrl' | 'apiToken' | 'icon'>
 
 export interface NormalizedDocument {
   sourceId: string

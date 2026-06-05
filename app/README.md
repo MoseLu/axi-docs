@@ -8,7 +8,7 @@ Axi Docs 不是单一 Markdown 站点，而是多个文档项目的统一索引�
 
 - **Web**: Dashboard + VitePress-like 文档阅读页 + 搜索 + 图谱
 - **MCP**: 面向 agent 的 source 列表、跨库搜索、原文读取、workspace 状态和项目摘要
-- **文档项目**: Workspace registry、Axi Skills、dbskill Content Assets、Obsidian、Blinko
+- **文档项目**: Workspace registry、Axi Skills、dbskill、Obsidian、Blinko
 
 `axi-skills` 作为独立仓库保持原生 `skills/**/SKILL.md` 结构，Axi Docs 通过 `skills` adapter 解析，不要求技能文件改成 Obsidian frontmatter。
 
@@ -25,8 +25,8 @@ Axi Docs 不是单一 Markdown 站点，而是多个文档项目的统一索引�
 | 源 | 类型 | 说明 |
 |----|------|------|
 | Axi Workspace | 本地 registry | 工作区项目状态、路径、验证命令、治理目录 |
-| Axi Skills | 本地 skill library | 共享 agent 技能库，读取 `skills/**/SKILL.md` |
-| dbskill Content Assets | 本地 skill library | dontbesilent 内容结构化系统，默认只索引 `dbs-content-system` 及其 docs/templates/scaffold Markdown |
+| Axi Skills | 本地 skill library | 共享 agent 技能库，读取 700+ `skills/**/SKILL.md`，并按 dbskill-style 能力族组织 |
+| dbskill | 本地 skill library | dontbesilent 最新 dbskill 工具箱，完整索引 21 个 dbs skill、知识包、模板和内容工程脚手架 |
 | Obsidian | 本地目录 | 本地 Obsidian Vault |
 | Blinko | API | 闪念笔记 & 灵感捕捉 |
 
@@ -99,7 +99,7 @@ MCP_HTTP_PORT=3010 BIND_ADDRESS=0.0.0.0 pnpm mcp:http
 | `AXI_DOCS_EXTRA_SOURCES_JSON` | 否 | 追加本地/API 知识源的 JSON 数组，可用于挂载 Hermes 目录 |
 | `AXI_SKILLS_PATH` | 否 | Axi Skills 仓库路径，默认 `/Volumes/code/workspace/shared/axi-skills` |
 | `DBSKILL_PATH` | 否 | dbskill 仓库路径，默认 `/Volumes/code/workspace/shared/dbskill` |
-| `DBSKILL_CONTENT_ASSETS_ENABLED` | 否 | 是否启用 dbskill 内容资产来源，设为 `false` 可关闭 |
+| `DBSKILL_CONTENT_ASSETS_ENABLED` | 否 | 是否启用 dbskill 来源，设为 `false` 可关闭 |
 | `AXI_WORKSPACE_GOVERNANCE_PATH` | 否 | workspace governance 仓库路径 |
 
 ### Token 优先级

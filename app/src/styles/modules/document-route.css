@@ -428,6 +428,10 @@ html[data-axi-docs-theme='light'] .app-main--document {
 }
 
 @media (min-width: 768px) {
+  .header-vp-nav {
+    display: flex;
+  }
+
   .header-vp-tools {
     display: inline-flex;
   }

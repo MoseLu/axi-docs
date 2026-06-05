@@ -14,9 +14,12 @@
   --axi-doc-vp-layout-offset: max(0px, calc((100vw - var(--axi-doc-vp-layout-max-width)) / 2));
   --axi-doc-vp-nav-height: 64px;
   --axi-doc-vp-sidebar-width: 272px;
+  --axi-doc-vp-sidebar-padding-left: max(32px, calc((100vw - (var(--axi-doc-vp-layout-max-width) - 64px)) / 2));
+  --axi-doc-vp-sidebar-shell-width: calc(var(--axi-doc-vp-sidebar-padding-left) + var(--axi-doc-vp-sidebar-width) - 32px);
+  --axi-doc-vp-content-left: calc(var(--axi-doc-vp-layout-offset) + var(--axi-doc-vp-sidebar-width));
+  --axi-doc-vp-content-right: var(--axi-doc-vp-layout-offset);
   --axi-doc-vp-aside-width: 256px;
   --axi-doc-vp-doc-content-width: 688px;
-  --axi-doc-vp-doc-content-offset: 72px;
   --header-height: var(--axi-doc-vp-nav-height);
 }
 
@@ -52,9 +55,9 @@ html[data-axi-docs-theme='light'] .app-main--document {
 }
 
 .app-layout--document .app-logo {
-  width: calc(var(--axi-doc-vp-layout-offset) + var(--axi-doc-vp-sidebar-width));
+  width: var(--axi-doc-vp-sidebar-shell-width);
   height: var(--axi-doc-vp-nav-height);
-  padding: 0 24px 0 calc(var(--axi-doc-vp-layout-offset) + 24px);
+  padding: 0 32px 0 var(--axi-doc-vp-sidebar-padding-left);
   color: var(--axi-doc-vp-c-text-1);
   border-bottom: 1px solid var(--axi-doc-vp-c-divider);
 }
@@ -78,7 +81,7 @@ html[data-axi-docs-theme='light'] .app-main--document {
   height: var(--axi-doc-vp-nav-height);
   flex: 1;
   margin-left: 0;
-  padding: 0 calc(var(--axi-doc-vp-layout-offset) + 16px) 0 16px;
+  padding: 0 calc(var(--axi-doc-vp-layout-offset) + 32px) 0 32px;
   justify-content: flex-start;
   gap: 12px;
 }
@@ -256,17 +259,18 @@ html[data-axi-docs-theme='light'] .app-main--document {
 
 .app-main--document {
   background: var(--axi-doc-vp-c-bg);
+  padding-right: var(--axi-doc-vp-content-right);
+  padding-left: var(--axi-doc-vp-content-left);
 }
 
 .document-detail-page {
   height: 100%;
   min-height: 0;
-  width: min(100%, var(--axi-doc-vp-layout-max-width));
-  max-width: var(--axi-doc-vp-layout-max-width);
-  margin: 0 auto;
-  display: grid;
-  grid-template-columns: var(--axi-doc-vp-sidebar-width) minmax(0, 1fr) var(--axi-doc-vp-aside-width);
-  gap: 0;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  padding: 48px 32px 0;
+  overflow: hidden;
   color: var(--axi-doc-vp-c-text-1);
   background: var(--axi-doc-vp-c-bg);
 }
@@ -279,8 +283,16 @@ html[data-axi-docs-theme='light'] .app-main--document {
 }
 
 .document-detail-page__sidebar {
-  padding: 16px 16px 40px 24px;
+  position: fixed;
+  top: var(--axi-doc-vp-nav-height);
+  bottom: 0;
+  left: 0;
+  z-index: 20;
+  width: var(--axi-doc-vp-sidebar-shell-width);
+  padding: 32px 32px 96px var(--axi-doc-vp-sidebar-padding-left);
   border-right: 1px solid var(--axi-doc-vp-c-divider);
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .document-detail-page__brand {
@@ -410,11 +422,13 @@ html[data-axi-docs-theme='light'] .app-main--document {
 }
 
 .document-detail-page__main {
+  order: 1;
   min-width: 0;
   min-height: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 0;
+  flex: 1 1 auto;
+  max-width: calc(100% - var(--axi-doc-vp-aside-width));
+  padding: 0 32px 128px;
+  overflow: hidden;
   background: var(--axi-doc-vp-c-bg);
 }
 
@@ -471,8 +485,8 @@ html[data-axi-docs-theme='light'] .app-main--document {
 }
 
 .document-detail-page__reader {
+  height: 100%;
   min-height: 0;
-  flex: 1;
   overflow: hidden;
 }
 
@@ -482,7 +496,7 @@ html[data-axi-docs-theme='light'] .app-main--document {
 }
 
 .document-detail-page__reader .app-content {
-  padding: 48px 32px 128px;
+  padding: 0;
   max-width: none;
   margin: 0;
   overflow-x: hidden;
@@ -493,7 +507,7 @@ html[data-axi-docs-theme='light'] .app-main--document {
 .document-detail-page__reader .doc-header,
 .document-detail-page__reader .doc-body {
   width: min(100%, var(--axi-doc-vp-doc-content-width));
-  margin: 0 0 0 var(--axi-doc-vp-doc-content-offset);
+  margin: 0 auto;
   background: transparent;
 }
 
@@ -590,8 +604,11 @@ html[data-axi-docs-theme='light'] .app-main--document {
 }
 
 .document-detail-page__aside {
-  padding: 48px 0 40px 32px;
-  border-left: 1px solid var(--axi-doc-vp-c-divider);
+  order: 2;
+  flex: 0 0 var(--axi-doc-vp-aside-width);
+  max-width: var(--axi-doc-vp-aside-width);
+  padding: 0 0 40px 32px;
+  border-left: 0;
   background: var(--axi-doc-vp-c-bg);
 }
 

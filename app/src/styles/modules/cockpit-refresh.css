@@ -80,7 +80,8 @@
 }
 
 .cockpit-shell.axi-docs-home {
-  display: grid;
+  display: flex;
+  flex-direction: row;
   gap: 0;
 }
 

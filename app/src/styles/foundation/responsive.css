@@ -67,15 +67,20 @@
 @media (max-width: 1279px) {
   .app-layout--document,
   .app-main--document {
-    --axi-doc-vp-doc-content-offset: 48px;
+    --axi-doc-vp-aside-width: 0px;
   }
 
   .document-detail-page {
-    grid-template-columns: var(--axi-doc-vp-sidebar-width) minmax(0, 1fr);
+    padding-right: 32px;
+    padding-left: 32px;
   }
 
   .document-detail-page__aside {
     display: none;
+  }
+
+  .document-detail-page__main {
+    max-width: 100%;
   }
 }
 
@@ -511,11 +516,13 @@
 @media (max-width: 959px) {
   .app-layout--document,
   .app-main--document {
-    --axi-doc-vp-doc-content-offset: 0px;
+    --axi-doc-vp-content-left: 0px;
+    --axi-doc-vp-content-right: 0px;
   }
 
   .document-detail-page {
-    grid-template-columns: 1fr;
+    padding-right: 24px;
+    padding-left: 24px;
   }
 
   .document-detail-page__sidebar {

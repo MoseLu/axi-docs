@@ -32,11 +32,11 @@
     },
     "019e96c8-92f4-7941-be47-6e90afc9e49b": {
       "ordinary_no_progress_guard": {
-        "fingerprint": "ordinary|已纠正并提交：`ac94f1e fix: hide header locale label only` 这次修的是正确对象： - 顶栏导航文字已恢复：`指南 / 技能库 / 工作区` 继续显示。 - 语言按钮关闭状态不再显示 `简体中文` / `english` 标签，只保留语言图标和下拉箭头。 - 打开语言下拉菜单后，菜单里仍显示 `简体中文` / `english` 选项。 - 上一轮的搜索栏左移保留。 验证： - `pnpm exec vitest run src/components/header.test.tsx src/app.test.tsx` - `pnpm lint` - `pnpm verify` - dev server 已 hmr 更新，仍在运行。 当前只剩未跟踪 `.omx/`。 ::git-stage{cwd=\"/volumes/code/workspace/projects/axi-docs\"} ::git-commit{cwd=\"/volumes/code/workspace/projects/axi-docs\"}",
-        "first_seen_at": "2026-06-05T08:22:11.709Z",
-        "last_seen_at": "2026-06-05T08:22:11.709Z",
+        "fingerprint": "ordinary|已顺着检查并修掉两处根因： 1. 同一个文档会被多个 catalog section 收录，所以 `axi 技能索引` 会在左栏重复出现。 2. 详情页左栏还混入了“相关推荐”，这会把同一批文档再列一遍；点击里面的项后看起来又像目录消失或变形。 现在处理为： - `/zh/skills` 顶级左栏跨 section 去重。 - `/docs/axi-skills/...` 详情页左栏也跨 section 去重。 - 有完整文档集目录时，左栏不再显示“相关推荐”。 - app 回归覆盖了：重复数据、首次点击左栏、再次点击详情页左栏，目录仍保留且 active 正确。 验证通过： - `pnpm exec vitest run src/components/homecommandcenter.test.tsx src/components/documentdetailpage.test.tsx src/app.test.tsx` - `pnpm exec tsc --noemit` - `pnpm lint`，仅既有 warning - `pnpm verify` chrome 实测链路这次没跑成：连接器当前没有 active tab，且这个窗口不能新建 tab；我用组件和 app 路由测试覆盖了同一条点击链。 已提交：`cc7f436 deduplicate document-set sidebars` ::git-stage{cwd=\"/volumes/code/workspace/projects/axi-docs\"} ::git-commit{cwd=\"/volumes/code/workspace/projects/axi-docs\"}",
+        "first_seen_at": "2026-06-05T11:15:10.618Z",
+        "last_seen_at": "2026-06-05T11:15:10.618Z",
         "repeat_count": 1,
-        "last_turn_id": "019e96dd-e626-7fc2-a709-b71711c9b2ad",
+        "last_turn_id": "019e9779-5943-7d02-b4be-3e710b4df5bf",
         "last_thread_id": null
       }
     }

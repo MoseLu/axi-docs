@@ -3,11 +3,9 @@ import { useSearchParams } from 'react-router-dom'
 import {
   DocSource,
   KnowledgeCatalog,
-  KnowledgeCatalogItem,
   SearchResult,
   SelectedFile,
 } from '../types'
-import { formatKnowledgeItemTitle } from '../lib/knowledgeFormatter'
 import { HomeCommandCenter, QuickKnowledgeItemLike } from './HomeCommandCenter'
 import { KnowledgeExplorer } from './KnowledgeExplorer'
 
@@ -139,11 +137,3 @@ export function KnowledgeWorkbench({
 }
 
 export type { QuickKnowledgeItemLike as QuickKnowledgeItem }
-
-export function documentTitle(
-  result:
-    | Pick<SearchResult, 'title' | 'name' | 'path'>
-    | Pick<KnowledgeCatalogItem, 'title' | 'name' | 'path' | 'graphTitle'>,
-) {
-  return formatKnowledgeItemTitle(result)
-}

@@ -28,15 +28,19 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
   const params = useParams()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
-  const routeCategory = pageMode === 'category'
-    ? normalizeCategoryRoute(params.categoryId, params.subId)
-    : null
-  const routeDocument = pageMode === 'document'
-    ? decodeDocumentId(params.docId || '')
-    : null
-  const previewDocument = pageMode === 'document'
-    ? routeDocument
-    : decodeDocumentId(searchParams.get('doc') || '')
+  const routeCategory = useMemo(
+    () => (pageMode === 'category' ? normalizeCategoryRoute(params.categoryId, params.subId) : null),
+    [pageMode, params.categoryId, params.subId],
+  )
+  const routeDocument = useMemo(
+    () => (pageMode === 'document' ? decodeDocumentId(params.docId || '') : null),
+    [pageMode, params.docId],
+  )
+  const docParam = searchParams.get('doc') || ''
+  const previewDocument = useMemo(
+    () => (pageMode === 'document' ? routeDocument : decodeDocumentId(docParam)),
+    [docParam, pageMode, routeDocument],
+  )
   const urlSearchQuery = searchParams.get('q') || searchParams.get('keyword') || ''
 
   const [sources, setSources] = useState<DocSource[]>([])

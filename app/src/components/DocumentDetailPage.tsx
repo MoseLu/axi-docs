@@ -158,6 +158,11 @@ export function DocumentDetailPage({
         <div className="document-detail-page__meta">
           <strong>文档信息</strong>
           <p>{categoryDescription}</p>
+          <span className="document-detail-page__source-kind">
+            {source.kind === 'skill-library' ? 'Skill Library' : 'Document Library'}
+          </span>
+          <strong className="document-detail-page__source-name">{source.name}</strong>
+          <p>{source.description}</p>
           {updatedLabel && (
             <span>
               <ClockIcon />

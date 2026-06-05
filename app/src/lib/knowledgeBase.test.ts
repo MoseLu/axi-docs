@@ -238,11 +238,21 @@ describe('knowledge base local index', () => {
 
   it('indexes Axi Skills SKILL.md files without Obsidian frontmatter', async () => {
     tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'axi-docs-skills-'))
-    const skillDir = path.join(tempDir, 'skills', 'deep-init-pro')
-    await fs.promises.mkdir(skillDir, { recursive: true })
+    const skillDirs = [
+      'deep-init-pro',
+      'frontend-dev',
+      'google-docs',
+      'cloudflare-deploy',
+      'gwas-catalog-skill',
+      'content-engine',
+    ]
+    for (const skillName of skillDirs) {
+      await fs.promises.mkdir(path.join(tempDir, 'skills', skillName), { recursive: true })
+    }
+    await fs.promises.mkdir(path.join(tempDir, 'docs'), { recursive: true })
     process.env.AXI_SKILLS_PATH = tempDir
 
-    await fs.promises.writeFile(path.join(skillDir, 'SKILL.md'), [
+    await fs.promises.writeFile(path.join(tempDir, 'skills', 'deep-init-pro', 'SKILL.md'), [
       '---',
       'name: deep-init-pro',
       'description: Generate layered project docs for agents.',
@@ -251,10 +261,55 @@ describe('knowledge base local index', () => {
       '',
       'Use this to create PARADIGM and ARCHITECTURE docs.',
     ].join('\n'), 'utf-8')
+    await fs.promises.writeFile(path.join(tempDir, 'skills', 'frontend-dev', 'SKILL.md'), [
+      '---',
+      'name: frontend-dev',
+      'description: Build frontend features.',
+      '---',
+      '# Frontend Dev',
+    ].join('\n'), 'utf-8')
+    await fs.promises.writeFile(path.join(tempDir, 'skills', 'google-docs', 'SKILL.md'), [
+      '---',
+      'name: google-docs',
+      'description: Work with Google Docs.',
+      '---',
+      '# Google Docs',
+    ].join('\n'), 'utf-8')
+    await fs.promises.writeFile(path.join(tempDir, 'skills', 'cloudflare-deploy', 'SKILL.md'), [
+      '---',
+      'name: cloudflare-deploy',
+      'description: Deploy to Cloudflare.',
+      '---',
+      '# Cloudflare Deploy',
+    ].join('\n'), 'utf-8')
+    await fs.promises.writeFile(path.join(tempDir, 'skills', 'gwas-catalog-skill', 'SKILL.md'), [
+      '---',
+      'name: gwas-catalog-skill',
+      'description: Query GWAS Catalog.',
+      '---',
+      '# GWAS Catalog',
+    ].join('\n'), 'utf-8')
+    await fs.promises.writeFile(path.join(tempDir, 'skills', 'content-engine', 'SKILL.md'), [
+      '---',
+      'name: content-engine',
+      'description: Build content systems.',
+      '---',
+      '# Content Engine',
+    ].join('\n'), 'utf-8')
+    await fs.promises.writeFile(path.join(tempDir, 'docs', 'SKILL_INDEX.md'), [
+      '# Skill Index',
+      '',
+      'Generated truncated table.',
+    ].join('\n'), 'utf-8')
 
     const catalog = await getKnowledgeCatalog('axi-skills')
-    expect(catalog.totalDocs).toBe(1)
-    expect(catalog.sections.some((section) => section.key === 'skills-agent-workflows')).toBe(true)
+    expect(catalog.totalDocs).toBe(7)
+    expect(catalog.sections.find((section) => section.key === 'skills-agent-workflows')?.count).toBe(1)
+    expect(catalog.sections.find((section) => section.key === 'skills-engineering')?.count).toBe(1)
+    expect(catalog.sections.find((section) => section.key === 'skills-tools-platforms')?.count).toBe(1)
+    expect(catalog.sections.find((section) => section.key === 'skills-cloud-devops')?.count).toBe(1)
+    expect(catalog.sections.find((section) => section.key === 'skills-data-research')?.count).toBe(1)
+    expect(catalog.sections.find((section) => section.key === 'skills-content-design')?.count).toBe(1)
 
     const results = await searchKnowledge('axi-skills', 'deep-init-pro')
     expect(results[0]?.path).toBe('skills/deep-init-pro/SKILL.md')
@@ -267,6 +322,11 @@ describe('knowledge base local index', () => {
 
     const raw = await readKnowledgeFile('axi-skills', 'skills/deep-init-pro/SKILL.md')
     expect(raw).toContain('name: deep-init-pro')
+    const indexRaw = await readKnowledgeFile('axi-skills', 'docs/SKILL_INDEX.md')
+    expect(indexRaw).toContain('## 能力分组')
+    expect(indexRaw).toContain('## Agent 工作流')
+    expect(indexRaw).toContain('## 工程实现与架构')
+    expect(indexRaw).toContain('`skills/frontend-dev/SKILL.md`')
   })
 
   it('indexes dbskill as a full organized skill library', async () => {

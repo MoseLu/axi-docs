@@ -453,43 +453,49 @@ const AXI_SKILL_FAMILIES: SkillFamilyDefinition[] = [
     key: 'skills-agent-workflows',
     title: 'Agent 工作流',
     description: '面向 agent 调度、记忆、浏览器、自动化和多角色协作的技能。',
-    match: ['agent', 'agents', 'agentic', 'agentmemory', 'autopilot', 'ralph', 'ralplan', 'team', 'swarm', 'browser', 'memory', 'workflow', 'automation', 'omx'],
+    match: ['agent', 'agents', 'agentic', 'agentmemory', 'analyze', 'ask', 'autopilot', 'autoresearch', 'autonomous', 'blueprint', 'browser', 'cancel', 'ccg', 'code-review', 'codex', 'claude', 'continuous', 'context', 'create-skill', 'deep', 'deep-init', 'deep-interview', 'deepinit', 'diagnose', 'doctor', 'encode-skill', 'eval', 'evaluate', 'forget', 'harness', 'hook', 'improve-skill', 'investigation', 'learner', 'loop', 'memory', 'minimal-skill', 'omc', 'omx', 'pipeline', 'plan', 'prometheus', 'prompt', 'ralph', 'ralplan', 'recall', 'remember', 'session-history', 'self-improve', 'skill-comply', 'skill-stocktake', 'skillify', 'split-to-prs', 'statusline', 'subagent', 'summary', 'swarm', 'team', 'to-issues', 'to-prd', 'trace', 'triage', 'ultra', 'verification', 'verify', 'visual', 'worker', 'workflow', 'write-a-skill'],
+  },
+  {
+    key: 'skills-ai-infra',
+    title: 'AI SDK 与模型基础设施',
+    description: '模型 SDK、网关、本地模型、评测、生成持久化和 AI 应用基础设施。',
+    match: ['ai', 'agents-sdk', 'chatgpt', 'chat-sdk', 'fal', 'foundation', 'gateway', 'gpt', 'hf', 'hugging-face', 'huggingface', 'local-model', 'model', 'ollama', 'openai', 'prompting', 'sandbox-sdk', 'sdk', 'transformers'],
   },
   {
     key: 'skills-engineering',
     title: '工程实现与架构',
     description: '代码实现、架构、后端、前端、移动端、测试和调试技能。',
-    match: ['dev', 'debug', 'test', 'testing', 'frontend', 'backend', 'fullstack', 'api', 'architecture', 'android', 'expo', 'flutter', 'django', 'fastapi', 'golang', 'csharp', 'cpp', 'typescript', 'react', 'nextjs', 'database'],
+    match: ['android', 'api', 'appkit', 'architecture', 'aspnet', 'auth', 'backend', 'bun', 'codebase', 'coding', 'compose', 'cpp', 'csharp', 'dart', 'database', 'debug', 'dev', 'django', 'dotnet', 'expo', 'fastapi', 'flutter', 'frontend', 'fullstack', 'game', 'golang', 'ios', 'java', 'jpa', 'kotlin', 'laravel', 'nestjs', 'next', 'nextjs', 'ncc', 'nuxt', 'perl', 'phaser', 'postgres', 'python', 'react', 'refactor', 'routing', 'shadcn', 'springboot', 'svelte', 'swift', 'swiftpm', 'swiftui', 'swr', 'tauri', 'tdd', 'test', 'testing', 'three', 'typescript', 'ui', 'use-dom', 'view-refactor', 'web'],
+  },
+  {
+    key: 'skills-tools-platforms',
+    title: '工具与平台连接',
+    description: 'CLI、MCP、Google、邮件、日历、浏览器、第三方平台和集成工具技能。',
+    match: ['box', 'canva', 'chrome', 'cli', 'connector', 'credentials', 'discord', 'email', 'env', 'feishu', 'figma', 'gmail', 'google', 'jira', 'local', 'mcp', 'mcpb', 'minimax', 'mubu', 'notebooklm', 'notification', 'notion', 'obsidian', 'outlook', 'plugin', 'sharepoint', 'slack', 'teams', 'tool', 'windows', 'zoom'],
   },
   {
     key: 'skills-cloud-devops',
     title: '云服务与交付',
     description: '部署、CI/CD、云平台、容器、GitHub 和发布治理技能。',
-    match: ['deploy', 'deployment', 'cloudflare', 'vercel', 'netlify', 'render', 'docker', 'circleci', 'github', 'git', 'ci', 'release', 'ops'],
+    match: ['bootstrap', 'canary', 'cache', 'ci', 'circleci', 'cloudflare', 'cron', 'deploy', 'deployment', 'docker', 'durable', 'git', 'github', 'neon', 'netlify', 'observability', 'packaging', 'release', 'render', 'runtime', 'sentry', 'setup', 'supabase', 'telemetry', 'turbopack', 'turborepo', 'vercel', 'workers', 'wrangler'],
   },
   {
     key: 'skills-content-design',
     title: '内容、设计与文档',
     description: '写作、内容资产、品牌、设计、演示文稿和文档生产技能。',
-    match: ['content', 'article', 'writing', 'writer', 'brand', 'design', 'figma', 'canva', 'slides', 'presentation', 'ppt', 'doc', 'docs', 'documentation', 'pdf', 'image', 'video'],
+    match: ['article', 'brand', 'canvas', 'ck', 'content', 'crosspost', 'design', 'doc', 'docs', 'documentation', 'document', 'draw', 'female', 'geist', 'gif', 'haowallpaper', 'image', 'investor-materials', 'liquid', 'pdf', 'portrait', 'ppt', 'pptx', 'presentation', 'remotion', 'satori', 'slides', 'sprite', 'svg', 'video', 'wallpaper', 'wechat', 'website', 'writer', 'writing'],
   },
   {
     key: 'skills-data-research',
     title: '研究、数据与模型',
     description: '外部研究、数据集、生物医学、模型训练和检索技能。',
-    match: ['research', 'data', 'dataset', 'huggingface', 'hf', 'model', 'eval', 'benchmark', 'bio', 'gene', 'gwas', 'clinical', 'chem', 'ontology', 'scraper'],
-  },
-  {
-    key: 'skills-tools-platforms',
-    title: '工具与平台连接',
-    description: 'CLI、Google、邮件、日历、浏览器、第三方平台和集成工具技能。',
-    match: ['cli', 'google', 'gmail', 'calendar', 'drive', 'sheets', 'slack', 'notion', 'outlook', 'chrome', 'mcp', 'plugin', 'connector', 'tool'],
+    match: ['alphafold', 'benchmark', 'bgee', 'bindingdb', 'bio', 'biobank', 'biorxiv', 'biostudies', 'blast', 'cbioportal', 'cellxgene', 'chebi', 'chem', 'chembl', 'civic', 'clinical', 'clinvar', 'clickhouse', 'data', 'dataset', 'efo', 'ensembl', 'entrez', 'epigraphdb', 'eqtl', 'eva', 'finngen', 'gene', 'genebass', 'gnomad', 'gtex', 'gwas', 'healthcare', 'hmdb', 'human-protein', 'ipd', 'iterative-retrieval', 'marketplace', 'metabolights', 'metric', 'mgnify', 'ncbi', 'ontology', 'opentargets', 'phewas', 'pharmgkb', 'pride', 'protein', 'proteomexchange', 'pubchem', 'quickgo', 'rcsb', 'reactome', 'research', 'rhea', 'rnacentral', 'scraper', 'search', 'tpmi', 'ukb', 'uniprot'],
   },
   {
     key: 'skills-business-ops',
     title: '业务与运营',
     description: '业务运营、支付、客户、市场、治理和团队流程技能。',
-    match: ['business', 'ops', 'payment', 'billing', 'customer', 'marketing', 'sales', 'finance', 'governance', 'management', 'project'],
+    match: ['access', 'billing', 'business', 'carrier', 'connections', 'customer', 'customs', 'energy', 'finance', 'governance', 'inventory', 'investor', 'lead', 'management', 'marketing', 'meeting', 'ops', 'payment', 'payments', 'procurement', 'product', 'production', 'project', 'sales', 'scheduling', 'stripe', 'trade'],
   },
 ]
 
@@ -497,28 +503,95 @@ function normalizeSkillToken(value: string): string {
   return value.trim().toLowerCase()
 }
 
+function tokenizeSkillKey(value: string): string[] {
+  return normalizeSkillToken(value)
+    .split(/[^a-z0-9]+/i)
+    .map((token) => token.trim())
+    .filter(Boolean)
+}
+
 function getSkillKey(document: Pick<ParsedDocument, 'name' | 'path' | 'aliases'>): string {
   return normalizeSkillToken(document.name || document.aliases[0] || path.basename(path.dirname(document.path)))
 }
 
 function getSkillFamily(document: ParsedDocument, definitions: SkillFamilyDefinition[]): SkillFamilyDefinition | null {
-  const searchText = normalizeSkillToken([
-    document.name,
-    document.title,
-    document.path,
-    document.description || '',
-    ...(document.aliases || []),
-    ...(document.tags || []),
-  ].join(' '))
   const skillKey = getSkillKey(document)
+  const pathTokens = tokenizeSkillKey(document.path.replace(/\/?SKILL\.md$/i, ''))
+  const aliasTokens = (document.aliases || []).flatMap(tokenizeSkillKey)
+  const keyTokens = tokenizeSkillKey(skillKey)
+  const exactTokens = new Set([...pathTokens, ...aliasTokens, ...keyTokens])
 
   return definitions.find((family) => family.match.some((token) => {
     const normalizedToken = normalizeSkillToken(token)
+    const tokenParts = tokenizeSkillKey(normalizedToken)
     return skillKey === normalizedToken
       || skillKey.startsWith(`${normalizedToken}-`)
       || skillKey.startsWith(`${normalizedToken}:`)
-      || searchText.includes(normalizedToken)
+      || skillKey.includes(`-${normalizedToken}-`)
+      || skillKey.endsWith(`-${normalizedToken}`)
+      || exactTokens.has(normalizedToken)
+      || (normalizedToken.length >= 4 && [...exactTokens].some((exactToken) => exactToken.startsWith(normalizedToken)))
+      || (tokenParts.length > 1 && tokenParts.every((part) => exactTokens.has(part)))
   })) || null
+}
+
+function getSkillFamilyDefinitions(source: DocSource): SkillFamilyDefinition[] {
+  return source.organizationHint === 'dbskill' ? DB_SKILL_FAMILIES : AXI_SKILL_FAMILIES
+}
+
+function buildSkillIndexMarkdown(source: DocSource, skillDocs: ParsedDocument[], originalRaw: string): string {
+  if (skillDocs.length === 0) return originalRaw
+
+  const definitions = getSkillFamilyDefinitions(source)
+  const grouped = new Map<string, { definition: SkillFamilyDefinition, items: ParsedDocument[] }>()
+
+  for (const document of skillDocs) {
+    const definition = getSkillFamily(document, definitions) || buildFallbackSkillFamily(document, source)
+    if (!grouped.has(definition.key)) {
+      grouped.set(definition.key, { definition, items: [] })
+    }
+    grouped.get(definition.key)!.items.push(document)
+  }
+
+  const orderedKeys = definitions.map((definition) => definition.key)
+  const groups = [...grouped.values()].sort((left, right) => {
+    const leftOrder = orderedKeys.indexOf(left.definition.key)
+    const rightOrder = orderedKeys.indexOf(right.definition.key)
+    if (leftOrder !== -1 || rightOrder !== -1) {
+      if (leftOrder === -1) return 1
+      if (rightOrder === -1) return -1
+      return leftOrder - rightOrder
+    }
+    if (right.items.length !== left.items.length) return right.items.length - left.items.length
+    return left.definition.title.localeCompare(right.definition.title, 'zh-CN')
+  })
+
+  const lines = [
+    `# ${source.name} 技能索引`,
+    '',
+    `当前索引 ${skillDocs.length} 个技能入口，按能力组组织；左侧侧栏只做快速入口，完整目录以本页分组为准。`,
+    '',
+    '## 能力分组',
+    '',
+    ...groups.map(({ definition, items }) => `- **${definition.title}**：${items.length} 个技能。${definition.description}`),
+    '',
+  ]
+
+  for (const { definition, items } of groups) {
+    lines.push(`## ${definition.title}`)
+    lines.push('')
+    lines.push(definition.description)
+    lines.push('')
+    lines.push('| Skill | Description | Path |')
+    lines.push('|---|---|---|')
+    for (const item of [...items].sort((left, right) => left.title.localeCompare(right.title, 'zh-CN') || left.path.localeCompare(right.path, 'zh-CN'))) {
+      const description = (item.description || '').replace(/\s+/g, ' ').replace(/\|/g, '/')
+      lines.push(`| \`${item.name}\` | ${description} | \`${item.path}\` |`)
+    }
+    lines.push('')
+  }
+
+  return lines.join('\n')
 }
 
 function buildSkillDocument(source: DocSource, relativePath: string, stat: fs.Stats, raw: string): ParsedDocument {
@@ -734,7 +807,8 @@ async function collectSkillDocuments(source: DocSource): Promise<ParsedDocument[
   if (allowedSkillNames.size === 0 && fs.existsSync(indexPath)) {
     const stat = await fs.promises.stat(indexPath)
     const raw = await fs.promises.readFile(indexPath, 'utf-8')
-    const body = parseMarkdownDocument(raw).content
+    const indexRaw = buildSkillIndexMarkdown(source, documents.filter((document) => document.docType === 'skill'), raw)
+    const body = parseMarkdownDocument(indexRaw).content
     documents.push(createVirtualParsedDocument({
       sourceId: source.id,
       path: 'docs/SKILL_INDEX.md',
@@ -747,7 +821,7 @@ async function collectSkillDocuments(source: DocSource): Promise<ParsedDocument[
       tags: ['技能', '索引', 'Agent'],
       categories: ['indexes', 'standards'],
       updated: stat.mtime.toISOString(),
-      raw,
+      raw: indexRaw,
       body,
       frontmatter: {
         id: 'axi-skills-index',
@@ -1633,7 +1707,16 @@ function sortCatalogItems(items: KnowledgeCatalogItem[]): KnowledgeCatalogItem[]
   })
 }
 
-function buildFallbackSkillFamily(document: ParsedDocument): SkillFamilyDefinition {
+function buildFallbackSkillFamily(document: ParsedDocument, source?: DocSource): SkillFamilyDefinition {
+  if (source?.organizationHint === 'skill-families') {
+    return {
+      key: 'skills-other',
+      title: '其他专业技能',
+      description: '未命中核心能力组的专业技能，保留完整入口并按名称排序。',
+      match: ['other'],
+    }
+  }
+
   const skillKey = getSkillKey(document)
   const namespace = skillKey.includes(':')
     ? skillKey.split(':')[0]
@@ -1655,7 +1738,7 @@ function buildSkillCatalogSections(source: DocSource, documents: ParsedDocument[
   const grouped = new Map<string, { definition: SkillFamilyDefinition, items: KnowledgeCatalogItem[] }>()
 
   for (const document of skillDocs) {
-    const definition = getSkillFamily(document, definitions) || buildFallbackSkillFamily(document)
+    const definition = getSkillFamily(document, definitions) || buildFallbackSkillFamily(document, source)
     if (!grouped.has(definition.key)) {
       grouped.set(definition.key, { definition, items: [] })
     }

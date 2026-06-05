@@ -92,7 +92,7 @@ html[data-axi-docs-theme='light'] .app-main--home {
   height: var(--axi-doc-vp-nav-height);
   flex: 1;
   margin-left: 0;
-  padding: 0 calc(var(--axi-doc-vp-layout-offset) + 32px) 0 32px;
+  padding: 0 calc(var(--axi-doc-vp-layout-offset) + 32px) 0 16px;
   justify-content: flex-start;
   gap: 12px;
 }

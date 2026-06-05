@@ -52,7 +52,6 @@ export function Header({
     window.localStorage.getItem('axi-docs-theme') === 'light' ? 'light' : 'dark'
   ))
   const [inputValue, setInputValue] = useState(searchQuery)
-  const [navOpen, setNavOpen] = useState(false)
   const [localeOpen, setLocaleOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([])
@@ -65,7 +64,6 @@ export function Header({
   const suggestionRequestRef = useRef(0)
 
   const trimmedInput = inputValue.trim()
-  const activeSource = new URLSearchParams(location.search).get('source')
   const currentLocale = getCurrentLocale(location.pathname)
   const currentLocaleLabel = localeOptions.find((locale) => locale.code === currentLocale)?.label || '简体中文'
   const guideHref = `/${currentLocale}/guide/getting-started`
@@ -110,19 +108,6 @@ export function Header({
       window.removeEventListener('keydown', handleEscape)
     }
   }, [localeOpen])
-
-  useEffect(() => {
-    if (pageMode === 'category') {
-      setNavOpen(false)
-      document.documentElement.classList.remove('axi-doc-nav-open')
-      return undefined
-    }
-
-    document.documentElement.classList.toggle('axi-doc-nav-open', navOpen)
-    return () => {
-      document.documentElement.classList.remove('axi-doc-nav-open')
-    }
-  }, [navOpen, pageMode])
 
   useEffect(() => {
     document.documentElement.classList.toggle('axi-search-open', searchOpen)
@@ -265,12 +250,6 @@ export function Header({
       </button>
     )
   }
-
-  const topNavItems = [
-    { label: '指南', to: guideHref, active: pageMode === 'document' || (pageMode === 'home' && !activeSource) },
-    { label: '技能库', to: '/?source=axi-skills', active: pageMode === 'home' && activeSource === 'axi-skills' },
-    { label: '工作区', to: '/?source=workspace', active: pageMode === 'home' && activeSource === 'workspace' },
-  ]
 
   const searchModal = searchOpen ? createPortal(
     <div
@@ -422,18 +401,6 @@ export function Header({
 
         {pageMode !== 'category' && (
           <>
-            <nav aria-label="顶部导航" className="header-vp-nav">
-              {topNavItems.map((item) => (
-                <Link
-                  key={item.label}
-                  className={`header-vp-nav__link${item.active ? ' active' : ''}`}
-                  onClick={() => setNavOpen(false)}
-                  to={item.to}
-                >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
             <div className="header-vp-tools" aria-label="站点工具">
               <div className="header-vp-locale" ref={localeMenuRef}>
                 <button
@@ -492,37 +459,9 @@ export function Header({
                 <GitHubIcon />
               </a>
             </div>
-            <button
-              aria-expanded={navOpen}
-              aria-label={navOpen ? '关闭导航菜单' : '打开导航菜单'}
-              className={`header-vp-menu${navOpen ? ' active' : ''}`}
-              onClick={() => setNavOpen((current) => !current)}
-              type="button"
-            >
-              <span />
-              <span />
-              <span />
-            </button>
           </>
         )}
       </div>
-
-      {pageMode !== 'category' && navOpen && (
-        <div className="header-vp-screen">
-          <nav aria-label="移动端顶部导航">
-            {topNavItems.map((item) => (
-              <Link
-                key={`${item.label}:screen`}
-                className={`header-vp-screen__link${item.active ? ' active' : ''}`}
-                onClick={() => setNavOpen(false)}
-                to={item.to}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
-      )}
 
       {searchModal}
     </header>

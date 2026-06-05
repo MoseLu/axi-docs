@@ -36,6 +36,17 @@ const source: DocSource = {
   adapter: 'workspace',
 }
 
+const skillsSource: DocSource = {
+  id: 'axi-skills',
+  name: 'Axi Skills',
+  description: 'Shared skill library',
+  path: '/skills',
+  enabled: true,
+  type: 'local',
+  kind: 'skill-library',
+  adapter: 'skills',
+}
+
 const catalog: KnowledgeCatalog = {
   sourceId: 'workspace',
   totalDocs: 1,
@@ -59,6 +70,32 @@ const catalog: KnowledgeCatalog = {
           docType: 'project',
           tags: [],
           categories: ['project'],
+          techStack: [],
+        },
+      ],
+    },
+  ],
+}
+
+const skillsCatalog: KnowledgeCatalog = {
+  ...catalog,
+  sourceId: 'axi-skills',
+  sections: [
+    {
+      key: 'frontend',
+      title: 'Frontend',
+      description: '前端技能',
+      count: 1,
+      items: [
+        {
+          sourceId: 'axi-skills',
+          path: 'skills/frontend-dev/SKILL.md',
+          name: 'frontend-dev',
+          title: 'Frontend Dev',
+          description: 'Frontend workflow skill',
+          docType: 'skill',
+          tags: [],
+          categories: ['frontend'],
           techStack: [],
         },
       ],
@@ -137,6 +174,31 @@ describe('App document route', () => {
 
     expect(screen.getAllByRole('link', { name: 'Getting Started' })[0]).toHaveAttribute('href', '/en/guide/getting-started')
     expect(screen.getAllByRole('link', { name: 'What is Axi Docs?' })[0]).toHaveAttribute('href', '/en/guide/what-is-axi-docs')
+  })
+
+  it('renders skills as a locale-prefixed document set with its own sidebar', async () => {
+    mocks.listKnowledgeSources.mockResolvedValue([source, skillsSource])
+    mocks.getKnowledgeCatalog.mockImplementation(async (sourceId: string) => (
+      sourceId === 'axi-skills' ? skillsCatalog : catalog
+    ))
+    mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
+    mocks.searchKnowledgeAll.mockResolvedValue([])
+    mocks.readKnowledgeFile.mockResolvedValue(null)
+
+    render(
+      <MemoryRouter initialEntries={['/zh/skills']}>
+        <App />
+      </MemoryRouter>,
+    )
+
+    await screen.findByRole('heading', { name: 'Axi Skills', level: 1 })
+
+    expect(mocks.getKnowledgeCatalog).toHaveBeenCalledWith('axi-skills')
+    expect(screen.getByRole('link', { name: '技能库' })).toHaveAttribute('href', '/zh/skills')
+    expect(screen.getByRole('link', { name: '技能库' })).toHaveClass('active')
+    expect(screen.getByRole('button', { name: 'Frontend' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /Frontend Dev/i })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: '快速开始' })).not.toBeInTheDocument()
   })
 
   it('loads a readable route document once instead of flickering back into loading', async () => {

@@ -31,6 +31,12 @@ function getCurrentLocale(pathname: string): HeaderLocale {
   return pathname.startsWith('/en/') ? 'en' : 'zh'
 }
 
+function getCurrentDocSet(pathname: string): 'guide' | 'skills' | 'workspace' {
+  if (/^\/(zh|en)\/skills(?:\/|$)/u.test(pathname)) return 'skills'
+  if (/^\/(zh|en)\/workspace(?:\/|$)/u.test(pathname)) return 'workspace'
+  return 'guide'
+}
+
 function buildLocaleHref(pathname: string, search: string, locale: HeaderLocale): string {
   if (/^\/(zh|en)\//u.test(pathname)) {
     return `${pathname.replace(/^\/(zh|en)\//u, `/${locale}/`)}${search}`
@@ -67,7 +73,10 @@ export function Header({
   const trimmedInput = inputValue.trim()
   const activeSource = new URLSearchParams(location.search).get('source')
   const currentLocale = getCurrentLocale(location.pathname)
+  const currentDocSet = getCurrentDocSet(location.pathname)
   const guideHref = `/${currentLocale}/guide/getting-started`
+  const skillsHref = `/${currentLocale}/skills`
+  const workspaceHref = `/${currentLocale}/workspace`
   const documentSuggestions = suggestions.filter((suggestion) => suggestion.kind === 'document')
   const tagSuggestions = suggestions.filter((suggestion) => suggestion.kind === 'tag')
 
@@ -266,9 +275,9 @@ export function Header({
   }
 
   const topNavItems = [
-    { label: '指南', to: guideHref, active: pageMode === 'document' || (pageMode === 'home' && !activeSource) },
-    { label: '技能库', to: '/?source=axi-skills', active: pageMode === 'home' && activeSource === 'axi-skills' },
-    { label: '工作区', to: '/?source=workspace', active: pageMode === 'home' && activeSource === 'workspace' },
+    { label: '指南', to: guideHref, active: pageMode === 'document' || (pageMode === 'home' && currentDocSet === 'guide' && !activeSource) },
+    { label: '技能库', to: skillsHref, active: pageMode === 'home' && currentDocSet === 'skills' },
+    { label: '工作区', to: workspaceHref, active: pageMode === 'home' && currentDocSet === 'workspace' },
   ]
 
   const searchModal = searchOpen ? createPortal(

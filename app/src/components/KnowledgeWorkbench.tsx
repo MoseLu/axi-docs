@@ -6,7 +6,7 @@ import {
   SearchResult,
   SelectedFile,
 } from '../types'
-import { HomeCommandCenter, QuickKnowledgeItemLike, type GuideLocale, type GuidePageId } from './HomeCommandCenter'
+import { HomeCommandCenter, QuickKnowledgeItemLike, type DocSetId, type GuideLocale, type GuidePageId } from './HomeCommandCenter'
 import { KnowledgeExplorer } from './KnowledgeExplorer'
 
 type ExplorerView = 'tree' | 'path' | 'islands'
@@ -27,10 +27,10 @@ interface KnowledgeWorkbenchProps {
   fileLoading: boolean
   activeTag: string | null
   pageMode: 'home' | 'explorer'
+  docSet?: DocSetId
   guideLocale?: GuideLocale
   guidePageId?: GuidePageId
   onOpenItem: (sourceId: string, path: string) => void
-  onSourceSelect: (sourceId: string) => void
   onTagSelect: (tag: string | null) => void
   onSearch: (query: string) => void
   onWikiLink: (noteName: string) => void
@@ -58,10 +58,10 @@ export function KnowledgeWorkbench({
   fileLoading,
   activeTag,
   pageMode,
+  docSet,
   guideLocale,
   guidePageId,
   onOpenItem,
-  onSourceSelect,
   onTagSelect,
   onWikiLink,
   onNavigateHome,
@@ -123,13 +123,13 @@ export function KnowledgeWorkbench({
         activeTag={activeTag}
         activeSourceId={activeSourceId}
         catalog={catalog}
+        docSet={docSet}
         graphFocusPath={graphFocusPath}
         guideLocale={guideLocale}
         guidePageId={guidePageId}
         onClearSelectedFile={onClearSelectedFile}
         onOpenExplorer={onNavigateExplorer}
         onOpenItem={onOpenItem}
-        onSourceSelect={onSourceSelect}
         onTagSelect={onTagSelect}
         searching={searching}
         searchQuery={searchQuery}

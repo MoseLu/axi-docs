@@ -51,7 +51,58 @@ const catalog: KnowledgeCatalog = {
       title: '指南',
       description: '核心文档阅读路径',
       count: 2,
-      items: [],
+      items: [
+        {
+          sourceId: 'workspace',
+          path: 'projects/alpha.md',
+          name: 'alpha',
+          title: 'Alpha Project',
+          description: 'Project overview',
+          docType: 'project',
+          tags: [],
+          categories: ['guide'],
+          techStack: [],
+        },
+      ],
+    },
+  ],
+}
+
+const skillsCatalog: KnowledgeCatalog = {
+  ...catalog,
+  sourceId: 'axi-skills',
+  recentDocs: [
+    {
+      sourceId: 'axi-skills',
+      path: 'skills/frontend-dev/SKILL.md',
+      name: 'frontend-dev',
+      title: 'Frontend Dev',
+      description: 'Frontend workflow skill',
+      docType: 'skill',
+      tags: [],
+      categories: ['frontend'],
+      techStack: [],
+    },
+  ],
+  sections: [
+    {
+      key: 'frontend',
+      title: 'Frontend',
+      description: '前端技能',
+      count: 1,
+      items: [
+        {
+          sourceId: 'axi-skills',
+          path: 'skills/frontend-dev/SKILL.md',
+          name: 'frontend-dev',
+          title: 'Frontend Dev',
+          description: 'Frontend workflow skill',
+          docType: 'skill',
+          tags: [],
+          categories: ['frontend'],
+          techStack: [],
+        },
+      ],
     },
   ],
 }
@@ -66,7 +117,6 @@ describe('HomeCommandCenter', () => {
         onClearSelectedFile={vi.fn()}
         onOpenExplorer={vi.fn()}
         onOpenItem={vi.fn()}
-        onSourceSelect={vi.fn()}
         onTagSelect={vi.fn()}
         searchQuery=""
         selectedFile={null}
@@ -81,32 +131,37 @@ describe('HomeCommandCenter', () => {
     expect(within(screen.getByLabelText('侧边栏导航')).getByRole('link', { name: '什么是 Axi Docs？' })).toHaveAttribute('href', '/zh/guide/what-is-axi-docs')
     expect(within(screen.getByLabelText('页面导航')).getByRole('link', { name: '快速开始' })).toBeInTheDocument()
     expect(within(document.querySelector('#getting-started') as HTMLElement).queryByText('Axi Workspace')).not.toBeInTheDocument()
-    expect(within(screen.getByLabelText('文档库')).getByRole('button', { name: /Axi Workspace/i })).not.toHaveClass('active')
     expect(screen.getByText('未锁定来源')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: '文档结构' })).toBeInTheDocument()
     expect(screen.queryByText('PROJECTS')).not.toBeInTheDocument()
   })
 
-  it('highlights a source only when it is explicitly selected', () => {
+  it('renders a nav-level skills document set with its own sidebar pages', () => {
+    const onOpenItem = vi.fn()
     render(
       <HomeCommandCenter
-        activeSourceId="workspace"
+        activeSourceId="axi-skills"
         activeTag={null}
-        catalog={catalog}
+        catalog={skillsCatalog}
+        docSet="skills"
         graphFocusPath={null}
         onClearSelectedFile={vi.fn()}
         onOpenExplorer={vi.fn()}
-        onOpenItem={vi.fn()}
-        onSourceSelect={vi.fn()}
+        onOpenItem={onOpenItem}
         onTagSelect={vi.fn()}
         searchQuery=""
         selectedFile={null}
-        source={sources[0]}
+        source={sources[1]}
         sources={sources}
       />,
     )
 
-    expect(within(screen.getByLabelText('文档库')).getByRole('button', { name: /Axi Workspace/i })).toHaveClass('active')
+    expect(screen.getByRole('heading', { name: 'Axi Skills', level: 1 })).toBeInTheDocument()
+    expect(within(screen.getByLabelText('侧边栏导航')).getByRole('button', { name: 'Frontend' })).toBeInTheDocument()
+    expect(within(screen.getByLabelText('Frontend')).getByRole('button', { name: /Frontend Dev/i })).toBeInTheDocument()
+    expect(within(screen.getByLabelText('侧边栏导航')).queryByRole('link', { name: '快速开始' })).not.toBeInTheDocument()
+    fireEvent.click(within(screen.getByLabelText('Frontend')).getByRole('button', { name: /Frontend Dev/i }))
+    expect(onOpenItem).toHaveBeenCalledWith('axi-skills', 'skills/frontend-dev/SKILL.md')
     expect(screen.getByText('当前来源')).toBeInTheDocument()
   })
 
@@ -120,7 +175,6 @@ describe('HomeCommandCenter', () => {
         onClearSelectedFile={vi.fn()}
         onOpenExplorer={vi.fn()}
         onOpenItem={vi.fn()}
-        onSourceSelect={vi.fn()}
         onTagSelect={vi.fn()}
         searchQuery=""
         selectedFile={null}
@@ -146,7 +200,6 @@ describe('HomeCommandCenter', () => {
         onClearSelectedFile={vi.fn()}
         onOpenExplorer={vi.fn()}
         onOpenItem={vi.fn()}
-        onSourceSelect={vi.fn()}
         onTagSelect={vi.fn()}
         searchQuery="AXI"
         searchResults={[]}
@@ -160,30 +213,6 @@ describe('HomeCommandCenter', () => {
     expect(screen.getByText('No matching documents found. Try another keyword or continue from a recommended reading path.')).toBeInTheDocument()
   })
 
-  it('keeps source selection actionable from the docs sidebar', () => {
-    const onSourceSelect = vi.fn()
-    render(
-      <HomeCommandCenter
-        activeTag={null}
-        catalog={catalog}
-        graphFocusPath={null}
-        onClearSelectedFile={vi.fn()}
-        onOpenExplorer={vi.fn()}
-        onOpenItem={vi.fn()}
-        onSourceSelect={onSourceSelect}
-        onTagSelect={vi.fn()}
-        searchQuery=""
-        selectedFile={null}
-        source={sources[0]}
-        sources={sources}
-      />,
-    )
-
-    fireEvent.click(within(screen.getByLabelText('文档库')).getByRole('button', { name: /Axi Skills/i }))
-
-    expect(onSourceSelect).toHaveBeenCalledWith('axi-skills')
-  })
-
   it('collapses and expands sidebar groups for real', () => {
     render(
       <HomeCommandCenter
@@ -193,7 +222,6 @@ describe('HomeCommandCenter', () => {
         onClearSelectedFile={vi.fn()}
         onOpenExplorer={vi.fn()}
         onOpenItem={vi.fn()}
-        onSourceSelect={vi.fn()}
         onTagSelect={vi.fn()}
         searchQuery=""
         selectedFile={null}
@@ -206,12 +234,12 @@ describe('HomeCommandCenter', () => {
     fireEvent.click(intro)
 
     expect(intro).toHaveAttribute('aria-expanded', 'false')
-    expect(within(screen.getByLabelText('简介')).queryByRole('link', { name: '快速开始' })).not.toBeInTheDocument()
+    expect(within(screen.getByLabelText('指南')).queryByRole('link', { name: '快速开始' })).not.toBeInTheDocument()
 
     fireEvent.click(intro)
 
     expect(intro).toHaveAttribute('aria-expanded', 'true')
-    expect(within(screen.getByLabelText('简介')).getByRole('link', { name: '快速开始' })).toBeInTheDocument()
+    expect(within(screen.getByLabelText('指南')).getByRole('link', { name: '快速开始' })).toBeInTheDocument()
   })
 
   it('shows inline search results as a document section', () => {
@@ -243,7 +271,6 @@ describe('HomeCommandCenter', () => {
         onOpenExplorer={vi.fn()}
         onOpenItem={onOpenItem}
         guidePageId="search"
-        onSourceSelect={vi.fn()}
         onTagSelect={vi.fn()}
         searchQuery="AXI"
         searchResults={searchResults}

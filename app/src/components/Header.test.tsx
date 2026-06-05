@@ -87,11 +87,13 @@ describe('Header', () => {
     }
   })
 
-  it('keeps the guide route separate from source navigation', () => {
-    renderHeader({ pageMode: 'home' }, '/?source=workspace')
+  it('maps top navigation to locale-prefixed document sets', () => {
+    renderHeader({ pageMode: 'home' }, '/zh/workspace')
 
     expect(screen.getByRole('link', { name: '返回首页' })).toHaveAttribute('href', '/zh/guide/getting-started')
     expect(screen.getByRole('link', { name: '指南' })).toHaveAttribute('href', '/zh/guide/getting-started')
+    expect(screen.getByRole('link', { name: '技能库' })).toHaveAttribute('href', '/zh/skills')
+    expect(screen.getByRole('link', { name: '工作区' })).toHaveAttribute('href', '/zh/workspace')
     expect(screen.getByRole('link', { name: '指南' })).not.toHaveClass('active')
     expect(screen.getByRole('link', { name: '工作区' })).toHaveClass('active')
     expect(screen.getByRole('button', { name: '选择语言' })).toBeInTheDocument()
@@ -117,6 +119,8 @@ describe('Header', () => {
     expect(screen.getByRole('menuitem', { name: 'English' })).toHaveAttribute('aria-current', 'page')
     expect(screen.getByRole('link', { name: '返回首页' })).toHaveAttribute('href', '/en/guide/getting-started')
     expect(screen.getByRole('link', { name: '指南' })).toHaveAttribute('href', '/en/guide/getting-started')
+    expect(screen.getByRole('link', { name: '技能库' })).toHaveAttribute('href', '/en/skills')
+    expect(screen.getByRole('link', { name: '工作区' })).toHaveAttribute('href', '/en/workspace')
   })
 
   it('debounces live search updates on the search page', async () => {

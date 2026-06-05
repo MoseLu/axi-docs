@@ -223,6 +223,7 @@ html[data-axi-docs-theme='light'] .app-main--document {
   width: 40px;
   height: 22px;
   padding: 0;
+  position: relative;
   border-radius: 999px;
   background: transparent;
 }
@@ -243,7 +244,7 @@ html[data-axi-docs-theme='light'] .app-main--document {
 }
 
 .header-vp-theme-toggle:hover .header-vp-theme-toggle__track {
-  border-color: var(--axi-doc-vp-c-border);
+  border-color: var(--axi-doc-vp-c-brand-1);
 }
 
 .header-vp-theme-toggle__thumb {

@@ -50,17 +50,19 @@ describe('Header', () => {
     expect(screen.getByText('搜索')).toBeInTheDocument()
     expect(screen.queryByText('搜索标签、标题或文档')).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: '全局搜索' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '切换浅色样式' })).toBeInTheDocument()
+    expect(screen.getByRole('switch', { name: '切换浅色样式' })).toHaveAttribute('title', '切换到浅色模式')
+    expect(screen.getByRole('switch', { name: '切换浅色样式' })).toHaveAttribute('aria-checked', 'true')
     expect(screen.getByRole('link', { name: 'GitHub' })).toHaveAttribute('href', 'https://github.com/axiomaticworld/axi-docs')
   })
 
   it('toggles the docs theme mode', () => {
     renderHeader()
 
-    fireEvent.click(screen.getByRole('button', { name: '切换浅色样式' }))
+    fireEvent.click(screen.getByRole('switch', { name: '切换浅色样式' }))
 
     expect(document.documentElement.dataset.axiDocsTheme).toBe('light')
-    expect(screen.getByRole('button', { name: '切换深色样式' })).toBeInTheDocument()
+    expect(screen.getByRole('switch', { name: '切换深色样式' })).toHaveAttribute('title', '切换到深色模式')
+    expect(screen.getByRole('switch', { name: '切换深色样式' })).toHaveAttribute('aria-checked', 'false')
   })
 
   it('keeps the guide route separate from source navigation', () => {

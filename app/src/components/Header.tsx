@@ -373,9 +373,11 @@ export function Header({
             <div className="header-vp-tools" aria-label="站点工具">
               <button
                 aria-label={themeMode === 'dark' ? '切换浅色样式' : '切换深色样式'}
-                aria-pressed={themeMode === 'light'}
+                aria-checked={themeMode === 'dark'}
                 className={`header-vp-tool header-vp-tool--theme header-vp-theme-toggle header-vp-theme-toggle--${themeMode}`}
                 onClick={() => setThemeMode((current) => (current === 'dark' ? 'light' : 'dark'))}
+                role="switch"
+                title={themeMode === 'dark' ? '切换到浅色模式' : '切换到深色模式'}
                 type="button"
               >
                 <span className="header-vp-theme-toggle__track" aria-hidden="true">

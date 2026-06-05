@@ -96,16 +96,23 @@ describe('Header', () => {
     expect(screen.getByRole('link', { name: '工作区' })).toHaveClass('active')
   })
 
-  it('switches between locale-prefixed guide routes', () => {
+  it('opens a locale menu with locale-prefixed guide routes', () => {
     renderHeader({ pageMode: 'home' }, '/zh/guide/search?q=axi')
 
-    expect(screen.getByRole('link', { name: '切换语言到English' })).toHaveAttribute('href', '/en/guide/search?q=axi')
+    fireEvent.click(screen.getByRole('button', { name: '选择语言' }))
+
+    expect(screen.getByRole('menu')).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: '简体中文' })).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByRole('menuitem', { name: 'English' })).toHaveAttribute('href', '/en/guide/search?q=axi')
   })
 
-  it('switches English guide routes back to Chinese', () => {
+  it('keeps English guide chrome and offers Chinese from the locale menu', () => {
     renderHeader({ pageMode: 'home' }, '/en/guide/getting-started')
 
-    expect(screen.getByRole('link', { name: '切换语言到简体中文' })).toHaveAttribute('href', '/zh/guide/getting-started')
+    fireEvent.click(screen.getByRole('button', { name: '选择语言' }))
+
+    expect(screen.getByRole('menuitem', { name: '简体中文' })).toHaveAttribute('href', '/zh/guide/getting-started')
+    expect(screen.getByRole('menuitem', { name: 'English' })).toHaveAttribute('aria-current', 'page')
     expect(screen.getByRole('link', { name: '返回首页' })).toHaveAttribute('href', '/en/guide/getting-started')
     expect(screen.getByRole('link', { name: '指南' })).toHaveAttribute('href', '/en/guide/getting-started')
   })

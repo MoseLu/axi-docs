@@ -6,6 +6,8 @@ import type { SearchSuggestion } from '../types'
 import { pageCopy } from '../config/pageCopy'
 import { BookIcon, FileIcon, GitHubIcon, LanguageIcon, SearchIcon, TagIcon, ThemeIcon } from './Icons'
 
+type HeaderLocale = 'zh' | 'en'
+
 interface HeaderProps {
   onSearchChange: (query: string) => void
   onSearchSubmit: (query: string) => void
@@ -15,9 +17,26 @@ interface HeaderProps {
   searching: boolean
 }
 
+const localeOptions: Array<{ code: HeaderLocale; label: string }> = [
+  { code: 'zh', label: '简体中文' },
+  { code: 'en', label: 'English' },
+]
+
 function SuggestionIcon({ kind }: Pick<SearchSuggestion, 'kind'>) {
   if (kind === 'tag') return <TagIcon />
   return <FileIcon />
+}
+
+function getCurrentLocale(pathname: string): HeaderLocale {
+  return pathname.startsWith('/en/') ? 'en' : 'zh'
+}
+
+function buildLocaleHref(pathname: string, search: string, locale: HeaderLocale): string {
+  if (/^\/(zh|en)\//u.test(pathname)) {
+    return `${pathname.replace(/^\/(zh|en)\//u, `/${locale}/`)}${search}`
+  }
+
+  return `/${locale}/guide/getting-started`
 }
 
 export function Header({
@@ -34,10 +53,12 @@ export function Header({
   ))
   const [inputValue, setInputValue] = useState(searchQuery)
   const [navOpen, setNavOpen] = useState(false)
+  const [localeOpen, setLocaleOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([])
   const [activeIndex, setActiveIndex] = useState(-1)
   const inputRef = useRef<HTMLInputElement | null>(null)
+  const localeMenuRef = useRef<HTMLDivElement | null>(null)
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const suggestionDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const themeSwitchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -45,14 +66,9 @@ export function Header({
 
   const trimmedInput = inputValue.trim()
   const activeSource = new URLSearchParams(location.search).get('source')
-  const currentLocale = location.pathname.startsWith('/en/') ? 'en' : 'zh'
+  const currentLocale = getCurrentLocale(location.pathname)
+  const currentLocaleLabel = localeOptions.find((locale) => locale.code === currentLocale)?.label || '简体中文'
   const guideHref = `/${currentLocale}/guide/getting-started`
-  const nextLocale = currentLocale === 'zh' ? 'en' : 'zh'
-  const localeHref = /^\/(zh|en)\//u.test(location.pathname)
-    ? `${location.pathname.replace(/^\/(zh|en)\//u, `/${nextLocale}/`)}${location.search}`
-    : `/${nextLocale}/guide/getting-started`
-  const localeLabel = currentLocale === 'zh' ? '简体中文' : 'English'
-  const nextLocaleLabel = nextLocale === 'zh' ? '简体中文' : 'English'
   const documentSuggestions = suggestions.filter((suggestion) => suggestion.kind === 'document')
   const tagSuggestions = suggestions.filter((suggestion) => suggestion.kind === 'tag')
 
@@ -69,6 +85,31 @@ export function Header({
   useEffect(() => {
     if (!searchOpen) setInputValue(searchQuery)
   }, [searchOpen, searchQuery])
+
+  useEffect(() => {
+    setLocaleOpen(false)
+  }, [location.pathname, location.search])
+
+  useEffect(() => {
+    if (!localeOpen) return undefined
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!localeMenuRef.current?.contains(event.target as Node)) {
+        setLocaleOpen(false)
+      }
+    }
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setLocaleOpen(false)
+    }
+
+    window.addEventListener('pointerdown', handlePointerDown)
+    window.addEventListener('keydown', handleEscape)
+    return () => {
+      window.removeEventListener('pointerdown', handlePointerDown)
+      window.removeEventListener('keydown', handleEscape)
+    }
+  }, [localeOpen])
 
   useEffect(() => {
     if (pageMode === 'category') {
@@ -394,16 +435,36 @@ export function Header({
               ))}
             </nav>
             <div className="header-vp-tools" aria-label="站点工具">
-              <Link
-                aria-label={`切换语言到${nextLocaleLabel}`}
-                className="header-vp-tool header-vp-tool--locale"
-                title={`切换语言到${nextLocaleLabel}`}
-                to={localeHref}
-              >
-                <LanguageIcon />
-                <span>{localeLabel}</span>
-                <span aria-hidden="true" className="header-vp-tool__caret">⌄</span>
-              </Link>
+              <div className="header-vp-locale" ref={localeMenuRef}>
+                <button
+                  aria-expanded={localeOpen}
+                  aria-haspopup="menu"
+                  aria-label="选择语言"
+                  className="header-vp-tool header-vp-tool--locale"
+                  onClick={() => setLocaleOpen((current) => !current)}
+                  type="button"
+                >
+                  <LanguageIcon />
+                  <span>{currentLocaleLabel}</span>
+                  <span aria-hidden="true" className="header-vp-tool__caret">⌄</span>
+                </button>
+                {localeOpen && (
+                  <div className="header-vp-locale-menu" role="menu">
+                    {localeOptions.map((locale) => (
+                      <Link
+                        key={locale.code}
+                        aria-current={locale.code === currentLocale ? 'page' : undefined}
+                        className={`header-vp-locale-menu__item${locale.code === currentLocale ? ' active' : ''}`}
+                        onClick={() => setLocaleOpen(false)}
+                        role="menuitem"
+                        to={buildLocaleHref(location.pathname, location.search, locale.code)}
+                      >
+                        {locale.label}
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </div>
               <span className="header-vp-separator" aria-hidden="true" />
               <button
                 aria-label={themeMode === 'dark' ? '切换浅色样式' : '切换深色样式'}

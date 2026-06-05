@@ -100,6 +100,14 @@ describe('Header', () => {
     expect(screen.queryByText('简体中文')).not.toBeInTheDocument()
   })
 
+  it('keeps the guide nav active even when a stale source query is present', () => {
+    renderHeader({ pageMode: 'home' }, '/zh/guide/getting-started?source=obsidian')
+
+    expect(screen.getByRole('link', { name: '指南' })).toHaveClass('active')
+    expect(screen.getByRole('link', { name: '技能库' })).not.toHaveClass('active')
+    expect(screen.getByRole('link', { name: '工作区' })).not.toHaveClass('active')
+  })
+
   it('opens a locale menu with locale-prefixed guide routes', () => {
     renderHeader({ pageMode: 'home' }, '/zh/guide/search?q=axi')
 

@@ -71,7 +71,6 @@ export function Header({
   const suggestionRequestRef = useRef(0)
 
   const trimmedInput = inputValue.trim()
-  const activeSource = new URLSearchParams(location.search).get('source')
   const currentLocale = getCurrentLocale(location.pathname)
   const currentDocSet = getCurrentDocSet(location.pathname)
   const guideHref = `/${currentLocale}/guide/getting-started`
@@ -275,7 +274,7 @@ export function Header({
   }
 
   const topNavItems = [
-    { label: '指南', to: guideHref, active: pageMode === 'document' || (pageMode === 'home' && currentDocSet === 'guide' && !activeSource) },
+    { label: '指南', to: guideHref, active: pageMode === 'document' || (pageMode === 'home' && currentDocSet === 'guide') },
     { label: '技能库', to: skillsHref, active: pageMode === 'home' && currentDocSet === 'skills' },
     { label: '工作区', to: workspaceHref, active: pageMode === 'home' && currentDocSet === 'workspace' },
   ]

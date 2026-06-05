@@ -40,6 +40,7 @@ export function Header({
   const inputRef = useRef<HTMLInputElement | null>(null)
   const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const suggestionDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const themeSwitchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   const suggestionRequestRef = useRef(0)
 
   const trimmedInput = inputValue.trim()
@@ -52,6 +53,11 @@ export function Header({
     document.documentElement.dataset.axiDocsTheme = themeMode
     window.localStorage.setItem('axi-docs-theme', themeMode)
   }, [themeMode])
+
+  useEffect(() => () => {
+    if (themeSwitchTimerRef.current) clearTimeout(themeSwitchTimerRef.current)
+    document.documentElement.classList.remove('axi-theme-switching')
+  }, [])
 
   useEffect(() => {
     if (!searchOpen) setInputValue(searchQuery)
@@ -153,6 +159,16 @@ export function Header({
   const openSearch = () => {
     setInputValue(searchQuery)
     setSearchOpen(true)
+  }
+
+  const toggleThemeMode = () => {
+    document.documentElement.classList.add('axi-theme-switching')
+    if (themeSwitchTimerRef.current) clearTimeout(themeSwitchTimerRef.current)
+    themeSwitchTimerRef.current = setTimeout(() => {
+      document.documentElement.classList.remove('axi-theme-switching')
+      themeSwitchTimerRef.current = null
+    }, 180)
+    setThemeMode((current) => (current === 'dark' ? 'light' : 'dark'))
   }
 
   const submitSearch = (value: string) => {
@@ -375,7 +391,7 @@ export function Header({
                 aria-label={themeMode === 'dark' ? '切换浅色样式' : '切换深色样式'}
                 aria-checked={themeMode === 'dark'}
                 className={`header-vp-tool header-vp-tool--theme header-vp-theme-toggle header-vp-theme-toggle--${themeMode}`}
-                onClick={() => setThemeMode((current) => (current === 'dark' ? 'light' : 'dark'))}
+                onClick={toggleThemeMode}
                 role="switch"
                 title={themeMode === 'dark' ? '切换到浅色模式' : '切换到深色模式'}
                 type="button"

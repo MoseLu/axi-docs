@@ -156,6 +156,15 @@ html[data-axi-docs-theme='light'] .app-main--document {
   font-size: 13px;
 }
 
+.axi-theme-switching .app-layout--document .header-search--global,
+.axi-theme-switching .app-layout--document .header-search__trigger,
+.axi-theme-switching .app-layout--document .header-search__trigger *,
+.axi-theme-switching .app-layout--home .header-search--global,
+.axi-theme-switching .app-layout--home .header-search__trigger,
+.axi-theme-switching .app-layout--home .header-search__trigger * {
+  transition: none !important;
+}
+
 .header-vp-nav {
   display: none;
   align-items: center;

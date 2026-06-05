@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { Header } from './Header'
 
@@ -40,6 +40,7 @@ describe('Header', () => {
     vi.clearAllMocks()
     window.localStorage.clear()
     document.documentElement.removeAttribute('data-axi-docs-theme')
+    document.documentElement.classList.remove('axi-theme-switching')
     mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
   })
 
@@ -63,6 +64,26 @@ describe('Header', () => {
     expect(document.documentElement.dataset.axiDocsTheme).toBe('light')
     expect(screen.getByRole('switch', { name: '切换深色样式' })).toHaveAttribute('title', '切换到深色模式')
     expect(screen.getByRole('switch', { name: '切换深色样式' })).toHaveAttribute('aria-checked', 'false')
+  })
+
+  it('temporarily suppresses search transitions while switching themes', () => {
+    vi.useFakeTimers()
+
+    try {
+      renderHeader()
+
+      fireEvent.click(screen.getByRole('switch', { name: '切换浅色样式' }))
+
+      expect(document.documentElement).toHaveClass('axi-theme-switching')
+
+      act(() => {
+        vi.advanceTimersByTime(180)
+      })
+
+      expect(document.documentElement).not.toHaveClass('axi-theme-switching')
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   it('keeps the guide route separate from source navigation', () => {

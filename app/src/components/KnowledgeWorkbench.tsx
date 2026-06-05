@@ -16,6 +16,7 @@ type ExplorerView = 'tree' | 'path' | 'islands'
 interface KnowledgeWorkbenchProps {
   source: DocSource
   sources: DocSource[]
+  activeSourceId?: string | null
   catalog: KnowledgeCatalog | null
   catalogLoading: boolean
   catalogError: string | null
@@ -46,6 +47,7 @@ function normalizeExplorerView(value: string | null): ExplorerView {
 export function KnowledgeWorkbench({
   source,
   sources,
+  activeSourceId = null,
   catalog,
   searchQuery,
   searchResults,
@@ -117,6 +119,7 @@ export function KnowledgeWorkbench({
     <div className="knowledge-workbench knowledge-workbench--home">
       <HomeCommandCenter
         activeTag={activeTag}
+        activeSourceId={activeSourceId}
         catalog={catalog}
         graphFocusPath={graphFocusPath}
         onClearSelectedFile={onClearSelectedFile}

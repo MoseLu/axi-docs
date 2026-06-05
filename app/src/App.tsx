@@ -602,6 +602,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
             ) : workspaceSource ? (
               <KnowledgeWorkbench
                 activeTag={activeTag}
+                activeSourceId={searchParams.get('source')}
                 catalog={catalog}
                 catalogError={catalogError}
                 catalogLoading={catalogLoading}

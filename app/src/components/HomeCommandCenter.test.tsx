@@ -80,8 +80,33 @@ describe('HomeCommandCenter', () => {
     expect(within(screen.getByLabelText('侧边栏导航')).getByRole('link', { name: '快速开始' })).toBeInTheDocument()
     expect(within(screen.getByLabelText('页面导航')).getByRole('link', { name: '快速开始' })).toBeInTheDocument()
     expect(within(document.querySelector('#quick-start') as HTMLElement).queryByText('Axi Workspace')).not.toBeInTheDocument()
+    expect(within(screen.getByLabelText('文档库')).getByRole('button', { name: /Axi Workspace/i })).not.toHaveClass('active')
+    expect(screen.getByText('未锁定来源')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: '文档结构' })).toBeInTheDocument()
     expect(screen.queryByText('PROJECTS')).not.toBeInTheDocument()
+  })
+
+  it('highlights a source only when it is explicitly selected', () => {
+    render(
+      <HomeCommandCenter
+        activeSourceId="workspace"
+        activeTag={null}
+        catalog={catalog}
+        graphFocusPath={null}
+        onClearSelectedFile={vi.fn()}
+        onOpenExplorer={vi.fn()}
+        onOpenItem={vi.fn()}
+        onSourceSelect={vi.fn()}
+        onTagSelect={vi.fn()}
+        searchQuery=""
+        selectedFile={null}
+        source={sources[0]}
+        sources={sources}
+      />,
+    )
+
+    expect(within(screen.getByLabelText('文档库')).getByRole('button', { name: /Axi Workspace/i })).toHaveClass('active')
+    expect(screen.getByText('当前来源')).toBeInTheDocument()
   })
 
   it('keeps source selection actionable from the docs sidebar', () => {

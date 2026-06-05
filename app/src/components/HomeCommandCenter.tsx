@@ -16,6 +16,7 @@ export interface QuickKnowledgeItemLike {
 interface HomeCommandCenterProps {
   source: DocSource
   sources: DocSource[]
+  activeSourceId?: string | null
   catalog: KnowledgeCatalog | null
   searchResults?: SearchResult[] | null
   searching?: boolean
@@ -33,6 +34,7 @@ interface HomeCommandCenterProps {
 export function HomeCommandCenter({
   source,
   sources,
+  activeSourceId = null,
   catalog,
   searchResults,
   searching = false,
@@ -45,7 +47,8 @@ export function HomeCommandCenter({
   const skillSource = sources.find((item) => item.id === 'axi-skills')
   const primarySections = catalog?.sections.slice(0, 4) || []
   const featuredDocs = catalog?.recentDocs.slice(0, 4) || []
-  const currentSourceName = source.name || '当前文档库'
+  const explicitSource = activeSourceId ? sources.find((item) => item.id === activeSourceId) || null : null
+  const currentSourceName = explicitSource?.name || source.name || '当前文档库'
   const normalizedSearchQuery = searchQuery.trim()
   const visibleSearchResults = (searchResults || []).slice(0, 8)
   const [openSections, setOpenSections] = useState<Record<SidebarSectionId, boolean>>({
@@ -85,7 +88,7 @@ export function HomeCommandCenter({
               {sources.map((item) => (
                 <button
                   key={item.id}
-                  className={`axi-docs-home__source-link${item.id === source.id ? ' active' : ''}`}
+                  className={`axi-docs-home__source-link${item.id === activeSourceId ? ' active' : ''}`}
                   onClick={() => onSourceSelect(item.id)}
                   type="button"
                 >
@@ -250,10 +253,14 @@ export function HomeCommandCenter({
         </div>
 
         <div className="axi-docs-home__outline-card" id="sources">
-          <span className="axi-docs-home__nav-label">当前来源</span>
-          <strong>{currentSourceName}</strong>
-          <p>{source.description || '当前文档库已经接入 Axi Docs。'}</p>
-          {recentProjects.length > 0 && <small>{recentProjects.length} 个近期项目入口</small>}
+          <span className="axi-docs-home__nav-label">{explicitSource ? '当前来源' : '文档来源'}</span>
+          <strong>{explicitSource ? currentSourceName : '未锁定来源'}</strong>
+          <p>
+            {explicitSource
+              ? explicitSource.description || '当前文档库已经接入 Axi Docs。'
+              : '指南页默认不激活具体文档库。选择左侧来源后，才进入对应的 workspace、skills 或知识库。'}
+          </p>
+          {explicitSource && recentProjects.length > 0 && <small>{recentProjects.length} 个近期项目入口</small>}
         </div>
       </aside>
     </PageShell>

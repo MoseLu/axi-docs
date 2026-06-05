@@ -89,8 +89,8 @@ describe('Header', () => {
   it('keeps the guide route separate from source navigation', () => {
     renderHeader({ pageMode: 'home' }, '/?source=workspace')
 
-    expect(screen.getByRole('link', { name: '返回首页' })).toHaveAttribute('href', '/')
-    expect(screen.getByRole('link', { name: '指南' })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: '返回首页' })).toHaveAttribute('href', '/zh/guide/getting-started')
+    expect(screen.getByRole('link', { name: '指南' })).toHaveAttribute('href', '/zh/guide/getting-started')
     expect(screen.getByRole('link', { name: '指南' })).not.toHaveClass('active')
     expect(screen.getByRole('link', { name: '工作区' })).toHaveClass('active')
   })

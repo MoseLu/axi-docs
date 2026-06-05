@@ -67,6 +67,59 @@ const catalog: KnowledgeCatalog = {
 }
 
 describe('App document route', () => {
+  it('renders the guide as a document pathname instead of a hash anchor route', async () => {
+    mocks.listKnowledgeSources.mockResolvedValue([source])
+    mocks.getKnowledgeCatalog.mockResolvedValue(catalog)
+    mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
+    mocks.searchKnowledgeAll.mockResolvedValue([])
+    mocks.readKnowledgeFile.mockResolvedValue(null)
+
+    render(
+      <MemoryRouter initialEntries={['/zh/guide/getting-started']}>
+        <App />
+      </MemoryRouter>,
+    )
+
+    await screen.findByRole('heading', { name: '快速开始', level: 1 })
+
+    expect(screen.getAllByRole('link', { name: '快速开始' })[0]).toHaveAttribute('href', '/zh/guide/getting-started')
+    expect(screen.getAllByRole('link', { name: '什么是 Axi Docs？' })[0]).toHaveAttribute('href', '/zh/guide/what-is-axi-docs')
+  })
+
+  it('redirects root search URLs into the guide search document', async () => {
+    mocks.listKnowledgeSources.mockResolvedValue([source])
+    mocks.getKnowledgeCatalog.mockResolvedValue(catalog)
+    mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
+    mocks.searchKnowledgeAll.mockResolvedValue([])
+    mocks.readKnowledgeFile.mockResolvedValue(null)
+
+    render(
+      <MemoryRouter initialEntries={['/?q=AXI']}>
+        <App />
+      </MemoryRouter>,
+    )
+
+    await screen.findByRole('heading', { name: '“AXI” 的匹配文档' })
+    await waitFor(() => expect(mocks.searchKnowledgeAll).toHaveBeenCalledWith('AXI'))
+  })
+
+  it('upgrades old root guide hashes to guide document routes', async () => {
+    mocks.listKnowledgeSources.mockResolvedValue([source])
+    mocks.getKnowledgeCatalog.mockResolvedValue(catalog)
+    mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
+    mocks.searchKnowledgeAll.mockResolvedValue([])
+    mocks.readKnowledgeFile.mockResolvedValue(null)
+
+    render(
+      <MemoryRouter initialEntries={['/#what-is-axi-docs']}>
+        <App />
+      </MemoryRouter>,
+    )
+
+    await screen.findByRole('heading', { name: '什么是 Axi Docs？', level: 1 })
+    expect(screen.getAllByRole('link', { name: '什么是 Axi Docs？' })[0]).toHaveAttribute('href', '/zh/guide/what-is-axi-docs')
+  })
+
   it('loads a readable route document once instead of flickering back into loading', async () => {
     mocks.listKnowledgeSources.mockResolvedValue([source])
     mocks.getKnowledgeCatalog.mockResolvedValue(catalog)

@@ -3,6 +3,14 @@ import { DocSource, KnowledgeCatalog, SearchResult, SelectedFile } from '../type
 import { PageShell } from './CockpitPrimitives'
 
 type SidebarSectionId = 'intro' | 'sources' | 'routes'
+export type GuidePageId = 'what-is-axi-docs' | 'getting-started' | 'search' | 'next-steps'
+
+const guideNavItems: Array<{ id: GuidePageId; label: string; href: string }> = [
+  { id: 'what-is-axi-docs', label: '什么是 Axi Docs？', href: '/zh/guide/what-is-axi-docs' },
+  { id: 'getting-started', label: '快速开始', href: '/zh/guide/getting-started' },
+  { id: 'search', label: '搜索结果', href: '/zh/guide/search' },
+  { id: 'next-steps', label: '下一步', href: '/zh/guide/next-steps' },
+]
 
 export interface QuickKnowledgeItemLike {
   sourceId: string
@@ -29,6 +37,7 @@ interface HomeCommandCenterProps {
   onSourceSelect: (sourceId: string) => void
   onClearSelectedFile: () => void
   graphFocusPath?: string | null
+  guidePageId?: GuidePageId
 }
 
 export function HomeCommandCenter({
@@ -42,6 +51,7 @@ export function HomeCommandCenter({
   onOpenExplorer,
   onOpenItem,
   onSourceSelect,
+  guidePageId = 'getting-started',
 }: HomeCommandCenterProps) {
   const recentProjects = catalog?.recentDocs.filter((item) => item.docType === 'project').slice(0, 5) || []
   const skillSource = sources.find((item) => item.id === 'axi-skills')
@@ -51,6 +61,8 @@ export function HomeCommandCenter({
   const currentSourceName = explicitSource?.name || source.name || '当前文档库'
   const normalizedSearchQuery = searchQuery.trim()
   const visibleSearchResults = (searchResults || []).slice(0, 8)
+  const isGuidePage = (pageId: GuidePageId) => guidePageId === pageId
+  const guideTitle = guideNavItems.find((item) => item.id === guidePageId)?.label || '快速开始'
   const [openSections, setOpenSections] = useState<Record<SidebarSectionId, boolean>>({
     intro: true,
     sources: true,
@@ -70,10 +82,15 @@ export function HomeCommandCenter({
           </button>
           {openSections.intro && (
             <div className="axi-docs-home__sidebar-items">
-              <a className="axi-docs-home__nav-link" href="#what-is-axi-docs">什么是 Axi Docs？</a>
-              <a className="axi-docs-home__nav-link active" href="#quick-start">快速开始</a>
-              <a className="axi-docs-home__nav-link" href="#search-results">搜索结果</a>
-              <a className="axi-docs-home__nav-link" href="#next-steps">下一步</a>
+              {guideNavItems.map((item) => (
+                <a
+                  key={item.id}
+                  className={`axi-docs-home__nav-link${item.id === guidePageId ? ' active' : ''}`}
+                  href={item.href}
+                >
+                  {item.label}
+                </a>
+              ))}
             </div>
           )}
         </nav>
@@ -125,17 +142,20 @@ export function HomeCommandCenter({
 
       <main className="axi-docs-home__content">
         <article className="axi-docs-home__doc" id="overview">
-          <h1>快速开始</h1>
+          <h1>{guideTitle}</h1>
 
-          <section className="axi-docs-home__section" id="what-is-axi-docs">
-            <h2>什么是 Axi Docs？</h2>
-            <p>
-              Axi Docs 是一个基于 React 的专业文档站，把 workspace 文档、Axi Skills 和长期知识库整理成统一入口。
-              它的首要目标是让人可以像阅读 VitePress 文档一样浏览内容，同时保留搜索、知识图谱和 Agent 调用能力。
-            </p>
-          </section>
+          {isGuidePage('what-is-axi-docs') && (
+            <section className="axi-docs-home__section" id="what-is-axi-docs">
+              <h2>什么是 Axi Docs？</h2>
+              <p>
+                Axi Docs 是一个基于 React 的专业文档站，把 workspace 文档、Axi Skills 和长期知识库整理成统一入口。
+                它的首要目标是让人可以像阅读 VitePress 文档一样浏览内容，同时保留搜索、知识图谱和 Agent 调用能力。
+              </p>
+            </section>
+          )}
 
-          <section className="axi-docs-home__section" id="quick-start">
+          {isGuidePage('getting-started') && (
+            <section className="axi-docs-home__section" id="getting-started">
             <h2>快速开始</h2>
             <p>
               Axi Docs 的默认入口是指南页，不等同于某一个文档来源。先按左侧目录理解文档站结构，
@@ -156,19 +176,23 @@ export function HomeCommandCenter({
                 首页不再作为营销页使用。默认阅读路径应保持为文档结构：左侧目录、中央正文、右侧页面导航。
               </p>
             </div>
-          </section>
+            </section>
+          )}
 
-          <section className="axi-docs-home__section" id="file-structure">
-            <h2>文档结构</h2>
-            <p>文档站当前把内容分成三类入口：</p>
-            <ul>
-              <li><strong>文档库</strong>：workspace、skills、Obsidian 等来源的真实文档。</li>
-              <li><strong>阅读路径</strong>：按分类、项目知识、架构决策和编码规范组织的导航。</li>
-              <li><strong>搜索结果</strong>：从标题、中文描述、路径、标签和正文中映射出的候选文档。</li>
-            </ul>
-          </section>
+          {isGuidePage('getting-started') && (
+            <section className="axi-docs-home__section" id="file-structure">
+              <h2>文档结构</h2>
+              <p>文档站当前把内容分成三类入口：</p>
+              <ul>
+                <li><strong>文档库</strong>：workspace、skills、Obsidian 等来源的真实文档。</li>
+                <li><strong>阅读路径</strong>：按分类、项目知识、架构决策和编码规范组织的导航。</li>
+                <li><strong>搜索结果</strong>：从标题、中文描述、路径、标签和正文中映射出的候选文档。</li>
+              </ul>
+            </section>
+          )}
 
-          <section className="axi-docs-home__section" id="search-results" aria-live="polite">
+          {isGuidePage('search') && (
+            <section className="axi-docs-home__section" id="search-results" aria-live="polite">
             <h2>{normalizedSearchQuery ? `“${normalizedSearchQuery}” 的匹配文档` : '搜索文档'}</h2>
             {normalizedSearchQuery ? (
               searching ? (
@@ -193,9 +217,11 @@ export function HomeCommandCenter({
             ) : (
               <p>按 <kbd>⌘K</kbd> 或点击顶部搜索框，输入标题、中文描述、路径或标签即可搜索。</p>
             )}
-          </section>
+            </section>
+          )}
 
-          <section className="axi-docs-home__section" id="next-steps">
+          {isGuidePage('next-steps') && (
+            <section className="axi-docs-home__section" id="next-steps">
             <h2>下一步</h2>
             <ul>
               <li>
@@ -216,9 +242,10 @@ export function HomeCommandCenter({
                 <li>最近更新包括 {featuredDocs.slice(0, 3).map((item) => item.title).join('、')}。</li>
               )}
             </ul>
-          </section>
+            </section>
+          )}
 
-          {featuredDocs.length > 0 && (
+          {isGuidePage('next-steps') && featuredDocs.length > 0 && (
             <section className="axi-docs-home__section" id="recent-docs">
               <h2>最近更新</h2>
               <div className="axi-docs-home__result-list">
@@ -245,11 +272,12 @@ export function HomeCommandCenter({
       <aside className="axi-docs-home__outline" aria-label="页面导航">
         <div className="axi-docs-home__outline-card">
           <span className="axi-docs-home__nav-label">页面导航</span>
-          <a href="#what-is-axi-docs">什么是 Axi Docs？</a>
-          <a href="#quick-start">快速开始</a>
-          <a href="#file-structure">文档结构</a>
-          <a href="#search-results">搜索文档</a>
-          <a href="#next-steps">下一步</a>
+          {isGuidePage('what-is-axi-docs') && <a href="#what-is-axi-docs">什么是 Axi Docs？</a>}
+          {isGuidePage('getting-started') && <a href="#getting-started">快速开始</a>}
+          {isGuidePage('getting-started') && <a href="#file-structure">文档结构</a>}
+          {isGuidePage('search') && <a href="#search-results">搜索文档</a>}
+          {isGuidePage('next-steps') && <a href="#next-steps">下一步</a>}
+          {isGuidePage('next-steps') && featuredDocs.length > 0 && <a href="#recent-docs">最近更新</a>}
         </div>
 
         <div className="axi-docs-home__outline-card" id="sources">

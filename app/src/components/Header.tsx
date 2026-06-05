@@ -45,7 +45,7 @@ export function Header({
 
   const trimmedInput = inputValue.trim()
   const activeSource = new URLSearchParams(location.search).get('source')
-  const guideHref = '/'
+  const guideHref = '/zh/guide/getting-started'
   const documentSuggestions = suggestions.filter((suggestion) => suggestion.kind === 'document')
   const tagSuggestions = suggestions.filter((suggestion) => suggestion.kind === 'tag')
 

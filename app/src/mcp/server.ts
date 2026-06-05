@@ -1542,6 +1542,7 @@ async function startHttpServer(port: number) {
     const spaRoutes = [
       pathname === '/' || pathname === '/index.html',
       pathname === '/search',
+      pathname.startsWith('/zh/guide/'),
       pathname.startsWith('/nodes/'),
       pathname.startsWith('/docs/'),
       pathname.startsWith('/doc/'),

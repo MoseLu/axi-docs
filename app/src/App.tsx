@@ -1,10 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
-import { Navigate, Route, Routes, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Navigate, Route, Routes, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Header } from './components/Header'
 import { CategoryGraphPage } from './components/CategoryGraphPage'
 import { DocumentDetailPage } from './components/DocumentDetailPage'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { KnowledgeWorkbench } from './components/KnowledgeWorkbench'
+import type { GuidePageId } from './components/HomeCommandCenter'
 import { NotFoundPage } from './components/NotFoundPage'
 import { KNOWLEDGE_CATEGORY_ORDER, getKnowledgeCategoryMeta, normalizeKnowledgeCategoryKey } from './config/knowledgeRules'
 import {
@@ -25,6 +26,16 @@ import { DocSource, KnowledgeCatalog, KnowledgeCatalogItem, SearchResult, Search
 
 type PageMode = 'home' | 'category' | 'document'
 type ParamUpdates = Record<string, string | null | undefined>
+const GUIDE_PAGE_IDS = new Set<GuidePageId>(['what-is-axi-docs', 'getting-started', 'search', 'next-steps'])
+const DEFAULT_GUIDE_ROUTE = '/zh/guide/getting-started'
+const GUIDE_SEARCH_ROUTE = '/zh/guide/search'
+const LEGACY_GUIDE_HASH_ROUTES: Record<string, string> = {
+  '#what-is-axi-docs': '/zh/guide/what-is-axi-docs',
+  '#quick-start': DEFAULT_GUIDE_ROUTE,
+  '#getting-started': DEFAULT_GUIDE_ROUTE,
+  '#search-results': GUIDE_SEARCH_ROUTE,
+  '#next-steps': '/zh/guide/next-steps',
+}
 
 function flattenCatalogItems(catalog: KnowledgeCatalog | null): KnowledgeCatalogItem[] {
   if (!catalog) return []
@@ -49,6 +60,9 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
     [docParam, pageMode, routeDocument],
   )
   const urlSearchQuery = searchParams.get('q') || searchParams.get('keyword') || ''
+  const guidePageId = pageMode === 'home' && params.guideId && GUIDE_PAGE_IDS.has(params.guideId as GuidePageId)
+    ? params.guideId as GuidePageId
+    : 'getting-started'
 
   const [sources, setSources] = useState<DocSource[]>([])
   const [activeSource, setActiveSource] = useState(searchParams.get('source') || routeDocument?.sourceId || 'workspace')
@@ -309,7 +323,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
     return catalog?.sections.find((section) => section.key === primaryCategory)?.items.slice(0, 10) || []
   }, [catalog?.sections, selectedCatalogItem?.categories])
   const handleNavigateHome = useCallback(() => {
-    navigateWithParams('/', {
+    navigateWithParams(DEFAULT_GUIDE_ROUTE, {
       q: null,
       keyword: null,
       tag: null,
@@ -427,7 +441,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
     setFileContent(null)
     setFileName('')
 
-    navigateWithParams('/', {
+    navigateWithParams(GUIDE_SEARCH_ROUTE, {
       q: normalizedQuery || null,
       keyword: null,
       tag: null,
@@ -461,7 +475,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
 
   const handleWikiLink = useCallback((noteName: string) => {
     if (pageMode === 'document') {
-      navigateWithParams('/', {
+      navigateWithParams(GUIDE_SEARCH_ROUTE, {
         q: noteName,
         keyword: null,
         source: activeSource,
@@ -476,7 +490,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
   const documentCategoryKey = normalizeKnowledgeCategoryKey(selectedCatalogItem?.categories[0] || '')
   const documentCategoryMeta = documentCategoryKey ? getKnowledgeCategoryMeta(documentCategoryKey) : null
   const categoryTargetSource = workspaceSource?.id || 'obsidian'
-  const homeHref = useMemo(() => buildHref('/', {
+  const homeHref = useMemo(() => buildHref(DEFAULT_GUIDE_ROUTE, {
     q: null,
     keyword: null,
     tag: null,
@@ -629,6 +643,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
                 onTagSelect={handleTagSelect}
                 onWikiLink={handleWikiLink}
                 pageMode="home"
+                guidePageId={guidePageId}
                 searchQuery={searchQuery}
                 searchResults={searchResults}
                 searching={searching}
@@ -670,7 +685,27 @@ function LegacySearchRedirect() {
   if (query) next.set('q', query)
   if (source) next.set('source', source)
 
-  return <Navigate replace to={{ pathname: '/', search: next.toString() ? `?${next}` : '' }} />
+  return <Navigate replace to={{ pathname: GUIDE_SEARCH_ROUTE, search: next.toString() ? `?${next}` : '' }} />
+}
+
+function RootGuideRedirect() {
+  const location = useLocation()
+  const searchParams = new URLSearchParams(location.search)
+  const legacyHashRoute = LEGACY_GUIDE_HASH_ROUTES[location.hash]
+  const targetPath = legacyHashRoute || (searchParams.has('q') || searchParams.has('keyword')
+    ? GUIDE_SEARCH_ROUTE
+    : DEFAULT_GUIDE_ROUTE)
+
+  return (
+    <Navigate
+      replace
+      to={{
+        pathname: targetPath,
+        search: location.search,
+        hash: legacyHashRoute ? '' : location.hash,
+      }}
+    />
+  )
 }
 
 function LegacyDocumentRedirect() {
@@ -697,7 +732,8 @@ function LegacyDocumentRedirect() {
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<HubPage pageMode="home" />} />
+      <Route path="/" element={<RootGuideRedirect />} />
+      <Route path="/zh/guide/:guideId" element={<HubPage pageMode="home" />} />
       <Route path="/nodes/:categoryId" element={<HubPage pageMode="category" />} />
       <Route path="/nodes/:categoryId/sub/:subId" element={<HubPage pageMode="category" />} />
       <Route path="/docs/:sourceId/*" element={<HubPage pageMode="document" />} />

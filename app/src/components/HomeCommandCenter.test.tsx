@@ -77,9 +77,10 @@ describe('HomeCommandCenter', () => {
 
     expect(screen.getByRole('heading', { name: '快速开始', level: 1 })).toBeInTheDocument()
     expect(screen.queryByRole('heading', { name: 'React 体系的专业文档站' })).not.toBeInTheDocument()
-    expect(within(screen.getByLabelText('侧边栏导航')).getByRole('link', { name: '快速开始' })).toBeInTheDocument()
+    expect(within(screen.getByLabelText('侧边栏导航')).getByRole('link', { name: '快速开始' })).toHaveAttribute('href', '/zh/guide/getting-started')
+    expect(within(screen.getByLabelText('侧边栏导航')).getByRole('link', { name: '什么是 Axi Docs？' })).toHaveAttribute('href', '/zh/guide/what-is-axi-docs')
     expect(within(screen.getByLabelText('页面导航')).getByRole('link', { name: '快速开始' })).toBeInTheDocument()
-    expect(within(document.querySelector('#quick-start') as HTMLElement).queryByText('Axi Workspace')).not.toBeInTheDocument()
+    expect(within(document.querySelector('#getting-started') as HTMLElement).queryByText('Axi Workspace')).not.toBeInTheDocument()
     expect(within(screen.getByLabelText('文档库')).getByRole('button', { name: /Axi Workspace/i })).not.toHaveClass('active')
     expect(screen.getByText('未锁定来源')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: '文档结构' })).toBeInTheDocument()
@@ -191,6 +192,7 @@ describe('HomeCommandCenter', () => {
         onClearSelectedFile={vi.fn()}
         onOpenExplorer={vi.fn()}
         onOpenItem={onOpenItem}
+        guidePageId="search"
         onSourceSelect={vi.fn()}
         onTagSelect={vi.fn()}
         searchQuery="AXI"

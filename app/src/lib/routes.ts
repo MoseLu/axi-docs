@@ -129,7 +129,7 @@ export function buildSearchRoute(keyword: string, sourceId?: string | null): str
   }
 
   const search = params.toString()
-  return search ? `/?${search}` : '/'
+  return search ? `/zh/guide/search?${search}` : '/zh/guide/search'
 }
 
 export function normalizeCategoryRoute(categoryId?: string | null, subId?: string | null): KnowledgeCategoryKey | null {
@@ -176,8 +176,8 @@ export function buildBrowserPathFromLegacyHashRoute(
     if (source) next.set('source', source)
 
     const search = next.toString()
-    const homePath = routerBase ? `${routerBase}/` : '/'
-    return search ? `${homePath}?${search}` : homePath
+    const searchPath = `${routerBase}/zh/guide/search`
+    return search ? `${searchPath}?${search}` : searchPath
   }
 
   const basePrefixedPath = routerBase && !routePath.startsWith(`${routerBase}/`) && routePath !== routerBase

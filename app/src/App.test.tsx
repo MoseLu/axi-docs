@@ -1,5 +1,5 @@
-import { render, screen, waitFor } from '@testing-library/react'
-import { MemoryRouter } from 'react-router-dom'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { MemoryRouter, useLocation } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
 import { buildDocumentRoute } from './lib/routes'
@@ -24,6 +24,11 @@ vi.mock('./lib/knowledgeClient', () => ({
 beforeEach(() => {
   vi.clearAllMocks()
 })
+
+function LocationProbe() {
+  const location = useLocation()
+  return <div data-testid="location">{`${location.pathname}${location.search}`}</div>
+}
 
 const source: DocSource = {
   id: 'workspace',
@@ -199,6 +204,48 @@ describe('App document route', () => {
     expect(screen.getByRole('button', { name: 'Frontend' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Frontend Dev/i })).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: '快速开始' })).not.toBeInTheDocument()
+  })
+
+  it('opens skills documents through canonical document routes', async () => {
+    mocks.listKnowledgeSources.mockResolvedValue([source, skillsSource])
+    mocks.getKnowledgeCatalog.mockImplementation(async (sourceId: string) => (
+      sourceId === 'axi-skills' ? skillsCatalog : catalog
+    ))
+    mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
+    mocks.searchKnowledgeAll.mockResolvedValue([])
+    mocks.readKnowledgeFile.mockResolvedValue('# Frontend Dev\n\nSkill body.')
+
+    render(
+      <MemoryRouter initialEntries={['/zh/skills']}>
+        <App />
+        <LocationProbe />
+      </MemoryRouter>,
+    )
+
+    fireEvent.click(await screen.findByRole('button', { name: /Frontend Dev/i }))
+
+    await waitFor(() => expect(screen.getByTestId('location').textContent).toBe('/docs/axi-skills/skills/frontend-dev/SKILL'))
+    expect(mocks.readKnowledgeFile).toHaveBeenCalledWith('axi-skills', 'skills/frontend-dev/SKILL.md')
+  })
+
+  it('strips legacy preview query parameters from document-set routes', async () => {
+    mocks.listKnowledgeSources.mockResolvedValue([source, skillsSource])
+    mocks.getKnowledgeCatalog.mockImplementation(async (sourceId: string) => (
+      sourceId === 'axi-skills' ? skillsCatalog : catalog
+    ))
+    mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
+    mocks.searchKnowledgeAll.mockResolvedValue([])
+    mocks.readKnowledgeFile.mockResolvedValue(null)
+
+    render(
+      <MemoryRouter initialEntries={['/zh/skills?source=axi-skills&doc=legacy']}>
+        <App />
+        <LocationProbe />
+      </MemoryRouter>,
+    )
+
+    await screen.findByRole('heading', { name: 'Axi Skills', level: 1 })
+    await waitFor(() => expect(screen.getByTestId('location')).toHaveTextContent('/zh/skills'))
   })
 
   it('loads a readable route document once instead of flickering back into loading', async () => {

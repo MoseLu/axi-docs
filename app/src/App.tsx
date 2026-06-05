@@ -259,6 +259,16 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
   }, [activeSource, activeTag, routeDocSetSourceId, searchParams, searchQuery, urlSearchQuery])
 
   useEffect(() => {
+    if (!routeDocSet) return
+    if (!searchParams.has('source') && !searchParams.has('doc')) return
+
+    const next = new URLSearchParams(searchParams)
+    next.delete('source')
+    next.delete('doc')
+    setSearchParams(next, { replace: true })
+  }, [routeDocSet, searchParams, setSearchParams])
+
+  useEffect(() => {
     if (!effectiveSelectedFile) {
       abortRef.current?.abort()
       setFileContent(null)
@@ -346,25 +356,11 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
     )
   }, [defaultCategoryKey, navigateWithParams, workspaceSource?.id])
 
-  const handleOpenPreview = useCallback((sourceId: string, path: string) => {
-    const nextFile = { sourceId, path }
-    setSelectedFile(nextFile)
-    if (sourceId !== activeSource) {
-      setActiveSource(sourceId)
-    }
-    if (pageMode !== 'document') {
-      syncParams({
-        source: sourceId,
-        doc: encodeDocumentId(nextFile),
-      }, false)
-    }
-  }, [activeSource, pageMode, syncParams])
-
   const handleOpenDocument = useCallback((sourceId: string, path: string) => {
     navigateWithParams(
       buildDocumentRoute({ sourceId, path }),
       {
-        source: sourceId,
+        source: null,
         doc: null,
         branch: null,
         node: null,
@@ -625,7 +621,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
                 onClearSelectedFile={handleClearSelectedFile}
                 onNavigateExplorer={handleNavigateCategory}
                 onNavigateHome={handleNavigateHome}
-                onOpenItem={handleOpenPreview}
+                onOpenItem={handleOpenDocument}
                 onSearch={handleSearch}
                 onTagSelect={handleTagSelect}
                 onWikiLink={handleWikiLink}

@@ -109,8 +109,19 @@ const skillsCatalog: KnowledgeCatalog = {
       key: 'workflow',
       title: 'Workflow',
       description: '流程技能',
-      count: 1,
+      count: 2,
       items: [
+        {
+          sourceId: 'axi-skills',
+          path: 'skills/frontend-dev/SKILL.md',
+          name: 'frontend-dev',
+          title: 'Frontend Dev',
+          description: 'Frontend workflow skill',
+          docType: 'skill',
+          tags: [],
+          categories: ['frontend'],
+          techStack: [],
+        },
         {
           sourceId: 'axi-skills',
           path: 'skills/workflow/SKILL.md',
@@ -250,9 +261,20 @@ describe('App document route', () => {
     expect(screen.getByRole('link', { name: '技能库' })).toHaveClass('active')
     expect(screen.getByLabelText('Frontend')).toBeInTheDocument()
     expect(screen.getByLabelText('Workflow')).toBeInTheDocument()
+    expect(screen.getAllByRole('link', { name: 'Frontend Dev 文档' })).toHaveLength(1)
     expect(screen.getByRole('link', { name: 'Frontend Dev 文档' })).toHaveClass('active')
     expect(screen.getByRole('link', { name: 'Workflow技能' })).toBeInTheDocument()
+
+    fireEvent.click(screen.getByRole('link', { name: 'Workflow技能' }))
+
+    await waitFor(() => expect(screen.getByTestId('location').textContent).toBe('/docs/axi-skills/skills/workflow/SKILL'))
+    expect(screen.getByLabelText('Frontend')).toBeInTheDocument()
+    expect(screen.getByLabelText('Workflow')).toBeInTheDocument()
+    expect(screen.getAllByRole('link', { name: 'Frontend Dev 文档' })).toHaveLength(1)
+    expect(screen.getByRole('link', { name: 'Workflow技能' })).toHaveClass('active')
+    expect(screen.queryByLabelText('相关推荐')).not.toBeInTheDocument()
     expect(mocks.readKnowledgeFile).toHaveBeenCalledWith('axi-skills', 'skills/frontend-dev/SKILL.md')
+    expect(mocks.readKnowledgeFile).toHaveBeenCalledWith('axi-skills', 'skills/workflow/SKILL.md')
   })
 
   it('strips legacy preview query parameters from document-set routes', async () => {

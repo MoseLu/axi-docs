@@ -104,6 +104,25 @@ const skillsCatalog: KnowledgeCatalog = {
         },
       ],
     },
+    {
+      key: 'workflow',
+      title: 'Workflow',
+      description: '流程技能',
+      count: 1,
+      items: [
+        {
+          sourceId: 'axi-skills',
+          path: 'skills/frontend-dev/SKILL.md',
+          name: 'frontend-dev',
+          title: 'Frontend Dev',
+          description: 'Frontend workflow skill',
+          docType: 'skill',
+          tags: [],
+          categories: ['frontend'],
+          techStack: [],
+        },
+      ],
+    },
   ],
 }
 
@@ -161,6 +180,7 @@ describe('HomeCommandCenter', () => {
     const frontendSection = screen.getByLabelText('Frontend')
     expect(within(frontendSection).getByRole('button', { name: 'Frontend Dev' })).toHaveAttribute('title', 'Frontend workflow skill')
     expect(within(frontendSection).queryByText('Frontend workflow skill')).not.toBeInTheDocument()
+    expect(within(screen.getByLabelText('侧边栏导航')).getAllByRole('button', { name: 'Frontend Dev' })).toHaveLength(1)
     expect(within(screen.getByLabelText('侧边栏导航')).queryByRole('link', { name: '快速开始' })).not.toBeInTheDocument()
     fireEvent.click(within(frontendSection).getByRole('button', { name: 'Frontend Dev' }))
     expect(onOpenItem).toHaveBeenCalledWith('axi-skills', 'skills/frontend-dev/SKILL.md')

@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { formatDisplayDate } from '../lib/intl'
 import {
@@ -60,6 +60,21 @@ export function DocumentDetailPage({
   }
   const isSectionOpen = (sectionId: string) => openSections[sectionId] ?? true
   const hasDocumentSetSidebar = sidebarSections.length > 0
+  const visibleSidebarSections = useMemo(() => {
+    const seen = new Set<string>()
+
+    return sidebarSections
+      .map((section) => ({
+        ...section,
+        items: section.items.filter((item) => {
+          const key = `${item.sourceId}:${item.path}`
+          if (seen.has(key)) return false
+          seen.add(key)
+          return true
+        }),
+      }))
+      .filter((section) => section.items.length > 0)
+  }, [sidebarSections])
 
   return (
     <div className="document-detail-page">
@@ -71,7 +86,7 @@ export function DocumentDetailPage({
         </div>
 
         {hasDocumentSetSidebar ? (
-          sidebarSections.map((section) => {
+          visibleSidebarSections.map((section) => {
             const sectionId = `catalog:${section.key}`
             const open = isSectionOpen(sectionId)
 
@@ -139,7 +154,7 @@ export function DocumentDetailPage({
           </nav>
         )}
 
-        {relatedItems.length > 0 && (
+        {!hasDocumentSetSidebar && relatedItems.length > 0 && (
           <nav className="document-detail-page__nav document-detail-page__nav--related" aria-label="相关推荐">
             <button
               aria-controls="document-nav-related"

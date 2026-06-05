@@ -146,5 +146,47 @@ describe('DocumentDetailPage', () => {
 
     expect(within(screen.getByLabelText('简介')).getByRole('link', { name: /快速开始/i })).toHaveClass('active')
     expect(within(screen.getByLabelText('参考')).getByRole('link', { name: /搜索文档/i })).toBeInTheDocument()
+    expect(screen.queryByLabelText('相关推荐')).not.toBeInTheDocument()
+  })
+
+  it('deduplicates repeated documents across document-set sidebar sections', () => {
+    render(
+      <MemoryRouter>
+        <DocumentDetailPage
+          categoryDescription="核心阅读路径"
+          categoryTitle="简介"
+          documentSiblings={siblings}
+          fileContent="# 快速开始"
+          fileLoading={false}
+          fileName="getting-started.md"
+          graphHref="/graph"
+          onTagSelect={vi.fn()}
+          onWikiLink={vi.fn()}
+          relatedItems={[]}
+          selectedCatalogItem={siblings[1]}
+          selectedFile={selectedFile}
+          sidebarSections={[
+            {
+              key: 'guide',
+              title: '简介',
+              description: '核心文档阅读路径',
+              count: 2,
+              items: siblings,
+            },
+            {
+              key: 'reference',
+              title: '参考',
+              description: '参考文档',
+              count: 2,
+              items: [siblings[1], relatedItems[0]],
+            },
+          ]}
+          source={source}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getAllByRole('link', { name: /快速开始/i })).toHaveLength(1)
+    expect(within(screen.getByLabelText('参考')).getByRole('link', { name: /搜索文档/i })).toBeInTheDocument()
   })
 })

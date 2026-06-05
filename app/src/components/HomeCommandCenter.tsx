@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { DocSource, KnowledgeCatalog, SearchResult, SelectedFile } from '../types'
 import { PageShell } from './CockpitPrimitives'
 
@@ -75,7 +75,21 @@ export function HomeCommandCenter({
   const isGuideDocSet = docSet === 'guide'
   const recentProjects = catalog?.recentDocs.filter((item) => item.docType === 'project').slice(0, 5) || []
   const skillSource = sources.find((item) => item.id === 'axi-skills')
-  const primarySections = catalog?.sections.slice(0, 4) || []
+  const primarySections = useMemo(() => {
+    const seen = new Set<string>()
+
+    return (catalog?.sections.slice(0, 4) || [])
+      .map((section) => ({
+        ...section,
+        items: section.items.filter((item) => {
+          const key = `${item.sourceId}:${item.path}`
+          if (seen.has(key)) return false
+          seen.add(key)
+          return true
+        }),
+      }))
+      .filter((section) => section.items.length > 0)
+  }, [catalog?.sections])
   const featuredDocs = catalog?.recentDocs.slice(0, 4) || []
   const explicitSource = activeSourceId ? sources.find((item) => item.id === activeSourceId) || null : null
   const currentSourceName = explicitSource?.name || source.name || '当前文档库'

@@ -13,7 +13,14 @@ import {
   readKnowledgeFile as loadKnowledgeFileContent,
   searchKnowledgeAll as searchKnowledgeDocuments,
 } from './lib/knowledgeClient'
-import { buildCategoryRoute, buildDocumentRoute, decodeDocumentId, encodeDocumentId, normalizeCategoryRoute } from './lib/routes'
+import {
+  buildCategoryRoute,
+  buildDocumentRoute,
+  decodeDocumentId,
+  decodeDocumentRoute,
+  encodeDocumentId,
+  normalizeCategoryRoute,
+} from './lib/routes'
 import { DocSource, KnowledgeCatalog, KnowledgeCatalogItem, SearchResult, SearchSuggestion, SelectedFile } from './types'
 
 type PageMode = 'home' | 'category' | 'document'
@@ -33,8 +40,8 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
     [pageMode, params.categoryId, params.subId],
   )
   const routeDocument = useMemo(
-    () => (pageMode === 'document' ? decodeDocumentId(params.docId || '') : null),
-    [pageMode, params.docId],
+    () => (pageMode === 'document' ? decodeDocumentRoute(params.sourceId, params['*']) : null),
+    [pageMode, params],
   )
   const docParam = searchParams.get('doc') || ''
   const previewDocument = useMemo(
@@ -666,13 +673,35 @@ function LegacySearchRedirect() {
   return <Navigate replace to={{ pathname: '/', search: next.toString() ? `?${next}` : '' }} />
 }
 
+function LegacyDocumentRedirect() {
+  const navigate = useNavigate()
+  const params = useParams()
+  const routeDocument = useMemo(() => decodeDocumentId(params.docId || ''), [params.docId])
+
+  if (!routeDocument) {
+    return (
+      <div className="standalone-route">
+        <NotFoundPage
+          description="当前旧版文档链接无法解析。请返回首页重新打开文档，或通过顶部搜索重新定位知识点。"
+          onPrimaryAction={() => navigate('/')}
+          onSecondaryAction={() => navigate('/')}
+          title="文档不存在或链接已失效"
+        />
+      </div>
+    )
+  }
+
+  return <Navigate replace to={buildDocumentRoute(routeDocument)} />
+}
+
 function App() {
   return (
     <Routes>
       <Route path="/" element={<HubPage pageMode="home" />} />
       <Route path="/nodes/:categoryId" element={<HubPage pageMode="category" />} />
       <Route path="/nodes/:categoryId/sub/:subId" element={<HubPage pageMode="category" />} />
-      <Route path="/doc/:docId" element={<HubPage pageMode="document" />} />
+      <Route path="/docs/:sourceId/*" element={<HubPage pageMode="document" />} />
+      <Route path="/doc/:docId" element={<LegacyDocumentRedirect />} />
       <Route path="/search" element={<LegacySearchRedirect />} />
       <Route path="*" element={<RouteFallback />} />
     </Routes>

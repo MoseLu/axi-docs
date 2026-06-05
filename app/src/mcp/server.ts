@@ -1533,12 +1533,6 @@ async function startHttpServer(port: number) {
       return
     }
 
-    if (pathname === '/docs' || pathname === '/docs/' || pathname.startsWith('/docs/')) {
-      res.writeHead(404, { 'Content-Type': 'text/plain' })
-      res.end('Not Found')
-      return
-    }
-
     // ── 静态首页 / SPA 部署 ──────────────────────────────────────────────────
 
     const distDir = path.join(process.cwd(), 'dist')
@@ -1549,6 +1543,7 @@ async function startHttpServer(port: number) {
       pathname === '/' || pathname === '/index.html',
       pathname === '/search',
       pathname.startsWith('/nodes/'),
+      pathname.startsWith('/docs/'),
       pathname.startsWith('/doc/'),
     ]
 

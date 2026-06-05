@@ -1,8 +1,8 @@
 import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
-import { encodeDocumentId } from './lib/routes'
+import { buildDocumentRoute, encodeDocumentId } from './lib/routes'
 import type { DocSource, KnowledgeCatalog } from './types'
 
 const mocks = vi.hoisted(() => ({
@@ -20,6 +20,10 @@ vi.mock('./lib/knowledgeClient', () => ({
   readKnowledgeFile: mocks.readKnowledgeFile,
   searchKnowledgeAll: mocks.searchKnowledgeAll,
 }))
+
+beforeEach(() => {
+  vi.clearAllMocks()
+})
 
 const source: DocSource = {
   id: 'workspace',
@@ -63,12 +67,38 @@ const catalog: KnowledgeCatalog = {
 }
 
 describe('App document route', () => {
-  it('loads a route document once instead of flickering back into loading', async () => {
+  it('loads a readable route document once instead of flickering back into loading', async () => {
     mocks.listKnowledgeSources.mockResolvedValue([source])
     mocks.getKnowledgeCatalog.mockResolvedValue(catalog)
     mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
     mocks.searchKnowledgeAll.mockResolvedValue([])
     mocks.readKnowledgeFile.mockResolvedValue('# Workspace Relationship Graph\n\nStable document body.')
+
+    const route = buildDocumentRoute({
+      sourceId: 'workspace',
+      path: 'projects/workspace-relationship-graph.md',
+    })
+
+    render(
+      <MemoryRouter initialEntries={[route]}>
+        <App />
+      </MemoryRouter>,
+    )
+
+    await screen.findByRole('heading', { name: /Workspace Relationship Graph/i })
+    await waitFor(() => expect(mocks.readKnowledgeFile).toHaveBeenCalledTimes(1))
+    await new Promise((resolve) => window.setTimeout(resolve, 50))
+
+    expect(mocks.readKnowledgeFile).toHaveBeenCalledTimes(1)
+    expect(screen.queryByText('Stable document body.')).toBeInTheDocument()
+  })
+
+  it('redirects legacy encoded document routes to the readable document route', async () => {
+    mocks.listKnowledgeSources.mockResolvedValue([source])
+    mocks.getKnowledgeCatalog.mockResolvedValue(catalog)
+    mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
+    mocks.searchKnowledgeAll.mockResolvedValue([])
+    mocks.readKnowledgeFile.mockResolvedValue('# Workspace Relationship Graph\n\nLegacy link body.')
 
     const docId = encodeDocumentId({
       sourceId: 'workspace',
@@ -83,9 +113,7 @@ describe('App document route', () => {
 
     await screen.findByRole('heading', { name: /Workspace Relationship Graph/i })
     await waitFor(() => expect(mocks.readKnowledgeFile).toHaveBeenCalledTimes(1))
-    await new Promise((resolve) => window.setTimeout(resolve, 50))
 
-    expect(mocks.readKnowledgeFile).toHaveBeenCalledTimes(1)
-    expect(screen.queryByText('Stable document body.')).toBeInTheDocument()
+    expect(screen.queryByText('Legacy link body.')).toBeInTheDocument()
   })
 })

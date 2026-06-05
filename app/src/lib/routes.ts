@@ -64,8 +64,56 @@ export function decodeDocumentId(documentId: string): SelectedFile | null {
   }
 }
 
+function encodeRoutePath(pathname: string): string {
+  return pathname
+    .split('/')
+    .filter(Boolean)
+    .map((segment) => encodeURIComponent(segment))
+    .join('/')
+}
+
+function decodeRoutePath(pathname: string): string | null {
+  try {
+    const decoded = pathname
+      .split('/')
+      .filter(Boolean)
+      .map((segment) => decodeURIComponent(segment))
+      .join('/')
+    return decoded || null
+  } catch {
+    return null
+  }
+}
+
+function stripMarkdownExtension(pathname: string): string {
+  return pathname.replace(/\.md$/u, '')
+}
+
+function ensureMarkdownExtension(pathname: string): string {
+  return /\.md$/u.test(pathname) ? pathname : `${pathname}.md`
+}
+
 export function buildDocumentRoute(file: SelectedFile): string {
-  return `/doc/${encodeDocumentId(file)}`
+  const sourceId = encodeURIComponent(file.sourceId)
+  const documentPath = encodeRoutePath(stripMarkdownExtension(file.path))
+  return `/docs/${sourceId}/${documentPath}`
+}
+
+export function decodeDocumentRoute(sourceId: string | undefined, documentPath: string | undefined): SelectedFile | null {
+  if (!sourceId || !documentPath) return null
+
+  try {
+    const decodedSourceId = decodeURIComponent(sourceId)
+    const decodedPath = decodeRoutePath(documentPath)
+    if (!decodedSourceId || !decodedPath) return null
+
+    return {
+      sourceId: decodedSourceId,
+      path: ensureMarkdownExtension(decodedPath),
+    }
+  } catch {
+    return null
+  }
 }
 
 export function buildSearchRoute(keyword: string, sourceId?: string | null): string {

@@ -21,6 +21,10 @@ export function getDocumentSourceRegistry(): DocumentSourceConfig[] {
     process.env.AXI_WORKSPACE_GOVERNANCE_PATH || '',
     resolveWorkspacePath('infra', 'axi-workspace-governance'),
   )
+  const dbskillPath = existingOrFallback(
+    process.env.DBSKILL_PATH || '',
+    resolveWorkspacePath('shared', 'dbskill'),
+  )
 
   return [
     {
@@ -47,6 +51,20 @@ export function getDocumentSourceRegistry(): DocumentSourceConfig[] {
       adapter: 'skills',
       audience: ['agent', 'human'],
       readOnly: true,
+      icon: 'folder',
+    },
+    {
+      id: 'dbskill-content-assets',
+      name: 'dbskill Content Assets',
+      description: 'dontbesilent 内容结构化系统，用于把增长中的 workspace 文档沉淀为可复用内容资产。',
+      path: dbskillPath,
+      enabled: process.env.DBSKILL_CONTENT_ASSETS_ENABLED !== 'false',
+      type: 'local',
+      kind: 'skill-library',
+      adapter: 'skills',
+      audience: ['agent', 'human'],
+      readOnly: true,
+      skillNames: ['dbs-content-system'],
       icon: 'folder',
     },
     {
@@ -100,4 +118,3 @@ export function validateDocumentSourceRegistry(sources: Pick<DocSource, 'id' | '
 
   return errors
 }
-

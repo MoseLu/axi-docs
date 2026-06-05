@@ -51,6 +51,8 @@ describe('knowledge base local index', () => {
   const originalObsidianPath = process.env.OBSIDIAN_PATH
   const originalExtraSources = process.env.AXI_DOCS_EXTRA_SOURCES_JSON
   const originalAxiSkillsPath = process.env.AXI_SKILLS_PATH
+  const originalDbskillPath = process.env.DBSKILL_PATH
+  const originalDbskillEnabled = process.env.DBSKILL_CONTENT_ASSETS_ENABLED
   const originalWorkspaceGovernancePath = process.env.AXI_WORKSPACE_GOVERNANCE_PATH
   let tempDir = ''
 
@@ -70,6 +72,16 @@ describe('knowledge base local index', () => {
       delete process.env.AXI_SKILLS_PATH
     } else {
       process.env.AXI_SKILLS_PATH = originalAxiSkillsPath
+    }
+    if (originalDbskillPath === undefined) {
+      delete process.env.DBSKILL_PATH
+    } else {
+      process.env.DBSKILL_PATH = originalDbskillPath
+    }
+    if (originalDbskillEnabled === undefined) {
+      delete process.env.DBSKILL_CONTENT_ASSETS_ENABLED
+    } else {
+      process.env.DBSKILL_CONTENT_ASSETS_ENABLED = originalDbskillEnabled
     }
     if (originalWorkspaceGovernancePath === undefined) {
       delete process.env.AXI_WORKSPACE_GOVERNANCE_PATH
@@ -212,6 +224,7 @@ describe('knowledge base local index', () => {
   it('validates the document source registry shape', () => {
     const registry = getDocumentSourceRegistry()
     expect(validateDocumentSourceRegistry(registry)).toEqual([])
+    expect(registry.find((source) => source.id === 'dbskill-content-assets')?.skillNames).toEqual(['dbs-content-system'])
     expect(validateDocumentSourceRegistry([
       { id: 'dup', adapter: 'markdown', enabled: true },
       { id: 'dup', adapter: 'skills', enabled: true },
@@ -250,6 +263,53 @@ describe('knowledge base local index', () => {
 
     const raw = await readKnowledgeFile('axi-skills', 'skills/deep-init-pro/SKILL.md')
     expect(raw).toContain('name: deep-init-pro')
+  })
+
+  it('indexes only the dbskill content asset workflow by default', async () => {
+    tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'axi-docs-dbskill-'))
+    process.env.DBSKILL_PATH = tempDir
+
+    const contentSystemDir = path.join(tempDir, 'skills', 'dbs-content-system')
+    const diagnosisDir = path.join(tempDir, 'skills', 'dbs-diagnosis')
+    await fs.promises.mkdir(contentSystemDir, { recursive: true })
+    await fs.promises.mkdir(diagnosisDir, { recursive: true })
+
+    await fs.promises.writeFile(path.join(contentSystemDir, 'SKILL.md'), [
+      '---',
+      'name: dbs-content-system',
+      'description: 把本地大量文稿搭成可持续生长的内容结构化工程。',
+      '---',
+      '# dbs-content-system',
+      '',
+      '先审计内容规模与边界，再建立可重组的内容资产工程。',
+    ].join('\n'), 'utf-8')
+    await fs.promises.mkdir(path.join(contentSystemDir, 'templates'), { recursive: true })
+    await fs.promises.writeFile(path.join(contentSystemDir, 'templates', '主题地图模板.md'), [
+      '# 主题地图模板',
+      '',
+      '用于把内容单元装配成主题地图。',
+    ].join('\n'), 'utf-8')
+
+    await fs.promises.writeFile(path.join(diagnosisDir, 'SKILL.md'), [
+      '---',
+      'name: dbs-diagnosis',
+      'description: 商业模式诊断。',
+      '---',
+      '# dbs-diagnosis',
+    ].join('\n'), 'utf-8')
+
+    const catalog = await getKnowledgeCatalog('dbskill-content-assets')
+    expect(catalog.totalDocs).toBe(2)
+    expect(catalog.recentDocs.some((doc) => doc.path === 'skills/dbs-content-system/SKILL.md')).toBe(true)
+    expect(catalog.recentDocs.some((doc) => doc.path === 'skills/dbs-content-system/templates/主题地图模板.md')).toBe(true)
+
+    const contentResults = await searchKnowledge('dbskill-content-assets', '内容资产')
+    expect(contentResults.some((result) => result.path === 'skills/dbs-content-system/SKILL.md')).toBe(true)
+    const templateResults = await searchKnowledge('dbskill-content-assets', '主题地图')
+    expect(templateResults.some((result) => result.path === 'skills/dbs-content-system/templates/主题地图模板.md')).toBe(true)
+
+    const diagnosisResults = await searchKnowledge('dbskill-content-assets', '商业模式诊断')
+    expect(diagnosisResults).toHaveLength(0)
   })
 
   it('handles missing skill descriptions and nested skill paths', async () => {

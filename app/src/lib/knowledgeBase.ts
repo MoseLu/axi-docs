@@ -110,6 +110,9 @@ function parseExtraSources(): DocSource[] {
                 : 'markdown-vault',
           audience: ['agent', 'human'],
           readOnly: source.readOnly === true,
+          skillNames: Array.isArray(source.skillNames)
+            ? source.skillNames.filter((skillName): skillName is string => typeof skillName === 'string' && skillName.trim().length > 0)
+            : undefined,
           apiUrl: typeof source.apiUrl === 'string' ? source.apiUrl : undefined,
           apiToken: typeof source.apiToken === 'string' ? source.apiToken : undefined,
           icon: source.icon === 'obsidian' || source.icon === 'blinko' || source.icon === 'folder'
@@ -413,7 +416,7 @@ function buildSkillDocument(source: DocSource, relativePath: string, stat: fs.St
       : extractDescription(frontmatter, parsed.content),
   ) || 'No frontmatter description'
   const description = `技能用途：${sourceDescription}`
-  const tags = ['技能', 'Agent', 'Axi Skills', skillName]
+  const tags = ['技能', 'Agent', source.name, skillName]
   const body = parsed.content || raw
   return createVirtualParsedDocument({
     sourceId: source.id,
@@ -446,10 +449,86 @@ function buildSkillDocument(source: DocSource, relativePath: string, stat: fs.St
   })
 }
 
+function buildSkillAssetDocument(source: DocSource, skillName: string, relativePath: string, stat: fs.Stats, raw: string): ParsedDocument {
+  const parsed = parseMarkdownDocument(raw)
+  const frontmatter = parsed.data as Frontmatter
+  const body = parsed.content || raw
+  const fileName = path.basename(relativePath).replace(/\.(md|markdown)$/i, '')
+  const rawTitle = extractRawTitle(frontmatter, body, fileName)
+  const description = extractDescription(frontmatter, body) || `内容资产方法库附属文档：${relativePath}`
+  const tags = ['内容资产', '技能资料', source.name, skillName]
+
+  return createVirtualParsedDocument({
+    sourceId: source.id,
+    path: normalizeSlashes(relativePath),
+    name: fileName,
+    title: rawTitle,
+    rawTitle,
+    description,
+    docType: typeof frontmatter.type === 'string' ? frontmatter.type : 'skill-asset',
+    status: typeof frontmatter.status === 'string' ? frontmatter.status : 'active',
+    tags,
+    categories: ['resources', 'standards'],
+    updated: stat.mtime.toISOString(),
+    raw,
+    body,
+    frontmatter: {
+      ...frontmatter,
+      id: `${source.id}:${skillName}:${normalizeSlashes(relativePath)}`,
+      title: rawTitle,
+      type: typeof frontmatter.type === 'string' ? frontmatter.type : 'skill-asset',
+      status: typeof frontmatter.status === 'string' ? frontmatter.status : 'active',
+      tags,
+      description,
+      modified: stat.mtime.toISOString(),
+      'graph-title': rawTitle,
+      'graph-tags': ['内容资产', '技能资料'],
+    },
+    aliases: [fileName, rawTitle, relativePath],
+    sourceTags: tags,
+  })
+}
+
+async function collectSelectedSkillAssets(
+  source: DocSource,
+  skillRootPath: string,
+  skillName: string,
+  rootPath: string,
+): Promise<ParsedDocument[]> {
+  const documents: ParsedDocument[] = []
+
+  async function walk(dirPath: string): Promise<void> {
+    let entries: fs.Dirent[]
+    try {
+      entries = await fs.promises.readdir(dirPath, { withFileTypes: true })
+    } catch {
+      return
+    }
+
+    for (const entry of entries) {
+      if (isExcludedName(entry.name)) continue
+      const fullPath = path.join(dirPath, entry.name)
+      if (entry.isDirectory()) {
+        await walk(fullPath)
+        continue
+      }
+      if (!entry.isFile() || entry.name === 'SKILL.md' || !isSupportedFile(entry.name)) continue
+      const stat = await fs.promises.stat(fullPath)
+      const raw = await fs.promises.readFile(fullPath, 'utf-8')
+      const relativePath = normalizeSlashes(path.relative(rootPath, fullPath))
+      documents.push(buildSkillAssetDocument(source, skillName, relativePath, stat, raw))
+    }
+  }
+
+  await walk(skillRootPath)
+  return documents
+}
+
 async function collectSkillDocuments(source: DocSource): Promise<ParsedDocument[]> {
   const rootPath = path.normalize(source.path)
   const skillsRoot = path.join(rootPath, 'skills')
   const documents: ParsedDocument[] = []
+  const allowedSkillNames = new Set((source.skillNames || []).map((skillName) => skillName.toLowerCase()))
 
   async function walk(dirPath: string): Promise<void> {
     let entries: fs.Dirent[]
@@ -470,13 +549,19 @@ async function collectSkillDocuments(source: DocSource): Promise<ParsedDocument[
       const stat = await fs.promises.stat(fullPath)
       const raw = await fs.promises.readFile(fullPath, 'utf-8')
       const relativePath = normalizeSlashes(path.relative(rootPath, fullPath))
-      documents.push(buildSkillDocument(source, relativePath, stat, raw))
+      const document = buildSkillDocument(source, relativePath, stat, raw)
+      if (allowedSkillNames.size === 0 || allowedSkillNames.has(document.name.toLowerCase())) {
+        documents.push(document)
+        if (allowedSkillNames.size > 0) {
+          documents.push(...await collectSelectedSkillAssets(source, path.dirname(fullPath), document.name, rootPath))
+        }
+      }
     }
   }
 
   await walk(skillsRoot)
   const indexPath = path.join(rootPath, 'docs', 'SKILL_INDEX.md')
-  if (fs.existsSync(indexPath)) {
+  if (allowedSkillNames.size === 0 && fs.existsSync(indexPath)) {
     const stat = await fs.promises.stat(indexPath)
     const raw = await fs.promises.readFile(indexPath, 'utf-8')
     const body = parseMarkdownDocument(raw).content

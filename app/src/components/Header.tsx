@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { getKnowledgeSearchSuggestions } from '../lib/knowledgeClient'
 import type { SearchSuggestion } from '../types'
 import { pageCopy } from '../config/pageCopy'
-import { BookIcon, FileIcon, GitHubIcon, SearchIcon, TagIcon } from './Icons'
+import { BookIcon, FileIcon, GitHubIcon, SearchIcon, TagIcon, ThemeIcon } from './Icons'
 
 interface HeaderProps {
   onSearchChange: (query: string) => void
@@ -379,7 +379,9 @@ export function Header({
                 type="button"
               >
                 <span className="header-vp-theme-toggle__track" aria-hidden="true">
-                  <span className="header-vp-theme-toggle__thumb" />
+                  <span className="header-vp-theme-toggle__thumb">
+                    <ThemeIcon />
+                  </span>
                 </span>
               </button>
               <span className="header-vp-separator" aria-hidden="true" />

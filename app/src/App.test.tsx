@@ -227,6 +227,8 @@ describe('App document route', () => {
     fireEvent.click(await screen.findByRole('button', { name: 'Frontend Dev' }))
 
     await waitFor(() => expect(screen.getByTestId('location').textContent).toBe('/docs/axi-skills/skills/frontend-dev/SKILL'))
+    expect(screen.getByRole('link', { name: '指南' })).not.toHaveClass('active')
+    expect(screen.getByRole('link', { name: '技能库' })).toHaveClass('active')
     expect(mocks.readKnowledgeFile).toHaveBeenCalledWith('axi-skills', 'skills/frontend-dev/SKILL.md')
   })
 

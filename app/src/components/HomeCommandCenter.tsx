@@ -328,9 +328,9 @@ export function HomeCommandCenter({
                 <li>
                   {guideLocale === 'zh' ? '需要查看 Agent 工作流时，打开' : 'To inspect Agent workflows, open '}
                   {' '}
-                  <button className="axi-docs-home__inline-action" onClick={() => onOpenItem('axi-skills', 'docs/SKILL_INDEX.md')} type="button">
+                  <a className="axi-docs-home__inline-action" href={`/${guideLocale}/skills`}>
                     {guideLocale === 'zh' ? 'Axi Skills 索引' : 'the Axi Skills index'}
-                  </button>
+                  </a>
                   {guideLocale === 'zh' ? '。' : '.'}
                 </li>
               )}

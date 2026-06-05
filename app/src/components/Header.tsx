@@ -7,8 +7,10 @@ import { pageCopy } from '../config/pageCopy'
 import { BookIcon, FileIcon, GitHubIcon, LanguageIcon, SearchIcon, TagIcon, ThemeIcon } from './Icons'
 
 type HeaderLocale = 'zh' | 'en'
+type HeaderDocSet = 'guide' | 'skills' | 'workspace'
 
 interface HeaderProps {
+  activeDocSet?: HeaderDocSet
   onSearchChange: (query: string) => void
   onSearchSubmit: (query: string) => void
   onSuggestionSelect: (suggestion: SearchSuggestion) => void
@@ -31,7 +33,7 @@ function getCurrentLocale(pathname: string): HeaderLocale {
   return pathname.startsWith('/en/') ? 'en' : 'zh'
 }
 
-function getCurrentDocSet(pathname: string): 'guide' | 'skills' | 'workspace' {
+function getCurrentDocSet(pathname: string): HeaderDocSet {
   if (/^\/(zh|en)\/skills(?:\/|$)/u.test(pathname)) return 'skills'
   if (/^\/(zh|en)\/workspace(?:\/|$)/u.test(pathname)) return 'workspace'
   return 'guide'
@@ -46,6 +48,7 @@ function buildLocaleHref(pathname: string, search: string, locale: HeaderLocale)
 }
 
 export function Header({
+  activeDocSet,
   onSearchChange,
   onSearchSubmit,
   onSuggestionSelect,
@@ -72,7 +75,7 @@ export function Header({
 
   const trimmedInput = inputValue.trim()
   const currentLocale = getCurrentLocale(location.pathname)
-  const currentDocSet = getCurrentDocSet(location.pathname)
+  const currentDocSet = activeDocSet || getCurrentDocSet(location.pathname)
   const guideHref = `/${currentLocale}/guide/getting-started`
   const skillsHref = `/${currentLocale}/skills`
   const workspaceHref = `/${currentLocale}/workspace`
@@ -274,9 +277,9 @@ export function Header({
   }
 
   const topNavItems = [
-    { label: '指南', to: guideHref, active: pageMode === 'document' || (pageMode === 'home' && currentDocSet === 'guide') },
-    { label: '技能库', to: skillsHref, active: pageMode === 'home' && currentDocSet === 'skills' },
-    { label: '工作区', to: workspaceHref, active: pageMode === 'home' && currentDocSet === 'workspace' },
+    { label: '指南', to: guideHref, active: (pageMode === 'home' || pageMode === 'document') && currentDocSet === 'guide' },
+    { label: '技能库', to: skillsHref, active: (pageMode === 'home' || pageMode === 'document') && currentDocSet === 'skills' },
+    { label: '工作区', to: workspaceHref, active: (pageMode === 'home' || pageMode === 'document') && currentDocSet === 'workspace' },
   ]
 
   const searchModal = searchOpen ? createPortal(

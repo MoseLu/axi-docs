@@ -215,6 +215,27 @@ describe('HomeCommandCenter', () => {
     expect(screen.getByText('No matching documents found. Try another keyword or continue from a recommended reading path.')).toBeInTheDocument()
   })
 
+  it('links the guide skills index action to the skills document set', () => {
+    render(
+      <HomeCommandCenter
+        activeTag={null}
+        catalog={catalog}
+        graphFocusPath={null}
+        guidePageId="next-steps"
+        onClearSelectedFile={vi.fn()}
+        onOpenExplorer={vi.fn()}
+        onOpenItem={vi.fn()}
+        onTagSelect={vi.fn()}
+        searchQuery=""
+        selectedFile={null}
+        source={sources[0]}
+        sources={sources}
+      />,
+    )
+
+    expect(screen.getByRole('link', { name: 'Axi Skills 索引' })).toHaveAttribute('href', '/zh/skills')
+  })
+
   it('collapses and expands sidebar groups for real', () => {
     render(
       <HomeCommandCenter

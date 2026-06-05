@@ -108,6 +108,14 @@ describe('Header', () => {
     expect(screen.getByRole('link', { name: '工作区' })).not.toHaveClass('active')
   })
 
+  it('keeps skills nav active on axi-skills document pages', () => {
+    renderHeader({ activeDocSet: 'skills', pageMode: 'document' }, '/docs/axi-skills/docs/SKILL_INDEX')
+
+    expect(screen.getByRole('link', { name: '指南' })).not.toHaveClass('active')
+    expect(screen.getByRole('link', { name: '技能库' })).toHaveClass('active')
+    expect(screen.getByRole('link', { name: '工作区' })).not.toHaveClass('active')
+  })
+
   it('opens a locale menu with locale-prefixed guide routes', () => {
     renderHeader({ pageMode: 'home' }, '/zh/guide/search?q=axi')
 

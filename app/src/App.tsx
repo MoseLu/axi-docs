@@ -35,6 +35,12 @@ function sourceIdForDocSet(docSet: DocSetId): string {
   return 'workspace'
 }
 
+function docSetForSourceId(sourceId?: string | null): DocSetId {
+  if (sourceId === 'axi-skills') return 'skills'
+  if (sourceId === 'workspace') return 'workspace'
+  return 'guide'
+}
+
 function flattenCatalogItems(catalog: KnowledgeCatalog | null): KnowledgeCatalogItem[] {
   if (!catalog) return []
   return catalog.sections.flatMap((section) => section.items)
@@ -464,6 +470,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
   const invalidCategoryRoute = pageMode === 'category' && !routeCategory
   const invalidGuideRoute = pageMode === 'home' && docSet === 'guide' && (!routeGuideLocale || !routeGuidePageId)
   const invalidDocSetRoute = pageMode === 'home' && Boolean(params.collection) && (!routeGuideLocale || !routeDocSet)
+  const activeHeaderDocSet = pageMode === 'document' ? docSetForSourceId(routeDocument?.sourceId) : docSet
   const documentCategoryKey = normalizeKnowledgeCategoryKey(selectedCatalogItem?.categories[0] || '')
   const documentCategoryMeta = documentCategoryKey ? getKnowledgeCategoryMeta(documentCategoryKey) : null
   const categoryTargetSource = workspaceSource?.id || 'obsidian'
@@ -526,6 +533,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
         跳到主内容
       </a>
       <Header
+        activeDocSet={activeHeaderDocSet}
         onSearchChange={handleSearch}
         onSearchSubmit={handleSearchSubmit}
         onSuggestionSelect={handleSuggestionSelect}

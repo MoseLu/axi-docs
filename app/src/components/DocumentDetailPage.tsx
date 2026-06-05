@@ -6,7 +6,7 @@ import {
   formatKnowledgeTagLabel,
 } from '../lib/knowledgeFormatter'
 import { buildDocumentRoute } from '../lib/routes'
-import type { DocSource, KnowledgeCatalogItem, SelectedFile } from '../types'
+import type { DocSource, KnowledgeCatalog, KnowledgeCatalogItem, SelectedFile } from '../types'
 import { ClockIcon, FileIcon } from './Icons'
 import { DocumentView } from './DocumentView'
 import { TableOfContents } from './TableOfContents'
@@ -21,13 +21,12 @@ interface DocumentDetailPageProps {
   categoryTitle: string
   categoryDescription: string
   documentSiblings: KnowledgeCatalogItem[]
+  sidebarSections?: KnowledgeCatalog['sections']
   graphHref: string
   relatedItems: KnowledgeCatalogItem[]
   onTagSelect: (tag: string | null) => void
   onWikiLink: (noteName: string) => void
 }
-
-type SidebarSectionId = 'category' | 'related'
 
 function documentTitle(item: Pick<KnowledgeCatalogItem, 'title' | 'name' | 'path' | 'graphTitle'>) {
   return formatKnowledgeItemTitle(item)
@@ -43,6 +42,7 @@ export function DocumentDetailPage({
   categoryTitle,
   categoryDescription,
   documentSiblings,
+  sidebarSections = [],
   relatedItems,
   onTagSelect,
   onWikiLink,
@@ -51,13 +51,15 @@ export function DocumentDetailPage({
   const updatedLabel = selectedCatalogItem?.updated
     ? formatDisplayDate(selectedCatalogItem.updated)
     : null
-  const [openSections, setOpenSections] = useState<Record<SidebarSectionId, boolean>>({
+  const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     category: true,
     related: true,
   })
-  const toggleSection = (sectionId: SidebarSectionId) => {
+  const toggleSection = (sectionId: string) => {
     setOpenSections((current) => ({ ...current, [sectionId]: !current[sectionId] }))
   }
+  const isSectionOpen = (sectionId: string) => openSections[sectionId] ?? true
+  const hasDocumentSetSidebar = sidebarSections.length > 0
 
   return (
     <div className="document-detail-page">
@@ -68,35 +70,74 @@ export function DocumentDetailPage({
           <p>{source.description}</p>
         </div>
 
-        <nav className="document-detail-page__nav" aria-label={`${source.name} 文档目录`}>
-          <button
-            aria-controls="document-nav-category"
-            aria-expanded={openSections.category}
-            className="document-detail-page__nav-heading"
-            onClick={() => toggleSection('category')}
-            type="button"
-          >
-            <span>{categoryTitle}</span>
-            <span className="document-detail-page__nav-heading-meta">
-              <small>{documentSiblings.length}</small>
-              <span aria-hidden="true" className="document-detail-page__nav-caret">⌄</span>
-            </span>
-          </button>
-          {openSections.category && (
-            <div className="document-detail-page__link-list" id="document-nav-category">
-              {documentSiblings.map((item) => (
-                <Link
-                  key={`${item.sourceId}:${item.path}`}
-                  className={`document-detail-page__link${item.path === selectedFile.path ? ' active' : ''}`}
-                  to={buildDocumentRoute({ sourceId: item.sourceId, path: item.path })}
+        {hasDocumentSetSidebar ? (
+          sidebarSections.map((section) => {
+            const sectionId = `catalog:${section.key}`
+            const open = isSectionOpen(sectionId)
+
+            return (
+              <nav key={section.key} className="document-detail-page__nav" aria-label={section.title}>
+                <button
+                  aria-controls={`document-nav-${section.key}`}
+                  aria-expanded={open}
+                  className="document-detail-page__nav-heading"
+                  onClick={() => toggleSection(sectionId)}
+                  type="button"
                 >
-                  <FileIcon />
-                  <span>{documentTitle(item)}</span>
-                </Link>
-              ))}
-            </div>
-          )}
-        </nav>
+                  <span>{section.title}</span>
+                  <span className="document-detail-page__nav-heading-meta">
+                    <small>{section.items.length}</small>
+                    <span aria-hidden="true" className="document-detail-page__nav-caret">⌄</span>
+                  </span>
+                </button>
+                {open && (
+                  <div className="document-detail-page__link-list" id={`document-nav-${section.key}`}>
+                    {section.items.slice(0, 12).map((item) => (
+                      <Link
+                        key={`${item.sourceId}:${item.path}`}
+                        className={`document-detail-page__link${item.sourceId === selectedFile.sourceId && item.path === selectedFile.path ? ' active' : ''}`}
+                        title={item.description || item.path}
+                        to={buildDocumentRoute({ sourceId: item.sourceId, path: item.path })}
+                      >
+                        <span>{documentTitle(item)}</span>
+                      </Link>
+                    ))}
+                  </div>
+                )}
+              </nav>
+            )
+          })
+        ) : (
+          <nav className="document-detail-page__nav" aria-label={`${source.name} 文档目录`}>
+            <button
+              aria-controls="document-nav-category"
+              aria-expanded={openSections.category}
+              className="document-detail-page__nav-heading"
+              onClick={() => toggleSection('category')}
+              type="button"
+            >
+              <span>{categoryTitle}</span>
+              <span className="document-detail-page__nav-heading-meta">
+                <small>{documentSiblings.length}</small>
+                <span aria-hidden="true" className="document-detail-page__nav-caret">⌄</span>
+              </span>
+            </button>
+            {openSections.category && (
+              <div className="document-detail-page__link-list" id="document-nav-category">
+                {documentSiblings.map((item) => (
+                  <Link
+                    key={`${item.sourceId}:${item.path}`}
+                    className={`document-detail-page__link${item.path === selectedFile.path ? ' active' : ''}`}
+                    to={buildDocumentRoute({ sourceId: item.sourceId, path: item.path })}
+                  >
+                    <FileIcon />
+                    <span>{documentTitle(item)}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </nav>
+        )}
 
         {relatedItems.length > 0 && (
           <nav className="document-detail-page__nav document-detail-page__nav--related" aria-label="相关推荐">

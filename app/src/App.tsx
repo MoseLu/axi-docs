@@ -333,6 +333,19 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
     if (!primaryCategory) return []
     return catalog?.sections.find((section) => section.key === primaryCategory)?.items.slice(0, 10) || []
   }, [catalog?.sections, selectedCatalogItem?.categories])
+  const documentSidebarSections = useMemo(() => {
+    const sections = catalog?.sections || []
+    const primarySections = sections.slice(0, 4)
+    const selectedSection = selectedCatalogItem
+      ? sections.find((section) => section.items.some((item) => item.sourceId === selectedCatalogItem.sourceId && item.path === selectedCatalogItem.path))
+      : null
+
+    if (!selectedSection || primarySections.some((section) => section.key === selectedSection.key)) {
+      return primarySections
+    }
+
+    return [...primarySections, selectedSection]
+  }, [catalog?.sections, selectedCatalogItem])
   const handleNavigateHome = useCallback(() => {
     navigateWithParams(DEFAULT_GUIDE_ROUTE, {
       q: null,
@@ -566,6 +579,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
                   categoryDescription={documentCategoryMeta?.description || '当前文档所属分类的上下文与延伸阅读。'}
                   categoryTitle={documentCategoryMeta?.title || '相关知识点'}
                   documentSiblings={documentSiblings}
+                  sidebarSections={documentSidebarSections}
                   fileContent={fileContent}
                   fileLoading={loading}
                   fileName={fileName}

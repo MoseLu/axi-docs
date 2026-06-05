@@ -105,6 +105,25 @@ const skillsCatalog: KnowledgeCatalog = {
         },
       ],
     },
+    {
+      key: 'workflow',
+      title: 'Workflow',
+      description: '流程技能',
+      count: 1,
+      items: [
+        {
+          sourceId: 'axi-skills',
+          path: 'skills/workflow/SKILL.md',
+          name: 'workflow',
+          title: 'Workflow Skill',
+          description: 'Workflow automation skill',
+          docType: 'skill',
+          tags: [],
+          categories: ['workflow'],
+          techStack: [],
+        },
+      ],
+    },
   ],
 }
 
@@ -229,6 +248,10 @@ describe('App document route', () => {
     await waitFor(() => expect(screen.getByTestId('location').textContent).toBe('/docs/axi-skills/skills/frontend-dev/SKILL'))
     expect(screen.getByRole('link', { name: '指南' })).not.toHaveClass('active')
     expect(screen.getByRole('link', { name: '技能库' })).toHaveClass('active')
+    expect(screen.getByLabelText('Frontend')).toBeInTheDocument()
+    expect(screen.getByLabelText('Workflow')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Frontend Dev 文档' })).toHaveClass('active')
+    expect(screen.getByRole('link', { name: 'Workflow技能' })).toBeInTheDocument()
     expect(mocks.readKnowledgeFile).toHaveBeenCalledWith('axi-skills', 'skills/frontend-dev/SKILL.md')
   })
 

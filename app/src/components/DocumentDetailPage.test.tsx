@@ -106,4 +106,45 @@ describe('DocumentDetailPage', () => {
     expect(relatedToggle).toHaveAttribute('aria-expanded', 'false')
     expect(within(relatedNav).queryByRole('link', { name: /搜索文档/i })).not.toBeInTheDocument()
   })
+
+  it('keeps full document-set sidebar sections on document pages', () => {
+    render(
+      <MemoryRouter>
+        <DocumentDetailPage
+          categoryDescription="核心阅读路径"
+          categoryTitle="简介"
+          documentSiblings={siblings}
+          fileContent="# 快速开始"
+          fileLoading={false}
+          fileName="getting-started.md"
+          graphHref="/graph"
+          onTagSelect={vi.fn()}
+          onWikiLink={vi.fn()}
+          relatedItems={[]}
+          selectedCatalogItem={siblings[1]}
+          selectedFile={selectedFile}
+          sidebarSections={[
+            {
+              key: 'guide',
+              title: '简介',
+              description: '核心文档阅读路径',
+              count: 2,
+              items: siblings,
+            },
+            {
+              key: 'reference',
+              title: '参考',
+              description: '参考文档',
+              count: 1,
+              items: relatedItems,
+            },
+          ]}
+          source={source}
+        />
+      </MemoryRouter>,
+    )
+
+    expect(within(screen.getByLabelText('简介')).getByRole('link', { name: /快速开始/i })).toHaveClass('active')
+    expect(within(screen.getByLabelText('参考')).getByRole('link', { name: /搜索文档/i })).toBeInTheDocument()
+  })
 })

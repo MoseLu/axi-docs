@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { getKnowledgeSearchSuggestions } from '../lib/knowledgeClient'
 import type { SearchSuggestion } from '../types'
 import { pageCopy } from '../config/pageCopy'
-import { BookIcon, FileIcon, GitHubIcon, SearchIcon, TagIcon, ThemeIcon } from './Icons'
+import { BookIcon, FileIcon, GitHubIcon, SearchIcon, TagIcon } from './Icons'
 
 interface HeaderProps {
   onSearchChange: (query: string) => void
@@ -373,11 +373,14 @@ export function Header({
             <div className="header-vp-tools" aria-label="站点工具">
               <button
                 aria-label={themeMode === 'dark' ? '切换浅色样式' : '切换深色样式'}
-                className="header-vp-tool header-vp-tool--theme"
+                aria-pressed={themeMode === 'light'}
+                className={`header-vp-tool header-vp-tool--theme header-vp-theme-toggle header-vp-theme-toggle--${themeMode}`}
                 onClick={() => setThemeMode((current) => (current === 'dark' ? 'light' : 'dark'))}
                 type="button"
               >
-                <ThemeIcon />
+                <span className="header-vp-theme-toggle__track" aria-hidden="true">
+                  <span className="header-vp-theme-toggle__thumb" />
+                </span>
               </button>
               <span className="header-vp-separator" aria-hidden="true" />
               <a

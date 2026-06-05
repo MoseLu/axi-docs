@@ -81,7 +81,7 @@ html[data-axi-docs-theme='light'] .app-main--document {
 .app-layout--document .app-logo {
   width: var(--axi-doc-vp-sidebar-shell-width);
   height: var(--axi-doc-vp-nav-height);
-  padding: 0 32px 0 var(--axi-doc-vp-sidebar-padding-left);
+  padding: 0 32px 0 calc(var(--axi-doc-vp-sidebar-padding-left) + 6px);
   color: var(--axi-doc-vp-c-text-1);
   border-bottom: 1px solid var(--axi-doc-vp-c-divider);
 }
@@ -216,7 +216,51 @@ html[data-axi-docs-theme='light'] .app-main--document {
 }
 
 .header-vp-tool--theme {
+  border: 0;
+}
+
+.header-vp-theme-toggle {
+  width: 40px;
+  height: 22px;
+  padding: 0;
+  border-radius: 999px;
+  background: transparent;
+}
+
+.header-vp-theme-toggle:hover {
+  background: transparent;
+}
+
+.header-vp-theme-toggle__track {
+  position: relative;
+  width: 40px;
+  height: 22px;
+  display: block;
   border: 1px solid var(--axi-doc-vp-c-divider);
+  border-radius: 999px;
+  background: var(--axi-doc-vp-c-bg-soft);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.header-vp-theme-toggle__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 16px;
+  height: 16px;
+  border-radius: 999px;
+  background: var(--axi-doc-vp-c-text-2);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.header-vp-theme-toggle--light .header-vp-theme-toggle__track {
+  border-color: var(--axi-doc-vp-c-brand-1);
+  background: var(--axi-doc-vp-c-bg);
+}
+
+.header-vp-theme-toggle--light .header-vp-theme-toggle__thumb {
+  transform: translateX(18px);
+  background: var(--axi-doc-vp-c-brand-1);
 }
 
 .header-vp-separator {
@@ -966,10 +1010,15 @@ html[data-axi-docs-theme='light'] .app-main--home {
 }
 
 .app-layout--home .app-header--command {
+  padding: 0;
   border-bottom: 1px solid var(--axi-doc-vp-c-divider);
   background: var(--axi-doc-vp-c-bg);
   box-shadow: none;
   backdrop-filter: none;
+}
+
+.app-layout--home .app-logo {
+  padding-left: calc(var(--axi-doc-vp-sidebar-padding-left) + 6px);
 }
 
 .app-layout--home .header-search--global {
@@ -1030,6 +1079,10 @@ html[data-axi-docs-theme='light'] .app-main--home {
   color: var(--axi-doc-vp-c-text-1);
 }
 
+.app-layout--home .header-vp-theme-toggle:hover {
+  background: transparent;
+}
+
 .axi-docs-home,
 .axi-docs-home__content,
 .axi-docs-home__outline {
@@ -1038,12 +1091,16 @@ html[data-axi-docs-theme='light'] .app-main--home {
 }
 
 .axi-docs-home__content,
-.document-detail-page__reader .app-content {
+.document-detail-page__reader .app-content,
+.axi-docs-home__sidebar,
+.document-detail-page__sidebar {
   scrollbar-width: none;
 }
 
 .axi-docs-home__content::-webkit-scrollbar,
-.document-detail-page__reader .app-content::-webkit-scrollbar {
+.document-detail-page__reader .app-content::-webkit-scrollbar,
+.axi-docs-home__sidebar::-webkit-scrollbar,
+.document-detail-page__sidebar::-webkit-scrollbar {
   display: none;
 }
 

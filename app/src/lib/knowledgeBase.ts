@@ -1887,7 +1887,7 @@ export async function getKnowledgeDocuments(sourceId: string): Promise<StaticKno
 function createStaticDocumentContent(source: DocSource, document: ParsedDocument): string {
   if (source.adapter !== 'skills') return document.raw
 
-  const excerpt = document.body.replace(/\s+$/g, '').slice(0, 1200)
+  const body = document.body.trim() || document.description || 'No skill body available.'
   return buildFrontmatter({
     id: document.frontmatter.id || `${source.id}:${document.name}`,
     title: document.title,
@@ -1899,18 +1899,7 @@ function createStaticDocumentContent(source: DocSource, document: ParsedDocument
     sourcePath: document.path,
     'graph-title': document.graphTitle || document.title,
     'graph-tags': ['技能', 'Agent'],
-  }) + [
-    `# ${document.title}`,
-    '',
-    document.description || 'No frontmatter description.',
-    '',
-    `Source path: \`${document.path}\``,
-    '',
-    '## Excerpt',
-    '',
-    excerpt,
-    document.body.length > excerpt.length ? '\n\n> Static Web preview is truncated. Use MCP `axi_docs_read` for the full skill source.' : '',
-  ].join('\n')
+  }) + body
 }
 
 export async function getKnowledgeDirectoryIndex(sourceId: string): Promise<Record<string, FileItem[]>> {

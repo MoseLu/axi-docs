@@ -8,6 +8,7 @@ import {
   __clearKnowledgeBaseCacheForTests,
   getProjectSummary,
   getKnowledgeCatalog,
+  getKnowledgeDocuments,
   listKnowledgeSources,
   readKnowledgeFile,
   searchKnowledge,
@@ -327,6 +328,13 @@ describe('knowledge base local index', () => {
     expect(indexRaw).toContain('## Agent 工作流')
     expect(indexRaw).toContain('## 工程实现与架构')
     expect(indexRaw).toContain('`skills/frontend-dev/SKILL.md`')
+
+    const staticDocuments = await getKnowledgeDocuments('axi-skills')
+    const staticDeepInit = staticDocuments.find((document) => document.path === 'skills/deep-init-pro/SKILL.md')
+    expect(staticDeepInit?.content).toContain('# Deep Init Pro')
+    expect(staticDeepInit?.content).toContain('Use this to create PARADIGM and ARCHITECTURE docs.')
+    expect(staticDeepInit?.content).not.toContain('Source path:')
+    expect(staticDeepInit?.content).not.toContain('## Excerpt')
   })
 
   it('indexes dbskill as a full organized skill library', async () => {

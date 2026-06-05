@@ -1225,7 +1225,7 @@ html[data-axi-docs-theme='light'] .app-main--home {
 }
 
 .axi-docs-home__nav-link,
-.axi-docs-home__source-link,
+.axi-docs-home__sidebar-link,
 .axi-docs-home__nav-card,
 .axi-docs-home__outline-card a {
   border-radius: 0;
@@ -1237,14 +1237,13 @@ html[data-axi-docs-theme='light'] .app-main--home {
 
 .axi-docs-home__nav-link:hover,
 .axi-docs-home__nav-link.active,
-.axi-docs-home__source-link:hover,
-.axi-docs-home__source-link.active,
+.axi-docs-home__sidebar-link:hover,
+.axi-docs-home__sidebar-link.active,
 .axi-docs-home__nav-card:hover {
   background: transparent;
   color: var(--axi-doc-vp-c-brand-1);
 }
 
-.axi-docs-home__source-link small,
 .axi-docs-home__nav-card small {
   color: var(--axi-doc-vp-c-text-3);
   font-size: 12px;

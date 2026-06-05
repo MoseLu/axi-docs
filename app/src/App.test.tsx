@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter, useLocation } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
@@ -201,8 +201,10 @@ describe('App document route', () => {
     expect(mocks.getKnowledgeCatalog).toHaveBeenCalledWith('axi-skills')
     expect(screen.getByRole('link', { name: '技能库' })).toHaveAttribute('href', '/zh/skills')
     expect(screen.getByRole('link', { name: '技能库' })).toHaveClass('active')
-    expect(screen.getByRole('button', { name: 'Frontend' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /Frontend Dev/i })).toBeInTheDocument()
+    const sidebar = screen.getByLabelText('侧边栏导航')
+    expect(within(sidebar).getByRole('button', { name: 'Frontend' })).toBeInTheDocument()
+    expect(within(sidebar).getByRole('button', { name: 'Frontend Dev' })).toBeInTheDocument()
+    expect(within(sidebar).queryByText('Frontend workflow skill')).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: '快速开始' })).not.toBeInTheDocument()
   })
 
@@ -222,7 +224,7 @@ describe('App document route', () => {
       </MemoryRouter>,
     )
 
-    fireEvent.click(await screen.findByRole('button', { name: /Frontend Dev/i }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Frontend Dev' }))
 
     await waitFor(() => expect(screen.getByTestId('location').textContent).toBe('/docs/axi-skills/skills/frontend-dev/SKILL'))
     expect(mocks.readKnowledgeFile).toHaveBeenCalledWith('axi-skills', 'skills/frontend-dev/SKILL.md')

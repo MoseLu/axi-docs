@@ -107,12 +107,12 @@ export function HomeCommandCenter({
             {section.items.slice(0, 12).map((item) => (
               <button
                 key={`${item.sourceId}:${item.path}`}
-                className={`axi-docs-home__source-link${item.sourceId === activeSourceId && item.path === selectedFile?.path ? ' active' : ''}`}
+                className={`axi-docs-home__sidebar-link${item.sourceId === activeSourceId && item.path === selectedFile?.path ? ' active' : ''}`}
                 onClick={() => onOpenItem(item.sourceId, item.path)}
+                title={item.description || item.path}
                 type="button"
               >
-                <span>{item.title || item.name}</span>
-                <small>{item.description || item.path}</small>
+                {item.title || item.name}
               </button>
             ))}
             {section.items.length === 0 && (

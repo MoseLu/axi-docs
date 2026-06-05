@@ -158,9 +158,11 @@ describe('HomeCommandCenter', () => {
 
     expect(screen.getByRole('heading', { name: 'Axi Skills', level: 1 })).toBeInTheDocument()
     expect(within(screen.getByLabelText('侧边栏导航')).getByRole('button', { name: 'Frontend' })).toBeInTheDocument()
-    expect(within(screen.getByLabelText('Frontend')).getByRole('button', { name: /Frontend Dev/i })).toBeInTheDocument()
+    const frontendSection = screen.getByLabelText('Frontend')
+    expect(within(frontendSection).getByRole('button', { name: 'Frontend Dev' })).toHaveAttribute('title', 'Frontend workflow skill')
+    expect(within(frontendSection).queryByText('Frontend workflow skill')).not.toBeInTheDocument()
     expect(within(screen.getByLabelText('侧边栏导航')).queryByRole('link', { name: '快速开始' })).not.toBeInTheDocument()
-    fireEvent.click(within(screen.getByLabelText('Frontend')).getByRole('button', { name: /Frontend Dev/i }))
+    fireEvent.click(within(frontendSection).getByRole('button', { name: 'Frontend Dev' }))
     expect(onOpenItem).toHaveBeenCalledWith('axi-skills', 'skills/frontend-dev/SKILL.md')
     expect(screen.getByText('当前来源')).toBeInTheDocument()
   })

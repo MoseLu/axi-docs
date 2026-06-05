@@ -219,7 +219,7 @@ html[data-axi-docs-theme='light'] .app-main--home {
 }
 
 .axi-docs-home__nav-link,
-.axi-docs-home__source-link,
+.axi-docs-home__sidebar-link,
 .axi-docs-home__nav-card {
   min-height: 32px;
   display: flex;
@@ -235,22 +235,23 @@ html[data-axi-docs-theme='light'] .app-main--home {
   padding: 0 12px;
 }
 
-.axi-docs-home__nav-link:hover,
-.axi-docs-home__nav-link.active {
-  color: var(--axi-doc-vp-c-brand-1);
-  background: var(--axi-doc-vp-c-brand-soft);
-  text-decoration: none;
-}
-
-.axi-docs-home__source-link {
-  display: grid;
-  gap: 2px;
+.axi-docs-home__sidebar-link {
   width: 100%;
-  padding: 9px 12px;
+  padding: 0 12px;
   border: 0;
   background: transparent;
   text-align: left;
   cursor: pointer;
+  font: inherit;
+}
+
+.axi-docs-home__nav-link:hover,
+.axi-docs-home__nav-link.active,
+.axi-docs-home__sidebar-link:hover,
+.axi-docs-home__sidebar-link.active {
+  color: var(--axi-doc-vp-c-brand-1);
+  background: var(--axi-doc-vp-c-brand-soft);
+  text-decoration: none;
 }
 
 .axi-docs-home__nav-card {
@@ -264,20 +265,12 @@ html[data-axi-docs-theme='light'] .app-main--home {
   cursor: pointer;
 }
 
-.axi-docs-home__source-link span {
-  color: inherit;
-  font-weight: 600;
-}
-
-.axi-docs-home__source-link small,
 .axi-docs-home__nav-card small {
   color: var(--axi-doc-vp-c-text-3);
   font-size: 11px;
   text-transform: uppercase;
 }
 
-.axi-docs-home__source-link:hover,
-.axi-docs-home__source-link.active,
 .axi-docs-home__nav-card:hover {
   color: var(--axi-doc-vp-c-brand-1);
   background: var(--axi-doc-vp-c-bg-soft);

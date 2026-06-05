@@ -6,7 +6,7 @@ import {
   SearchResult,
   SelectedFile,
 } from '../types'
-import { HomeCommandCenter, QuickKnowledgeItemLike, type GuidePageId } from './HomeCommandCenter'
+import { HomeCommandCenter, QuickKnowledgeItemLike, type GuideLocale, type GuidePageId } from './HomeCommandCenter'
 import { KnowledgeExplorer } from './KnowledgeExplorer'
 
 type ExplorerView = 'tree' | 'path' | 'islands'
@@ -27,6 +27,7 @@ interface KnowledgeWorkbenchProps {
   fileLoading: boolean
   activeTag: string | null
   pageMode: 'home' | 'explorer'
+  guideLocale?: GuideLocale
   guidePageId?: GuidePageId
   onOpenItem: (sourceId: string, path: string) => void
   onSourceSelect: (sourceId: string) => void
@@ -57,6 +58,7 @@ export function KnowledgeWorkbench({
   fileLoading,
   activeTag,
   pageMode,
+  guideLocale,
   guidePageId,
   onOpenItem,
   onSourceSelect,
@@ -122,6 +124,7 @@ export function KnowledgeWorkbench({
         activeSourceId={activeSourceId}
         catalog={catalog}
         graphFocusPath={graphFocusPath}
+        guideLocale={guideLocale}
         guidePageId={guidePageId}
         onClearSelectedFile={onClearSelectedFile}
         onOpenExplorer={onNavigateExplorer}

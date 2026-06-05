@@ -2,7 +2,7 @@ import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import App from './App'
-import { buildDocumentRoute, encodeDocumentId } from './lib/routes'
+import { buildDocumentRoute } from './lib/routes'
 import type { DocSource, KnowledgeCatalog } from './types'
 
 const mocks = vi.hoisted(() => ({
@@ -86,7 +86,7 @@ describe('App document route', () => {
     expect(screen.getAllByRole('link', { name: '什么是 Axi Docs？' })[0]).toHaveAttribute('href', '/zh/guide/what-is-axi-docs')
   })
 
-  it('redirects root search URLs into the guide search document', async () => {
+  it('redirects the root to the default localized guide document', async () => {
     mocks.listKnowledgeSources.mockResolvedValue([source])
     mocks.getKnowledgeCatalog.mockResolvedValue(catalog)
     mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
@@ -94,16 +94,16 @@ describe('App document route', () => {
     mocks.readKnowledgeFile.mockResolvedValue(null)
 
     render(
-      <MemoryRouter initialEntries={['/?q=AXI']}>
+      <MemoryRouter initialEntries={['/']}>
         <App />
       </MemoryRouter>,
     )
 
-    await screen.findByRole('heading', { name: '“AXI” 的匹配文档' })
-    await waitFor(() => expect(mocks.searchKnowledgeAll).toHaveBeenCalledWith('AXI'))
+    await screen.findByRole('heading', { name: '快速开始', level: 1 })
+    expect(screen.getAllByRole('link', { name: '快速开始' })[0]).toHaveAttribute('href', '/zh/guide/getting-started')
   })
 
-  it('upgrades old root guide hashes to guide document routes', async () => {
+  it('does not map old guide hashes to new guide document routes', async () => {
     mocks.listKnowledgeSources.mockResolvedValue([source])
     mocks.getKnowledgeCatalog.mockResolvedValue(catalog)
     mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
@@ -116,8 +116,27 @@ describe('App document route', () => {
       </MemoryRouter>,
     )
 
-    await screen.findByRole('heading', { name: '什么是 Axi Docs？', level: 1 })
-    expect(screen.getAllByRole('link', { name: '什么是 Axi Docs？' })[0]).toHaveAttribute('href', '/zh/guide/what-is-axi-docs')
+    await screen.findByRole('heading', { name: '快速开始', level: 1 })
+    expect(screen.queryByRole('heading', { name: '什么是 Axi Docs？', level: 1 })).not.toBeInTheDocument()
+  })
+
+  it('renders the English guide under the locale-prefixed route', async () => {
+    mocks.listKnowledgeSources.mockResolvedValue([source])
+    mocks.getKnowledgeCatalog.mockResolvedValue(catalog)
+    mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
+    mocks.searchKnowledgeAll.mockResolvedValue([])
+    mocks.readKnowledgeFile.mockResolvedValue(null)
+
+    render(
+      <MemoryRouter initialEntries={['/en/guide/getting-started']}>
+        <App />
+      </MemoryRouter>,
+    )
+
+    await screen.findByRole('heading', { name: 'Getting Started', level: 1 })
+
+    expect(screen.getAllByRole('link', { name: 'Getting Started' })[0]).toHaveAttribute('href', '/en/guide/getting-started')
+    expect(screen.getAllByRole('link', { name: 'What is Axi Docs?' })[0]).toHaveAttribute('href', '/en/guide/what-is-axi-docs')
   })
 
   it('loads a readable route document once instead of flickering back into loading', async () => {
@@ -146,27 +165,20 @@ describe('App document route', () => {
     expect(screen.queryByText('Stable document body.')).toBeInTheDocument()
   })
 
-  it('redirects legacy encoded document routes to the readable document route', async () => {
+  it('returns 404 for legacy encoded document routes instead of redirecting them', async () => {
     mocks.listKnowledgeSources.mockResolvedValue([source])
     mocks.getKnowledgeCatalog.mockResolvedValue(catalog)
     mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
     mocks.searchKnowledgeAll.mockResolvedValue([])
     mocks.readKnowledgeFile.mockResolvedValue('# Workspace Relationship Graph\n\nLegacy link body.')
 
-    const docId = encodeDocumentId({
-      sourceId: 'workspace',
-      path: 'projects/workspace-relationship-graph.md',
-    })
-
     render(
-      <MemoryRouter initialEntries={[`/doc/${docId}`]}>
+      <MemoryRouter initialEntries={['/doc/workspace:projects/workspace-relationship-graph.md']}>
         <App />
       </MemoryRouter>,
     )
 
-    await screen.findByRole('heading', { name: /Workspace Relationship Graph/i })
-    await waitFor(() => expect(mocks.readKnowledgeFile).toHaveBeenCalledTimes(1))
-
-    expect(screen.queryByText('Legacy link body.')).toBeInTheDocument()
+    await screen.findByRole('heading', { name: '页面不存在' })
+    expect(mocks.readKnowledgeFile).not.toHaveBeenCalled()
   })
 })

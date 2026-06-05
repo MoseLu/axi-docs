@@ -224,6 +224,27 @@ html[data-axi-docs-theme='light'] .app-main--document {
   height: 18px;
 }
 
+.header-vp-tool--locale {
+  width: auto;
+  gap: 6px;
+  padding: 0 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.header-vp-tool--locale svg {
+  width: 16px;
+  height: 16px;
+}
+
+.header-vp-tool__caret {
+  color: var(--axi-doc-vp-c-text-3);
+  font-size: 12px;
+  line-height: 1;
+}
+
 .header-vp-tool--theme {
   border: 0;
 }

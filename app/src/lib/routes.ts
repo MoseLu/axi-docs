@@ -1,6 +1,8 @@
 import { KnowledgeCategoryKey, normalizeKnowledgeCategoryKey } from '../config/knowledgeRules'
 import { SelectedFile } from '../types'
 
+type GuideRouteLocale = 'zh' | 'en'
+
 function hasBrowserBase64Api() {
   return typeof btoa === 'function' && typeof atob === 'function'
 }
@@ -116,7 +118,7 @@ export function decodeDocumentRoute(sourceId: string | undefined, documentPath: 
   }
 }
 
-export function buildSearchRoute(keyword: string, sourceId?: string | null): string {
+export function buildSearchRoute(keyword: string, sourceId?: string | null, locale: GuideRouteLocale = 'zh'): string {
   const params = new URLSearchParams()
   const normalizedKeyword = keyword.trim()
 
@@ -129,7 +131,7 @@ export function buildSearchRoute(keyword: string, sourceId?: string | null): str
   }
 
   const search = params.toString()
-  return search ? `/zh/guide/search?${search}` : '/zh/guide/search'
+  return search ? `/${locale}/guide/search?${search}` : `/${locale}/guide/search`
 }
 
 export function normalizeCategoryRoute(categoryId?: string | null, subId?: string | null): KnowledgeCategoryKey | null {
@@ -156,34 +158,4 @@ export function normalizeRouterBasename(base: string | undefined): string | unde
     const withoutTrailingSlash = pathname.replace(/\/$/u, '')
     return withoutTrailingSlash && withoutTrailingSlash !== '/' ? withoutTrailingSlash : undefined
   }
-}
-
-export function buildBrowserPathFromLegacyHashRoute(
-  location: Pick<Location, 'hash' | 'pathname' | 'search'>,
-  basename?: string,
-): string | null {
-  if (!location.hash.startsWith('#/')) return null
-
-  const routePath = location.hash.slice(1)
-  const routerBase = normalizeRouterBasename(basename) || ''
-  if (routePath === '/search' || routePath.startsWith('/search?')) {
-    const legacySearch = new URLSearchParams(routePath.split('?')[1] || '')
-    const query = legacySearch.get('keyword') || legacySearch.get('q') || ''
-    const source = legacySearch.get('source') || ''
-    const next = new URLSearchParams()
-
-    if (query) next.set('q', query)
-    if (source) next.set('source', source)
-
-    const search = next.toString()
-    const searchPath = `${routerBase}/zh/guide/search`
-    return search ? `${searchPath}?${search}` : searchPath
-  }
-
-  const basePrefixedPath = routerBase && !routePath.startsWith(`${routerBase}/`) && routePath !== routerBase
-    ? `${routerBase}${routePath}`
-    : routePath
-  const outerSearch = location.search && !routePath.includes('?') ? location.search : ''
-
-  return `${basePrefixedPath}${outerSearch}`
 }

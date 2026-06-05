@@ -16,6 +16,7 @@ vi.mock('./Icons', () => ({
   BookIcon: () => <span data-testid="book-icon">📖</span>,
   FileIcon: () => <span data-testid="file-icon">📄</span>,
   GitHubIcon: () => <span data-testid="github-icon">GitHub</span>,
+  LanguageIcon: () => <span data-testid="language-icon">Language</span>,
   TagIcon: () => <span data-testid="tag-icon">🏷️</span>,
   ThemeIcon: () => <span data-testid="theme-icon">Theme</span>,
 }))
@@ -93,6 +94,20 @@ describe('Header', () => {
     expect(screen.getByRole('link', { name: '指南' })).toHaveAttribute('href', '/zh/guide/getting-started')
     expect(screen.getByRole('link', { name: '指南' })).not.toHaveClass('active')
     expect(screen.getByRole('link', { name: '工作区' })).toHaveClass('active')
+  })
+
+  it('switches between locale-prefixed guide routes', () => {
+    renderHeader({ pageMode: 'home' }, '/zh/guide/search?q=axi')
+
+    expect(screen.getByRole('link', { name: '切换语言到English' })).toHaveAttribute('href', '/en/guide/search?q=axi')
+  })
+
+  it('switches English guide routes back to Chinese', () => {
+    renderHeader({ pageMode: 'home' }, '/en/guide/getting-started')
+
+    expect(screen.getByRole('link', { name: '切换语言到简体中文' })).toHaveAttribute('href', '/zh/guide/getting-started')
+    expect(screen.getByRole('link', { name: '返回首页' })).toHaveAttribute('href', '/en/guide/getting-started')
+    expect(screen.getByRole('link', { name: '指南' })).toHaveAttribute('href', '/en/guide/getting-started')
   })
 
   it('debounces live search updates on the search page', async () => {

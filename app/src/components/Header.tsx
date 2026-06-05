@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { getKnowledgeSearchSuggestions } from '../lib/knowledgeClient'
 import type { SearchSuggestion } from '../types'
 import { pageCopy } from '../config/pageCopy'
-import { BookIcon, FileIcon, GitHubIcon, SearchIcon, TagIcon, ThemeIcon } from './Icons'
+import { BookIcon, FileIcon, GitHubIcon, LanguageIcon, SearchIcon, TagIcon, ThemeIcon } from './Icons'
 
 interface HeaderProps {
   onSearchChange: (query: string) => void
@@ -45,7 +45,14 @@ export function Header({
 
   const trimmedInput = inputValue.trim()
   const activeSource = new URLSearchParams(location.search).get('source')
-  const guideHref = '/zh/guide/getting-started'
+  const currentLocale = location.pathname.startsWith('/en/') ? 'en' : 'zh'
+  const guideHref = `/${currentLocale}/guide/getting-started`
+  const nextLocale = currentLocale === 'zh' ? 'en' : 'zh'
+  const localeHref = /^\/(zh|en)\//u.test(location.pathname)
+    ? `${location.pathname.replace(/^\/(zh|en)\//u, `/${nextLocale}/`)}${location.search}`
+    : `/${nextLocale}/guide/getting-started`
+  const localeLabel = currentLocale === 'zh' ? '简体中文' : 'English'
+  const nextLocaleLabel = nextLocale === 'zh' ? '简体中文' : 'English'
   const documentSuggestions = suggestions.filter((suggestion) => suggestion.kind === 'document')
   const tagSuggestions = suggestions.filter((suggestion) => suggestion.kind === 'tag')
 
@@ -387,6 +394,17 @@ export function Header({
               ))}
             </nav>
             <div className="header-vp-tools" aria-label="站点工具">
+              <Link
+                aria-label={`切换语言到${nextLocaleLabel}`}
+                className="header-vp-tool header-vp-tool--locale"
+                title={`切换语言到${nextLocaleLabel}`}
+                to={localeHref}
+              >
+                <LanguageIcon />
+                <span>{localeLabel}</span>
+                <span aria-hidden="true" className="header-vp-tool__caret">⌄</span>
+              </Link>
+              <span className="header-vp-separator" aria-hidden="true" />
               <button
                 aria-label={themeMode === 'dark' ? '切换浅色样式' : '切换深色样式'}
                 aria-checked={themeMode === 'dark'}

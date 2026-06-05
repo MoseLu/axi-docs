@@ -110,6 +110,56 @@ describe('HomeCommandCenter', () => {
     expect(screen.getByText('当前来源')).toBeInTheDocument()
   })
 
+  it('renders localized English guide navigation', () => {
+    render(
+      <HomeCommandCenter
+        activeTag={null}
+        catalog={catalog}
+        graphFocusPath={null}
+        guideLocale="en"
+        onClearSelectedFile={vi.fn()}
+        onOpenExplorer={vi.fn()}
+        onOpenItem={vi.fn()}
+        onSourceSelect={vi.fn()}
+        onTagSelect={vi.fn()}
+        searchQuery=""
+        selectedFile={null}
+        source={sources[0]}
+        sources={sources}
+      />,
+    )
+
+    expect(screen.getByRole('heading', { name: 'Getting Started', level: 1 })).toBeInTheDocument()
+    expect(within(screen.getByLabelText('侧边栏导航')).getByRole('link', { name: 'Getting Started' })).toHaveAttribute('href', '/en/guide/getting-started')
+    expect(within(screen.getByLabelText('侧边栏导航')).getByRole('link', { name: 'What is Axi Docs?' })).toHaveAttribute('href', '/en/guide/what-is-axi-docs')
+    expect(screen.getByRole('heading', { name: 'File Structure' })).toBeInTheDocument()
+  })
+
+  it('renders localized English search copy', () => {
+    render(
+      <HomeCommandCenter
+        activeTag={null}
+        catalog={catalog}
+        graphFocusPath={null}
+        guideLocale="en"
+        guidePageId="search"
+        onClearSelectedFile={vi.fn()}
+        onOpenExplorer={vi.fn()}
+        onOpenItem={vi.fn()}
+        onSourceSelect={vi.fn()}
+        onTagSelect={vi.fn()}
+        searchQuery="AXI"
+        searchResults={[]}
+        selectedFile={null}
+        source={sources[0]}
+        sources={sources}
+      />,
+    )
+
+    expect(screen.getByRole('heading', { name: 'Matches for "AXI"' })).toBeInTheDocument()
+    expect(screen.getByText('No matching documents found. Try another keyword or continue from a recommended reading path.')).toBeInTheDocument()
+  })
+
   it('keeps source selection actionable from the docs sidebar', () => {
     const onSourceSelect = vi.fn()
     render(

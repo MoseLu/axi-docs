@@ -1,11 +1,11 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
-import { Navigate, Route, Routes, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { Navigate, Route, Routes, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Header } from './components/Header'
 import { CategoryGraphPage } from './components/CategoryGraphPage'
 import { DocumentDetailPage } from './components/DocumentDetailPage'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { KnowledgeWorkbench } from './components/KnowledgeWorkbench'
-import type { GuidePageId } from './components/HomeCommandCenter'
+import type { GuideLocale, GuidePageId } from './components/HomeCommandCenter'
 import { NotFoundPage } from './components/NotFoundPage'
 import { KNOWLEDGE_CATEGORY_ORDER, getKnowledgeCategoryMeta, normalizeKnowledgeCategoryKey } from './config/knowledgeRules'
 import {
@@ -17,7 +17,6 @@ import {
 import {
   buildCategoryRoute,
   buildDocumentRoute,
-  decodeDocumentId,
   decodeDocumentRoute,
   encodeDocumentId,
   normalizeCategoryRoute,
@@ -27,15 +26,8 @@ import { DocSource, KnowledgeCatalog, KnowledgeCatalogItem, SearchResult, Search
 type PageMode = 'home' | 'category' | 'document'
 type ParamUpdates = Record<string, string | null | undefined>
 const GUIDE_PAGE_IDS = new Set<GuidePageId>(['what-is-axi-docs', 'getting-started', 'search', 'next-steps'])
+const GUIDE_LOCALES = new Set<GuideLocale>(['zh', 'en'])
 const DEFAULT_GUIDE_ROUTE = '/zh/guide/getting-started'
-const GUIDE_SEARCH_ROUTE = '/zh/guide/search'
-const LEGACY_GUIDE_HASH_ROUTES: Record<string, string> = {
-  '#what-is-axi-docs': '/zh/guide/what-is-axi-docs',
-  '#quick-start': DEFAULT_GUIDE_ROUTE,
-  '#getting-started': DEFAULT_GUIDE_ROUTE,
-  '#search-results': GUIDE_SEARCH_ROUTE,
-  '#next-steps': '/zh/guide/next-steps',
-}
 
 function flattenCatalogItems(catalog: KnowledgeCatalog | null): KnowledgeCatalogItem[] {
   if (!catalog) return []
@@ -54,19 +46,19 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
     () => (pageMode === 'document' ? decodeDocumentRoute(params.sourceId, params['*']) : null),
     [pageMode, params],
   )
-  const docParam = searchParams.get('doc') || ''
-  const previewDocument = useMemo(
-    () => (pageMode === 'document' ? routeDocument : decodeDocumentId(docParam)),
-    [docParam, pageMode, routeDocument],
-  )
   const urlSearchQuery = searchParams.get('q') || searchParams.get('keyword') || ''
-  const guidePageId = pageMode === 'home' && params.guideId && GUIDE_PAGE_IDS.has(params.guideId as GuidePageId)
+  const routeGuideLocale = pageMode === 'home' && GUIDE_LOCALES.has(params.locale as GuideLocale)
+    ? params.locale as GuideLocale
+    : null
+  const routeGuidePageId = pageMode === 'home' && params.guideId && GUIDE_PAGE_IDS.has(params.guideId as GuidePageId)
     ? params.guideId as GuidePageId
-    : 'getting-started'
+    : null
+  const guideLocale = routeGuideLocale || 'zh'
+  const guidePageId = routeGuidePageId || 'getting-started'
 
   const [sources, setSources] = useState<DocSource[]>([])
   const [activeSource, setActiveSource] = useState(searchParams.get('source') || routeDocument?.sourceId || 'workspace')
-  const [selectedFile, setSelectedFile] = useState<SelectedFile | null>(() => (pageMode === 'document' ? null : previewDocument))
+  const [selectedFile, setSelectedFile] = useState<SelectedFile | null>(null)
   const [fileContent, setFileContent] = useState<string | null>(null)
   const [fileName, setFileName] = useState('')
   const [loading, setLoading] = useState(false)
@@ -245,23 +237,11 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
   useEffect(() => {
     if (urlSearchQuery !== searchQuery) setSearchQuery(urlSearchQuery)
     if ((searchParams.get('tag') || null) !== activeTag) setActiveTag(searchParams.get('tag'))
-    if (previewDocument?.sourceId && previewDocument.sourceId !== activeSource) {
-      setActiveSource(previewDocument.sourceId)
-    } else {
-      const sourceFromUrl = searchParams.get('source')
-      if (sourceFromUrl && sourceFromUrl !== activeSource) {
-        setActiveSource(sourceFromUrl)
-      }
+    const sourceFromUrl = searchParams.get('source')
+    if (sourceFromUrl && sourceFromUrl !== activeSource) {
+      setActiveSource(sourceFromUrl)
     }
-
-    if (pageMode !== 'document') {
-      const currentDoc = selectedFile ? `${selectedFile.sourceId}:${selectedFile.path}` : null
-      const nextDoc = previewDocument ? `${previewDocument.sourceId}:${previewDocument.path}` : null
-      if (currentDoc !== nextDoc) {
-        setSelectedFile(previewDocument)
-      }
-    }
-  }, [activeSource, activeTag, pageMode, previewDocument, searchParams, searchQuery, selectedFile, urlSearchQuery])
+  }, [activeSource, activeTag, searchParams, searchQuery, urlSearchQuery])
 
   useEffect(() => {
     if (!effectiveSelectedFile) {
@@ -441,7 +421,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
     setFileContent(null)
     setFileName('')
 
-    navigateWithParams(GUIDE_SEARCH_ROUTE, {
+    navigateWithParams(`/${guideLocale}/guide/search`, {
       q: normalizedQuery || null,
       keyword: null,
       tag: null,
@@ -450,7 +430,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
       node: null,
       view: null,
     })
-  }, [navigateWithParams])
+  }, [guideLocale, navigateWithParams])
 
   const handleSuggestionSelect = useCallback((suggestion: SearchSuggestion) => {
     if (suggestion.kind === 'document' && suggestion.sourceId && suggestion.path) {
@@ -475,7 +455,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
 
   const handleWikiLink = useCallback((noteName: string) => {
     if (pageMode === 'document') {
-      navigateWithParams(GUIDE_SEARCH_ROUTE, {
+      navigateWithParams(`/${guideLocale}/guide/search`, {
         q: noteName,
         keyword: null,
         source: activeSource,
@@ -484,9 +464,10 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
       return
     }
     handleSearch(noteName)
-  }, [activeSource, handleSearch, navigateWithParams, pageMode])
+  }, [activeSource, guideLocale, handleSearch, navigateWithParams, pageMode])
 
   const invalidCategoryRoute = pageMode === 'category' && !routeCategory
+  const invalidGuideRoute = pageMode === 'home' && (!routeGuideLocale || !routeGuidePageId)
   const documentCategoryKey = normalizeKnowledgeCategoryKey(selectedCatalogItem?.categories[0] || '')
   const documentCategoryMeta = documentCategoryKey ? getKnowledgeCategoryMeta(documentCategoryKey) : null
   const categoryTargetSource = workspaceSource?.id || 'obsidian'
@@ -559,7 +540,14 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
       <div className="app-body">
         <main className={`app-main app-main--${pageMode}`} id="app-main-content" tabIndex={-1}>
           <ErrorBoundary>
-            {invalidCategoryRoute ? (
+            {invalidGuideRoute ? (
+              <NotFoundPage
+                description="当前指南路径不存在。Axi Docs 只提供 /zh/guide/* 与 /en/guide/* 这类语言化文档路径。"
+                onPrimaryAction={handleNavigateHome}
+                onSecondaryAction={handleNavigateCategory}
+                title="指南页面不存在"
+              />
+            ) : invalidCategoryRoute ? (
               <div className="workspace-empty-state">
                 <div className="workspace-empty-state__eyebrow">Category Route</div>
                 <h2>当前分类路由不存在</h2>
@@ -643,6 +631,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
                 onTagSelect={handleTagSelect}
                 onWikiLink={handleWikiLink}
                 pageMode="home"
+                guideLocale={guideLocale}
                 guidePageId={guidePageId}
                 searchQuery={searchQuery}
                 searchResults={searchResults}
@@ -676,69 +665,14 @@ function RouteFallback() {
   )
 }
 
-function LegacySearchRedirect() {
-  const [searchParams] = useSearchParams()
-  const next = new URLSearchParams()
-  const query = searchParams.get('keyword') || searchParams.get('q') || ''
-  const source = searchParams.get('source') || ''
-
-  if (query) next.set('q', query)
-  if (source) next.set('source', source)
-
-  return <Navigate replace to={{ pathname: GUIDE_SEARCH_ROUTE, search: next.toString() ? `?${next}` : '' }} />
-}
-
-function RootGuideRedirect() {
-  const location = useLocation()
-  const searchParams = new URLSearchParams(location.search)
-  const legacyHashRoute = LEGACY_GUIDE_HASH_ROUTES[location.hash]
-  const targetPath = legacyHashRoute || (searchParams.has('q') || searchParams.has('keyword')
-    ? GUIDE_SEARCH_ROUTE
-    : DEFAULT_GUIDE_ROUTE)
-
-  return (
-    <Navigate
-      replace
-      to={{
-        pathname: targetPath,
-        search: location.search,
-        hash: legacyHashRoute ? '' : location.hash,
-      }}
-    />
-  )
-}
-
-function LegacyDocumentRedirect() {
-  const navigate = useNavigate()
-  const params = useParams()
-  const routeDocument = useMemo(() => decodeDocumentId(params.docId || ''), [params.docId])
-
-  if (!routeDocument) {
-    return (
-      <div className="standalone-route">
-        <NotFoundPage
-          description="当前旧版文档链接无法解析。请返回首页重新打开文档，或通过顶部搜索重新定位知识点。"
-          onPrimaryAction={() => navigate('/')}
-          onSecondaryAction={() => navigate('/')}
-          title="文档不存在或链接已失效"
-        />
-      </div>
-    )
-  }
-
-  return <Navigate replace to={buildDocumentRoute(routeDocument)} />
-}
-
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<RootGuideRedirect />} />
-      <Route path="/zh/guide/:guideId" element={<HubPage pageMode="home" />} />
+      <Route path="/" element={<Navigate replace to={DEFAULT_GUIDE_ROUTE} />} />
+      <Route path="/:locale/guide/:guideId" element={<HubPage pageMode="home" />} />
       <Route path="/nodes/:categoryId" element={<HubPage pageMode="category" />} />
       <Route path="/nodes/:categoryId/sub/:subId" element={<HubPage pageMode="category" />} />
       <Route path="/docs/:sourceId/*" element={<HubPage pageMode="document" />} />
-      <Route path="/doc/:docId" element={<LegacyDocumentRedirect />} />
-      <Route path="/search" element={<LegacySearchRedirect />} />
       <Route path="*" element={<RouteFallback />} />
     </Routes>
   )

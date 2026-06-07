@@ -5,15 +5,15 @@ type: guide
 status: published
 tags: [Axi Docs, configuration, sources, English]
 created: 2026-06-07
-modified: 2026-06-07
+modified: 2026-06-08
 graph-title: Configuration and Sources
 graph-tags: [Axi Docs, Configuration]
-description: Locate site navigation, document source, path override, and local service configuration.
+description: Locate site navigation, document sources, path overrides, and local service configuration.
 ---
 
 ## Site configuration
 
-`app/src/config/siteConfig.ts` manages locales, top navigation, Guide groups, page titles, document-set mappings, and UI copy. A new Guide page needs an id, group membership, and labels for both locales.
+`app/src/config/siteConfig.ts` manages locales, the top navigation, Guide groups, page titles, document-set mappings, and UI copy. A new Guide page needs an id, group membership, and labels for both locales.
 
 ## Document sources
 
@@ -29,8 +29,8 @@ AXI_SKILLS_PATH=/path/to/axi-skills
 AXI_WORKSPACE_GOVERNANCE_PATH=/path/to/governance
 ```
 
-Local path settings can live in environment files. Credentials and access tokens must not be documented or committed.
+Local path settings may live in environment files. Credentials and access tokens must not be documented or committed.
 
 ## Verify configuration
 
-Run focused tests, `pnpm --dir app lint`, and `pnpm --dir app verify`, then open the affected locale routes and document sets in a browser.
+After editing, run the focused unit tests, `pnpm --dir app lint`, and `pnpm --dir app verify`, then open the affected locale routes and document sets in a browser.

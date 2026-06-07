@@ -5,7 +5,7 @@ type: guide
 status: published
 tags: [Axi Docs, sources, documents, English]
 created: 2026-06-07
-modified: 2026-06-07
+modified: 2026-06-08
 graph-title: Document Sources
 graph-tags: [Axi Docs, Sources]
 description: Learn how Axi Docs registers, distinguishes, and reads local document sources.
@@ -13,7 +13,7 @@ description: Learn how Axi Docs registers, distinguishes, and reads local docume
 
 ## Source registry
 
-`app/src/config/documentSources.ts` is the source registry. Each entry defines a unique id, label, root path, adapter, source kind, locale, and read-only state.
+`app/src/config/documentSources.ts` is the source registry. Each entry defines a unique `id`, label, root path, adapter, source kind, locale, and read-only state.
 
 ## Built-in sources
 
@@ -24,7 +24,7 @@ description: Learn how Axi Docs registers, distinguishes, and reads local docume
 
 ## Paths and environment variables
 
-Default paths resolve relative to the workspace. Environment variables such as `AXI_DOCS_CONTENT_PATH`, `AXI_SKILLS_PATH`, and `AXI_WORKSPACE_GOVERNANCE_PATH` can override them. Never place credentials in Markdown.
+Default paths resolve relative to the workspace. Environment variables such as `AXI_DOCS_CONTENT_PATH`, `AXI_SKILLS_PATH`, and `AXI_WORKSPACE_GOVERNANCE_PATH` can override them. Never place credentials in Markdown or commit them to the repository.
 
 ## Add a source
 

@@ -1,10 +1,8 @@
-# Axi Docs Changelog
+# Axi Docs 变更日志
 
-All notable changes to this project are documented here.
-Format: [Keep a Changelog 1.1](https://keepachangelog.com/en/1.1.0/).
-This project adheres to [Semantic Versioning](https://semver.org/) for public MCP
-tool surfaces (`axi_docs_*`) and Web routes; internal build / refactor work is
-not versioned.
+本文档记录本项目所有值得关注的变更。
+格式：[Keep a Changelog 1.1](https://keepachangelog.com/en/1.1.0/)。
+本项目对公开 MCP 工具面（`axi_docs_*`）和 Web 路由遵循 [Semantic Versioning](https://semver.org/)；内部构建/重构工作不进行版本化。
 
 > 用途：根级 `CHANGELOG.md` 只记录**对仓库结构、依赖、文档源、用户可见契约**的
 > 重大变更。**不**复制 `app/docs/logs/submit/2026*.md` 中由 OMX 自动生成的逐批

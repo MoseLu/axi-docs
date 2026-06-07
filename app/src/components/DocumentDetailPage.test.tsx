@@ -71,7 +71,6 @@ function renderDocumentDetailPage() {
         fileContent="# 快速开始"
         fileLoading={false}
         fileName="getting-started.md"
-        graphHref="/graph"
         onTagSelect={vi.fn()}
         onWikiLink={vi.fn()}
         relatedItems={relatedItems}
@@ -117,7 +116,6 @@ describe('DocumentDetailPage', () => {
           fileContent="# 快速开始"
           fileLoading={false}
           fileName="getting-started.md"
-          graphHref="/graph"
           onTagSelect={vi.fn()}
           onWikiLink={vi.fn()}
           relatedItems={[]}
@@ -149,7 +147,130 @@ describe('DocumentDetailPage', () => {
     expect(screen.queryByLabelText('相关推荐')).not.toBeInTheDocument()
   })
 
-  it('deduplicates repeated documents across document-set sidebar sections', () => {
+  it('does not cap skill-library document-set sidebar sections', () => {
+    const skillSource: DocSource = {
+      ...source,
+      id: 'axi-skills-zh',
+      name: 'Axi Skills · 中文镜像',
+      kind: 'skill-library',
+      adapter: 'skills',
+    }
+    const skillItems: KnowledgeCatalogItem[] = Array.from({ length: 14 }, (_, index) => ({
+      sourceId: 'axi-skills-zh',
+      path: `skills.zh/item-${index + 1}/SKILL.md`,
+      name: `item-${index + 1}`,
+      title: `条目 ${index + 1}`,
+      tags: [],
+      categories: ['agent-orchestration'],
+      techStack: [],
+    }))
+
+    render(
+      <MemoryRouter>
+        <DocumentDetailPage
+          categoryDescription="多 Agent 协作"
+          categoryTitle="Agent 编排与协作"
+          documentSiblings={skillItems}
+          fileContent="# 条目 1"
+          fileLoading={false}
+          fileName="SKILL.md"
+          onTagSelect={vi.fn()}
+          onWikiLink={vi.fn()}
+          relatedItems={[]}
+          selectedCatalogItem={skillItems[0]}
+          selectedFile={{ sourceId: 'axi-skills-zh', path: 'skills.zh/item-1/SKILL.md' }}
+          sidebarSections={[
+            {
+              key: 'agent-orchestration',
+              title: 'Agent 编排与协作',
+              description: '多 Agent 协作',
+              count: skillItems.length,
+              items: skillItems,
+            },
+          ]}
+          source={skillSource}
+        />
+      </MemoryRouter>,
+    )
+
+    const section = screen.getByLabelText('Agent 编排与协作')
+    const toggle = within(section).getByRole('button', { name: /Agent 编排与协作/ })
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    expect(within(section).queryByRole('link', { name: '条目 14' })).not.toBeInTheDocument()
+
+    fireEvent.click(toggle)
+    expect(within(section).getByRole('link', { name: '条目 14' })).toBeInTheDocument()
+  })
+
+  it('renders skill-library subsections collapsed on document pages', () => {
+    const skillSource: DocSource = {
+      ...source,
+      id: 'axi-skills-zh',
+      name: 'Axi Skills · 中文镜像',
+      kind: 'skill-library',
+      adapter: 'skills',
+    }
+    const skillItems: KnowledgeCatalogItem[] = [
+      {
+        sourceId: 'axi-skills-zh',
+        path: 'skills.zh/team/SKILL.md',
+        name: 'team',
+        title: 'tmux 协同执行',
+        tags: [],
+        categories: ['agent-orchestration'],
+        techStack: [],
+      },
+    ]
+
+    render(
+      <MemoryRouter>
+        <DocumentDetailPage
+          categoryDescription="多 Agent 协作"
+          categoryTitle="Agent 编排与协作"
+          documentSiblings={skillItems}
+          fileContent="# tmux 协同执行"
+          fileLoading={false}
+          fileName="SKILL.md"
+          onTagSelect={vi.fn()}
+          onWikiLink={vi.fn()}
+          relatedItems={[]}
+          selectedCatalogItem={skillItems[0]}
+          selectedFile={{ sourceId: 'axi-skills-zh', path: 'skills.zh/team/SKILL.md' }}
+          sidebarSections={[
+            {
+              key: 'agent-orchestration',
+              title: 'Agent 编排与协作',
+              description: '多 Agent 协作',
+              count: skillItems.length,
+              items: skillItems,
+              subsections: [
+                {
+                  key: 'team-agents',
+                  title: '团队与子代理',
+                  description: '团队、worker、子代理与并行分派。',
+                  count: skillItems.length,
+                  items: skillItems,
+                },
+              ],
+            },
+          ]}
+          source={skillSource}
+        />
+      </MemoryRouter>,
+    )
+
+    const section = screen.getByLabelText('Agent 编排与协作')
+    fireEvent.click(within(section).getByRole('button', { name: /Agent 编排与协作/ }))
+    const subsection = within(section).getByRole('button', { name: /团队与子代理/ })
+
+    expect(subsection).toHaveAttribute('aria-expanded', 'false')
+    expect(within(section).queryByRole('link', { name: 'tmux 协同执行' })).not.toBeInTheDocument()
+
+    fireEvent.click(subsection)
+    expect(within(section).getByRole('link', { name: 'tmux 协同执行' })).toHaveClass('active')
+  })
+
+  it('deduplicates repeated documents within each document-set sidebar section', () => {
     render(
       <MemoryRouter>
         <DocumentDetailPage
@@ -159,7 +280,6 @@ describe('DocumentDetailPage', () => {
           fileContent="# 快速开始"
           fileLoading={false}
           fileName="getting-started.md"
-          graphHref="/graph"
           onTagSelect={vi.fn()}
           onWikiLink={vi.fn()}
           relatedItems={[]}
@@ -177,8 +297,8 @@ describe('DocumentDetailPage', () => {
               key: 'reference',
               title: '参考',
               description: '参考文档',
-              count: 2,
-              items: [siblings[1], relatedItems[0]],
+              count: 3,
+              items: [siblings[1], siblings[1], relatedItems[0]],
             },
           ]}
           source={source}
@@ -186,7 +306,7 @@ describe('DocumentDetailPage', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getAllByRole('link', { name: /快速开始/i })).toHaveLength(1)
+    expect(screen.getAllByRole('link', { name: /快速开始/i })).toHaveLength(2)
     expect(within(screen.getByLabelText('参考')).getByRole('link', { name: /搜索文档/i })).toBeInTheDocument()
   })
 })

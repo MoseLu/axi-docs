@@ -4,6 +4,7 @@ import {
   formatKnowledgeItemTitle,
   formatKnowledgeTagLabel,
 } from '../lib/knowledgeFormatter'
+import { prepareDocumentDisplayMarkdown } from '../lib/documentDisplay'
 import { buildDocumentRoute } from '../lib/routes'
 import type { DocSource, KnowledgeCatalog, KnowledgeCatalogItem, SelectedFile } from '../types'
 import { DocumentFooter } from './DocumentFooter'
@@ -22,7 +23,6 @@ interface DocumentDetailPageProps {
   categoryDescription: string
   documentSiblings: KnowledgeCatalogItem[]
   sidebarSections?: KnowledgeCatalog['sections']
-  graphHref: string
   relatedItems: KnowledgeCatalogItem[]
   onTagSelect: (tag: string | null) => void
   onWikiLink: (noteName: string) => void
@@ -55,23 +55,53 @@ export function DocumentDetailPage({
   const toggleSection = (sectionId: string) => {
     setOpenSections((current) => ({ ...current, [sectionId]: !current[sectionId] }))
   }
-  const isSectionOpen = (sectionId: string) => openSections[sectionId] ?? true
+  const isSectionOpen = (sectionId: string) => openSections[sectionId] ?? (source.kind === 'skill-library' && sectionId.startsWith('catalog:') ? false : true)
   const hasDocumentSetSidebar = sidebarSections.length > 0
+  const tocContent = useMemo(
+    () => prepareDocumentDisplayMarkdown(fileContent || '', source, selectedFile),
+    [fileContent, selectedFile, source],
+  )
   const visibleSidebarSections = useMemo(() => {
-    const seen = new Set<string>()
-
     return sidebarSections
-      .map((section) => ({
-        ...section,
-        items: section.items.filter((item) => {
+      .map((section) => {
+        const seen = new Set<string>()
+        const items = section.items.filter((item) => {
           const key = `${item.sourceId}:${item.path}`
           if (seen.has(key)) return false
           seen.add(key)
           return true
-        }),
-      }))
+        })
+        const visibleItemKeys = new Set(items.map((item) => `${item.sourceId}:${item.path}`))
+        const subsections = section.subsections
+          ?.map((subsection) => {
+            const subsectionItems = subsection.items.filter((item) => visibleItemKeys.has(`${item.sourceId}:${item.path}`))
+            return {
+              ...subsection,
+              count: subsectionItems.length,
+              items: subsectionItems,
+            }
+          })
+          .filter((subsection) => subsection.items.length > 0)
+
+        return {
+          ...section,
+          count: items.length,
+          items,
+          subsections,
+        }
+      })
       .filter((section) => section.items.length > 0)
   }, [sidebarSections])
+  const renderDocumentSetLink = (item: KnowledgeCatalogItem) => (
+    <Link
+      key={`${item.sourceId}:${item.path}`}
+      className={`document-detail-page__link${item.sourceId === selectedFile.sourceId && item.path === selectedFile.path ? ' active' : ''}`}
+      title={item.description || item.path}
+      to={buildDocumentRoute({ sourceId: item.sourceId, path: item.path })}
+    >
+      <span>{documentTitle(item)}</span>
+    </Link>
+  )
 
   return (
     <div className="document-detail-page">
@@ -86,6 +116,7 @@ export function DocumentDetailPage({
           visibleSidebarSections.map((section) => {
             const sectionId = `catalog:${section.key}`
             const open = isSectionOpen(sectionId)
+            const hasSubsections = source.kind === 'skill-library' && section.subsections && section.subsections.length > 0
 
             return (
               <nav key={section.key} className="document-detail-page__nav" aria-label={section.title}>
@@ -98,22 +129,38 @@ export function DocumentDetailPage({
                 >
                   <span>{section.title}</span>
                   <span className="document-detail-page__nav-heading-meta">
-                    <small>{section.items.length}</small>
                     <span aria-hidden="true" className="document-detail-page__nav-caret">⌄</span>
                   </span>
                 </button>
                 {open && (
                   <div className="document-detail-page__link-list" id={`document-nav-${section.key}`}>
-                    {section.items.slice(0, 12).map((item) => (
-                      <Link
-                        key={`${item.sourceId}:${item.path}`}
-                        className={`document-detail-page__link${item.sourceId === selectedFile.sourceId && item.path === selectedFile.path ? ' active' : ''}`}
-                        title={item.description || item.path}
-                        to={buildDocumentRoute({ sourceId: item.sourceId, path: item.path })}
-                      >
-                        <span>{documentTitle(item)}</span>
-                      </Link>
-                    ))}
+                    {hasSubsections
+                      ? section.subsections!.map((subsection) => {
+                        const subsectionId = `${sectionId}:${subsection.key}`
+                        const subsectionOpen = isSectionOpen(subsectionId)
+                        return (
+                          <div key={subsection.key} className="document-detail-page__subsection">
+                            <button
+                              aria-expanded={subsectionOpen}
+                              className="document-detail-page__subheading"
+                              onClick={() => toggleSection(subsectionId)}
+                              title={subsection.description}
+                              type="button"
+                            >
+                              <span>{subsection.title}</span>
+                              <span className="document-detail-page__nav-heading-meta">
+                                <span aria-hidden="true" className="document-detail-page__nav-caret">⌄</span>
+                              </span>
+                            </button>
+                            {subsectionOpen && (
+                              <div className="document-detail-page__subitems">
+                                {subsection.items.map(renderDocumentSetLink)}
+                              </div>
+                            )}
+                          </div>
+                        )
+                      })
+                      : section.items.slice(0, source.kind === 'skill-library' ? section.items.length : 12).map(renderDocumentSetLink)}
                   </div>
                 )}
               </nav>
@@ -211,7 +258,7 @@ export function DocumentDetailPage({
         <div className="document-detail-page__toc">
           <strong>页面导航</strong>
           <TableOfContents
-            content={fileContent || ''}
+            content={tocContent}
             headingRootSelector=".document-detail-page__reader .doc-body"
             scrollContainerSelector=".document-detail-page__reader .app-content"
           />

@@ -1,5 +1,7 @@
 // ─── Source Types ──────────────────────────────────────────────────────────────
 
+export type SkillSourceLocale = 'en' | 'zh'
+
 export interface DocSource {
   id: string
   name: string
@@ -12,6 +14,22 @@ export interface DocSource {
   audience?: Array<'agent' | 'human'>
   readOnly?: boolean
   skillNames?: string[]
+  /**
+   * Optional override for the directory inside `path` where the skills
+   * adapter reads `SKILL.md` files. Defaults to `skills` for backward
+   * compatibility. Localized mirrors use `skills.zh` (or any other locale
+   * subfolder) without forcing the source to override the registry path.
+   */
+  skillRoot?: string
+  /**
+   * Optional locale tag that mirrors the public route prefix the source is
+   * meant to serve. Only meaningful for `skill-library` sources. The
+   * router uses this to map `/en/skills` -> `axi-skills` and
+   * `/zh/skills` -> `axi-skills-zh`. Missing files remain visible through
+   * verification; the adapter does not silently fall back to the English
+   * source.
+   */
+  locale?: SkillSourceLocale
   includeSkillAssets?: boolean
   includeSupportDocs?: boolean
   organizationHint?: 'dbskill' | 'skill-families'
@@ -22,7 +40,7 @@ export interface DocSource {
 
 export type DocumentSourceConfig = Required<
   Pick<DocSource, 'id' | 'name' | 'kind' | 'path' | 'adapter' | 'enabled' | 'audience' | 'readOnly'>
-> & Pick<DocSource, 'description' | 'type' | 'skillNames' | 'includeSkillAssets' | 'includeSupportDocs' | 'organizationHint' | 'apiUrl' | 'apiToken' | 'icon'>
+> & Pick<DocSource, 'description' | 'type' | 'skillNames' | 'skillRoot' | 'locale' | 'includeSkillAssets' | 'includeSupportDocs' | 'organizationHint' | 'apiUrl' | 'apiToken' | 'icon'>
 
 export interface NormalizedDocument {
   sourceId: string
@@ -70,6 +88,7 @@ export interface Frontmatter {
   ['graph-tags']?: string[] | string
   section?: string[] | string
   sections?: string[] | string
+  skillFamily?: string
   knowledgeSection?: string[] | string
   knowledgeSections?: string[] | string
   ['tech-stack']?: string[] | string
@@ -228,6 +247,15 @@ export interface KnowledgeCatalogItem {
 }
 
 export interface KnowledgeCatalogSection {
+  key: string
+  title: string
+  description: string
+  count: number
+  items: KnowledgeCatalogItem[]
+  subsections?: KnowledgeCatalogSubsection[]
+}
+
+export interface KnowledgeCatalogSubsection {
   key: string
   title: string
   description: string

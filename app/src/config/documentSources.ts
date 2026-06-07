@@ -4,6 +4,10 @@ import type { DocSource, DocumentSourceConfig } from '../types'
 const DEFAULT_OBSIDIAN_PATH = 'F:/docs/obsidian/'
 const DEFAULT_BLINKO_URL = 'http://localhost:1111'
 
+function resolveProjectPath(...segments: string[]): string {
+  return path.resolve(process.cwd(), '..', ...segments)
+}
+
 function resolveWorkspacePath(...segments: string[]): string {
   return path.resolve(process.cwd(), '../../..', ...segments)
 }
@@ -24,6 +28,10 @@ export function getDocumentSourceRegistry(): DocumentSourceConfig[] {
   const dbskillPath = existingOrFallback(
     process.env.DBSKILL_PATH || '',
     resolveWorkspacePath('shared', 'dbskill'),
+  )
+  const axiDocsContentPath = existingOrFallback(
+    process.env.AXI_DOCS_CONTENT_PATH || '',
+    resolveProjectPath('docs', 'content'),
   )
 
   return [
@@ -53,6 +61,52 @@ export function getDocumentSourceRegistry(): DocumentSourceConfig[] {
       readOnly: true,
       organizationHint: 'skill-families',
       icon: 'folder',
+      skillRoot: 'skills',
+      locale: 'en',
+    },
+    {
+      id: 'axi-skills-zh',
+      name: 'Axi Skills · 中文镜像',
+      description: 'Axi Skills 的中文本地化镜像，索引 skills.zh/**/SKILL.md。',
+      path: axiSkillsPath,
+      enabled: process.env.AXI_SKILLS_ZH_ENABLED !== 'false',
+      type: 'local',
+      kind: 'skill-library',
+      adapter: 'skills',
+      audience: ['agent', 'human'],
+      readOnly: true,
+      organizationHint: 'skill-families',
+      icon: 'folder',
+      skillRoot: 'skills.zh',
+      locale: 'zh',
+    },
+    {
+      id: 'axi-docs-en',
+      name: 'Axi Docs · English',
+      description: 'Axi Docs source-language documentation under docs/content/en.',
+      path: path.join(axiDocsContentPath, 'en'),
+      enabled: true,
+      type: 'local',
+      kind: 'markdown-vault',
+      adapter: 'markdown',
+      audience: ['agent', 'human'],
+      readOnly: false,
+      icon: 'folder',
+      locale: 'en',
+    },
+    {
+      id: 'axi-docs-zh',
+      name: 'Axi Docs · 中文文档',
+      description: 'Axi Docs 中文翻译目标目录，位于 docs/content/zh。',
+      path: path.join(axiDocsContentPath, 'zh'),
+      enabled: true,
+      type: 'local',
+      kind: 'markdown-vault',
+      adapter: 'markdown',
+      audience: ['agent', 'human'],
+      readOnly: false,
+      icon: 'folder',
+      locale: 'zh',
     },
     {
       id: 'dbskill',

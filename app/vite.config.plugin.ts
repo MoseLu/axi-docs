@@ -67,6 +67,8 @@ function sanitizeSource(source: DocSource): DocSource {
     audience: source.audience,
     readOnly: source.readOnly,
     icon: source.icon,
+    ...(source.skillRoot ? { skillRoot: source.skillRoot } : {}),
+    ...(source.locale ? { locale: source.locale } : {}),
   }
 }
 

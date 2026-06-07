@@ -1,11 +1,15 @@
 ---
 name: axi-docs
-description: Axi Docs 文档同步与查看平台的架构规则和 Agent 指南
+description: Axi Docs 文档同步与查看平台的架构规则和 Agent 指南 (English: Architecture and agent guide for the Axi Docs sync & viewing platform)
 ---
 
 # Axi Docs AGENTS.md
 
 > 本文件定义 Axi Docs 项目的架构规则。当前应用代码仍位于 `app/` 子目录，所有代码变更必须符合本文件的模块划分和技术选型。
+
+## 关于本镜像（i18n note）
+
+本文件是上游源文档的简体中文工作区镜像（命名后缀 zh-CN）。当与源文件出现差异时，请以源项目内的同名源文档为准；本镜像主要用于跨项目 owner 文档巡检与本地化一致性检查，模块划分、契约、环境变量等技术细节随源同步。
 
 ---
 

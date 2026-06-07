@@ -248,43 +248,47 @@ export function DocumentView({
   const domain = frontmatter.domain as string | undefined
   const problem = frontmatter.problem as string | undefined
   const isDaily = docType === 'daily'
+  const isSkillDocument = source?.kind === 'skill-library' || docType === 'skill'
 
   return (
     <div className={`doc-layout${variant === 'panel' ? ' doc-layout--panel' : ''}`}>
       <div className="app-content">
         {/* Document Header */}
         <div className="doc-header">
-          <div className="doc-breadcrumb">
-            <span className="breadcrumb-source">{source?.name || selectedFile.sourceId}</span>
-            {selectedFile.path.split('/').slice(0, -1).map((part, i) => (
-              <span key={i} className="breadcrumb-sep">
-                <span className="breadcrumb-chevron">›</span>
-                <span className="breadcrumb-part">{part}</span>
-              </span>
-            ))}
-          </div>
+          {!isSkillDocument && (
+            <div className="doc-breadcrumb">
+              <span className="breadcrumb-source">{source?.name || selectedFile.sourceId}</span>
+              {selectedFile.path.split('/').slice(0, -1).map((part, i) => (
+                <span key={i} className="breadcrumb-sep">
+                  <span className="breadcrumb-chevron">›</span>
+                  <span className="breadcrumb-part">{part}</span>
+                </span>
+              ))}
+            </div>
+          )}
 
           <div className="doc-title-row">
             <h1 className="doc-title">{displayTitle}</h1>
-            {isDaily && <span className="doc-type-badge">日记</span>}
-            {docType && !isDaily && <span className="doc-type-badge">{docType}</span>}
+            {!isSkillDocument && isDaily && <span className="doc-type-badge">日记</span>}
+            {!isSkillDocument && docType && !isDaily && <span className="doc-type-badge">{docType}</span>}
           </div>
 
           {description && <p className="doc-description">{description}</p>}
 
-          {/* Skill Metadata — Apple badge style */}
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
-            {domain && <SkillBadge label="领域" value={domain} />}
-            {tech && <SkillBadge label="技术" value={tech} />}
-            {version && <SkillBadge label="版本" value={version} />}
-            {problem && <SkillBadge label="问题" value={problem} />}
-            {date && (
-              <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 980, fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>
-                <ClockIcon />
-                {formatDisplayDate(date)}
-              </div>
-            )}
-          </div>
+          {!isSkillDocument && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
+              {domain && <SkillBadge label="领域" value={domain} />}
+              {tech && <SkillBadge label="技术" value={tech} />}
+              {version && <SkillBadge label="版本" value={version} />}
+              {problem && <SkillBadge label="问题" value={problem} />}
+              {date && (
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 4, padding: '3px 10px', borderRadius: 980, fontSize: 'var(--font-size-xs)', color: 'var(--color-text-muted)' }}>
+                  <ClockIcon />
+                  {formatDisplayDate(date)}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Tags — rendered ONLY in body, not duplicated in meta */}
         </div>

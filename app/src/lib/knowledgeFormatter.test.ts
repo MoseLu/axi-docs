@@ -19,6 +19,8 @@ describe('knowledge formatter', () => {
   it('maps English document names to Chinese display metadata', () => {
     expect(formatKnowledgeDocumentTitle('Axi Image Preview', 'projects/axi-image-preview.md')).toBe('Axi 图片预览')
     expect(formatKnowledgeDocumentTitle('Current Context', '_agent/current-context.md')).toBe('当前上下文')
+    expect(formatKnowledgeDocumentTitle('Workspace Relationship Graph', 'projects/workspace-relationship-graph.md')).toBe('工作区关系图谱')
+    expect(formatKnowledgeDocumentTitle('Workspace DevServices', 'projects/workspace-devservices.md')).toBe('工作区开发服务')
     expect(formatKnowledgeDocumentTitle('ck', 'skills/ck/SKILL.md')).toBe('ck')
     expect(formatKnowledgeDocumentDescription({
       title: 'Axi Image Preview',
@@ -40,6 +42,9 @@ describe('knowledge formatter', () => {
 
   it('keeps branch and tag labels metadata-driven', () => {
     expect(formatKnowledgeTagLabel('#前端')).toBe('前端')
+    expect(formatKnowledgeTagLabel('#Workspace')).toBe('工作区')
+    expect(formatKnowledgeTagLabel('Axi Workspace')).toBe('Axi 工作区')
+    expect(formatKnowledgeTagLabel('active')).toBe('活跃')
     expect(formatKnowledgeBranchLabel('2026')).toBe('2026年')
     expect(formatKnowledgeBranchPath('20-Projects/axi-docs/ADR')).toBe('项目 / 文档中心 / 架构决策')
   })

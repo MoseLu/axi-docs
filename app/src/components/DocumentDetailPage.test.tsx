@@ -147,6 +147,13 @@ describe('DocumentDetailPage', () => {
     expect(screen.queryByLabelText('相关推荐')).not.toBeInTheDocument()
   })
 
+  it('uses localized source kind labels for workspace document pages', () => {
+    renderDocumentDetailPage()
+
+    expect(screen.getAllByText('工作区文档')).toHaveLength(2)
+    expect(screen.queryByText('Document Library')).not.toBeInTheDocument()
+  })
+
   it('does not cap skill-library document-set sidebar sections', () => {
     const skillSource: DocSource = {
       ...source,

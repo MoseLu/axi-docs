@@ -37,8 +37,8 @@ export function getDocumentSourceRegistry(): DocumentSourceConfig[] {
   return [
     {
       id: 'workspace',
-      name: 'Axi Workspace',
-      description: 'Axi 工作区项目索引、治理目录和 Agent 入口。',
+      name: 'Axi 工作区',
+      description: 'Axi 工作区项目索引、治理目录和智能体入口。',
       path: workspaceGovernancePath,
       enabled: true,
       type: 'local',

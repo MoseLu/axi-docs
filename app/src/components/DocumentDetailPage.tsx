@@ -32,6 +32,12 @@ function documentTitle(item: Pick<KnowledgeCatalogItem, 'title' | 'name' | 'path
   return formatKnowledgeItemTitle(item)
 }
 
+function sourceKindLabel(source: DocSource) {
+  if (source.kind === 'skill-library') return '技能库'
+  if (source.kind === 'workspace-registry') return '工作区文档'
+  return '文档库'
+}
+
 export function DocumentDetailPage({
   source,
   selectedFile,
@@ -48,6 +54,7 @@ export function DocumentDetailPage({
   onWikiLink,
 }: DocumentDetailPageProps) {
   const tags = selectedCatalogItem?.tags || []
+  const sourceLabel = sourceKindLabel(source)
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     category: true,
     related: true,
@@ -107,7 +114,7 @@ export function DocumentDetailPage({
     <div className="document-detail-page">
       <aside className="document-detail-page__sidebar">
         <div className="document-detail-page__brand">
-          <span>{source.kind === 'skill-library' ? 'Skill Library' : 'Document Library'}</span>
+          <span>{sourceLabel}</span>
           <strong>{source.name}</strong>
           <p>{source.description}</p>
         </div>
@@ -268,7 +275,7 @@ export function DocumentDetailPage({
           <strong>文档信息</strong>
           <p>{categoryDescription}</p>
           <span className="document-detail-page__source-kind">
-            {source.kind === 'skill-library' ? 'Skill Library' : 'Document Library'}
+            {sourceLabel}
           </span>
           <strong className="document-detail-page__source-name">{source.name}</strong>
           <p>{source.description}</p>

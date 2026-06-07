@@ -19,6 +19,7 @@ const BRANCH_LABELS = new Map([
 ])
 const TITLE_OVERRIDES = new Map([
   ['axi docs', 'Axi 文档站'],
+  ['axi agent platform', 'Axi 智能体平台'],
   ['axi image preview', 'Axi 图片预览'],
   ['axi local registry', 'Axi 本地注册表'],
   ['axi notify mobile', 'Axi 移动通知'],
@@ -29,7 +30,10 @@ const TITLE_OVERRIDES = new Map([
   ['axi ui', 'Axi 界面组件'],
   ['axi video downloader', 'Axi 视频下载器'],
   ['axi workspace index', 'Axi 工作区索引'],
+  ['axi workspace', 'Axi 工作区'],
   ['workspace project catalog', '工作区项目目录'],
+  ['workspace dev services', '工作区开发服务'],
+  ['workspace relationship graph', '工作区关系图谱'],
   ['current context', '当前上下文'],
   ['vault index for agent', '智能体知识库索引'],
   ['deep init pro', '深度初始化专业技能'],
@@ -43,6 +47,7 @@ const TOKEN_LABELS = new Map([
   ['agents', '智能体'],
   ['anything', 'Anything'],
   ['architecture', '架构'],
+  ['active', '活跃'],
   ['browser', '浏览器'],
   ['catalog', '目录'],
   ['center', '中心'],
@@ -96,6 +101,8 @@ const TOKEN_LABELS = new Map([
   ['registry', '注册表'],
   ['review', '审查'],
   ['sdk', 'SDK'],
+  ['service', '服务'],
+  ['services', '服务'],
   ['skill', '技能'],
   ['skills', '技能'],
   ['starter', '启动模板'],
@@ -107,6 +114,7 @@ const TOKEN_LABELS = new Map([
   ['vercel', 'Vercel'],
   ['video', '视频'],
   ['workspace', '工作区'],
+  ['relationship', '关系'],
 ])
 const DOC_TYPE_LABELS = new Map([
   ['component', '组件文档'],
@@ -331,7 +339,17 @@ export function formatKnowledgeItemTitle(item: {
 }
 
 export function formatKnowledgeTagLabel(tag: string): string {
-  return normalizeText(tag).replace(/^#/, '')
+  const normalized = normalizeText(tag).replace(/^#/, '')
+  if (!normalized) return ''
+  if (hasChinese(normalized)) return normalized
+
+  const override = TITLE_OVERRIDES.get(titleKey(normalized))
+  if (override) return override
+
+  const tokens = tokenizeTitle(normalized).map(formatToken)
+  return tokens.some((token) => hasChinese(token))
+    ? joinFormattedTitleTokens(tokens)
+    : normalized
 }
 
 export function formatKnowledgeBranchLabel(segment: string): string {

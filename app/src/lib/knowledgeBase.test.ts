@@ -585,6 +585,7 @@ describe('knowledge base local index', () => {
     const workspaceRoot = tempDir
     const governanceRoot = path.join(workspaceRoot, 'infra', 'axi-workspace-governance')
     await fs.promises.mkdir(path.join(governanceRoot, 'docs'), { recursive: true })
+    await fs.promises.mkdir(path.join(workspaceRoot, 'shared', 'axi-skills'), { recursive: true })
     process.env.AXI_WORKSPACE_GOVERNANCE_PATH = governanceRoot
 
     await fs.promises.writeFile(path.join(workspaceRoot, 'WORKSPACE_INDEX.md'), [
@@ -612,5 +613,10 @@ describe('knowledge base local index', () => {
     expect(projectDocument).toContain('# Axi Docs')
     expect(projectBody).not.toContain('Path:')
     expect(projectBody).not.toContain('/workspace/projects/axi-docs')
+
+    const axiSkillsDocument = await readKnowledgeFile('workspace', 'projects/axi-skills.md')
+    expect(axiSkillsDocument).toContain('# Axi 技能库')
+    expect(axiSkillsDocument).toContain('Axi 智能体共享技能树')
+    expect(axiSkillsDocument).not.toContain('Shared version-controlled skill tree')
   })
 })

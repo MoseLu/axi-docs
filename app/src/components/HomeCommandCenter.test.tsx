@@ -1,7 +1,13 @@
 import { fireEvent, render, screen, within } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
+import type { ReactElement } from 'react'
 import { describe, expect, it, vi } from 'vitest'
 import { HomeCommandCenter } from './HomeCommandCenter'
 import type { DocSource, KnowledgeCatalog, SearchResult } from '../types'
+
+function renderWithRouter(ui: ReactElement) {
+  return render(<MemoryRouter>{ui}</MemoryRouter>)
+}
 
 const sources: DocSource[] = [
   {
@@ -154,7 +160,7 @@ Use the grouped sidebar and page outline.`
 
 describe('HomeCommandCenter', () => {
   it('renders a VitePress-like docs home instead of a marketing hero', () => {
-    render(
+    renderWithRouter(
       <HomeCommandCenter
         activeTag={null}
         catalog={catalog}
@@ -185,7 +191,7 @@ describe('HomeCommandCenter', () => {
 
   it('renders a nav-level skills document set with its own sidebar pages', () => {
     const onOpenItem = vi.fn()
-    render(
+    renderWithRouter(
       <HomeCommandCenter
         activeSourceId="axi-skills"
         activeTag={null}
@@ -234,7 +240,7 @@ describe('HomeCommandCenter', () => {
     }))
     const onOpenItem = vi.fn()
 
-    render(
+    renderWithRouter(
       <HomeCommandCenter
         activeSourceId="axi-skills"
         activeTag={null}
@@ -290,7 +296,7 @@ describe('HomeCommandCenter', () => {
       ],
     }))
 
-    render(
+    renderWithRouter(
       <HomeCommandCenter
         activeSourceId="axi-skills"
         activeTag={null}
@@ -315,7 +321,7 @@ describe('HomeCommandCenter', () => {
   })
 
   it('renders skill subsections collapsed under expanded skill groups', () => {
-    render(
+    renderWithRouter(
       <HomeCommandCenter
         activeSourceId="axi-skills"
         activeTag={null}
@@ -364,7 +370,7 @@ describe('HomeCommandCenter', () => {
   it('opens skill section overview cards as documents instead of the removed category graph', () => {
     const onOpenExplorer = vi.fn()
     const onOpenItem = vi.fn()
-    render(
+    renderWithRouter(
       <HomeCommandCenter
         activeSourceId="axi-skills"
         activeTag={null}
@@ -390,7 +396,7 @@ describe('HomeCommandCenter', () => {
   })
 
   it('renders localized English guide navigation', () => {
-    render(
+    renderWithRouter(
       <HomeCommandCenter
         activeTag={null}
         catalog={catalog}
@@ -416,7 +422,7 @@ describe('HomeCommandCenter', () => {
   })
 
   it('renders localized English search copy', () => {
-    render(
+    renderWithRouter(
       <HomeCommandCenter
         activeTag={null}
         catalog={catalog}
@@ -440,7 +446,7 @@ describe('HomeCommandCenter', () => {
   })
 
   it('renders ordered previous-page navigation for the last guide page', () => {
-    render(
+    renderWithRouter(
       <HomeCommandCenter
         activeTag={null}
         catalog={catalog}
@@ -457,12 +463,16 @@ describe('HomeCommandCenter', () => {
       />,
     )
 
+    expect(screen.getByRole('link', { name: '在 GitHub 上编辑此页面' })).toHaveAttribute(
+      'href',
+      'https://github.com/axiomaticworld/axi-docs/edit/dev/docs/content/zh/guide/configuration.md',
+    )
     expect(screen.getByRole('link', { name: '上一页国际化' })).toHaveAttribute('href', '/zh/guide/localization')
     expect(screen.queryByText('下一页')).not.toBeInTheDocument()
   })
 
   it('collapses and expands sidebar groups for real', () => {
-    render(
+    renderWithRouter(
       <HomeCommandCenter
         activeTag={null}
         catalog={catalog}
@@ -510,7 +520,7 @@ describe('HomeCommandCenter', () => {
       },
     ]
 
-    render(
+    renderWithRouter(
       <HomeCommandCenter
         activeTag={null}
         catalog={catalog}

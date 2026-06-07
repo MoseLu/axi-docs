@@ -9,6 +9,7 @@ import { EditIcon } from './Icons'
 import './DocumentFooter.css'
 
 interface DocumentFooterProps {
+  buildItemRoute?: (item: KnowledgeCatalogItem) => string
   documentSiblings: KnowledgeCatalogItem[]
   selectedCatalogItem: KnowledgeCatalogItem | null
   selectedFile: SelectedFile
@@ -21,6 +22,7 @@ function documentTitle(item: KnowledgeCatalogItem) {
 }
 
 export function DocumentFooter({
+  buildItemRoute = (item) => buildDocumentRoute({ sourceId: item.sourceId, path: item.path }),
   documentSiblings,
   selectedCatalogItem,
   selectedFile,
@@ -89,7 +91,7 @@ export function DocumentFooter({
             {previousDocument && (
               <Link
                 className="document-detail-page__pager-link"
-                to={buildDocumentRoute({ sourceId: previousDocument.sourceId, path: previousDocument.path })}
+                to={buildItemRoute(previousDocument)}
               >
                 <span>{isEnglish ? 'Previous page' : '上一页'}</span>
                 <strong>{documentTitle(previousDocument)}</strong>
@@ -100,7 +102,7 @@ export function DocumentFooter({
             {nextDocument && (
               <Link
                 className="document-detail-page__pager-link document-detail-page__pager-link--next"
-                to={buildDocumentRoute({ sourceId: nextDocument.sourceId, path: nextDocument.path })}
+                to={buildItemRoute(nextDocument)}
               >
                 <span>{isEnglish ? 'Next page' : '下一页'}</span>
                 <strong>{documentTitle(nextDocument)}</strong>

@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { DocSource, KnowledgeCatalog, SearchResult, SelectedFile } from '../types'
+import { DocSource, KnowledgeCatalog, KnowledgeCatalogItem, SearchResult, SelectedFile } from '../types'
 import {
   buildGuideRoute,
   getSiteLocaleConfig,
@@ -8,6 +8,7 @@ import {
   type SiteLocale,
 } from '../config/siteConfig'
 import { PageShell } from './CockpitPrimitives'
+import { DocumentFooter } from './DocumentFooter'
 import { DocumentView } from './DocumentView'
 import { TableOfContents } from './TableOfContents'
 
@@ -114,15 +115,33 @@ export function HomeCommandCenter({
   const guidePages = localeConfig.themeConfig.guidePages
   const guideSections = localeConfig.themeConfig.guideSections
   const guideTitle = guidePages.find((page) => page.id === guidePageId)?.text || guidePageId
-  const guidePageIndex = guidePages.findIndex((page) => page.id === guidePageId)
-  const previousGuidePage = guidePageIndex > 0 ? guidePages[guidePageIndex - 1] : null
-  const nextGuidePage = guidePageIndex >= 0 && guidePageIndex < guidePages.length - 1
-    ? guidePages[guidePageIndex + 1]
-    : null
   const guideSelectedFile: SelectedFile = {
     sourceId: `axi-docs-${guideLocale}`,
     path: `guide/${guidePageId}.md`,
   }
+  const guideCatalogItems = useMemo(() => (
+    catalog?.sections.flatMap((section) => section.items)
+      .filter((item) => item.sourceId === guideSelectedFile.sourceId)
+    || []
+  ), [catalog?.sections, guideSelectedFile.sourceId])
+  const guideCatalogItemsByPath = useMemo(() => new Map(
+    guideCatalogItems.map((item) => [item.path, item]),
+  ), [guideCatalogItems])
+  const guideDocumentSiblings = useMemo<KnowledgeCatalogItem[]>(() => (
+    guidePages.map((page) => {
+      const path = `guide/${page.id}.md`
+      return guideCatalogItemsByPath.get(path) || {
+        sourceId: guideSelectedFile.sourceId,
+        path,
+        name: page.id,
+        title: page.text,
+        tags: [],
+        categories: ['guide'],
+        techStack: [],
+      }
+    })
+  ), [guideCatalogItemsByPath, guidePages, guideSelectedFile.sourceId])
+  const selectedGuideCatalogItem = guideCatalogItemsByPath.get(guideSelectedFile.path) || null
   const guideSource = sources.find((item) => item.id === guideSelectedFile.sourceId) || {
     id: guideSelectedFile.sourceId,
     name: guideLocale === 'zh' ? 'Axi Docs · 中文文档' : 'Axi Docs · English',
@@ -276,24 +295,14 @@ export function HomeCommandCenter({
               content={fileContent}
               fileName={fileName || guideTitle}
               footer={(
-                <nav aria-label={homeCopy.pagerLabel} className="axi-docs-home__footer-nav">
-                  <div>
-                    {previousGuidePage && (
-                      <a className="axi-docs-home__pager-link" href={previousGuidePage.link}>
-                        <span>{homeCopy.previousPage}</span>
-                        <strong>{previousGuidePage.text}</strong>
-                      </a>
-                    )}
-                  </div>
-                  <div>
-                    {nextGuidePage && (
-                      <a className="axi-docs-home__pager-link axi-docs-home__pager-link--next" href={nextGuidePage.link}>
-                        <span>{homeCopy.nextPage}</span>
-                        <strong>{nextGuidePage.text}</strong>
-                      </a>
-                    )}
-                  </div>
-                </nav>
+                <DocumentFooter
+                  buildItemRoute={(item) => buildGuideRoute(guideLocale, item.path.replace(/^guide\//u, '').replace(/\.md$/u, '') as GuidePageId)}
+                  documentSiblings={guideDocumentSiblings}
+                  selectedCatalogItem={selectedGuideCatalogItem}
+                  selectedFile={guideSelectedFile}
+                  sidebarSections={[]}
+                  source={guideSource}
+                />
               )}
               loading={fileLoading}
               onTagSelect={() => undefined}

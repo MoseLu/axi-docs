@@ -599,8 +599,17 @@ describe('knowledge base local index', () => {
     await fs.promises.writeFile(path.join(governanceRoot, 'docs', 'project-catalog.md'), '# Catalog\n', 'utf-8')
 
     const catalog = await getKnowledgeCatalog('workspace')
-    expect(catalog.totalDocs).toBeGreaterThanOrEqual(2)
-    expect(catalog.sections.some((section) => section.key === 'projects')).toBe(true)
+    expect(catalog.totalDocs).toBeGreaterThanOrEqual(5)
+
+    const projectSection = catalog.sections.find((section) => section.key === 'projects')
+    const architectureSection = catalog.sections.find((section) => section.key === 'architecture')
+    const standardsSection = catalog.sections.find((section) => section.key === 'standards')
+    const solutionsSection = catalog.sections.find((section) => section.key === 'solutions')
+    expect(projectSection?.items.some((item) => item.path === 'projects/axi-docs.md')).toBe(true)
+    expect(projectSection?.items.some((item) => item.path === 'projects/axi-docs/architecture.md')).toBe(false)
+    expect(architectureSection?.items.some((item) => item.path === 'projects/axi-docs/architecture.md')).toBe(true)
+    expect(standardsSection?.items.some((item) => item.path === 'projects/axi-docs/standards.md')).toBe(true)
+    expect(solutionsSection?.items.some((item) => item.path === 'projects/axi-docs/operations.md')).toBe(true)
 
     const summary = await getProjectSummary('axi-docs')
     expect(summary?.title).toBe('Axi 文档站')
@@ -611,8 +620,23 @@ describe('knowledge base local index', () => {
     const projectDocument = await readKnowledgeFile('workspace', 'projects/axi-docs.md')
     const projectBody = projectDocument?.replace(/^---[\s\S]*?---\s*/u, '') || ''
     expect(projectDocument).toContain('# Axi Docs')
+    expect(projectDocument).toContain('[架构说明](./axi-docs/architecture.md)')
+    expect(projectDocument).toContain('[运维与验证](./axi-docs/operations.md)')
+    expect(projectDocument).toContain('[协作规范](./axi-docs/standards.md)')
     expect(projectBody).not.toContain('Path:')
     expect(projectBody).not.toContain('/workspace/projects/axi-docs')
+
+    const architectureDocument = await readKnowledgeFile('workspace', 'projects/axi-docs/architecture.md')
+    expect(architectureDocument).toContain('# Axi Docs 架构')
+    expect(architectureDocument).toContain('React, TypeScript')
+
+    const operationsDocument = await readKnowledgeFile('workspace', 'projects/axi-docs/operations.md')
+    expect(operationsDocument).toContain('# Axi Docs 运维与验证')
+    expect(operationsDocument).toContain('`pnpm --dir app verify`')
+
+    const standardsDocument = await readKnowledgeFile('workspace', 'projects/axi-docs/standards.md')
+    expect(standardsDocument).toContain('# Axi Docs 协作规范')
+    expect(standardsDocument).toContain('TODO.md')
 
     const axiSkillsDocument = await readKnowledgeFile('workspace', 'projects/axi-skills.md')
     expect(axiSkillsDocument).toContain('# Axi 技能库')

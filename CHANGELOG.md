@@ -24,7 +24,9 @@ not versioned.
 - 2026-06-07: 新增 `docs/sources.lock.json` 与 `pnpm source:check`，用锁定 commit 管理 `axi-skills` 外部仓库快照，替代 Git submodule 方案。
 
 ### Changed
-- (无)
+- 2026-06-08: Workspace adapter 从“每个项目一个单页”扩展为“每个项目一套虚拟文档”
+  （概览、架构、运维与验证、协作规范）；项目概览只归入「项目知识」，架构/规范/运维页分别进入
+  对应分类，避免侧边栏在多个分类中重复显示同一张项目卡。
 
 ### Deprecated
 - (无)
@@ -88,4 +90,4 @@ not versioned.
 
 ---
 
-*最后更新：2026-06-07 — 根级 CHANGELOG 首版，由 workspace-docs-gap 子代理 A4 落地。*
+*最后更新：2026-06-08 — workspace adapter 项目文档套件化。*

@@ -1396,8 +1396,16 @@ const WORKSPACE_PURPOSE_OVERRIDES = new Map([
   ['Workspace Relationship Graph', '工作区项目关系图，用于记录 provider、consumer、contract 和 shared-resource 关系。'],
 ])
 
+const WORKSPACE_TITLE_OVERRIDES = new Map([
+  ['Axi Skills', 'Axi 技能库'],
+])
+
 function resolveWorkspacePurpose(cleanName: string, fallbackPurpose: string, fallbackNotes: string): string {
   return WORKSPACE_PURPOSE_OVERRIDES.get(cleanName) || fallbackPurpose || fallbackNotes
+}
+
+function resolveWorkspaceTitle(cleanName: string): string {
+  return WORKSPACE_TITLE_OVERRIDES.get(cleanName) || cleanName
 }
 
 function joinChineseFacts(facts: Array<[string, string | undefined]>): string {
@@ -1410,7 +1418,35 @@ function joinChineseFacts(facts: Array<[string, string | undefined]>): string {
     .join('。')
 }
 
-function buildWorkspaceProjectDocument(source: DocSource, row: string[], updated: string): ParsedDocument | null {
+type WorkspaceProjectInfo = {
+  id: string
+  name: string
+  projectPath: string
+  purpose: string
+  stack: string
+  status: string
+  docs: string
+  verification: string
+  notes: string
+  description: string
+  updated: string
+}
+
+type WorkspaceProjectSuiteDoc = {
+  suffix?: string
+  name: string
+  title: string
+  docType: string
+  categories: string[]
+  tags: string[]
+  sourceTags: string[]
+  description: string
+  body: string
+  graphTags: string[]
+  aliases?: string[]
+}
+
+function parseWorkspaceProjectRow(row: string[], updated: string): WorkspaceProjectInfo | null {
   const [name, projectPath, purpose, stack, status, docs, verification, notes] = row
   if (!name || !projectPath || name === 'Project' || /^-+$/.test(name)) return null
   const cleanName = stripMarkdownLinks(name)
@@ -1423,7 +1459,6 @@ function buildWorkspaceProjectDocument(source: DocSource, row: string[], updated
   const cleanNotes = stripMarkdownLinks(notes || '')
   const purposeSummary = resolveWorkspacePurpose(cleanName, cleanPurpose, cleanNotes)
   const id = cleanName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || cleanPath.replace(/[^a-z0-9]+/gi, '-')
-  const title = cleanName
   const description = joinChineseFacts([
     ['用途', purposeSummary],
     ['状态', cleanStatus],
@@ -1431,54 +1466,217 @@ function buildWorkspaceProjectDocument(source: DocSource, row: string[], updated
     ['验证', cleanVerification],
     ['文档', cleanDocs],
   ])
-  const body = [
-    `# ${title}`,
+
+  return {
+    id,
+    name: resolveWorkspaceTitle(cleanName),
+    projectPath: cleanPath,
+    purpose: purposeSummary,
+    stack: cleanStack,
+    status: cleanStatus,
+    docs: cleanDocs,
+    verification: cleanVerification,
+    notes: cleanNotes,
+    description,
+    updated,
+  }
+}
+
+function formatWorkspaceValue(value: string, fallback = '未标注'): string {
+  return value.trim() || fallback
+}
+
+function formatWorkspaceCommand(value: string): string {
+  return value.trim() ? `\`${value.trim()}\`` : '未标注'
+}
+
+function buildWorkspaceProjectSuiteDefinitions(project: WorkspaceProjectInfo): WorkspaceProjectSuiteDoc[] {
+  const overviewBody = [
+    `# ${project.name}`,
     '',
-    `- 状态：${cleanStatus}`,
-    `- 技术栈：${cleanStack || '未标注'}`,
-    `- 权威文档：${cleanDocs}`,
-    `- 常用验证：\`${cleanVerification}\``,
+    `- 状态：${project.status}`,
+    `- 技术栈：${formatWorkspaceValue(project.stack)}`,
+    `- 权威文档：${formatWorkspaceValue(project.docs)}`,
+    `- 常用验证：${formatWorkspaceCommand(project.verification)}`,
     '',
     '## 用途',
     '',
-    purposeSummary,
+    project.purpose,
     '',
-    notes ? '## 备注' : '',
-    notes ? cleanNotes : '',
+    '## 文档套件',
+    '',
+    `- [架构说明](./${project.id}/architecture.md)`,
+    `- [运维与验证](./${project.id}/operations.md)`,
+    `- [协作规范](./${project.id}/standards.md)`,
+    '',
+    project.notes ? '## 备注' : '',
+    project.notes || '',
   ].filter(Boolean).join('\n')
-  const raw = buildFrontmatter({
-    id: `workspace-${id}`,
-    title,
-    type: 'project',
-    status: cleanStatus,
-    tags: ['Axi 工作区', '项目', cleanStatus],
-    created: updated,
-    modified: updated,
-    'graph-title': title,
-    'graph-tags': ['项目', '工作区'],
-    path: cleanPath,
-    stack: cleanStack,
-    verification: cleanVerification,
-    description,
-  }) + body
 
-  return createVirtualParsedDocument({
-    sourceId: source.id,
-    path: `projects/${id}.md`,
-    name: id,
-    title,
-    rawTitle: title,
-    description,
-    docType: 'project',
-    status: cleanStatus,
-    tags: ['项目', '工作区', cleanStatus],
-    categories: ['projects', 'architecture', 'standards'],
-    updated,
-    raw,
-    body,
-    frontmatter: parseMarkdownDocument(raw).data as Frontmatter,
-    aliases: [cleanPath, title],
-    sourceTags: ['project', 'workspace', cleanStatus],
+  const architectureBody = [
+    `# ${project.name} 架构`,
+    '',
+    '## 项目边界',
+    '',
+    project.purpose,
+    '',
+    '## 技术栈',
+    '',
+    formatWorkspaceValue(project.stack),
+    '',
+    '## 上游契约',
+    '',
+    `- 工作区路径：由 WORKSPACE_INDEX 记录为 \`${project.projectPath}\`。`,
+    `- 关系与依赖：通过 \`/Volumes/code/workspace/workspace.graph.json\` 与 \`workspace-project\` 查询。`,
+    `- 权威入口：${formatWorkspaceValue(project.docs)}。`,
+  ].join('\n')
+
+  const operationsBody = [
+    `# ${project.name} 运维与验证`,
+    '',
+    '## 当前状态',
+    '',
+    project.status,
+    '',
+    '## 常用验证',
+    '',
+    formatWorkspaceCommand(project.verification),
+    '',
+    '## 执行准则',
+    '',
+    '- 从项目本地 AGENTS/README/包清单读取具体命令。',
+    '- 涉及跨项目消费关系时先查询 workspace graph。',
+    '- 验证结果必须来自当前命令输出，不能只依赖索引描述。',
+  ].join('\n')
+
+  const standardsBody = [
+    `# ${project.name} 协作规范`,
+    '',
+    '## 文档入口',
+    '',
+    formatWorkspaceValue(project.docs),
+    '',
+    '## Agent 规则',
+    '',
+    '- 进入项目后先读取最近的 AGENTS.md、CLAUDE.md 或 README.md。',
+    '- 保持修改半径在项目边界内；跨项目契约变更先查 consumers/providers。',
+    '- 不提交运行态、缓存、构建产物或凭证。',
+    '',
+    '## 补齐标准',
+    '',
+    '- 项目至少应有入口说明、架构边界、任务/TODO、里程碑和验证命令。',
+    '- P0/P1 任务需要绑定需求、测试或明确的验证缺口。',
+  ].join('\n')
+
+  return [
+    {
+      name: project.id,
+      title: project.name,
+      docType: 'project',
+      categories: ['projects'],
+      tags: ['项目', '工作区', project.status],
+      sourceTags: ['project', 'workspace', project.status],
+      description: project.description,
+      body: overviewBody,
+      graphTags: ['项目', '工作区'],
+      aliases: [project.projectPath, project.name],
+    },
+    {
+      suffix: 'architecture',
+      name: `${project.id}-architecture`,
+      title: `${project.name} 架构`,
+      docType: 'architecture',
+      categories: ['architecture'],
+      tags: ['架构', '工作区', project.status],
+      sourceTags: ['architecture', 'project', 'workspace', project.status],
+      description: joinChineseFacts([
+        ['架构边界', project.purpose],
+        ['技术栈', project.stack],
+        ['契约', 'workspace.graph.json'],
+      ]),
+      body: architectureBody,
+      graphTags: ['架构', '项目'],
+      aliases: [project.name, `${project.name} architecture`, project.projectPath],
+    },
+    {
+      suffix: 'operations',
+      name: `${project.id}-operations`,
+      title: `${project.name} 运维与验证`,
+      docType: 'runbook',
+      categories: ['solutions'],
+      tags: ['运维', '验证', '工作区', project.status],
+      sourceTags: ['operations', 'verification', 'project', 'workspace', project.status],
+      description: joinChineseFacts([
+        ['状态', project.status],
+        ['验证', project.verification],
+        ['对象', project.name],
+      ]),
+      body: operationsBody,
+      graphTags: ['运维', '验证'],
+      aliases: [project.name, `${project.name} verify`, `${project.name} operations`],
+    },
+    {
+      suffix: 'standards',
+      name: `${project.id}-standards`,
+      title: `${project.name} 协作规范`,
+      docType: 'standard',
+      categories: ['standards'],
+      tags: ['规范', '协作', '工作区', project.status],
+      sourceTags: ['standards', 'project', 'workspace', project.status],
+      description: joinChineseFacts([
+        ['文档入口', project.docs],
+        ['协作边界', '项目本地规则优先'],
+        ['对象', project.name],
+      ]),
+      body: standardsBody,
+      graphTags: ['规范', '项目'],
+      aliases: [project.name, `${project.name} standards`, project.docs],
+    },
+  ]
+}
+
+function buildWorkspaceProjectDocuments(source: DocSource, row: string[], updated: string): ParsedDocument[] {
+  const project = parseWorkspaceProjectRow(row, updated)
+  if (!project) return []
+
+  return buildWorkspaceProjectSuiteDefinitions(project).map((definition) => {
+    const documentPath = definition.suffix
+      ? `projects/${project.id}/${definition.suffix}.md`
+      : `projects/${project.id}.md`
+    const raw = buildFrontmatter({
+      id: `workspace-${project.id}${definition.suffix ? `-${definition.suffix}` : ''}`,
+      title: definition.title,
+      type: definition.docType,
+      status: project.status,
+      tags: definition.tags,
+      created: project.updated,
+      modified: project.updated,
+      'graph-title': definition.title,
+      'graph-tags': definition.graphTags,
+      stack: project.stack,
+      verification: project.verification,
+      description: definition.description,
+    }) + definition.body
+
+    return createVirtualParsedDocument({
+      sourceId: source.id,
+      path: documentPath,
+      name: definition.name,
+      title: definition.title,
+      rawTitle: definition.title,
+      description: definition.description,
+      docType: definition.docType,
+      status: project.status,
+      tags: definition.tags,
+      categories: definition.categories,
+      updated: project.updated,
+      raw,
+      body: definition.body,
+      frontmatter: parseMarkdownDocument(raw).data as Frontmatter,
+      aliases: definition.aliases || [project.name],
+      sourceTags: definition.sourceTags,
+      techStack: project.stack ? project.stack.split(',').map((item) => item.trim()).filter(Boolean) : [],
+    })
   })
 }
 
@@ -1504,8 +1702,7 @@ async function collectWorkspaceDocuments(source: DocSource): Promise<ParsedDocum
     .filter((line) => line.startsWith('|') && !line.includes('| ---'))
     .map(splitMarkdownTableRow)
     .filter((row) => row.length >= 7)
-    .map((row) => buildWorkspaceProjectDocument(source, row, updated))
-    .filter((document): document is ParsedDocument => Boolean(document))
+    .flatMap((row) => buildWorkspaceProjectDocuments(source, row, updated))
 
   documents.push(...projectRows)
 
@@ -1523,7 +1720,7 @@ async function collectWorkspaceDocuments(source: DocSource): Promise<ParsedDocum
       docType: 'index',
       status: 'active',
       tags: ['索引', '项目', '工作区'],
-      categories: ['indexes', 'projects'],
+      categories: ['indexes'],
       updated: catalogUpdated,
       raw,
       body: parseMarkdownDocument(raw).content,
@@ -1555,7 +1752,7 @@ async function collectWorkspaceDocuments(source: DocSource): Promise<ParsedDocum
       docType: 'index',
       status: 'active',
       tags: ['索引', '项目', '工作区'],
-      categories: ['indexes', 'projects'],
+      categories: ['indexes'],
       updated: indexUpdated,
       raw: indexText,
       body: parseMarkdownDocument(indexText).content,
@@ -1575,45 +1772,17 @@ async function collectWorkspaceDocuments(source: DocSource): Promise<ParsedDocum
   }
 
   const axiSkillsPath = path.resolve(workspaceRoot, 'shared', 'axi-skills')
-  if (fs.existsSync(axiSkillsPath) && !documents.some((document) => document.title === 'Axi Skills')) {
-    const axiSkillsTitle = 'Axi 技能库'
-    const axiSkillsDescription = 'Axi 智能体共享技能树，用于沉淀可版本化、可复用的智能体技能入口。'
-    documents.push(createVirtualParsedDocument({
-      sourceId: source.id,
-      path: 'projects/axi-skills.md',
-      name: 'axi-skills',
-      title: axiSkillsTitle,
-      rawTitle: 'Axi Skills',
-      description: `用途：${axiSkillsDescription}位置：shared/axi-skills。对象：工作区智能体与技能维护者`,
-      docType: 'project',
-      status: 'active',
-      tags: ['项目', '技能', '工作区'],
-      categories: ['projects', 'standards'],
-      updated,
-      raw: buildFrontmatter({
-        id: 'workspace-axi-skills',
-        title: axiSkillsTitle,
-        type: 'project',
-        status: 'active',
-        tags: ['项目', '技能', '工作区'],
-        modified: updated,
-        'graph-title': axiSkillsTitle,
-        'graph-tags': ['项目', '技能'],
-      }) + `# ${axiSkillsTitle}\n\n${axiSkillsDescription}`,
-      body: `# ${axiSkillsTitle}\n\n${axiSkillsDescription}`,
-      frontmatter: {
-        id: 'workspace-axi-skills',
-        title: axiSkillsTitle,
-        type: 'project',
-        status: 'active',
-        tags: ['项目', '技能', '工作区'],
-        modified: updated,
-        'graph-title': axiSkillsTitle,
-        'graph-tags': ['项目', '技能'],
-      },
-      aliases: ['Axi Skills', 'axi-skills', axiSkillsPath],
-      sourceTags: ['project', 'skills', 'workspace'],
-    }))
+  if (fs.existsSync(axiSkillsPath) && !documents.some((document) => document.rawTitle === 'Axi Skills' || document.name.startsWith('axi-skills'))) {
+    documents.push(...buildWorkspaceProjectDocuments(source, [
+      'Axi Skills',
+      axiSkillsPath,
+      'Axi 智能体共享技能树，用于沉淀可版本化、可复用的智能体技能入口。',
+      'Markdown, Agent Skills',
+      'active',
+      'README.md, skills/**/SKILL.md, skills.zh/**/SKILL.md',
+      'scripts/verify.py when editing skills; scripts/verify_i18n.py --all --json when editing localized mirrors',
+      '工作区智能体与技能维护者使用的共享技能库。',
+    ], updated))
   }
 
   return documents.sort((left, right) => left.title.localeCompare(right.title, 'zh-CN'))

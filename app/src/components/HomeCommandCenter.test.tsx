@@ -445,7 +445,7 @@ describe('HomeCommandCenter', () => {
         activeTag={null}
         catalog={catalog}
         graphFocusPath={null}
-        guidePageId="next-steps"
+        guidePageId="configuration"
         onClearSelectedFile={vi.fn()}
         onOpenExplorer={vi.fn()}
         onOpenItem={vi.fn()}
@@ -457,7 +457,7 @@ describe('HomeCommandCenter', () => {
       />,
     )
 
-    expect(screen.getByRole('link', { name: '上一页配置与数据源' })).toHaveAttribute('href', '/zh/guide/configuration')
+    expect(screen.getByRole('link', { name: '上一页国际化' })).toHaveAttribute('href', '/zh/guide/localization')
     expect(screen.queryByText('下一页')).not.toBeInTheDocument()
   })
 

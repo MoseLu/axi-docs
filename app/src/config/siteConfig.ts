@@ -16,7 +16,6 @@ export type GuidePageId =
   | 'knowledge-graph'
   | 'localization'
   | 'configuration'
-  | 'next-steps'
 
 export interface LocaleNavItem {
   docSet: DocSetId
@@ -120,7 +119,7 @@ const GUIDE_SECTION_DEFINITIONS: Array<{ id: GuideSectionId; pageIds: GuidePageI
   { id: 'introduction', pageIds: ['what-is-axi-docs', 'getting-started', 'routing'] },
   { id: 'content', pageIds: ['document-sources', 'markdown', 'frontmatter', 'search'] },
   { id: 'knowledge', pageIds: ['skills', 'workspace', 'knowledge-graph'] },
-  { id: 'operations', pageIds: ['localization', 'configuration', 'next-steps'] },
+  { id: 'operations', pageIds: ['localization', 'configuration'] },
 ]
 const GUIDE_PAGE_IDS: GuidePageId[] = GUIDE_SECTION_DEFINITIONS.flatMap((section) => section.pageIds)
 const DOC_SET_IDS: DocSetId[] = ['guide', 'skills', 'workspace']
@@ -211,7 +210,6 @@ export const siteConfig = {
         'knowledge-graph': '知识图谱',
         localization: '国际化',
         configuration: '配置与数据源',
-        'next-steps': '下一步',
       },
       guideSections: {
         introduction: '简介',
@@ -301,7 +299,6 @@ export const siteConfig = {
         'knowledge-graph': 'Knowledge Graph',
         localization: 'Localization',
         configuration: 'Configuration and Sources',
-        'next-steps': 'Next Steps',
       },
       guideSections: {
         introduction: 'Introduction',

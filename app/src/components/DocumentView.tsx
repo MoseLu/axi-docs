@@ -7,6 +7,7 @@ import { Components } from 'react-markdown'
 import { DocumentIcon, ClockIcon } from './Icons'
 import { KnowledgePanel } from './KnowledgePanel'
 import { formatDisplayDate } from '../lib/intl'
+import { prepareDocumentDisplayMarkdown, stripDisplayEmoji } from '../lib/documentDisplay'
 import { formatKnowledgeDocumentTitle } from '../lib/knowledgeFormatter'
 import { buildSearchRoute } from '../lib/routes'
 import { DocSource, SelectedFile, Frontmatter } from '../types'
@@ -20,7 +21,7 @@ interface DocumentViewProps {
   onWikiLink: (noteName: string) => void
   onTagSelect?: (tag: string) => void
   showKnowledgePanel?: boolean
-  variant?: 'page' | 'panel'
+  variant?: 'page' | 'panel' | 'guide'
   footer?: React.ReactNode
 }
 
@@ -103,10 +104,89 @@ function CopyButton({ text }: { text: string }) {
     setTimeout(() => setCopied(false), 2000)
   }
   return (
-    <button className={`copy-btn${copied ? ' copy-btn--copied' : ''}`} onClick={handleCopy} type="button">
-      {copied ? '✓ 已复制' : '复制'}
+    <button
+      aria-label={copied ? '代码已复制' : '复制代码块'}
+      className={`copy-btn copy${copied ? ' copy-btn--copied copied' : ''}`}
+      onClick={handleCopy}
+      title={copied ? '已复制' : '复制'}
+      type="button"
+    >
+      {copied ? (
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+          <path d="m5 12 5 5L20 7" />
+        </svg>
+      ) : (
+        <svg aria-hidden="true" viewBox="0 0 24 24">
+          <rect x="8" y="8" width="12" height="12" rx="2" />
+          <path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" />
+        </svg>
+      )}
     </button>
   )
+}
+
+function codeLanguage(className: string): string {
+  const rawLanguage = className.split(/\s+/u).find((entry) => entry.startsWith('language-'))?.replace('language-', '') || ''
+  return ['plain', 'plaintext', 'txt'].includes(rawLanguage) ? 'text' : rawLanguage
+}
+
+function blockCodeClassName(className: string, text: string): string {
+  if (codeLanguage(className)) return className
+  return text.includes('\n') ? 'language-text' : className
+}
+
+function isShellLanguage(language: string): boolean {
+  return ['bash', 'sh', 'shell', 'zsh', 'console'].includes(language)
+}
+
+function shellTokenClass(token: string, isFirstToken: boolean): string {
+  if (/^#/.test(token)) return 'shell-comment'
+  if (/^(['"`]).*\1$/u.test(token)) return 'shell-string'
+  if (/^-{1,2}[\w-]+(?:=.*)?$/u.test(token)) return 'shell-flag'
+  if (isFirstToken || /^(?:npm|npx|pnpm|yarn|bun|turbo|git|curl|docker|node|tsx|vite|vercel)$/u.test(token)) {
+    return 'shell-command'
+  }
+  if (/^(?:@?[\w.-]+\/)?[\w.-]+@[\w.-]+$/u.test(token)) return 'shell-package'
+  return 'shell-arg'
+}
+
+function renderShellLine(line: string, lineIndex: number): React.ReactNode {
+  const leadingWhitespace = line.match(/^\s*/u)?.[0] || ''
+  const content = line.slice(leadingWhitespace.length)
+  if (!content) return line
+  if (content.startsWith('#')) {
+    return (
+      <span key={lineIndex}>
+        {leadingWhitespace}
+        <span className="shell-comment">{content}</span>
+      </span>
+    )
+  }
+
+  const tokenRegex = /\s+|"(?:\\.|[^"\\])*"|'(?:\\.|[^'\\])*'|`(?:\\.|[^`\\])*`|\S+/gu
+  let commandSeen = false
+  return (
+    <span key={lineIndex}>
+      {leadingWhitespace}
+      {Array.from(content.matchAll(tokenRegex)).map((match, tokenIndex) => {
+        const token = match[0]
+        if (/^\s+$/u.test(token)) return token
+        const isFirstToken = !commandSeen && token !== '$'
+        if (token !== '$') commandSeen = true
+        return (
+          <span key={tokenIndex} className={token === '$' ? 'shell-prompt' : shellTokenClass(token, isFirstToken)}>
+            {token}
+          </span>
+        )
+      })}
+    </span>
+  )
+}
+
+function renderShellSyntax(text: string): React.ReactNode {
+  return text.split(/(\n)/u).map((part, index) => (
+    part === '\n' ? part : renderShellLine(part, index)
+  ))
 }
 
 // Wiki link renderer
@@ -122,7 +202,7 @@ function renderWikiLinks(text: string, sourceId?: string): React.ReactNode {
     parts.push(
       <Link
         key={match.index}
-        className="wiki-link"
+        className="wiki-link md-link"
         title={`搜索相关知识: ${noteName}`}
         to={buildSearchRoute(noteName, sourceId)}
       >
@@ -169,6 +249,7 @@ export function DocumentView({
     if (!content) return { frontmatter: {}, body: '' }
     return parseFrontmatter(preprocessContent(content))
   }, [content])
+  const displayBody = useMemo(() => prepareDocumentDisplayMarkdown(body, source, selectedFile), [body, selectedFile, source])
 
   const handleNavigate = (path: string) => onWikiLink(path)
   const wikiLinkSourceId = selectedFile?.sourceId || source?.id
@@ -176,24 +257,48 @@ export function DocumentView({
   const components: Components = useMemo(() => ({
     p({ children }) { return <p>{processChildren(children, wikiLinkSourceId)}</p> },
     li({ children }) { return <li>{processChildren(children, wikiLinkSourceId)}</li> },
+    a({ href, children, className, title }) {
+      const isExternal = Boolean(href && /^(?:https?:)?\/\//iu.test(href))
+      const linkClassName = ['md-link', isExternal ? 'md-link--external' : '', className].filter(Boolean).join(' ')
+      return (
+        <a
+          className={linkClassName}
+          href={href}
+          rel={isExternal ? 'noopener noreferrer' : undefined}
+          target={isExternal ? '_blank' : undefined}
+          title={title}
+        >
+          {children}
+        </a>
+      )
+    },
     pre({ children }) {
       const codeEl = Array.isArray(children) ? children[0] : children
       const className = (codeEl as React.ReactElement)?.props?.className || ''
-      const lang = (className as string).replace('language-', '') || ''
       const rawText = extractText(children)
+      const lang = codeLanguage(className as string) || (rawText.includes('\n') ? 'text' : '')
+      const codeBlockClassName = [
+        'code-block',
+        lang ? `language-${lang}` : '',
+        lang === 'text' ? 'code-block--text' : '',
+      ].filter(Boolean).join(' ')
       return (
-        <div className="code-block">
-          <div className="code-header">
-            {lang && <span className="code-lang">{lang}</span>}
-            <CopyButton text={rawText} />
-          </div>
+        <div className={codeBlockClassName}>
+          <CopyButton text={rawText} />
+          {lang && <span className="code-lang lang">{lang}</span>}
           <pre>{children}</pre>
         </div>
       )
     },
     code({ className, children }) {
-      const isBlock = className?.startsWith('language-')
-      if (isBlock) return <code className={className}>{children}</code>
+      const rawClassName = className || ''
+      const rawText = extractText(children)
+      const lang = codeLanguage(rawClassName)
+      const isBlock = Boolean(lang || rawClassName.includes('hljs') || rawText.includes('\n'))
+      if (isBlock && isShellLanguage(lang)) {
+        return <code className={blockCodeClassName(rawClassName, rawText)}>{renderShellSyntax(rawText)}</code>
+      }
+      if (isBlock) return <code className={blockCodeClassName(rawClassName, rawText)}>{children}</code>
       return <code className="inline-code">{children}</code>
     },
     h1: ({ children }) => {
@@ -240,24 +345,27 @@ export function DocumentView({
 
   const title = (frontmatter.title as string) || fileName
   const graphTitle = (frontmatter['graph-title'] as string) || (frontmatter.graphTitle as string) || undefined
-  const displayTitle = formatKnowledgeDocumentTitle(title, selectedFile.path, graphTitle)
+  const isGuideDocument = variant === 'guide'
+  const displayTitle = stripDisplayEmoji(
+    isGuideDocument ? title : formatKnowledgeDocumentTitle(title, selectedFile.path, graphTitle),
+  )
   const date = (frontmatter.modified || frontmatter.updated || frontmatter.date || frontmatter.created) as string | undefined
-  const description = frontmatter.description as string | undefined
-  const docType = frontmatter.type as string | undefined
+  const description = stripDisplayEmoji((frontmatter.description as string | undefined) || '')
+  const docType = stripDisplayEmoji((frontmatter.type as string | undefined) || '')
   // Skill metadata fields (MCP-ready)
-  const tech = frontmatter.tech as string | undefined
-  const version = frontmatter.version as string | undefined
-  const domain = frontmatter.domain as string | undefined
-  const problem = frontmatter.problem as string | undefined
+  const tech = stripDisplayEmoji((frontmatter.tech as string | undefined) || '')
+  const version = stripDisplayEmoji((frontmatter.version as string | undefined) || '')
+  const domain = stripDisplayEmoji((frontmatter.domain as string | undefined) || '')
+  const problem = stripDisplayEmoji((frontmatter.problem as string | undefined) || '')
   const isDaily = docType === 'daily'
   const isSkillDocument = source?.kind === 'skill-library' || docType === 'skill'
 
   return (
-    <div className={`doc-layout${variant === 'panel' ? ' doc-layout--panel' : ''}`}>
+    <div className={`doc-layout${variant === 'panel' ? ' doc-layout--panel' : ''}${isGuideDocument ? ' doc-layout--guide' : ''}`}>
       <div className="app-content">
         {/* Document Header */}
         <div className="doc-header">
-          {!isSkillDocument && (
+          {!isSkillDocument && !isGuideDocument && (
             <div className="doc-breadcrumb">
               <span className="breadcrumb-source">{source?.name || selectedFile.sourceId}</span>
               {selectedFile.path.split('/').slice(0, -1).map((part, i) => (
@@ -271,13 +379,13 @@ export function DocumentView({
 
           <div className="doc-title-row">
             <h1 className="doc-title">{displayTitle}</h1>
-            {!isSkillDocument && isDaily && <span className="doc-type-badge">日记</span>}
-            {!isSkillDocument && docType && !isDaily && <span className="doc-type-badge">{docType}</span>}
+            {!isSkillDocument && !isGuideDocument && isDaily && <span className="doc-type-badge">日记</span>}
+            {!isSkillDocument && !isGuideDocument && docType && !isDaily && <span className="doc-type-badge">{docType}</span>}
           </div>
 
           {description && <p className="doc-description">{description}</p>}
 
-          {!isSkillDocument && (
+          {!isSkillDocument && !isGuideDocument && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
               {domain && <SkillBadge label="领域" value={domain} />}
               {tech && <SkillBadge label="技术" value={tech} />}
@@ -303,7 +411,7 @@ export function DocumentView({
               rehypePlugins={[rehypeHighlight]}
               components={components}
             >
-              {body}
+              {displayBody}
             </ReactMarkdown>
           </div>
         </div>
@@ -314,7 +422,7 @@ export function DocumentView({
       {/* Knowledge Panel */}
       {selectedFile && showKnowledgePanel && (
         <KnowledgePanel
-          content={body || null}
+          content={displayBody || null}
           selectedFile={selectedFile}
           source={source}
           onNavigate={handleNavigate}

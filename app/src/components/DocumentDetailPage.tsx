@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
-import { formatDisplayDate } from '../lib/intl'
 import {
   formatKnowledgeItemTitle,
   formatKnowledgeTagLabel,
 } from '../lib/knowledgeFormatter'
 import { buildDocumentRoute } from '../lib/routes'
 import type { DocSource, KnowledgeCatalog, KnowledgeCatalogItem, SelectedFile } from '../types'
-import { ClockIcon, FileIcon } from './Icons'
+import { DocumentFooter } from './DocumentFooter'
+import { FileIcon } from './Icons'
 import { DocumentView } from './DocumentView'
 import { TableOfContents } from './TableOfContents'
 
@@ -48,9 +48,6 @@ export function DocumentDetailPage({
   onWikiLink,
 }: DocumentDetailPageProps) {
   const tags = selectedCatalogItem?.tags || []
-  const updatedLabel = selectedCatalogItem?.updated
-    ? formatDisplayDate(selectedCatalogItem.updated)
-    : null
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     category: true,
     related: true,
@@ -191,6 +188,15 @@ export function DocumentDetailPage({
           <DocumentView
             content={fileContent}
             fileName={fileName}
+            footer={(
+              <DocumentFooter
+                documentSiblings={documentSiblings}
+                selectedCatalogItem={selectedCatalogItem}
+                selectedFile={selectedFile}
+                sidebarSections={visibleSidebarSections}
+                source={source}
+              />
+            )}
             loading={fileLoading}
             onTagSelect={onTagSelect}
             onWikiLink={onWikiLink}
@@ -219,12 +225,6 @@ export function DocumentDetailPage({
           </span>
           <strong className="document-detail-page__source-name">{source.name}</strong>
           <p>{source.description}</p>
-          {updatedLabel && (
-            <span>
-              <ClockIcon />
-              {updatedLabel}
-            </span>
-          )}
           {tags.length > 0 && (
             <div className="document-detail-page__tags">
               {tags.slice(0, 8).map((tag) => (

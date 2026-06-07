@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { RefreshIcon, SearchIcon, BookIcon, FileIcon, FolderIcon, LanguageIcon, TagIcon } from './Icons'
+import { RefreshIcon, SearchIcon, BookIcon, EditIcon, FileIcon, FolderIcon, LanguageIcon, TagIcon } from './Icons'
 
 describe('Icons', () => {
   describe('RefreshIcon', () => {
@@ -42,6 +42,13 @@ describe('Icons', () => {
     it('should render SVG element', () => {
       render(<TagIcon />)
       expect(screen.getByTestId('tag-icon')).toBeInTheDocument()
+    })
+  })
+
+  describe('EditIcon', () => {
+    it('should render SVG element', () => {
+      render(<EditIcon />)
+      expect(screen.getByTestId('edit-icon')).toBeInTheDocument()
     })
   })
 

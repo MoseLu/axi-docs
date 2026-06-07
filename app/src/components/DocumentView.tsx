@@ -21,6 +21,7 @@ interface DocumentViewProps {
   onTagSelect?: (tag: string) => void
   showKnowledgePanel?: boolean
   variant?: 'page' | 'panel'
+  footer?: React.ReactNode
 }
 
 // Decode JSON-encoded content strings
@@ -162,6 +163,7 @@ export function DocumentView({
   content, fileName, loading, selectedFile, source, onWikiLink, onTagSelect,
   showKnowledgePanel = true,
   variant = 'page',
+  footer,
 }: DocumentViewProps) {
   const { frontmatter, body } = useMemo(() => {
     if (!content) return { frontmatter: {}, body: '' }
@@ -305,6 +307,8 @@ export function DocumentView({
             </ReactMarkdown>
           </div>
         </div>
+
+        {footer}
       </div>
 
       {/* Knowledge Panel */}

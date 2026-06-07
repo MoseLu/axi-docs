@@ -19,7 +19,7 @@ describe('knowledge formatter', () => {
   it('maps English document names to Chinese display metadata', () => {
     expect(formatKnowledgeDocumentTitle('Axi Image Preview', 'projects/axi-image-preview.md')).toBe('Axi 图片预览')
     expect(formatKnowledgeDocumentTitle('Current Context', '_agent/current-context.md')).toBe('当前上下文')
-    expect(formatKnowledgeDocumentTitle('ck', 'skills/ck/SKILL.md')).toBe('ck 文档')
+    expect(formatKnowledgeDocumentTitle('ck', 'skills/ck/SKILL.md')).toBe('ck')
     expect(formatKnowledgeDocumentDescription({
       title: 'Axi Image Preview',
       rawTitle: 'Axi Image Preview',
@@ -28,6 +28,14 @@ describe('knowledge formatter', () => {
       docType: 'project',
       sourceId: 'workspace',
     })).toBe('工作区项目文档摘要：Generate image preview workflows.')
+  })
+
+  it('formats skill library titles from skill keys without generic document suffixes', () => {
+    expect(formatKnowledgeDocumentTitle('ai-generation-persistence', 'skills.zh/ai-generation-persistence/SKILL.md')).toBe('AI 生成持久化')
+    expect(formatKnowledgeDocumentTitle('cli-anything-ollama', 'skills.zh/cli-anything-ollama/SKILL.md')).toBe('Ollama CLI 自动化')
+    expect(formatKnowledgeDocumentTitle('make-plan', 'skills.zh/openclaw/skills/make-plan/SKILL.md')).toBe('OpenClaw 制定计划')
+    expect(formatKnowledgeDocumentTitle('vercel-react-native-skills', 'skills.zh/vercel-react-native-skills/SKILL.md')).toBe('Vercel React Native 指南')
+    expect(formatKnowledgeDocumentTitle('中文用途摘要', 'skills.zh/model-switcher/SKILL.md')).toBe('模型切换器')
   })
 
   it('keeps branch and tag labels metadata-driven', () => {

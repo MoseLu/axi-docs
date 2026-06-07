@@ -1,6 +1,7 @@
 import fs from 'fs'
 import os from 'os'
 import path from 'path'
+import { execFileSync } from 'child_process'
 import { afterEach, describe, expect, it } from 'vitest'
 import { classifyKnowledgeCategories } from '../config/knowledgeRules'
 import { getDocumentSourceRegistry, validateDocumentSourceRegistry } from '../config/documentSources'
@@ -152,6 +153,48 @@ describe('knowledge base local index', () => {
     expect(solutionsSection?.items.some((item) => item.path === 'playbook.md')).toBe(true)
   })
 
+  it('uses git commit time as the document last updated value when available', async () => {
+    tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'axi-docs-kb-git-'))
+    process.env.OBSIDIAN_PATH = tempDir
+
+    const committedAt = '2026-04-08T09:10:11+08:00'
+    const filePath = path.join(tempDir, 'git-updated.md')
+    await fs.promises.writeFile(filePath, [
+      '---',
+      'id: git-updated',
+      'title: Git Updated',
+      'tags: [docs, git]',
+      'type: concept',
+      'status: evergreen',
+      'created: 2025-01-01',
+      'modified: 2025-01-01',
+      'graph-title: Git 更新时间',
+      'graph-tags: [文档, Git]',
+      '---',
+      '# Git Updated',
+      '',
+      'This document should use the commit timestamp.',
+    ].join('\n'), 'utf-8')
+
+    execFileSync('git', ['init'], { cwd: tempDir, stdio: 'ignore' })
+    execFileSync('git', ['config', 'user.name', 'Axi Test'], { cwd: tempDir, stdio: 'ignore' })
+    execFileSync('git', ['config', 'user.email', 'axi-test@example.com'], { cwd: tempDir, stdio: 'ignore' })
+    execFileSync('git', ['add', 'git-updated.md'], { cwd: tempDir, stdio: 'ignore' })
+    execFileSync('git', ['commit', '-m', 'Add git updated doc'], {
+      cwd: tempDir,
+      env: {
+        ...process.env,
+        GIT_AUTHOR_DATE: committedAt,
+        GIT_COMMITTER_DATE: committedAt,
+      },
+      stdio: 'ignore',
+    })
+
+    const documents = await getKnowledgeDocuments('obsidian')
+    const item = documents.find((entry) => entry.path === 'git-updated.md')
+    expect(item?.updated).toBe('2026-04-08T09:10:11+08:00')
+  })
+
   it('admits documents with standard frontmatter even when graph metadata is omitted', async () => {
     tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'axi-docs-kb-fallback-'))
     process.env.OBSIDIAN_PATH = tempDir
@@ -237,6 +280,127 @@ describe('knowledge base local index', () => {
     ])).toContain('duplicate source id: dup')
   })
 
+  it('exposes the localized axi-skills-zh source alongside the English axi-skills source', () => {
+    const registry = getDocumentSourceRegistry()
+    const enSource = registry.find((source) => source.id === 'axi-skills')
+    const zhSource = registry.find((source) => source.id === 'axi-skills-zh')
+    expect(enSource).toBeDefined()
+    expect(zhSource).toBeDefined()
+    expect(enSource?.skillRoot).toBe('skills')
+    expect(enSource?.locale).toBe('en')
+    expect(zhSource?.skillRoot).toBe('skills.zh')
+    expect(zhSource?.locale).toBe('zh')
+    expect(enSource?.path).toBe(zhSource?.path)
+  })
+
+  it('exposes locale-specific Axi Docs content roots for translation work', () => {
+    const registry = getDocumentSourceRegistry()
+    const enSource = registry.find((source) => source.id === 'axi-docs-en')
+    const zhSource = registry.find((source) => source.id === 'axi-docs-zh')
+
+    expect(enSource).toBeDefined()
+    expect(zhSource).toBeDefined()
+    expect(enSource?.adapter).toBe('markdown')
+    expect(zhSource?.adapter).toBe('markdown')
+    expect(enSource?.locale).toBe('en')
+    expect(zhSource?.locale).toBe('zh')
+    expect(enSource?.path.endsWith(path.join('docs', 'content', 'en'))).toBe(true)
+    expect(zhSource?.path.endsWith(path.join('docs', 'content', 'zh'))).toBe(true)
+  })
+
+  it('reads Chinese skills from a localized skills.zh mirror without silent English fallback', async () => {
+    tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'axi-docs-skills-zh-'))
+    const englishRoot = path.join(tempDir, 'skills', 'frontend-dev')
+    const chineseRoot = path.join(tempDir, 'skills.zh', 'frontend-dev')
+    await fs.promises.mkdir(englishRoot, { recursive: true })
+    await fs.promises.mkdir(chineseRoot, { recursive: true })
+
+    await fs.promises.writeFile(path.join(englishRoot, 'SKILL.md'), [
+      '---',
+      'name: frontend-dev',
+      'description: Build frontend features.',
+      '---',
+      '# Frontend Dev',
+    ].join('\n'), 'utf-8')
+    await fs.promises.writeFile(path.join(chineseRoot, 'SKILL.md'), [
+      '---',
+      'name: frontend-dev',
+      'title: 前端开发',
+      'description: 构建前端功能。',
+      '---',
+      '# 前端开发',
+    ].join('\n'), 'utf-8')
+
+    process.env.AXI_SKILLS_PATH = tempDir
+
+    const enDocs = await getKnowledgeDocuments('axi-skills')
+    const zhDocs = await getKnowledgeDocuments('axi-skills-zh')
+    expect(enDocs.some((doc) => doc.path === 'skills/frontend-dev/SKILL.md')).toBe(true)
+    expect(enDocs.some((doc) => doc.path === 'skills.zh/frontend-dev/SKILL.md')).toBe(false)
+    expect(zhDocs.some((doc) => doc.path === 'skills.zh/frontend-dev/SKILL.md')).toBe(true)
+    expect(zhDocs.some((doc) => doc.path === 'skills/frontend-dev/SKILL.md')).toBe(false)
+    expect(zhDocs.find((doc) => doc.path === 'skills.zh/frontend-dev/SKILL.md')?.description)
+      .toContain('构建前端功能')
+    expect(zhDocs.find((doc) => doc.path === 'skills.zh/frontend-dev/SKILL.md')?.title)
+      .toBe('前端开发')
+    expect(enDocs.find((doc) => doc.path === 'skills/frontend-dev/SKILL.md')?.description)
+      .toContain('Build frontend features')
+  })
+
+  it('keeps localized skill titles from loose CRLF frontmatter', async () => {
+    tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'axi-docs-skills-zh-loose-'))
+    const chineseRoot = path.join(tempDir, 'skills.zh', 'blueprint')
+    await fs.promises.mkdir(chineseRoot, { recursive: true })
+
+    await fs.promises.writeFile(path.join(chineseRoot, 'SKILL.md'), [
+      '---',
+      '',
+      'name: blueprint',
+      'title: "Blueprint 指南"',
+      'description: 将单行目标转化为多会话计划。',
+      '---',
+      '',
+      '# /blueprint',
+    ].join('\r\n'), 'utf-8')
+
+    process.env.AXI_SKILLS_PATH = tempDir
+
+    const zhDocs = await getKnowledgeDocuments('axi-skills-zh')
+    const blueprint = zhDocs.find((doc) => doc.path === 'skills.zh/blueprint/SKILL.md')
+
+    expect(blueprint?.title).toBe('Blueprint 指南')
+    expect(blueprint?.description).toContain('将单行目标转化')
+  })
+
+  it('honors skillRoot from extra sources when reading a custom skills directory', async () => {
+    tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'axi-docs-skills-extra-'))
+    const customRoot = path.join(tempDir, 'custom', 'skills-x')
+    await fs.promises.mkdir(customRoot, { recursive: true })
+
+    process.env.AXI_DOCS_EXTRA_SOURCES_JSON = JSON.stringify([
+      {
+        id: 'custom-skills',
+        name: 'Custom Skills',
+        path: tempDir,
+        enabled: true,
+        type: 'local',
+        adapter: 'skills',
+        skillRoot: 'custom/skills-x',
+      },
+    ])
+
+    await fs.promises.writeFile(path.join(customRoot, 'SKILL.md'), [
+      '---',
+      'name: custom-skill',
+      'description: A custom skill that lives in a non-default folder.',
+      '---',
+      '# Custom Skill',
+    ].join('\n'), 'utf-8')
+
+    const documents = await getKnowledgeDocuments('custom-skills')
+    expect(documents.some((doc) => doc.path === 'custom/skills-x/SKILL.md')).toBe(true)
+  })
+
   it('indexes Axi Skills SKILL.md files without Obsidian frontmatter', async () => {
     tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'axi-docs-skills-'))
     const skillDirs = [
@@ -305,12 +469,14 @@ describe('knowledge base local index', () => {
 
     const catalog = await getKnowledgeCatalog('axi-skills')
     expect(catalog.totalDocs).toBe(7)
-    expect(catalog.sections.find((section) => section.key === 'skills-agent-workflows')?.count).toBe(1)
-    expect(catalog.sections.find((section) => section.key === 'skills-engineering')?.count).toBe(1)
-    expect(catalog.sections.find((section) => section.key === 'skills-tools-platforms')?.count).toBe(1)
-    expect(catalog.sections.find((section) => section.key === 'skills-cloud-devops')?.count).toBe(1)
-    expect(catalog.sections.find((section) => section.key === 'skills-data-research')?.count).toBe(1)
-    expect(catalog.sections.find((section) => section.key === 'skills-content-design')?.count).toBe(1)
+    expect(catalog.sections[0]?.key).toBe('skill-support-docs')
+    expect(catalog.sections[0]?.title).toBe('技能库附属文档')
+    expect(catalog.sections.find((section) => section.key === 'agent-planning')?.count).toBe(1)
+    expect(catalog.sections.find((section) => section.key === 'frontend-ui')?.count).toBe(1)
+    expect(catalog.sections.find((section) => section.key === 'google-workspace')?.count).toBe(1)
+    expect(catalog.sections.find((section) => section.key === 'cloud-deployment')?.count).toBe(1)
+    expect(catalog.sections.find((section) => section.key === 'bio-health-research')?.count).toBe(1)
+    expect(catalog.sections.find((section) => section.key === 'design-content')?.count).toBe(1)
 
     const results = await searchKnowledge('axi-skills', 'deep-init-pro')
     expect(results[0]?.path).toBe('skills/deep-init-pro/SKILL.md')
@@ -325,8 +491,8 @@ describe('knowledge base local index', () => {
     expect(raw).toContain('name: deep-init-pro')
     const indexRaw = await readKnowledgeFile('axi-skills', 'docs/SKILL_INDEX.md')
     expect(indexRaw).toContain('## 能力分组')
-    expect(indexRaw).toContain('## Agent 工作流')
-    expect(indexRaw).toContain('## 工程实现与架构')
+    expect(indexRaw).toContain('## Agent 规划与需求')
+    expect(indexRaw).toContain('## 前端界面与组件')
     expect(indexRaw).toContain('`skills/frontend-dev/SKILL.md`')
 
     const staticDocuments = await getKnowledgeDocuments('axi-skills')

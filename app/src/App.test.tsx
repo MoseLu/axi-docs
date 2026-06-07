@@ -50,7 +50,72 @@ const skillsSource: DocSource = {
   type: 'local',
   kind: 'skill-library',
   adapter: 'skills',
+  skillRoot: 'skills',
+  locale: 'en',
 }
+
+const skillsSourceZh: DocSource = {
+  id: 'axi-skills-zh',
+  name: 'Axi Skills · 中文镜像',
+  description: 'Axi Skills 的中文本地化镜像',
+  path: '/skills',
+  enabled: true,
+  type: 'local',
+  kind: 'skill-library',
+  adapter: 'skills',
+  skillRoot: 'skills.zh',
+  locale: 'zh',
+}
+
+const docsSourceEn: DocSource = {
+  id: 'axi-docs-en',
+  name: 'Axi Docs · English',
+  description: 'Axi Docs source-language documentation',
+  path: '/docs/content/en',
+  enabled: true,
+  type: 'local',
+  kind: 'markdown-vault',
+  adapter: 'markdown',
+  locale: 'en',
+}
+
+const docsSourceZh: DocSource = {
+  id: 'axi-docs-zh',
+  name: 'Axi Docs · 中文文档',
+  description: 'Axi Docs 中文翻译目标目录',
+  path: '/docs/content/zh',
+  enabled: true,
+  type: 'local',
+  kind: 'markdown-vault',
+  adapter: 'markdown',
+  locale: 'zh',
+}
+
+const zhGettingStartedGuide = `---
+title: 快速开始
+description: 快速开始指南
+---
+
+## 启动本地站点
+
+运行开发服务器。
+
+## 文档导航
+
+使用侧栏继续阅读。`
+
+const enGettingStartedGuide = `---
+title: Getting Started
+description: Getting started guide
+---
+
+## Start the local site
+
+Run the development server.
+
+## Navigate the docs
+
+Use the sidebar to continue.`
 
 const catalog: KnowledgeCatalog = {
   sourceId: 'workspace',
@@ -138,13 +203,39 @@ const skillsCatalog: KnowledgeCatalog = {
   ],
 }
 
+const skillsCatalogZh: KnowledgeCatalog = {
+  ...catalog,
+  sourceId: 'axi-skills-zh',
+  sections: [
+    {
+      key: 'frontend',
+      title: '前端技能',
+      description: '前端相关技能',
+      count: 1,
+      items: [
+        {
+          sourceId: 'axi-skills-zh',
+          path: 'skills.zh/frontend-dev/SKILL.md',
+          name: 'frontend-dev',
+          title: '前端开发',
+          description: '前端工作流技能',
+          docType: 'skill',
+          tags: [],
+          categories: ['frontend'],
+          techStack: [],
+        },
+      ],
+    },
+  ],
+}
+
 describe('App document route', () => {
   it('renders the guide as a document pathname instead of a hash anchor route', async () => {
-    mocks.listKnowledgeSources.mockResolvedValue([source])
+    mocks.listKnowledgeSources.mockResolvedValue([source, docsSourceEn, docsSourceZh])
     mocks.getKnowledgeCatalog.mockResolvedValue(catalog)
     mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
     mocks.searchKnowledgeAll.mockResolvedValue([])
-    mocks.readKnowledgeFile.mockResolvedValue(null)
+    mocks.readKnowledgeFile.mockResolvedValue(zhGettingStartedGuide)
 
     render(
       <MemoryRouter initialEntries={['/zh/guide/getting-started']}>
@@ -154,16 +245,19 @@ describe('App document route', () => {
 
     await screen.findByRole('heading', { name: '快速开始', level: 1 })
 
+    await waitFor(() => expect(mocks.getKnowledgeCatalog).toHaveBeenCalledWith('axi-docs-zh'))
+    await waitFor(() => expect(mocks.readKnowledgeFile).toHaveBeenCalledTimes(1))
+    expect(mocks.readKnowledgeFile).toHaveBeenCalledWith('axi-docs-zh', 'guide/getting-started.md')
     expect(screen.getAllByRole('link', { name: '快速开始' })[0]).toHaveAttribute('href', '/zh/guide/getting-started')
     expect(screen.getAllByRole('link', { name: '什么是 Axi Docs？' })[0]).toHaveAttribute('href', '/zh/guide/what-is-axi-docs')
   })
 
   it('redirects the root to the default localized guide document', async () => {
-    mocks.listKnowledgeSources.mockResolvedValue([source])
+    mocks.listKnowledgeSources.mockResolvedValue([source, docsSourceEn, docsSourceZh])
     mocks.getKnowledgeCatalog.mockResolvedValue(catalog)
     mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
     mocks.searchKnowledgeAll.mockResolvedValue([])
-    mocks.readKnowledgeFile.mockResolvedValue(null)
+    mocks.readKnowledgeFile.mockResolvedValue(zhGettingStartedGuide)
 
     render(
       <MemoryRouter initialEntries={['/']}>
@@ -176,11 +270,11 @@ describe('App document route', () => {
   })
 
   it('does not map old guide hashes to new guide document routes', async () => {
-    mocks.listKnowledgeSources.mockResolvedValue([source])
+    mocks.listKnowledgeSources.mockResolvedValue([source, docsSourceEn, docsSourceZh])
     mocks.getKnowledgeCatalog.mockResolvedValue(catalog)
     mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
     mocks.searchKnowledgeAll.mockResolvedValue([])
-    mocks.readKnowledgeFile.mockResolvedValue(null)
+    mocks.readKnowledgeFile.mockResolvedValue(zhGettingStartedGuide)
 
     render(
       <MemoryRouter initialEntries={['/#what-is-axi-docs']}>
@@ -193,11 +287,11 @@ describe('App document route', () => {
   })
 
   it('renders the English guide under the locale-prefixed route', async () => {
-    mocks.listKnowledgeSources.mockResolvedValue([source])
+    mocks.listKnowledgeSources.mockResolvedValue([source, docsSourceEn, docsSourceZh])
     mocks.getKnowledgeCatalog.mockResolvedValue(catalog)
     mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
     mocks.searchKnowledgeAll.mockResolvedValue([])
-    mocks.readKnowledgeFile.mockResolvedValue(null)
+    mocks.readKnowledgeFile.mockResolvedValue(enGettingStartedGuide)
 
     render(
       <MemoryRouter initialEntries={['/en/guide/getting-started']}>
@@ -207,15 +301,18 @@ describe('App document route', () => {
 
     await screen.findByRole('heading', { name: 'Getting Started', level: 1 })
 
+    expect(mocks.getKnowledgeCatalog).toHaveBeenCalledWith('axi-docs-en')
     expect(screen.getAllByRole('link', { name: 'Getting Started' })[0]).toHaveAttribute('href', '/en/guide/getting-started')
     expect(screen.getAllByRole('link', { name: 'What is Axi Docs?' })[0]).toHaveAttribute('href', '/en/guide/what-is-axi-docs')
   })
 
   it('renders skills as a locale-prefixed document set with its own sidebar', async () => {
-    mocks.listKnowledgeSources.mockResolvedValue([source, skillsSource])
-    mocks.getKnowledgeCatalog.mockImplementation(async (sourceId: string) => (
-      sourceId === 'axi-skills' ? skillsCatalog : catalog
-    ))
+    mocks.listKnowledgeSources.mockResolvedValue([source, skillsSource, skillsSourceZh])
+    mocks.getKnowledgeCatalog.mockImplementation(async (sourceId: string) => {
+      if (sourceId === 'axi-skills') return skillsCatalog
+      if (sourceId === 'axi-skills-zh') return skillsCatalogZh
+      return catalog
+    })
     mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
     mocks.searchKnowledgeAll.mockResolvedValue([])
     mocks.readKnowledgeFile.mockResolvedValue(null)
@@ -226,23 +323,26 @@ describe('App document route', () => {
       </MemoryRouter>,
     )
 
-    await screen.findByRole('heading', { name: 'Axi Skills', level: 1 })
+    await screen.findByRole('heading', { name: 'Axi Skills · 中文镜像', level: 1 })
 
-    expect(mocks.getKnowledgeCatalog).toHaveBeenCalledWith('axi-skills')
+    expect(mocks.getKnowledgeCatalog).toHaveBeenCalledWith('axi-skills-zh')
     expect(screen.getByRole('link', { name: '技能库' })).toHaveAttribute('href', '/zh/skills')
     expect(screen.getByRole('link', { name: '技能库' })).toHaveClass('active')
     const sidebar = screen.getByLabelText('侧边栏导航')
-    expect(await within(sidebar).findByText('Frontend')).toBeInTheDocument()
-    expect(await within(sidebar).findByRole('button', { name: 'Frontend Dev' })).toBeInTheDocument()
+    expect(await within(sidebar).findByText('前端技能')).toBeInTheDocument()
+    fireEvent.click(within(sidebar).getByRole('button', { name: '前端技能' }))
+    expect(await within(sidebar).findByRole('button', { name: '前端开发' })).toBeInTheDocument()
     expect(within(sidebar).queryByText('Frontend workflow skill')).not.toBeInTheDocument()
     expect(screen.queryByRole('link', { name: '快速开始' })).not.toBeInTheDocument()
   })
 
   it('opens skills documents through canonical document routes', async () => {
-    mocks.listKnowledgeSources.mockResolvedValue([source, skillsSource])
-    mocks.getKnowledgeCatalog.mockImplementation(async (sourceId: string) => (
-      sourceId === 'axi-skills' ? skillsCatalog : catalog
-    ))
+    mocks.listKnowledgeSources.mockResolvedValue([source, skillsSource, skillsSourceZh])
+    mocks.getKnowledgeCatalog.mockImplementation(async (sourceId: string) => {
+      if (sourceId === 'axi-skills') return skillsCatalog
+      if (sourceId === 'axi-skills-zh') return skillsCatalogZh
+      return catalog
+    })
     mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
     mocks.searchKnowledgeAll.mockResolvedValue([])
     mocks.readKnowledgeFile.mockResolvedValue('# Frontend Dev\n\nSkill body.')
@@ -254,34 +354,75 @@ describe('App document route', () => {
       </MemoryRouter>,
     )
 
-    fireEvent.click(await screen.findByRole('button', { name: 'Frontend Dev' }))
+    fireEvent.click(await screen.findByRole('button', { name: '前端技能' }))
+    fireEvent.click(await screen.findByRole('button', { name: '前端开发' }))
 
-    await waitFor(() => expect(screen.getByTestId('location').textContent).toBe('/docs/axi-skills/skills/frontend-dev/SKILL'))
+    await waitFor(() => expect(screen.getByTestId('location').textContent).toBe('/docs/axi-skills-zh/skills.zh/frontend-dev/SKILL'))
     expect(screen.getByRole('link', { name: '指南' })).not.toHaveClass('active')
     expect(screen.getByRole('link', { name: '技能库' })).toHaveClass('active')
-    expect(screen.getByLabelText('Frontend')).toBeInTheDocument()
-    expect(screen.getByLabelText('Workflow')).toBeInTheDocument()
-    expect(screen.getAllByRole('link', { name: 'Frontend Dev 文档' })).toHaveLength(1)
-    expect(screen.getByRole('link', { name: 'Frontend Dev 文档' })).toHaveClass('active')
-    expect(screen.getByRole('link', { name: 'Workflow技能' })).toBeInTheDocument()
+    expect(screen.getByLabelText('前端技能')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '前端技能' }))
+    const activeLink = screen.getByRole('link', { name: '前端开发' })
+    expect(activeLink).toHaveClass('active')
 
-    fireEvent.click(screen.getByRole('link', { name: 'Workflow技能' }))
+    expect(mocks.readKnowledgeFile).toHaveBeenCalledWith('axi-skills-zh', 'skills.zh/frontend-dev/SKILL.md')
+  })
 
-    await waitFor(() => expect(screen.getByTestId('location').textContent).toBe('/docs/axi-skills/skills/workflow/SKILL'))
-    expect(screen.getByLabelText('Frontend')).toBeInTheDocument()
-    expect(screen.getByLabelText('Workflow')).toBeInTheDocument()
-    expect(screen.getAllByRole('link', { name: 'Frontend Dev 文档' })).toHaveLength(1)
-    expect(screen.getByRole('link', { name: 'Workflow技能' })).toHaveClass('active')
-    expect(screen.queryByLabelText('相关推荐')).not.toBeInTheDocument()
-    expect(mocks.readKnowledgeFile).toHaveBeenCalledWith('axi-skills', 'skills/frontend-dev/SKILL.md')
-    expect(mocks.readKnowledgeFile).toHaveBeenCalledWith('axi-skills', 'skills/workflow/SKILL.md')
+  it('keeps the full document sidebar stable when opening documents from later sections', async () => {
+    const fullSkillsCatalog: KnowledgeCatalog = {
+      ...skillsCatalogZh,
+      sections: Array.from({ length: 6 }, (_, index) => ({
+        key: `section-${index + 1}`,
+        title: `分类 ${index + 1}`,
+        description: `分类 ${index + 1} 描述`,
+        count: 1,
+        items: [
+          {
+            sourceId: 'axi-skills-zh',
+            path: `skills.zh/item-${index + 1}/SKILL.md`,
+            name: `item-${index + 1}`,
+            title: `条目 ${index + 1}`,
+            description: `条目 ${index + 1} 描述`,
+            docType: 'skill',
+            tags: [],
+            categories: [`section-${index + 1}`],
+            techStack: [],
+          },
+        ],
+      })),
+    }
+
+    mocks.listKnowledgeSources.mockResolvedValue([source, skillsSource, skillsSourceZh])
+    mocks.getKnowledgeCatalog.mockImplementation(async (sourceId: string) => {
+      if (sourceId === 'axi-skills-zh') return fullSkillsCatalog
+      if (sourceId === 'axi-skills') return skillsCatalog
+      return catalog
+    })
+    mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
+    mocks.searchKnowledgeAll.mockResolvedValue([])
+    mocks.readKnowledgeFile.mockResolvedValue('# 条目 6\n\nSkill body.')
+
+    render(
+      <MemoryRouter initialEntries={['/docs/axi-skills-zh/skills.zh/item-6/SKILL']}>
+        <App />
+      </MemoryRouter>,
+    )
+
+    await screen.findByRole('heading', { name: '条目 6', level: 1 })
+
+    for (let index = 1; index <= 6; index += 1) {
+      expect(screen.getByLabelText(`分类 ${index}`)).toBeInTheDocument()
+    }
+    expect(screen.getByLabelText('分类 6')).toHaveTextContent('分类 6')
   })
 
   it('strips legacy preview query parameters from document-set routes', async () => {
-    mocks.listKnowledgeSources.mockResolvedValue([source, skillsSource])
-    mocks.getKnowledgeCatalog.mockImplementation(async (sourceId: string) => (
-      sourceId === 'axi-skills' ? skillsCatalog : catalog
-    ))
+    mocks.listKnowledgeSources.mockResolvedValue([source, skillsSource, skillsSourceZh])
+    mocks.getKnowledgeCatalog.mockImplementation(async (sourceId: string) => {
+      if (sourceId === 'axi-skills') return skillsCatalog
+      if (sourceId === 'axi-skills-zh') return skillsCatalogZh
+      return catalog
+    })
     mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
     mocks.searchKnowledgeAll.mockResolvedValue([])
     mocks.readKnowledgeFile.mockResolvedValue(null)
@@ -293,8 +434,54 @@ describe('App document route', () => {
       </MemoryRouter>,
     )
 
-    await screen.findByRole('heading', { name: 'Axi Skills', level: 1 })
+    await screen.findByRole('heading', { name: 'Axi Skills · 中文镜像', level: 1 })
     await waitFor(() => expect(screen.getByTestId('location')).toHaveTextContent('/zh/skills'))
+  })
+
+  it('redirects removed category graph routes back to the localized document set', async () => {
+    mocks.listKnowledgeSources.mockResolvedValue([source, skillsSource, skillsSourceZh])
+    mocks.getKnowledgeCatalog.mockImplementation(async (sourceId: string) => {
+      if (sourceId === 'axi-skills') return skillsCatalog
+      if (sourceId === 'axi-skills-zh') return skillsCatalogZh
+      return catalog
+    })
+    mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
+    mocks.searchKnowledgeAll.mockResolvedValue([])
+    mocks.readKnowledgeFile.mockResolvedValue(null)
+
+    render(
+      <MemoryRouter initialEntries={['/nodes/indexes?source=axi-skills-zh&view=tree&node=branch%3A__knowledge-root__']}>
+        <App />
+        <LocationProbe />
+      </MemoryRouter>,
+    )
+
+    await waitFor(() => expect(screen.getByTestId('location')).toHaveTextContent('/zh/skills'))
+    await screen.findByRole('heading', { name: 'Axi Skills · 中文镜像', level: 1 })
+    expect(screen.queryByText('分类图谱')).not.toBeInTheDocument()
+  })
+
+  it('redirects legacy category node document links to canonical document routes', async () => {
+    mocks.listKnowledgeSources.mockResolvedValue([source, skillsSource, skillsSourceZh])
+    mocks.getKnowledgeCatalog.mockImplementation(async (sourceId: string) => {
+      if (sourceId === 'axi-skills') return skillsCatalog
+      if (sourceId === 'axi-skills-zh') return skillsCatalogZh
+      return catalog
+    })
+    mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
+    mocks.searchKnowledgeAll.mockResolvedValue([])
+    mocks.readKnowledgeFile.mockResolvedValue('# 前端开发\n\nSkill body.')
+
+    render(
+      <MemoryRouter initialEntries={['/nodes/indexes?source=axi-skills-zh&view=tree&node=skills.zh/frontend-dev/SKILL.md']}>
+        <App />
+        <LocationProbe />
+      </MemoryRouter>,
+    )
+
+    await waitFor(() => expect(screen.getByTestId('location').textContent).toBe('/docs/axi-skills-zh/skills.zh/frontend-dev/SKILL'))
+    expect(await screen.findAllByRole('heading', { name: '前端开发', level: 1 })).not.toHaveLength(0)
+    expect(mocks.readKnowledgeFile).toHaveBeenCalledWith('axi-skills-zh', 'skills.zh/frontend-dev/SKILL.md')
   })
 
   it('loads a readable route document once instead of flickering back into loading', async () => {
@@ -338,5 +525,65 @@ describe('App document route', () => {
 
     await screen.findByRole('heading', { name: '页面不存在' })
     expect(mocks.readKnowledgeFile).not.toHaveBeenCalled()
+  })
+
+  it('routes /en/skills to the English axi-skills source and /zh/skills to the Chinese mirror', async () => {
+    mocks.listKnowledgeSources.mockResolvedValue([source, skillsSource, skillsSourceZh])
+    mocks.getKnowledgeCatalog.mockImplementation(async (sourceId: string) => {
+      if (sourceId === 'axi-skills') return skillsCatalog
+      if (sourceId === 'axi-skills-zh') return skillsCatalogZh
+      return catalog
+    })
+    mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
+    mocks.searchKnowledgeAll.mockResolvedValue([])
+    mocks.readKnowledgeFile.mockResolvedValue(null)
+
+    const { unmount } = render(
+      <MemoryRouter initialEntries={['/en/skills']}>
+        <App />
+      </MemoryRouter>,
+    )
+
+    await screen.findByRole('heading', { name: 'Axi Skills', level: 1 })
+    expect(mocks.getKnowledgeCatalog).toHaveBeenCalledWith('axi-skills')
+
+    unmount()
+
+    render(
+      <MemoryRouter initialEntries={['/zh/skills']}>
+        <App />
+      </MemoryRouter>,
+    )
+
+    await screen.findByRole('heading', { name: 'Axi Skills · 中文镜像', level: 1 })
+    expect(mocks.getKnowledgeCatalog).toHaveBeenCalledWith('axi-skills-zh')
+  })
+
+  it('does not silently fall back to English when the Chinese mirror is empty', async () => {
+    mocks.listKnowledgeSources.mockResolvedValue([source, skillsSource, skillsSourceZh])
+    const emptyCatalog: KnowledgeCatalog = {
+      ...skillsCatalogZh,
+      totalDocs: 0,
+      sections: [],
+      recentDocs: [],
+    }
+    mocks.getKnowledgeCatalog.mockImplementation(async (sourceId: string) => {
+      if (sourceId === 'axi-skills-zh') return emptyCatalog
+      if (sourceId === 'axi-skills') return skillsCatalog
+      return catalog
+    })
+    mocks.getKnowledgeSearchSuggestions.mockResolvedValue([])
+    mocks.searchKnowledgeAll.mockResolvedValue([])
+    mocks.readKnowledgeFile.mockResolvedValue(null)
+
+    render(
+      <MemoryRouter initialEntries={['/zh/skills']}>
+        <App />
+      </MemoryRouter>,
+    )
+
+    await screen.findByRole('heading', { name: 'Axi Skills · 中文镜像', level: 1 })
+    expect(mocks.getKnowledgeCatalog).toHaveBeenCalledWith('axi-skills-zh')
+    expect(mocks.getKnowledgeCatalog).not.toHaveBeenCalledWith('axi-skills')
   })
 })

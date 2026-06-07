@@ -1,13 +1,21 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type MouseEvent } from 'react'
 import { Navigate, Route, Routes, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Header } from './components/Header'
-import { CategoryGraphPage } from './components/CategoryGraphPage'
 import { DocumentDetailPage } from './components/DocumentDetailPage'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { KnowledgeWorkbench } from './components/KnowledgeWorkbench'
-import type { DocSetId, GuideLocale, GuidePageId } from './components/HomeCommandCenter'
 import { NotFoundPage } from './components/NotFoundPage'
-import { KNOWLEDGE_CATEGORY_ORDER, getKnowledgeCategoryMeta, normalizeKnowledgeCategoryKey } from './config/knowledgeRules'
+import { getKnowledgeCategoryMeta, normalizeKnowledgeCategoryKey } from './config/knowledgeRules'
+import {
+  DEFAULT_LOCALE,
+  getDefaultGuideRoute,
+  getDocSetSourceId,
+  getSiteLocaleConfig,
+  isDocSetId,
+  isGuidePageId,
+  isSiteLocale,
+  type DocSetId,
+} from './config/siteConfig'
 import {
   getKnowledgeCatalog as loadKnowledgeCatalog,
   listKnowledgeSources as loadKnowledgeSources,
@@ -15,28 +23,20 @@ import {
   searchKnowledgeAll as searchKnowledgeDocuments,
 } from './lib/knowledgeClient'
 import {
-  buildCategoryRoute,
   buildDocumentRoute,
   decodeDocumentRoute,
-  encodeDocumentId,
-  normalizeCategoryRoute,
+  decodeDocumentId,
 } from './lib/routes'
 import { DocSource, KnowledgeCatalog, KnowledgeCatalogItem, SearchResult, SearchSuggestion, SelectedFile } from './types'
 
-type PageMode = 'home' | 'category' | 'document'
+type PageMode = 'home' | 'document'
 type ParamUpdates = Record<string, string | null | undefined>
-const GUIDE_PAGE_IDS = new Set<GuidePageId>(['what-is-axi-docs', 'getting-started', 'search', 'next-steps'])
-const GUIDE_LOCALES = new Set<GuideLocale>(['zh', 'en'])
-const DOC_SET_IDS = new Set<DocSetId>(['guide', 'skills', 'workspace'])
-const DEFAULT_GUIDE_ROUTE = '/zh/guide/getting-started'
-
-function sourceIdForDocSet(docSet: DocSetId): string {
-  if (docSet === 'skills') return 'axi-skills'
-  return 'workspace'
-}
+const DEFAULT_GUIDE_ROUTE = getDefaultGuideRoute()
 
 function docSetForSourceId(sourceId?: string | null): DocSetId {
-  if (sourceId === 'axi-skills') return 'skills'
+  if (typeof sourceId === 'string' && (sourceId === 'axi-skills' || sourceId === 'axi-skills-zh')) {
+    return 'skills'
+  }
   if (sourceId === 'workspace') return 'workspace'
   return 'guide'
 }
@@ -50,30 +50,25 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
   const params = useParams()
   const navigate = useNavigate()
   const [searchParams, setSearchParams] = useSearchParams()
-  const routeCategory = useMemo(
-    () => (pageMode === 'category' ? normalizeCategoryRoute(params.categoryId, params.subId) : null),
-    [pageMode, params.categoryId, params.subId],
-  )
   const routeDocument = useMemo(
     () => (pageMode === 'document' ? decodeDocumentRoute(params.sourceId, params['*']) : null),
     [pageMode, params],
   )
   const urlSearchQuery = searchParams.get('q') || searchParams.get('keyword') || ''
-  const routeGuideLocale = pageMode === 'home' && GUIDE_LOCALES.has(params.locale as GuideLocale)
-    ? params.locale as GuideLocale
+  const routeGuideLocale = pageMode === 'home' && isSiteLocale(params.locale)
+    ? params.locale
     : null
-  const routeGuidePageId = pageMode === 'home' && params.guideId && GUIDE_PAGE_IDS.has(params.guideId as GuidePageId)
-    ? params.guideId as GuidePageId
+  const routeGuidePageId = pageMode === 'home' && params.guideId && isGuidePageId(params.guideId)
+    ? params.guideId
     : null
-  const guideLocale = routeGuideLocale || 'zh'
+  const guideLocale = routeGuideLocale || DEFAULT_LOCALE
   const guidePageId = routeGuidePageId || 'getting-started'
-  const routeDocSet = pageMode === 'home' && params.collection && DOC_SET_IDS.has(params.collection as DocSetId)
-    ? params.collection as DocSetId
+  const routeDocSet = pageMode === 'home' && params.collection && isDocSetId(params.collection)
+    ? params.collection
     : null
   const docSet = routeDocSet || 'guide'
-  const routeDocSetSourceId = routeDocSet ? sourceIdForDocSet(routeDocSet) : null
-
   const [sources, setSources] = useState<DocSource[]>([])
+  const routeDocSetSourceId = pageMode === 'home' ? getDocSetSourceId(docSet, guideLocale, sources) : null
   const [activeSource, setActiveSource] = useState(routeDocSetSourceId || searchParams.get('source') || routeDocument?.sourceId || 'workspace')
   const [selectedFile, setSelectedFile] = useState<SelectedFile | null>(null)
   const [fileContent, setFileContent] = useState<string | null>(null)
@@ -88,8 +83,16 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
   const [catalogError, setCatalogError] = useState<string | null>(null)
   const abortRef = useRef<AbortController | null>(null)
   const searchAbortRef = useRef<AbortController | null>(null)
+  const localeConfig = useMemo(() => getSiteLocaleConfig(guideLocale), [guideLocale])
+  const appCopy = localeConfig.ui
 
-  const effectiveSelectedFile = pageMode === 'document' ? routeDocument : selectedFile
+  const guideRouteFile = useMemo<SelectedFile | null>(
+    () => pageMode === 'home' && docSet === 'guide' && routeDocSetSourceId
+      ? { sourceId: routeDocSetSourceId, path: `guide/${guidePageId}.md` }
+      : null,
+    [docSet, guidePageId, pageMode, routeDocSetSourceId],
+  )
+  const effectiveSelectedFile = pageMode === 'document' ? routeDocument : guideRouteFile || selectedFile
   const currentSource = useMemo(
     () => sources.find((source) => source.id === activeSource) || null,
     [activeSource, sources],
@@ -132,11 +135,6 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
       search: search ? `?${search}` : '',
     }
   }, [searchParams])
-
-  const buildHref = useCallback((pathname: string, updates?: ParamUpdates) => {
-    const location = buildLocation(pathname, updates)
-    return `${location.pathname}${location.search}`
-  }, [buildLocation])
 
   const navigateWithParams = useCallback((pathname: string, updates?: ParamUpdates, replace = false) => {
     navigate(buildLocation(pathname, updates), { replace })
@@ -252,6 +250,12 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
   }, [fetchSources])
 
   useEffect(() => {
+    document.documentElement.lang = localeConfig.lang
+    document.documentElement.dir = localeConfig.dir
+    document.title = localeConfig.title
+  }, [localeConfig])
+
+  useEffect(() => {
     if (urlSearchQuery !== searchQuery) setSearchQuery(urlSearchQuery)
     if ((searchParams.get('tag') || null) !== activeTag) setActiveTag(searchParams.get('tag'))
     const sourceFromUrl = searchParams.get('source')
@@ -265,14 +269,14 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
   }, [activeSource, activeTag, routeDocSetSourceId, searchParams, searchQuery, urlSearchQuery])
 
   useEffect(() => {
-    if (!routeDocSet) return
+    if (pageMode !== 'home') return
     if (!searchParams.has('source') && !searchParams.has('doc')) return
 
     const next = new URLSearchParams(searchParams)
     next.delete('source')
     next.delete('doc')
     setSearchParams(next, { replace: true })
-  }, [routeDocSet, searchParams, setSearchParams])
+  }, [pageMode, searchParams, setSearchParams])
 
   useEffect(() => {
     if (!effectiveSelectedFile) {
@@ -310,16 +314,6 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
       : null,
     [catalogItems, effectiveSelectedFile],
   )
-  const defaultCategoryKey = useMemo(() => {
-    const explicitCategory = routeCategory
-      || normalizeKnowledgeCategoryKey(selectedCatalogItem?.categories?.[0] || '')
-      || normalizeKnowledgeCategoryKey(catalog?.sections[0]?.key || '')
-    return explicitCategory || KNOWLEDGE_CATEGORY_ORDER[0]
-  }, [catalog?.sections, routeCategory, selectedCatalogItem?.categories])
-  const categorySection = useMemo(
-    () => routeCategory ? catalog?.sections.find((section) => section.key === routeCategory) || null : null,
-    [catalog?.sections, routeCategory],
-  )
   const relatedItems = useMemo(() => {
     if (!selectedCatalogItem) return []
     const primaryCategory = normalizeKnowledgeCategoryKey(selectedCatalogItem.categories[0] || '')
@@ -334,18 +328,8 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
     return catalog?.sections.find((section) => section.key === primaryCategory)?.items.slice(0, 10) || []
   }, [catalog?.sections, selectedCatalogItem?.categories])
   const documentSidebarSections = useMemo(() => {
-    const sections = catalog?.sections || []
-    const primarySections = sections.slice(0, 4)
-    const selectedSection = selectedCatalogItem
-      ? sections.find((section) => section.items.some((item) => item.sourceId === selectedCatalogItem.sourceId && item.path === selectedCatalogItem.path))
-      : null
-
-    if (!selectedSection || primarySections.some((section) => section.key === selectedSection.key)) {
-      return primarySections
-    }
-
-    return [...primarySections, selectedSection]
-  }, [catalog?.sections, selectedCatalogItem])
+    return catalog?.sections || []
+  }, [catalog?.sections])
   const handleNavigateHome = useCallback(() => {
     navigateWithParams(DEFAULT_GUIDE_ROUTE, {
       q: null,
@@ -359,21 +343,20 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
   }, [navigateWithParams])
 
   const handleNavigateCategory = useCallback(() => {
-    const targetSource = workspaceSource?.id || 'obsidian'
     navigateWithParams(
-      buildCategoryRoute(defaultCategoryKey),
+      docSet === 'guide' ? `/${guideLocale}/workspace` : `/${guideLocale}/${docSet}`,
       {
-        source: targetSource,
+        source: null,
         q: null,
         keyword: null,
         tag: null,
         doc: null,
         branch: null,
         node: null,
-        view: 'tree',
+        view: null,
       },
     )
-  }, [defaultCategoryKey, navigateWithParams, workspaceSource?.id])
+  }, [docSet, guideLocale, navigateWithParams])
 
   const handleOpenDocument = useCallback((sourceId: string, path: string) => {
     navigateWithParams(
@@ -387,19 +370,6 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
       },
     )
   }, [navigateWithParams])
-
-  const handlePreviewCategoryItem = useCallback((sourceId: string, path: string) => {
-    const nextFile = { sourceId, path }
-    setSelectedFile(nextFile)
-    if (sourceId !== activeSource) {
-      setActiveSource(sourceId)
-    }
-    syncParams({
-      source: sourceId,
-      doc: encodeDocumentId(nextFile),
-      node: path,
-    }, false)
-  }, [activeSource, syncParams])
 
   const handleClearSelectedFile = useCallback(() => {
     setSelectedFile(null)
@@ -480,58 +450,11 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
     handleSearch(noteName)
   }, [activeSource, guideLocale, handleSearch, navigateWithParams, pageMode])
 
-  const invalidCategoryRoute = pageMode === 'category' && !routeCategory
   const invalidGuideRoute = pageMode === 'home' && docSet === 'guide' && (!routeGuideLocale || !routeGuidePageId)
   const invalidDocSetRoute = pageMode === 'home' && Boolean(params.collection) && (!routeGuideLocale || !routeDocSet)
   const activeHeaderDocSet = pageMode === 'document' ? docSetForSourceId(routeDocument?.sourceId) : docSet
   const documentCategoryKey = normalizeKnowledgeCategoryKey(selectedCatalogItem?.categories[0] || '')
   const documentCategoryMeta = documentCategoryKey ? getKnowledgeCategoryMeta(documentCategoryKey) : null
-  const categoryTargetSource = workspaceSource?.id || 'obsidian'
-  const homeHref = useMemo(() => buildHref(DEFAULT_GUIDE_ROUTE, {
-    q: null,
-    keyword: null,
-    tag: null,
-    doc: null,
-    branch: null,
-    node: null,
-    view: null,
-  }), [buildHref])
-  const categoryHref = useMemo(() => buildHref(
-    buildCategoryRoute(defaultCategoryKey),
-    {
-      source: categoryTargetSource,
-      q: null,
-      keyword: null,
-      tag: null,
-      doc: null,
-      branch: null,
-      node: null,
-      view: 'tree',
-    },
-  ), [buildHref, categoryTargetSource, defaultCategoryKey])
-  const getDocumentHref = useCallback((sourceId: string, path: string) => buildDocumentRoute({ sourceId, path }), [])
-  const getCategoryHref = useCallback((route: string) => buildHref(route, {
-    source: categoryTargetSource,
-    doc: null,
-    node: null,
-    branch: null,
-    view: 'tree',
-  }), [buildHref, categoryTargetSource])
-  const documentGraphHref = useMemo(() => {
-    if (!effectiveSelectedFile) return categoryHref
-
-    return buildHref(
-      buildCategoryRoute(documentCategoryKey || defaultCategoryKey),
-      {
-        source: effectiveSelectedFile.sourceId,
-        doc: encodeDocumentId(effectiveSelectedFile),
-        node: effectiveSelectedFile.path,
-        branch: null,
-        view: 'tree',
-      },
-    )
-  }, [buildHref, categoryHref, defaultCategoryKey, documentCategoryKey, effectiveSelectedFile])
-
   const handleSkipToMain = useCallback((event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault()
     const main = document.getElementById('app-main-content')
@@ -543,7 +466,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
   return (
     <div className={`app-layout app-layout--${pageMode}`}>
       <a className="skip-link" href="#app-main-content" onClick={handleSkipToMain}>
-        跳到主内容
+        {appCopy.skipToContent}
       </a>
       <Header
         activeDocSet={activeHeaderDocSet}
@@ -559,20 +482,11 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
           <ErrorBoundary>
             {invalidGuideRoute || invalidDocSetRoute ? (
               <NotFoundPage
-                description="当前文档路径不存在。Axi Docs 只提供 /zh/guide/*、/zh/skills、/zh/workspace 这类语言化文档集路径。"
+                description={appCopy.notFound.invalidDocSetDescription}
                 onPrimaryAction={handleNavigateHome}
                 onSecondaryAction={handleNavigateCategory}
-                title="文档页面不存在"
+                title={appCopy.notFound.invalidDocSet}
               />
-            ) : invalidCategoryRoute ? (
-              <div className="workspace-empty-state">
-                <div className="workspace-empty-state__eyebrow">Category Route</div>
-                <h2>当前分类路由不存在</h2>
-                <p>请返回首页重新选择知识分类，或检查链接中的分类标识是否正确。</p>
-                <button className="workspace-empty-state__action" onClick={handleNavigateHome}>
-                  返回首页
-                </button>
-              </div>
             ) : pageMode === 'document' ? (
               effectiveSelectedFile ? (
                 <DocumentDetailPage
@@ -583,7 +497,6 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
                   fileContent={fileContent}
                   fileLoading={loading}
                   fileName={fileName}
-                  graphHref={documentGraphHref}
                   onTagSelect={handleTagSelect}
                   onWikiLink={handleWikiLink}
                   relatedItems={relatedItems}
@@ -593,42 +506,11 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
                 />
               ) : (
                 <NotFoundPage
-                  description="当前文档链接无法解析到有效内容。你可以返回首页重新打开文档，或通过顶部搜索重新定位知识点。"
+                  description={appCopy.notFound.invalidDocumentDescription}
                   onPrimaryAction={handleNavigateHome}
                   onSecondaryAction={handleNavigateCategory}
-                  title="文档不存在或链接已失效"
+                  title={appCopy.notFound.invalidDocument}
                 />
-              )
-            ) : pageMode === 'category' ? (
-              workspaceSource ? (
-                <CategoryGraphPage
-                  activeTag={activeTag}
-                  catalog={catalog}
-                  categorySection={categorySection}
-                  fileContent={fileContent}
-                  fileLoading={loading}
-                  fileName={fileName}
-                  getCategoryHref={getCategoryHref}
-                  getDocumentHref={getDocumentHref}
-                  homeHref={homeHref}
-                  onBranchChange={(branch) => syncParams({ view: searchParams.get('view') || 'tree', branch, node: searchParams.get('node') }, false)}
-                  onNodeChange={(node) => syncParams({ view: searchParams.get('view') || 'tree', branch: searchParams.get('branch'), node }, false)}
-                  onOpenItem={handleOpenDocument}
-                  onPreviewItem={handlePreviewCategoryItem}
-                  onTagSelect={handleTagSelect}
-                  onViewChange={(view) => syncParams({ view, branch: searchParams.get('branch'), node: searchParams.get('node') }, false)}
-                  onWikiLink={handleWikiLink}
-                  searchQuery={searchQuery}
-                  selectedBranch={searchParams.get('branch')}
-                  selectedFile={selectedFile}
-                  selectedNodeId={searchParams.get('node')}
-                  source={workspaceSource}
-                  view={((searchParams.get('view') === 'path' || searchParams.get('view') === 'islands')
-                    ? searchParams.get('view')
-                    : 'tree') as 'tree' | 'path' | 'islands'}
-                />
-              ) : (
-                <div className="loading"><div className="spinner" /></div>
               )
             ) : workspaceSource ? (
               <KnowledgeWorkbench
@@ -674,13 +556,38 @@ function RouteFallback() {
   return (
     <div className="standalone-route">
       <NotFoundPage
-        description="当前页面路径没有匹配到任何文档页面。请返回首页重新定位内容。"
+        description={getSiteLocaleConfig(DEFAULT_LOCALE).ui.notFound.fallbackDescription}
         onPrimaryAction={() => navigate('/')}
         onSecondaryAction={() => navigate('/')}
-        title="页面不存在"
+        title={getSiteLocaleConfig(DEFAULT_LOCALE).ui.notFound.fallback}
       />
     </div>
   )
+}
+
+function docSetRouteForSource(sourceId: string | null): string {
+  if (sourceId === 'axi-skills') return '/en/skills'
+  if (sourceId === 'axi-skills-zh') return '/zh/skills'
+  if (sourceId === 'workspace') return '/zh/workspace'
+  return DEFAULT_GUIDE_ROUTE
+}
+
+function LegacyCategoryRedirect() {
+  const [searchParams] = useSearchParams()
+  const sourceId = searchParams.get('source')
+  const documentFromParam = searchParams.get('doc')
+  const node = searchParams.get('node')
+  const decodedDocument = documentFromParam ? decodeDocumentId(documentFromParam) : null
+
+  if (decodedDocument) {
+    return <Navigate replace to={buildDocumentRoute(decodedDocument)} />
+  }
+
+  if (sourceId && node && !node.startsWith('branch:') && /\//u.test(node)) {
+    return <Navigate replace to={buildDocumentRoute({ sourceId, path: node })} />
+  }
+
+  return <Navigate replace to={docSetRouteForSource(sourceId)} />
 }
 
 function App() {
@@ -689,8 +596,8 @@ function App() {
       <Route path="/" element={<Navigate replace to={DEFAULT_GUIDE_ROUTE} />} />
       <Route path="/:locale/guide/:guideId" element={<HubPage pageMode="home" />} />
       <Route path="/:locale/:collection" element={<HubPage pageMode="home" />} />
-      <Route path="/nodes/:categoryId" element={<HubPage pageMode="category" />} />
-      <Route path="/nodes/:categoryId/sub/:subId" element={<HubPage pageMode="category" />} />
+      <Route path="/nodes/:categoryId" element={<LegacyCategoryRedirect />} />
+      <Route path="/nodes/:categoryId/sub/:subId" element={<LegacyCategoryRedirect />} />
       <Route path="/docs/:sourceId/*" element={<HubPage pageMode="document" />} />
       <Route path="*" element={<RouteFallback />} />
     </Routes>

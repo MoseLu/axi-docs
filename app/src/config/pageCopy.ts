@@ -1,4 +1,5 @@
-export const pageCopy = {
+const localizedPageCopy = {
+  zh: {
   header: {
     brandPrimary: 'Axi Docs',
     brandSecondary: 'Knowledge Hub',
@@ -89,4 +90,105 @@ export const pageCopy = {
       inspectorEmpty: '点击一个节点查看路径、标签和快速操作。',
     },
   },
+  },
+  en: {
+    header: {
+      brandPrimary: 'Axi Docs',
+      brandSecondary: 'Knowledge Hub',
+      defaultContext: 'Knowledge Overview',
+      searchLabel: 'Search',
+      searchPlaceholder: 'Search tags, titles, or docs',
+      commandSearchIdle: 'Search knowledge base',
+    },
+    home: {
+      eyebrow: 'Knowledge Graph',
+      title: 'Open the knowledge graph directly',
+      description: 'The home route keeps the global relationship view first, then lets readers enter category navigation or source documents.',
+      actionPrimary: 'Open category graph',
+      actionSecondary: 'Use top search',
+      commandLabel: 'Search knowledge base',
+      commandPlaceholder: 'Search questions, components, specs, ADRs, or troubleshooting notes',
+      metrics: ['Knowledge docs', 'Experience levels', 'Frequent tags'],
+      stageLabel: 'Relationship stage',
+      stageHint: 'The home page keeps the tree-shaped 3D graph as the primary stage.',
+    },
+    results: {
+      eyebrow: 'Answers and Evidence',
+      title: 'Answer candidates and source evidence',
+      idleTitle: 'Enter evidence reading from experience layers',
+      description: 'A lighter workbench handles search results, experience layers, and source previews without competing with the first-screen graph.',
+    },
+    category: {
+      fallbackTitle: 'Category Graph',
+      fallbackDescription: 'Focus on core nodes, hierarchy, and related knowledge around the current category.',
+      railTitle: 'Category Navigation',
+      railDescription: 'The left rail switches categories and entries, the center keeps the graph stage, and node details expand on demand.',
+      nodeIntel: 'Node Intelligence',
+      summaryTab: 'Relationship Summary',
+      previewTab: 'Source Preview',
+      readingTab: 'Further Reading',
+    },
+    document: {
+      description: 'Read the full document and continue through the outline, related nodes, and recommended routes.',
+      toc: 'Outline Anchors',
+      related: 'Related Nodes',
+      intelligence: 'Document Intelligence',
+      recommendations: 'Recommendations',
+    },
+    graph: {
+      loading: 'Building knowledge graph...',
+      emptyFocus: 'Select a document before opening the focused graph.',
+      emptyFiltered: 'No nodes are available for the current filter.',
+      heroPosterTitle: 'Knowledge Relationship Stage',
+      heroPosterDescription: 'Stabilize the first-screen structure first, then load the 3D graph when idle.',
+      heroMode: 'Main Stage',
+      heroHint: 'Drag to rotate, click to focus, double-click to open evidence',
+      stageHint: 'Drag to rotate, scroll to zoom, click to focus, double-click to open evidence',
+      treePanel: 'Knowledge Tree Drawer',
+      inspectorPanel: 'Node Intelligence',
+      badges: {
+        current: 'Current document',
+        note: 'Knowledge document',
+        tag: 'Tag node',
+        branch: 'Tree branch',
+      },
+      labels: {
+        focusEyebrow: 'Document Focus',
+        globalEyebrow: 'Relationship Map',
+        treeEyebrow: 'Knowledge Tree',
+        orphanEyebrow: 'Island Radar',
+        focusTitle: 'Local Relationship Graph',
+        globalTitle: 'Global Knowledge Graph',
+        treeTitle: 'Tree Knowledge Architecture',
+        orphanTitle: 'Orphan Knowledge Distribution',
+        focusMode: 'Focus View',
+        treeMode: 'Tree View',
+        globalMode: 'Relationship View',
+        orphanMode: 'Island View',
+        documents: 'Docs',
+        links: 'Links',
+        tags: 'Tags',
+        orphans: 'Orphans',
+        searchPlaceholder: 'Filter path / tag / document name',
+        tagsToggle: 'Tags',
+        rotateToggle: 'Auto rotate',
+        clearBranch: 'Clear branch',
+        rootView: 'All docs',
+        looseDocs: 'Root docs',
+        preview: 'Preview source',
+        open: 'Open document',
+        filterByTag: 'Filter by this tag',
+        focusBranch: 'Focus this branch',
+        inspectorEmpty: 'Click a node to inspect path, tags, and quick actions.',
+      },
+    },
+  },
 } as const
+
+export type PageCopyLocale = keyof typeof localizedPageCopy
+
+export function getPageCopy(locale: string | null | undefined = 'zh') {
+  return locale === 'en' ? localizedPageCopy.en : localizedPageCopy.zh
+}
+
+export const pageCopy = localizedPageCopy.zh

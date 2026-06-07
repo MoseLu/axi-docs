@@ -3,14 +3,20 @@ import { createPortal } from 'react-dom'
 import { Link, useLocation } from 'react-router-dom'
 import { getKnowledgeSearchSuggestions } from '../lib/knowledgeClient'
 import type { SearchSuggestion } from '../types'
-import { pageCopy } from '../config/pageCopy'
+import { getPageCopy } from '../config/pageCopy'
+import {
+  buildDocSetRoute,
+  getDefaultGuideRoute,
+  getLocaleOptions,
+  getSiteLocaleConfig,
+  resolveSiteLocaleFromPath,
+  type DocSetId,
+  type SiteLocale,
+} from '../config/siteConfig'
 import { BookIcon, FileIcon, GitHubIcon, LanguageIcon, SearchIcon, TagIcon, ThemeIcon } from './Icons'
 
-type HeaderLocale = 'zh' | 'en'
-type HeaderDocSet = 'guide' | 'skills' | 'workspace'
-
 interface HeaderProps {
-  activeDocSet?: HeaderDocSet
+  activeDocSet?: DocSetId
   onSearchChange: (query: string) => void
   onSearchSubmit: (query: string) => void
   onSuggestionSelect: (suggestion: SearchSuggestion) => void
@@ -19,32 +25,25 @@ interface HeaderProps {
   searching: boolean
 }
 
-const localeOptions: Array<{ code: HeaderLocale; label: string }> = [
-  { code: 'zh', label: '简体中文' },
-  { code: 'en', label: 'English' },
-]
+const localeOptions = getLocaleOptions()
 
 function SuggestionIcon({ kind }: Pick<SearchSuggestion, 'kind'>) {
   if (kind === 'tag') return <TagIcon />
   return <FileIcon />
 }
 
-function getCurrentLocale(pathname: string): HeaderLocale {
-  return pathname.startsWith('/en/') ? 'en' : 'zh'
-}
-
-function getCurrentDocSet(pathname: string): HeaderDocSet {
+function getCurrentDocSet(pathname: string): DocSetId {
   if (/^\/(zh|en)\/skills(?:\/|$)/u.test(pathname)) return 'skills'
   if (/^\/(zh|en)\/workspace(?:\/|$)/u.test(pathname)) return 'workspace'
   return 'guide'
 }
 
-function buildLocaleHref(pathname: string, search: string, locale: HeaderLocale): string {
+function buildLocaleHref(pathname: string, search: string, locale: SiteLocale): string {
   if (/^\/(zh|en)\//u.test(pathname)) {
     return `${pathname.replace(/^\/(zh|en)\//u, `/${locale}/`)}${search}`
   }
 
-  return `/${locale}/guide/getting-started`
+  return getDefaultGuideRoute(locale)
 }
 
 export function Header({
@@ -74,11 +73,12 @@ export function Header({
   const suggestionRequestRef = useRef(0)
 
   const trimmedInput = inputValue.trim()
-  const currentLocale = getCurrentLocale(location.pathname)
+  const currentLocale = resolveSiteLocaleFromPath(location.pathname)
+  const localeConfig = getSiteLocaleConfig(currentLocale)
+  const uiCopy = localeConfig.ui.header
+  const pageCopy = getPageCopy(currentLocale)
   const currentDocSet = activeDocSet || getCurrentDocSet(location.pathname)
-  const guideHref = `/${currentLocale}/guide/getting-started`
-  const skillsHref = `/${currentLocale}/skills`
-  const workspaceHref = `/${currentLocale}/workspace`
+  const guideHref = getDefaultGuideRoute(currentLocale)
   const documentSuggestions = suggestions.filter((suggestion) => suggestion.kind === 'document')
   const tagSuggestions = suggestions.filter((suggestion) => suggestion.kind === 'tag')
 
@@ -277,9 +277,11 @@ export function Header({
   }
 
   const topNavItems = [
-    { label: '指南', to: guideHref, active: (pageMode === 'home' || pageMode === 'document') && currentDocSet === 'guide' },
-    { label: '技能库', to: skillsHref, active: (pageMode === 'home' || pageMode === 'document') && currentDocSet === 'skills' },
-    { label: '工作区', to: workspaceHref, active: (pageMode === 'home' || pageMode === 'document') && currentDocSet === 'workspace' },
+    ...localeConfig.themeConfig.nav.map((item) => ({
+      label: item.text,
+      to: buildDocSetRoute(currentLocale, item.docSet),
+      active: (pageMode === 'home' || pageMode === 'document') && currentDocSet === item.docSet,
+    })),
   ]
 
   const searchModal = searchOpen ? createPortal(
@@ -300,9 +302,9 @@ export function Header({
             aria-autocomplete="list"
             aria-controls="header-search-suggestions"
             aria-expanded={suggestions.length > 0}
-            aria-label="搜索文档或标签"
+            aria-label={uiCopy.searchInputLabel}
             className="header-search-input"
-            placeholder="搜索文档、路径、标签，或直接回车搜索"
+            placeholder={uiCopy.searchPlaceholder}
             type="text"
             value={inputValue}
             onChange={(event) => setInputValue(event.target.value)}
@@ -340,7 +342,7 @@ export function Header({
           />
           {inputValue && (
             <button
-              aria-label="清除搜索"
+              aria-label={uiCopy.clearSearch}
               className="search-clear-btn"
               onClick={clearSearch}
               type="button"
@@ -366,21 +368,21 @@ export function Header({
                 <SearchIcon />
               </span>
               <span className="header-search__suggestion-copy">
-                <strong>搜索全部：{trimmedInput}</strong>
-                <small>在首页收起式展示匹配文档</small>
+                <strong>{uiCopy.searchAllPrefix}{trimmedInput}</strong>
+                <small>{uiCopy.searchAllMeta}</small>
               </span>
             </button>
 
             {documentSuggestions.length > 0 && (
               <div className="header-search__group">
-                <span>文档</span>
+                <span>{uiCopy.documentGroup}</span>
                 {documentSuggestions.map(renderSuggestion)}
               </div>
             )}
 
             {tagSuggestions.length > 0 && (
               <div className="header-search__group">
-                <span>标签</span>
+                <span>{uiCopy.tagGroup}</span>
                 {tagSuggestions.map(renderSuggestion)}
               </div>
             )}
@@ -389,11 +391,11 @@ export function Header({
 
         <div className="header-search-modal__footer">
           <div className="header-search-modal__keys">
-            <span><kbd>↑</kbd><kbd>↓</kbd> 导航</span>
-            <span><kbd>Enter</kbd> 选择</span>
-            <span><kbd>Esc</kbd> 关闭</span>
+            <span><kbd>↑</kbd><kbd>↓</kbd> {uiCopy.navigationKeys}</span>
+            <span><kbd>Enter</kbd> {uiCopy.selectKey}</span>
+            <span><kbd>Esc</kbd> {uiCopy.closeKey}</span>
           </div>
-          <span className="header-search-modal__brand">由 Axi Knowledge 提供</span>
+          <span className="header-search-modal__brand">{uiCopy.poweredBy}</span>
         </div>
       </div>
     </div>,
@@ -402,7 +404,7 @@ export function Header({
 
   return (
     <header className="app-header app-header--command">
-      <Link aria-label="返回首页" className="app-logo" to={guideHref}>
+      <Link aria-label={uiCopy.homeAria} className="app-logo" to={guideHref}>
         <BookIcon />
         <div className="app-logo__copy">
           <span>{pageCopy.header.brandPrimary}</span>
@@ -413,7 +415,7 @@ export function Header({
         <div className="header-search header-search--global">
           <button
             aria-keyshortcuts="Meta+K Control+K"
-            aria-label="全局搜索"
+            aria-label={uiCopy.globalSearch}
             className="header-search__trigger"
             onClick={openSearch}
             type="button"
@@ -432,7 +434,7 @@ export function Header({
 
         {pageMode !== 'category' && (
           <>
-            <nav aria-label="顶部导航" className="header-vp-nav">
+            <nav aria-label={uiCopy.topNavLabel} className="header-vp-nav">
               {topNavItems.map((item) => (
                 <Link
                   key={item.label}
@@ -444,12 +446,12 @@ export function Header({
                 </Link>
               ))}
             </nav>
-            <div className="header-vp-tools" aria-label="站点工具">
+            <div className="header-vp-tools" aria-label={uiCopy.siteToolsLabel}>
               <div className="header-vp-locale" ref={localeMenuRef}>
                 <button
                   aria-expanded={localeOpen}
                   aria-haspopup="menu"
-                  aria-label="选择语言"
+                  aria-label={uiCopy.languageLabel}
                   className="header-vp-tool header-vp-tool--locale"
                   onClick={() => setLocaleOpen((current) => !current)}
                   type="button"
@@ -476,12 +478,12 @@ export function Header({
               </div>
               <span className="header-vp-separator" aria-hidden="true" />
               <button
-                aria-label={themeMode === 'dark' ? '切换浅色样式' : '切换深色样式'}
+                aria-label={themeMode === 'dark' ? uiCopy.switchToLight : uiCopy.switchToDark}
                 aria-checked={themeMode === 'dark'}
                 className={`header-vp-tool header-vp-tool--theme header-vp-theme-toggle header-vp-theme-toggle--${themeMode}`}
                 onClick={toggleThemeMode}
                 role="switch"
-                title={themeMode === 'dark' ? '切换到浅色模式' : '切换到深色模式'}
+                title={themeMode === 'dark' ? uiCopy.switchToLightTitle : uiCopy.switchToDarkTitle}
                 type="button"
               >
                 <span className="header-vp-theme-toggle__track" aria-hidden="true">
@@ -503,7 +505,7 @@ export function Header({
             </div>
             <button
               aria-expanded={navOpen}
-              aria-label={navOpen ? '关闭导航菜单' : '打开导航菜单'}
+              aria-label={navOpen ? uiCopy.closeMenu : uiCopy.openMenu}
               className={`header-vp-menu${navOpen ? ' active' : ''}`}
               onClick={() => setNavOpen((current) => !current)}
               type="button"

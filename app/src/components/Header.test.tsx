@@ -129,14 +129,14 @@ describe('Header', () => {
   it('keeps English guide chrome and offers Chinese from the locale menu', () => {
     renderHeader({ pageMode: 'home' }, '/en/guide/getting-started')
 
-    fireEvent.click(screen.getByRole('button', { name: '选择语言' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Change language' }))
 
     expect(screen.getByRole('menuitem', { name: '简体中文' })).toHaveAttribute('href', '/zh/guide/getting-started')
     expect(screen.getByRole('menuitem', { name: 'English' })).toHaveAttribute('aria-current', 'page')
-    expect(screen.getByRole('link', { name: '返回首页' })).toHaveAttribute('href', '/en/guide/getting-started')
-    expect(screen.getByRole('link', { name: '指南' })).toHaveAttribute('href', '/en/guide/getting-started')
-    expect(screen.getByRole('link', { name: '技能库' })).toHaveAttribute('href', '/en/skills')
-    expect(screen.getByRole('link', { name: '工作区' })).toHaveAttribute('href', '/en/workspace')
+    expect(screen.getByRole('link', { name: 'Return home' })).toHaveAttribute('href', '/en/guide/getting-started')
+    expect(screen.getByRole('link', { name: 'Guide' })).toHaveAttribute('href', '/en/guide/getting-started')
+    expect(screen.getByRole('link', { name: 'Skills' })).toHaveAttribute('href', '/en/skills')
+    expect(screen.getByRole('link', { name: 'Workspace' })).toHaveAttribute('href', '/en/workspace')
   })
 
   it('debounces live search updates on the search page', async () => {

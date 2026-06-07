@@ -124,6 +124,9 @@ export function KnowledgeWorkbench({
         activeSourceId={activeSourceId}
         catalog={catalog}
         docSet={docSet}
+        fileContent={fileContent}
+        fileLoading={fileLoading}
+        fileName={fileName}
         graphFocusPath={graphFocusPath}
         guideLocale={guideLocale}
         guidePageId={guidePageId}
@@ -131,6 +134,7 @@ export function KnowledgeWorkbench({
         onOpenExplorer={onNavigateExplorer}
         onOpenItem={onOpenItem}
         onTagSelect={onTagSelect}
+        onWikiLink={onWikiLink}
         searching={searching}
         searchQuery={searchQuery}
         searchResults={searchResults}

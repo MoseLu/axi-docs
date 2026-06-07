@@ -118,7 +118,19 @@
 
   .document-detail-page {
     height: auto;
+    overflow: visible;
+  }
+
+  .app-main--document {
     overflow: auto;
+  }
+
+  .document-detail-page__main,
+  .document-detail-page__reader,
+  .document-detail-page__reader .doc-layout,
+  .document-detail-page__reader .app-content {
+    height: auto;
+    overflow: visible;
   }
 
   .search-page__preview-card {
@@ -551,6 +563,52 @@
     background: rgba(0, 0, 0, 0.42);
     content: "";
   }
+
+  .cockpit-shell.axi-docs-home {
+    display: block;
+    padding: 0;
+    overflow: auto;
+  }
+
+  .axi-docs-home__sidebar {
+    display: none;
+  }
+
+  .axi-doc-nav-open .app-layout--home .header-vp-screen {
+    display: none;
+  }
+
+  .axi-doc-nav-open .axi-docs-home__sidebar {
+    position: fixed;
+    top: var(--axi-doc-vp-nav-height);
+    bottom: 0;
+    left: 0;
+    z-index: 30;
+    display: block;
+    width: calc(100vw - 64px);
+    max-width: 320px;
+    height: auto;
+    padding: 24px 24px 96px;
+    border-right: 1px solid var(--axi-doc-vp-c-divider);
+    border-bottom: 0;
+    box-shadow: 0 18px 48px rgba(0, 0, 0, 0.34);
+    overscroll-behavior: contain;
+  }
+
+  .axi-doc-nav-open .axi-docs-home::before {
+    position: fixed;
+    inset: var(--axi-doc-vp-nav-height) 0 0 0;
+    z-index: 29;
+    background: rgba(0, 0, 0, 0.42);
+    content: "";
+  }
+
+  .axi-docs-home__content {
+    width: 100%;
+    max-width: none;
+    padding: 36px 24px 64px;
+    overflow: visible;
+  }
 }
 
 @media (max-width: 620px) {
@@ -572,6 +630,16 @@
 }
 
 @media (max-width: 767px) {
+  .document-detail-page {
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .document-detail-page__main {
+    padding-right: 0;
+    padding-left: 0;
+  }
+
   .app-layout--document .app-header--command {
     height: var(--axi-doc-vp-nav-height);
     min-height: var(--axi-doc-vp-nav-height);

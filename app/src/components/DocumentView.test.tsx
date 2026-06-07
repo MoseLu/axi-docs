@@ -31,6 +31,17 @@ const englishSkillSource: DocSource = {
   locale: 'en',
 }
 
+const workspaceSource: DocSource = {
+  id: 'workspace',
+  name: 'Axi Workspace',
+  description: '工作区项目索引',
+  path: '/workspace',
+  enabled: true,
+  type: 'local',
+  kind: 'workspace-registry',
+  adapter: 'workspace',
+}
+
 describe('DocumentView', () => {
   it('keeps skill document headers focused on the title and description', () => {
     const { container } = render(
@@ -112,6 +123,45 @@ modified: 2026-06-07
     expect(skillHeader.queryByText('skills')).not.toBeInTheDocument()
     expect(skillHeader.queryByText('formatter')).not.toBeInTheDocument()
     expect(skillHeader.queryByText('2026年6月7日')).not.toBeInTheDocument()
+  })
+
+  it('keeps workspace registry document headers free of path, type, and frontmatter date chrome', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <DocumentView
+          content={`---
+title: Axi 技能库
+type: project
+modified: 2026-06-07
+---
+# Axi Skills
+
+Path: /Volumes/code/workspace/shared/axi-skills
+
+Shared version-controlled skill tree for Axi agents.`}
+          fileName="axi-skills.md"
+          loading={false}
+          onWikiLink={vi.fn()}
+          selectedFile={{
+            sourceId: 'workspace',
+            path: 'projects/axi-skills.md',
+          }}
+          showKnowledgePanel={false}
+          source={workspaceSource}
+        />
+      </MemoryRouter>,
+    )
+
+    const header = container.querySelector('.doc-header')
+    expect(header).not.toBeNull()
+
+    const workspaceHeader = within(header as HTMLElement)
+    expect(workspaceHeader.getByRole('heading', { name: 'Axi 技能库' })).toBeInTheDocument()
+    expect(workspaceHeader.queryByText('Axi Workspace')).not.toBeInTheDocument()
+    expect(workspaceHeader.queryByText('projects')).not.toBeInTheDocument()
+    expect(workspaceHeader.queryByText('project')).not.toBeInTheDocument()
+    expect(workspaceHeader.queryByText('2026年6月7日')).not.toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Axi Skills' })).toBeInTheDocument()
   })
 
   it('renders code blocks with a language label and icon copy control', () => {

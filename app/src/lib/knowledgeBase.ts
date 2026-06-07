@@ -1434,7 +1434,6 @@ function buildWorkspaceProjectDocument(source: DocSource, row: string[], updated
   const body = [
     `# ${title}`,
     '',
-    `- Path: \`${cleanPath}\``,
     `- Status: ${cleanStatus}`,
     `- Stack: ${cleanStack || 'unknown'}`,
     `- Authoritative docs: ${cleanDocs}`,
@@ -1598,8 +1597,8 @@ async function collectWorkspaceDocuments(source: DocSource): Promise<ParsedDocum
         modified: updated,
         'graph-title': 'Axi Skills',
         'graph-tags': ['项目', '技能'],
-      }) + `# Axi Skills\n\nPath: \`${axiSkillsPath}\`\n\nShared version-controlled skill tree for Axi agents.`,
-      body: `# Axi Skills\n\nPath: \`${axiSkillsPath}\`\n\nShared version-controlled skill tree for Axi agents.`,
+      }) + '# Axi Skills\n\nShared version-controlled skill tree for Axi agents.',
+      body: '# Axi Skills\n\nShared version-controlled skill tree for Axi agents.',
       frontmatter: {
         id: 'workspace-axi-skills',
         title: 'Axi Skills',

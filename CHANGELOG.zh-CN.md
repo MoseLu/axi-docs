@@ -39,6 +39,9 @@
   同步修复 `frontmatter.md` YAML 示例块里残留的 `id: axi-docs-zh-guide-search` 错字（应
   为 `axi-docs-en-guide-search`），并新增 `docs/content/README.zh-CN.md` 作为根 README
   的中文翻译副本。
+- 2026-06-08: 二次修正 `docs/content/{en,zh}/README.md` 的正文——`en/README.md` 先前被
+  误填成"英文版中文 README"（正文在英文里介绍中文内容树），现已回滚为描述英文内容树的英文
+  README；`zh/README.md` 同步重写为描述中文内容树的中文 README。
 
 ### Security
 - (无)

@@ -13,7 +13,7 @@ description: Axi Docs 的简体中文翻译目标目录。
 
 # Axi Docs 中文内容
 
-本目录是 Axi Docs 的简体中文内容树。
+本目录是 Axi Docs 的简体中文翻译树。
 
 ## 章节
 

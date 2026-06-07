@@ -359,13 +359,14 @@ export function DocumentView({
   const problem = stripDisplayEmoji((frontmatter.problem as string | undefined) || '')
   const isDaily = docType === 'daily'
   const isSkillDocument = source?.kind === 'skill-library' || docType === 'skill'
+  const hasCleanHeader = isSkillDocument || isGuideDocument || source?.kind === 'workspace-registry'
 
   return (
     <div className={`doc-layout${variant === 'panel' ? ' doc-layout--panel' : ''}${isGuideDocument ? ' doc-layout--guide' : ''}`}>
       <div className="app-content">
         {/* Document Header */}
         <div className="doc-header">
-          {!isSkillDocument && !isGuideDocument && (
+          {!hasCleanHeader && (
             <div className="doc-breadcrumb">
               <span className="breadcrumb-source">{source?.name || selectedFile.sourceId}</span>
               {selectedFile.path.split('/').slice(0, -1).map((part, i) => (
@@ -379,13 +380,13 @@ export function DocumentView({
 
           <div className="doc-title-row">
             <h1 className="doc-title">{displayTitle}</h1>
-            {!isSkillDocument && !isGuideDocument && isDaily && <span className="doc-type-badge">日记</span>}
-            {!isSkillDocument && !isGuideDocument && docType && !isDaily && <span className="doc-type-badge">{docType}</span>}
+            {!hasCleanHeader && isDaily && <span className="doc-type-badge">日记</span>}
+            {!hasCleanHeader && docType && !isDaily && <span className="doc-type-badge">{docType}</span>}
           </div>
 
           {description && <p className="doc-description">{description}</p>}
 
-          {!isSkillDocument && !isGuideDocument && (
+          {!hasCleanHeader && (
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: 6, marginBottom: 12 }}>
               {domain && <SkillBadge label="领域" value={domain} />}
               {tech && <SkillBadge label="技术" value={tech} />}

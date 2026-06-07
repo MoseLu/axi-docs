@@ -13,10 +13,10 @@ description: Source-language documentation tree for Axi Docs.
 
 # Axi Docs English Content
 
-This directory is the Simplified Chinese content tree of Axi Docs.
+This locale tree contains the English source documentation.
 
-## Directory Rules
+## Sections
 
-- `guide/` maps to `/en/guide/*`.
-- Chinese files should keep the same relative paths as `../en/`.
-- When translating, preserve the `id`, `type`, `status`, `tags`, and `graph-*` semantics from the frontmatter.
+- `guide/` contains the public guide pages that map to `/en/guide/*`.
+
+Use the same relative paths in `../zh/` when creating Simplified Chinese translations.

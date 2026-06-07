@@ -62,4 +62,46 @@ domain: Agent
     expect(skillHeader.queryByText('tmux')).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Worker 技能' })).toBeInTheDocument()
   })
+
+  it('uses the same clean header for every skill-library document even without explicit skill type', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <DocumentView
+          content={`---
+title: Formatter 结构
+description: 检查技能文档渲染结构
+modified: 2026-06-07
+---
+# Formatter
+
+正文内容`}
+          fileName="SKILL.md"
+          loading={false}
+          onWikiLink={vi.fn()}
+          selectedFile={{
+            sourceId: 'dbskill',
+            path: 'skills/formatter/SKILL.md',
+          }}
+          showKnowledgePanel={false}
+          source={{
+            ...skillSource,
+            id: 'dbskill',
+            name: 'dbskill',
+            skillRoot: 'skills',
+          }}
+        />
+      </MemoryRouter>,
+    )
+
+    const header = container.querySelector('.doc-header')
+    expect(header).not.toBeNull()
+
+    const skillHeader = within(header as HTMLElement)
+    expect(skillHeader.getByRole('heading', { name: 'Formatter 结构' })).toBeInTheDocument()
+    expect(skillHeader.getByText('检查技能文档渲染结构')).toBeInTheDocument()
+    expect(skillHeader.queryByText('dbskill')).not.toBeInTheDocument()
+    expect(skillHeader.queryByText('skills')).not.toBeInTheDocument()
+    expect(skillHeader.queryByText('formatter')).not.toBeInTheDocument()
+    expect(skillHeader.queryByText('2026年6月7日')).not.toBeInTheDocument()
+  })
 })

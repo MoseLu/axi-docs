@@ -15,6 +15,7 @@ import { TableOfContents } from './TableOfContents'
 type SidebarSectionId = string
 export type GuideLocale = SiteLocale
 export type { DocSetId, GuidePageId }
+type CatalogSection = KnowledgeCatalog['sections'][number]
 
 export interface QuickKnowledgeItemLike {
   sourceId: string
@@ -49,6 +50,38 @@ interface HomeCommandCenterProps {
   guidePageId?: GuidePageId
 }
 
+function workspaceProjectGroupKey(item: KnowledgeCatalogItem): string {
+  if (item.projectId) return item.projectId
+  const pathParts = item.path.split('/').filter(Boolean)
+  if (pathParts[0] === 'project-docs' && pathParts[1]) return pathParts[1]
+  return pathParts[0] || item.name
+}
+
+function buildWorkspaceProjectSections(section: CatalogSection | undefined): CatalogSection[] {
+  if (!section) return []
+
+  const grouped = new Map<string, { title: string, description: string, items: KnowledgeCatalogItem[] }>()
+  for (const item of section.items) {
+    const key = workspaceProjectGroupKey(item)
+    const title = item.projectTitle || item.title || key
+    const description = item.description || section.description
+    if (!grouped.has(key)) {
+      grouped.set(key, { title, description, items: [] })
+    }
+    grouped.get(key)!.items.push(item)
+  }
+
+  return [...grouped.entries()]
+    .sort((left, right) => left[1].title.localeCompare(right[1].title, 'zh-CN'))
+    .map(([key, group]) => ({
+      key: `workspace-project-${key}`,
+      title: group.title,
+      description: group.description,
+      count: group.items.length,
+      items: group.items,
+    }))
+}
+
 export function HomeCommandCenter({
   source,
   sources,
@@ -70,7 +103,8 @@ export function HomeCommandCenter({
 }: HomeCommandCenterProps) {
   const isGuideDocSet = docSet === 'guide'
   const isSkillsDocSet = docSet === 'skills'
-  const isStructuredDocSet = isSkillsDocSet || source.kind === 'workspace-registry'
+  const isWorkspaceDocSet = docSet === 'workspace' || source.kind === 'workspace-registry'
+  const isStructuredDocSet = isSkillsDocSet || isWorkspaceDocSet
   const recentProjects = catalog?.recentDocs.filter((item) => item.docType === 'project').slice(0, 5) || []
   const dbskillSource = sources.find((item) => item.id === 'dbskill')
   const primarySections = useMemo(() => {
@@ -106,6 +140,17 @@ export function HomeCommandCenter({
       })
       .filter((section) => section.items.length > 0)
   }, [catalog?.sections, isStructuredDocSet])
+  const workspaceDocumentTypeSections = isWorkspaceDocSet ? primarySections : []
+  const [selectedWorkspaceDocumentTypeKey, setSelectedWorkspaceDocumentTypeKey] = useState<string | null>(null)
+  const activeWorkspaceDocumentTypeKey = workspaceDocumentTypeSections.some((section) => section.key === selectedWorkspaceDocumentTypeKey)
+    ? selectedWorkspaceDocumentTypeKey
+    : workspaceDocumentTypeSections[0]?.key || null
+  const activeWorkspaceDocumentType = workspaceDocumentTypeSections.find((section) => section.key === activeWorkspaceDocumentTypeKey)
+  const workspaceProjectSections = useMemo(
+    () => buildWorkspaceProjectSections(activeWorkspaceDocumentType),
+    [activeWorkspaceDocumentType],
+  )
+  const navigationSections = isWorkspaceDocSet ? workspaceProjectSections : primarySections
   const featuredDocs = catalog?.recentDocs.slice(0, 4) || []
   const explicitSource = activeSourceId ? sources.find((item) => item.id === activeSourceId) || null : null
   const currentSourceName = explicitSource?.name || source.name || '当前文档库'
@@ -268,8 +313,8 @@ export function HomeCommandCenter({
           })
         ) : (
           <>
-            {primarySections.map(renderCatalogSidebarSection)}
-            {primarySections.length === 0 && (
+            {navigationSections.map(renderCatalogSidebarSection)}
+            {navigationSections.length === 0 && (
               <nav className="axi-docs-home__sidebar-section" aria-label={currentSourceName}>
                 <button aria-expanded={isSectionOpen('catalog:fallback')} className="axi-docs-home__sidebar-toggle" onClick={() => toggleSection('catalog:fallback')} type="button">
                   <span>{currentSourceName}</span>
@@ -290,6 +335,28 @@ export function HomeCommandCenter({
       </aside>
 
       <main className="axi-docs-home__content">
+        {isWorkspaceDocSet && workspaceDocumentTypeSections.length > 0 && (
+          <nav className="axi-docs-home__type-bar" aria-label={guideLocale === 'zh' ? '文档类型' : 'Document types'}>
+            <div className="axi-docs-home__type-tabs">
+              {workspaceDocumentTypeSections.map((section) => {
+                const active = section.key === activeWorkspaceDocumentTypeKey
+                return (
+                  <button
+                    key={section.key}
+                    aria-pressed={active}
+                    className={`axi-docs-home__type-tab${active ? ' active' : ''}`}
+                    onClick={() => setSelectedWorkspaceDocumentTypeKey(section.key)}
+                    title={section.description}
+                    type="button"
+                  >
+                    <span>{section.title}</span>
+                    <small>{section.count}</small>
+                  </button>
+                )
+              })}
+            </div>
+          </nav>
+        )}
         {isGuideDocSet ? (
           <article className="axi-docs-home__doc axi-docs-home__guide-reader document-detail-page__reader" id="overview">
             <DocumentView
@@ -371,9 +438,9 @@ export function HomeCommandCenter({
                   </p>
                 </div>
               )}
-              {primarySections.length > 0 && (
+              {navigationSections.length > 0 && (
                 <div className="axi-docs-home__result-list">
-                  {primarySections.map((section) => (
+                  {navigationSections.map((section) => (
                     <button
                       key={section.key}
                       onClick={() => {
@@ -384,7 +451,9 @@ export function HomeCommandCenter({
                     >
                       <strong>{section.title}</strong>
                       <span>{section.description}</span>
-                      <small>{section.count} {guideLocale === 'zh' ? '篇文档' : 'docs'}</small>
+                      <small>{isWorkspaceDocSet && activeWorkspaceDocumentType
+                        ? activeWorkspaceDocumentType.title
+                        : `${section.count} ${guideLocale === 'zh' ? '篇文档' : 'docs'}`}</small>
                     </button>
                   ))}
                 </div>

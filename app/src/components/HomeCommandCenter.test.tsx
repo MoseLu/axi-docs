@@ -364,18 +364,18 @@ describe('HomeCommandCenter', () => {
     expect(within(frontendSection).getByRole('button', { name: 'Frontend Dev' })).toBeInTheDocument()
   })
 
-  it('renders all workspace document-type sections with project subsections', () => {
-    const workspaceSections: KnowledgeCatalog['sections'] = Array.from({ length: 5 }, (_, index) => ({
+  it('renders workspace document types as a content bar crossed with project sidebar sections', () => {
+    const workspaceSections: KnowledgeCatalog['sections'] = ['README', 'TDD'].map((type, index) => ({
       key: `workspace-section-${index}`,
       title: `Workspace Type ${index}`,
-      description: `Workspace document type ${index}`,
+      description: `${type} workspace document type`,
       count: 1,
       items: [
         {
           sourceId: 'workspace',
           path: `project-docs/alpha/doc-${index}.md`,
           name: `alpha-doc-${index}`,
-          title: `Alpha Doc ${index}`,
+          title: `Alpha ${type}`,
           description: 'Project document',
           docType: 'project',
           tags: [],
@@ -397,7 +397,7 @@ describe('HomeCommandCenter', () => {
               sourceId: 'workspace',
               path: `project-docs/alpha/doc-${index}.md`,
               name: `alpha-doc-${index}`,
-              title: `Alpha Doc ${index}`,
+              title: `Alpha ${type}`,
               description: 'Project document',
               docType: 'project',
               tags: [],
@@ -430,10 +430,20 @@ describe('HomeCommandCenter', () => {
       />,
     )
 
-    expect(within(screen.getByLabelText('侧边栏导航')).getByText('Workspace Type 4')).toBeInTheDocument()
-    const firstSection = screen.getByLabelText('Workspace Type 0')
-    expect(within(firstSection).getByRole('button', { name: /Alpha Project/ })).toHaveAttribute('aria-expanded', 'false')
-    expect(within(firstSection).queryByRole('button', { name: 'Alpha Doc 0' })).not.toBeInTheDocument()
+    const documentTypes = screen.getByRole('navigation', { name: '文档类型' })
+    expect(within(documentTypes).getByRole('button', { name: /Workspace Type 0/ })).toHaveAttribute('aria-pressed', 'true')
+    expect(within(documentTypes).getByRole('button', { name: /Workspace Type 1/ })).toHaveAttribute('aria-pressed', 'false')
+
+    const sidebar = screen.getByLabelText('侧边栏导航')
+    expect(within(sidebar).queryByText('Workspace Type 0')).not.toBeInTheDocument()
+    expect(within(sidebar).getByLabelText('Alpha Project')).toBeInTheDocument()
+    expect(within(sidebar).getByRole('button', { name: 'Alpha README' })).toBeInTheDocument()
+    expect(within(sidebar).queryByRole('button', { name: 'Alpha TDD' })).not.toBeInTheDocument()
+
+    fireEvent.click(within(documentTypes).getByRole('button', { name: /Workspace Type 1/ }))
+    expect(within(documentTypes).getByRole('button', { name: /Workspace Type 1/ })).toHaveAttribute('aria-pressed', 'true')
+    expect(within(sidebar).getByRole('button', { name: 'Alpha TDD' })).toBeInTheDocument()
+    expect(within(sidebar).queryByRole('button', { name: 'Alpha README' })).not.toBeInTheDocument()
   })
 
   it('opens skill section overview cards as documents instead of the removed category graph', () => {

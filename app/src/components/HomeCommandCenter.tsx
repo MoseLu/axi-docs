@@ -185,7 +185,7 @@ export function HomeCommandCenter({
       <nav key={section.key} className="axi-docs-home__sidebar-section" aria-label={section.title}>
         <button aria-expanded={open} className="axi-docs-home__sidebar-toggle" onClick={() => toggleSection(sectionId)} type="button">
           <span>{section.title}</span>
-          <span aria-hidden="true" className="axi-docs-home__sidebar-caret">⌄</span>
+          <span aria-hidden="true" className="axi-docs-home__sidebar-caret"></span>
         </button>
         {open && (
           <div className="axi-docs-home__sidebar-items">
@@ -203,7 +203,7 @@ export function HomeCommandCenter({
                       type="button"
                     >
                       <span>{subsection.title}</span>
-                      <span aria-hidden="true" className="axi-docs-home__sidebar-caret">⌄</span>
+                      <span aria-hidden="true" className="axi-docs-home__sidebar-caret"></span>
                     </button>
                     {subsectionOpen && (
                       <div className="axi-docs-home__sidebar-subitems">
@@ -247,7 +247,7 @@ export function HomeCommandCenter({
                   type="button"
                 >
                   <span>{section.text}</span>
-                  <span aria-hidden="true" className="axi-docs-home__sidebar-caret">⌄</span>
+                  <span aria-hidden="true" className="axi-docs-home__sidebar-caret"></span>
                 </button>
                 {open && (
                   <div className="axi-docs-home__sidebar-items">
@@ -273,7 +273,7 @@ export function HomeCommandCenter({
               <nav className="axi-docs-home__sidebar-section" aria-label={currentSourceName}>
                 <button aria-expanded={isSectionOpen('catalog:fallback')} className="axi-docs-home__sidebar-toggle" onClick={() => toggleSection('catalog:fallback')} type="button">
                   <span>{currentSourceName}</span>
-                  <span aria-hidden="true" className="axi-docs-home__sidebar-caret">⌄</span>
+                  <span aria-hidden="true" className="axi-docs-home__sidebar-caret"></span>
                 </button>
                 {isSectionOpen('catalog:fallback') && (
                   <div className="axi-docs-home__sidebar-items">

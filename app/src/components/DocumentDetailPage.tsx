@@ -136,7 +136,7 @@ export function DocumentDetailPage({
                 >
                   <span>{section.title}</span>
                   <span className="document-detail-page__nav-heading-meta">
-                    <span aria-hidden="true" className="document-detail-page__nav-caret">⌄</span>
+                    <span aria-hidden="true" className="document-detail-page__nav-caret"></span>
                   </span>
                 </button>
                 {open && (
@@ -156,7 +156,7 @@ export function DocumentDetailPage({
                             >
                               <span>{subsection.title}</span>
                               <span className="document-detail-page__nav-heading-meta">
-                                <span aria-hidden="true" className="document-detail-page__nav-caret">⌄</span>
+                                <span aria-hidden="true" className="document-detail-page__nav-caret"></span>
                               </span>
                             </button>
                             {subsectionOpen && (
@@ -185,7 +185,7 @@ export function DocumentDetailPage({
               <span>{categoryTitle}</span>
               <span className="document-detail-page__nav-heading-meta">
                 <small>{documentSiblings.length}</small>
-                <span aria-hidden="true" className="document-detail-page__nav-caret">⌄</span>
+                <span aria-hidden="true" className="document-detail-page__nav-caret"></span>
               </span>
             </button>
             {openSections.category && (
@@ -217,7 +217,7 @@ export function DocumentDetailPage({
               <span>相关推荐</span>
               <span className="document-detail-page__nav-heading-meta">
                 <small>{relatedItems.length}</small>
-                <span aria-hidden="true" className="document-detail-page__nav-caret">⌄</span>
+                <span aria-hidden="true" className="document-detail-page__nav-caret"></span>
               </span>
             </button>
             {openSections.related && (

@@ -179,7 +179,7 @@ html[data-axi-docs-theme='light'] .app-main--home {
 }
 
 .axi-docs-home__sidebar-section:has(.axi-docs-home__sidebar-toggle[aria-expanded='false']) {
-  padding: 0;
+  padding: 10px 0 10px;
   border-bottom: 1px solid var(--axi-doc-vp-c-divider);
 }
 
@@ -215,10 +215,29 @@ html[data-axi-docs-theme='light'] .app-main--home {
 }
 
 .axi-docs-home__sidebar-caret {
-  flex: 0 0 18px;
-  width: 18px;
-  text-align: center;
-  transition: transform 0.16s ease;
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: -4px -7px -4px 0;
+  color: var(--axi-doc-vp-c-text-3);
+  transition: transform 0.25s ease, color 0.25s ease;
+}
+
+.axi-docs-home__sidebar-caret::before {
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  content: '';
+  transform: rotate(45deg);
+}
+
+.axi-docs-home__sidebar-toggle:hover .axi-docs-home__sidebar-caret,
+.axi-docs-home__sidebar-subtoggle:hover .axi-docs-home__sidebar-caret {
+  color: var(--axi-doc-vp-c-text-2);
 }
 
 .axi-docs-home__sidebar-items {
@@ -1611,4 +1630,3 @@ html[data-axi-docs-theme='light'] .app-main--home {
 .doc-layout--panel .markdown-body blockquote {
   color: rgba(203, 213, 225, 0.82);
 }
-

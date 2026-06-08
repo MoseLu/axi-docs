@@ -562,15 +562,30 @@ html[data-axi-docs-theme='light'] .app-main--document {
   display: inline-flex;
   align-items: center;
   flex: 0 0 auto;
+  gap: 4px;
   justify-content: center;
-  width: 32px;
+  min-width: 32px;
 }
 
 .document-detail-page__nav-caret {
+  flex: 0 0 32px;
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin: -4px -7px -4px 0;
   color: var(--axi-doc-vp-c-text-3);
-  font-size: 18px;
-  line-height: 1;
-  transition: transform 0.18s ease, color 0.18s ease;
+  transition: transform 0.25s ease, color 0.25s ease;
+}
+
+.document-detail-page__nav-caret::before {
+  width: 8px;
+  height: 8px;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  content: '';
+  transform: rotate(45deg);
 }
 
 .document-detail-page__nav-heading:hover .document-detail-page__nav-caret {

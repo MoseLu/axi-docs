@@ -55,6 +55,7 @@ describe('Header', () => {
     expect(screen.getByRole('button', { name: '全局搜索' })).toBeInTheDocument()
     expect(screen.getByRole('switch', { name: '切换浅色样式' })).toHaveAttribute('title', '切换到浅色模式')
     expect(screen.getByRole('switch', { name: '切换浅色样式' })).toHaveAttribute('aria-checked', 'true')
+    expect(screen.getByTestId('moon-icon')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'GitHub' })).toHaveAttribute('href', 'https://github.com/axiomaticworld/axi-docs')
   })
 
@@ -66,6 +67,7 @@ describe('Header', () => {
     expect(document.documentElement.dataset.axiDocsTheme).toBe('light')
     expect(screen.getByRole('switch', { name: '切换深色样式' })).toHaveAttribute('title', '切换到深色模式')
     expect(screen.getByRole('switch', { name: '切换深色样式' })).toHaveAttribute('aria-checked', 'false')
+    expect(screen.getByTestId('theme-icon')).toBeInTheDocument()
   })
 
   it('temporarily suppresses search transitions while switching themes', () => {

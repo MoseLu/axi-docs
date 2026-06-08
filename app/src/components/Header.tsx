@@ -488,7 +488,7 @@ export function Header({
               >
                 <span className="header-vp-theme-toggle__track" aria-hidden="true">
                   <span className="header-vp-theme-toggle__thumb">
-                    {themeMode === 'dark' ? <ThemeIcon /> : <MoonIcon />}
+                    {themeMode === 'dark' ? <MoonIcon /> : <ThemeIcon />}
                   </span>
                 </span>
               </button>

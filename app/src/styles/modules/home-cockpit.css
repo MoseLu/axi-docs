@@ -179,7 +179,8 @@ html[data-axi-docs-theme='light'] .app-main--home {
 }
 
 .axi-docs-home__sidebar-section:has(.axi-docs-home__sidebar-toggle[aria-expanded='false']) {
-  padding-bottom: 10px;
+  padding: 0;
+  border-bottom: 1px solid var(--axi-doc-vp-c-divider);
 }
 
 .axi-docs-home__sidebar-section:last-child {

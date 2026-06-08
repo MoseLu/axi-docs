@@ -1,5 +1,6 @@
 /* ─── Loading & Empty States ────────────────────────────────────────────────── */
-.loading { display: flex; align-items: center; justify-content: center; padding: 80px; }
+.loading { display: flex; align-items: center; justify-content: center; height: 100%; padding: 80px; }
+.loading--fullscreen { position: fixed; inset: 0; }
 .spinner {
   width: var(--icon-size-xl); height: var(--icon-size-xl);
   border: 2px solid var(--color-border);

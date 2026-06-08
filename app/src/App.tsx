@@ -541,7 +541,7 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
                 sources={sources}
               />
             ) : (
-              <div className="loading"><div className="spinner" /></div>
+              <div className="loading loading--fullscreen"><div className="spinner" /></div>
             )}
           </ErrorBoundary>
         </main>

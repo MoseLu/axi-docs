@@ -62,7 +62,7 @@ export function DocumentDetailPage({
   const toggleSection = (sectionId: string) => {
     setOpenSections((current) => ({ ...current, [sectionId]: !current[sectionId] }))
   }
-  const isSectionOpen = (sectionId: string) => openSections[sectionId] ?? (source.kind === 'skill-library' && sectionId.startsWith('catalog:') ? false : true)
+  const isSectionOpen = (sectionId: string) => openSections[sectionId] ?? (sectionId.split(':').length > 2 || (source.kind === 'skill-library' && sectionId.startsWith('catalog:')) ? false : true)
   const hasDocumentSetSidebar = sidebarSections.length > 0
   const tocContent = useMemo(
     () => prepareDocumentDisplayMarkdown(fileContent || '', source, selectedFile),
@@ -123,7 +123,7 @@ export function DocumentDetailPage({
           visibleSidebarSections.map((section) => {
             const sectionId = `catalog:${section.key}`
             const open = isSectionOpen(sectionId)
-            const hasSubsections = source.kind === 'skill-library' && section.subsections && section.subsections.length > 0
+            const hasSubsections = section.subsections && section.subsections.length > 0
 
             return (
               <nav key={section.key} className="document-detail-page__nav" aria-label={section.title}>
@@ -167,7 +167,7 @@ export function DocumentDetailPage({
                           </div>
                         )
                       })
-                      : section.items.slice(0, source.kind === 'skill-library' ? section.items.length : 12).map(renderDocumentSetLink)}
+                      : section.items.slice(0, source.kind === 'skill-library' || source.kind === 'workspace-registry' ? section.items.length : 12).map(renderDocumentSetLink)}
                   </div>
                 )}
               </nav>

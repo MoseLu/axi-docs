@@ -46,6 +46,18 @@ type ParsedDocument = KnowledgeCatalogItem & {
   intakeIssues: string[]
 }
 
+type WorkspaceDocumentTypeDefinition = {
+  key: string
+  fileNames: string[]
+  title: string
+  description: string
+  itemTitleSuffix: string
+  docType: string
+  categories: string[]
+  graphTags: string[]
+  sourceTags: string[]
+}
+
 type IndexedLocalFile = {
   relativePath: string
   fullPath: string
@@ -80,6 +92,20 @@ function getGitRoot(fullPath: string): string | null {
     ? fullPath
     : path.dirname(fullPath)
   if (gitRootCache.has(startDir)) return gitRootCache.get(startDir) || null
+
+  let probeDir = startDir
+  let hasGitMetadata = false
+  while (probeDir && probeDir !== path.dirname(probeDir)) {
+    if (fs.existsSync(path.join(probeDir, '.git'))) {
+      hasGitMetadata = true
+      break
+    }
+    probeDir = path.dirname(probeDir)
+  }
+  if (!hasGitMetadata) {
+    gitRootCache.set(startDir, null)
+    return null
+  }
 
   try {
     const root = execFileSync('git', ['-C', startDir, 'rev-parse', '--show-toplevel'], {
@@ -442,6 +468,9 @@ function createVirtualParsedDocument(input: NormalizedDocument & {
   aliases?: string[]
   sourceTags?: string[]
   techStack?: string[]
+  projectId?: string
+  projectTitle?: string
+  documentTypeKey?: string
 }): ParsedDocument {
   const fileName = input.name || path.basename(input.path).replace(/\.(md|markdown)$/i, '')
   const rawTitle = input.rawTitle || input.title
@@ -478,6 +507,9 @@ function createVirtualParsedDocument(input: NormalizedDocument & {
     techStack: input.techStack || extractTechStack(input.frontmatter, sourceTags),
     updated: input.updated,
     graphTitle,
+    projectId: input.projectId,
+    projectTitle: input.projectTitle,
+    documentTypeKey: input.documentTypeKey,
     raw: input.raw,
     body: input.body,
     frontmatter,
@@ -1446,6 +1478,110 @@ type WorkspaceProjectSuiteDoc = {
   aliases?: string[]
 }
 
+const WORKSPACE_DOCUMENT_TYPE_DEFINITIONS: WorkspaceDocumentTypeDefinition[] = [
+  {
+    key: 'overview',
+    fileNames: ['README.md'],
+    title: '项目入口',
+    description: '各项目的 README 入口、范围说明和快速验证起点。',
+    itemTitleSuffix: '',
+    docType: 'project',
+    categories: ['projects'],
+    graphTags: ['项目', '入口'],
+    sourceTags: ['overview', 'readme', 'project', 'workspace'],
+  },
+  {
+    key: 'requirements',
+    fileNames: ['PRD.md'],
+    title: '需求文档 PRD',
+    description: '项目需求、用户、非目标和验收标准。',
+    itemTitleSuffix: 'PRD',
+    docType: 'prd',
+    categories: ['standards'],
+    graphTags: ['PRD', '需求'],
+    sourceTags: ['prd', 'requirements', 'project', 'workspace'],
+  },
+  {
+    key: 'technical-design',
+    fileNames: ['TDD.md'],
+    title: '技术设计 TDD',
+    description: '技术设计、架构假设、验证命令和风险用例。',
+    itemTitleSuffix: 'TDD',
+    docType: 'tdd',
+    categories: ['architecture'],
+    graphTags: ['TDD', '架构'],
+    sourceTags: ['tdd', 'technical-design', 'architecture', 'project', 'workspace'],
+  },
+  {
+    key: 'agent-guides',
+    fileNames: ['AGENTS.md'],
+    title: 'Agent 指南',
+    description: '项目级 agent 规则、边界和安全约束。',
+    itemTitleSuffix: 'Agent 指南',
+    docType: 'agent-guide',
+    categories: ['standards'],
+    graphTags: ['Agent', '规范'],
+    sourceTags: ['agents', 'agent-guide', 'standards', 'project', 'workspace'],
+  },
+  {
+    key: 'todos',
+    fileNames: ['TODO.md'],
+    title: '任务清单 TODO',
+    description: '项目待办、优先级和需求到任务的映射。',
+    itemTitleSuffix: 'TODO',
+    docType: 'todo',
+    categories: ['projects'],
+    graphTags: ['TODO', '任务'],
+    sourceTags: ['todo', 'tasks', 'project', 'workspace'],
+  },
+  {
+    key: 'milestones',
+    fileNames: ['MILESTONES.md'],
+    title: '里程碑',
+    description: '项目阶段、交付证据和退出标准。',
+    itemTitleSuffix: '里程碑',
+    docType: 'milestone',
+    categories: ['projects'],
+    graphTags: ['里程碑', '项目'],
+    sourceTags: ['milestone', 'roadmap', 'project', 'workspace'],
+  },
+  {
+    key: 'changelog',
+    fileNames: ['CHANGELOG.md'],
+    title: '变更记录',
+    description: '项目可见变更、发布历史和结构调整记录。',
+    itemTitleSuffix: 'CHANGELOG',
+    docType: 'changelog',
+    categories: ['projects'],
+    graphTags: ['变更记录', '发布'],
+    sourceTags: ['changelog', 'release-notes', 'project', 'workspace'],
+  },
+  {
+    key: 'indexes',
+    fileNames: ['INDEX.md'],
+    title: '文档索引',
+    description: '项目文档地图、阅读顺序和权威来源。',
+    itemTitleSuffix: 'INDEX',
+    docType: 'index',
+    categories: ['indexes'],
+    graphTags: ['索引', '目录'],
+    sourceTags: ['index', 'catalog', 'project', 'workspace'],
+  },
+  {
+    key: 'security',
+    fileNames: ['SECURITY.md'],
+    title: '安全策略',
+    description: '项目安全边界、凭证处理和漏洞响应规则。',
+    itemTitleSuffix: '安全策略',
+    docType: 'security',
+    categories: ['standards'],
+    graphTags: ['安全', '策略'],
+    sourceTags: ['security', 'policy', 'project', 'workspace'],
+  },
+]
+
+const WORKSPACE_DOCUMENT_TYPE_ORDER = WORKSPACE_DOCUMENT_TYPE_DEFINITIONS.map((definition) => definition.key)
+
 function parseWorkspaceProjectRow(row: string[], updated: string): WorkspaceProjectInfo | null {
   const [name, projectPath, purpose, stack, status, docs, verification, notes] = row
   if (!name || !projectPath || name === 'Project' || /^-+$/.test(name)) return null
@@ -1488,6 +1624,82 @@ function formatWorkspaceValue(value: string, fallback = '未标注'): string {
 
 function formatWorkspaceCommand(value: string): string {
   return value.trim() ? `\`${value.trim()}\`` : '未标注'
+}
+
+async function buildWorkspaceProjectRootDocuments(
+  source: DocSource,
+  project: WorkspaceProjectInfo,
+): Promise<ParsedDocument[]> {
+  const projectRoot = path.isAbsolute(project.projectPath)
+    ? project.projectPath
+    : path.resolve(project.projectPath)
+  if (!projectRoot || !fs.existsSync(projectRoot)) return []
+
+  const documents: ParsedDocument[] = []
+  for (const definition of WORKSPACE_DOCUMENT_TYPE_DEFINITIONS) {
+    const fileName = definition.fileNames.find((candidate) => fs.existsSync(path.join(projectRoot, candidate)))
+    if (!fileName) continue
+
+    const fullPath = path.join(projectRoot, fileName)
+    const stat = await fs.promises.stat(fullPath)
+    if (!stat.isFile()) continue
+
+    const raw = await fs.promises.readFile(fullPath, 'utf-8')
+    const parsed = parseMarkdownDocument(raw)
+    const frontmatter = parsed.data as Frontmatter
+    const body = parsed.content
+    const updated = normalizeDate(frontmatter.modified)
+      || normalizeDate(frontmatter.updated)
+      || stat.mtime.toISOString()
+    const rawTitle = extractRawTitle(frontmatter, body, fileName.replace(/\.md$/i, ''))
+    const title = definition.itemTitleSuffix
+      ? `${project.name} ${definition.itemTitleSuffix}`
+      : project.name
+    const sourceTags = [
+      ...definition.sourceTags,
+      ...normalizeStringArray(frontmatter.tags),
+      ...extractInlineTags(raw),
+      `project-id:${project.id}`,
+      `project-name:${project.name}`,
+      `workspace-doc-type:${definition.key}`,
+      fileName.toLowerCase(),
+    ]
+
+    documents.push(createVirtualParsedDocument({
+      sourceId: source.id,
+      path: `project-docs/${project.id}/${fileName}`,
+      name: `${project.id}-${definition.key}`,
+      title,
+      rawTitle,
+      description: extractDescription(frontmatter, body) || `${project.name} 的${definition.title}。${project.description}`,
+      docType: definition.docType,
+      status: project.status,
+      tags: [...new Set([...definition.graphTags, project.status])],
+      categories: definition.categories,
+      updated,
+      raw,
+      body,
+      frontmatter: {
+        ...frontmatter,
+        id: typeof frontmatter.id === 'string' ? frontmatter.id : `workspace-${project.id}-${definition.key}`,
+        title,
+        type: definition.docType,
+        status: project.status,
+        tags: [...new Set([...definition.graphTags, project.status])],
+        modified: updated,
+        'graph-title': title,
+        'graph-tags': definition.graphTags,
+      },
+      aliases: [project.name, rawTitle, project.projectPath, fullPath, fileName],
+      sourceTags,
+      techStack: project.stack ? project.stack.split(',').map((item) => item.trim()).filter(Boolean) : [],
+      projectId: project.id,
+      projectTitle: project.name,
+      documentTypeKey: definition.key,
+    }))
+  }
+
+  return documents
 }
 
 function buildWorkspaceProjectSuiteDefinitions(project: WorkspaceProjectInfo): WorkspaceProjectSuiteDoc[] {
@@ -1697,14 +1909,66 @@ async function collectWorkspaceDocuments(source: DocSource): Promise<ParsedDocum
     indexText = ''
   }
 
-  const projectRows = indexText
+  const workspaceProjects = indexText
     .split('\n')
     .filter((line) => line.startsWith('|') && !line.includes('| ---'))
     .map(splitMarkdownTableRow)
     .filter((row) => row.length >= 7)
-    .flatMap((row) => buildWorkspaceProjectDocuments(source, row, updated))
+    .map((row) => parseWorkspaceProjectRow(row, updated))
+    .filter((project): project is WorkspaceProjectInfo => Boolean(project))
 
-  documents.push(...projectRows)
+  for (const project of workspaceProjects) {
+    const projectRootDocuments = await buildWorkspaceProjectRootDocuments(source, project)
+    documents.push(...(projectRootDocuments.length > 0
+      ? projectRootDocuments
+      : buildWorkspaceProjectSuiteDefinitions(project).map((definition) => {
+        const documentPath = definition.suffix
+          ? `projects/${project.id}/${definition.suffix}.md`
+          : `projects/${project.id}.md`
+        const raw = buildFrontmatter({
+          id: `workspace-${project.id}${definition.suffix ? `-${definition.suffix}` : ''}`,
+          title: definition.title,
+          type: definition.docType,
+          status: project.status,
+          tags: definition.tags,
+          created: project.updated,
+          modified: project.updated,
+          'graph-title': definition.title,
+          'graph-tags': definition.graphTags,
+          stack: project.stack,
+          verification: project.verification,
+          description: definition.description,
+        }) + definition.body
+
+        return createVirtualParsedDocument({
+          sourceId: source.id,
+          path: documentPath,
+          name: definition.name,
+          title: definition.title,
+          rawTitle: definition.title,
+          description: definition.description,
+          docType: definition.docType,
+          status: project.status,
+          tags: definition.tags,
+          categories: definition.categories,
+          updated: project.updated,
+          raw,
+          body: definition.body,
+          frontmatter: parseMarkdownDocument(raw).data as Frontmatter,
+          aliases: definition.aliases || [project.name],
+          sourceTags: [
+            ...definition.sourceTags,
+            `project-id:${project.id}`,
+            `project-name:${project.name}`,
+            `workspace-doc-type:${definition.docType}`,
+          ],
+          techStack: project.stack ? project.stack.split(',').map((item) => item.trim()).filter(Boolean) : [],
+          projectId: project.id,
+          projectTitle: project.name,
+          documentTypeKey: definition.docType,
+        })
+      })))
+  }
 
   if (fs.existsSync(catalogPath)) {
     const stat = await fs.promises.stat(catalogPath)
@@ -1772,8 +2036,8 @@ async function collectWorkspaceDocuments(source: DocSource): Promise<ParsedDocum
   }
 
   const axiSkillsPath = path.resolve(workspaceRoot, 'shared', 'axi-skills')
-  if (fs.existsSync(axiSkillsPath) && !documents.some((document) => document.rawTitle === 'Axi Skills' || document.name.startsWith('axi-skills'))) {
-    documents.push(...buildWorkspaceProjectDocuments(source, [
+  if (fs.existsSync(axiSkillsPath) && !documents.some((document) => document.projectId === 'axi-skills' || document.rawTitle === 'Axi Skills' || document.name.startsWith('axi-skills'))) {
+    const axiSkillsProject = parseWorkspaceProjectRow([
       'Axi Skills',
       axiSkillsPath,
       'Axi 智能体共享技能树，用于沉淀可版本化、可复用的智能体技能入口。',
@@ -1782,7 +2046,22 @@ async function collectWorkspaceDocuments(source: DocSource): Promise<ParsedDocum
       'README.md, skills/**/SKILL.md, skills.zh/**/SKILL.md',
       'scripts/verify.py when editing skills; scripts/verify_i18n.py --all --json when editing localized mirrors',
       '工作区智能体与技能维护者使用的共享技能库。',
-    ], updated))
+    ], updated)
+    if (axiSkillsProject) {
+      const axiSkillsRootDocuments = await buildWorkspaceProjectRootDocuments(source, axiSkillsProject)
+      documents.push(...(axiSkillsRootDocuments.length > 0
+        ? axiSkillsRootDocuments
+        : buildWorkspaceProjectDocuments(source, [
+          'Axi Skills',
+          axiSkillsPath,
+          'Axi 智能体共享技能树，用于沉淀可版本化、可复用的智能体技能入口。',
+          'Markdown, Agent Skills',
+          'active',
+          'README.md, skills/**/SKILL.md, skills.zh/**/SKILL.md',
+          'scripts/verify.py when editing skills; scripts/verify_i18n.py --all --json when editing localized mirrors',
+          '工作区智能体与技能维护者使用的共享技能库。',
+        ], updated)))
+    }
   }
 
   return documents.sort((left, right) => left.title.localeCompare(right.title, 'zh-CN'))
@@ -2040,6 +2319,9 @@ function toKnowledgeCatalogItem(document: ParsedDocument): KnowledgeCatalogItem 
     techStack: [...document.techStack],
     updated: document.updated,
     graphTitle: document.graphTitle,
+    projectId: document.projectId,
+    projectTitle: document.projectTitle,
+    documentTypeKey: document.documentTypeKey,
   }
 }
 
@@ -2488,6 +2770,78 @@ function buildSkillCatalogSections(source: DocSource, documents: ParsedDocument[
   return sections
 }
 
+function compareWorkspaceProjectItems(left: KnowledgeCatalogItem, right: KnowledgeCatalogItem): number {
+  const projectOrder = (left.projectTitle || left.title).localeCompare(right.projectTitle || right.title, 'zh-CN')
+  if (projectOrder !== 0) return projectOrder
+  const leftTypeOrder = WORKSPACE_DOCUMENT_TYPE_ORDER.indexOf(left.documentTypeKey || '')
+  const rightTypeOrder = WORKSPACE_DOCUMENT_TYPE_ORDER.indexOf(right.documentTypeKey || '')
+  if (leftTypeOrder !== -1 || rightTypeOrder !== -1) {
+    if (leftTypeOrder === -1) return 1
+    if (rightTypeOrder === -1) return -1
+    return leftTypeOrder - rightTypeOrder
+  }
+  return left.title.localeCompare(right.title, 'zh-CN')
+}
+
+function buildWorkspaceCatalogSubsections(items: KnowledgeCatalogItem[]): KnowledgeCatalog['sections'][number]['subsections'] {
+  const grouped = new Map<string, { title: string, items: KnowledgeCatalogItem[] }>()
+
+  for (const item of items) {
+    const key = item.projectId || item.path.split('/')[1] || item.name
+    const title = item.projectTitle || key
+    if (!grouped.has(key)) {
+      grouped.set(key, { title, items: [] })
+    }
+    grouped.get(key)!.items.push(item)
+  }
+
+  return [...grouped.entries()]
+    .sort((left, right) => left[1].title.localeCompare(right[1].title, 'zh-CN'))
+    .map(([key, group]) => ({
+      key,
+      title: group.title,
+      description: `${group.title} 的项目文档。`,
+      count: group.items.length,
+      items: [...group.items].sort(compareWorkspaceProjectItems),
+    }))
+}
+
+function buildWorkspaceCatalogSections(documents: ParsedDocument[]): KnowledgeCatalog['sections'] {
+  const items = documents.map(toKnowledgeCatalogItem)
+  const sections = WORKSPACE_DOCUMENT_TYPE_DEFINITIONS
+    .map((definition) => {
+      const sectionItems = items
+        .filter((item) => item.documentTypeKey === definition.key)
+        .sort(compareWorkspaceProjectItems)
+      if (sectionItems.length === 0) return null
+      return {
+        key: `workspace-${definition.key}`,
+        title: definition.title,
+        description: definition.description,
+        count: sectionItems.length,
+        items: sectionItems,
+        subsections: buildWorkspaceCatalogSubsections(sectionItems),
+      }
+    })
+    .filter(Boolean) as KnowledgeCatalog['sections']
+
+  const workspaceIndexes = items
+    .filter((item) => !item.documentTypeKey)
+    .sort(compareWorkspaceProjectItems)
+  if (workspaceIndexes.length > 0) {
+    sections.push({
+      key: 'workspace-source-indexes',
+      title: '工作区索引',
+      description: 'WORKSPACE_INDEX 和治理目录等工作区级入口。',
+      count: workspaceIndexes.length,
+      items: workspaceIndexes,
+      subsections: undefined,
+    })
+  }
+
+  return sections
+}
+
 export async function getKnowledgeCatalog(sourceId: string): Promise<KnowledgeCatalog> {
   const source = getSource(sourceId)
   if (!source) {
@@ -2538,7 +2892,9 @@ export async function getKnowledgeCatalog(sourceId: string): Promise<KnowledgeCa
   const index = await getLocalSourceIndex(source)
   const sections = source.kind === 'skill-library'
     ? buildSkillCatalogSections(source, index.documents)
-    : KNOWLEDGE_CATEGORY_ORDER
+    : source.kind === 'workspace-registry'
+      ? buildWorkspaceCatalogSections(index.documents)
+      : KNOWLEDGE_CATEGORY_ORDER
       .map((key) => {
         const items = sortCatalogItems(index.documents
           .filter((document) => document.categories.includes(key))

@@ -70,11 +70,12 @@ export function HomeCommandCenter({
 }: HomeCommandCenterProps) {
   const isGuideDocSet = docSet === 'guide'
   const isSkillsDocSet = docSet === 'skills'
+  const isStructuredDocSet = isSkillsDocSet || source.kind === 'workspace-registry'
   const recentProjects = catalog?.recentDocs.filter((item) => item.docType === 'project').slice(0, 5) || []
   const dbskillSource = sources.find((item) => item.id === 'dbskill')
   const primarySections = useMemo(() => {
     const seen = new Set<string>()
-    const sourceSections = isSkillsDocSet ? catalog?.sections || [] : catalog?.sections.slice(0, 4) || []
+    const sourceSections = isStructuredDocSet ? catalog?.sections || [] : catalog?.sections.slice(0, 4) || []
 
     return sourceSections
       .map((section) => {
@@ -104,7 +105,7 @@ export function HomeCommandCenter({
         }
       })
       .filter((section) => section.items.length > 0)
-  }, [catalog?.sections, isSkillsDocSet])
+  }, [catalog?.sections, isStructuredDocSet])
   const featuredDocs = catalog?.recentDocs.slice(0, 4) || []
   const explicitSource = activeSourceId ? sources.find((item) => item.id === activeSourceId) || null : null
   const currentSourceName = explicitSource?.name || source.name || '当前文档库'
@@ -160,14 +161,14 @@ export function HomeCommandCenter({
   const toggleSection = (sectionId: SidebarSectionId) => {
     setOpenSections((current) => ({ ...current, [sectionId]: !current[sectionId] }))
   }
-  const isSectionOpen = (sectionId: SidebarSectionId) => openSections[sectionId] ?? (isSkillsDocSet ? false : true)
+  const isSectionOpen = (sectionId: SidebarSectionId) => openSections[sectionId] ?? (sectionId.split(':').length > 2 || isSkillsDocSet ? false : true)
 
   const renderCatalogSidebarSection = (section: NonNullable<KnowledgeCatalog['sections']>[number]) => {
     const sectionId = `catalog:${section.key}`
     const open = isSectionOpen(sectionId)
-    const itemLimit = isSkillsDocSet ? section.items.length : 12
+    const itemLimit = section.items.length
     const hiddenItemCount = Math.max(0, section.items.length - itemLimit)
-    const hasSubsections = isSkillsDocSet && section.subsections && section.subsections.length > 0
+    const hasSubsections = section.subsections && section.subsections.length > 0
     const renderCatalogItemButton = (item: NonNullable<KnowledgeCatalog['sections']>[number]['items'][number]) => (
       <button
         key={`${item.sourceId}:${item.path}`}

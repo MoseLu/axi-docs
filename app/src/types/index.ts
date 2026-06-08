@@ -244,6 +244,9 @@ export interface KnowledgeCatalogItem {
   techStack: string[]
   updated?: string
   graphTitle?: string
+  projectId?: string
+  projectTitle?: string
+  documentTypeKey?: string
 }
 
 export interface KnowledgeCatalogSection {

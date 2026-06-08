@@ -367,6 +367,78 @@ describe('HomeCommandCenter', () => {
     expect(within(frontendSection).getByRole('button', { name: 'Frontend Dev' })).toBeInTheDocument()
   })
 
+  it('renders all workspace document-type sections with project subsections', () => {
+    const workspaceSections: KnowledgeCatalog['sections'] = Array.from({ length: 5 }, (_, index) => ({
+      key: `workspace-section-${index}`,
+      title: `Workspace Type ${index}`,
+      description: `Workspace document type ${index}`,
+      count: 1,
+      items: [
+        {
+          sourceId: 'workspace',
+          path: `project-docs/alpha/doc-${index}.md`,
+          name: `alpha-doc-${index}`,
+          title: `Alpha Doc ${index}`,
+          description: 'Project document',
+          docType: 'project',
+          tags: [],
+          categories: ['projects'],
+          techStack: [],
+          projectId: 'alpha',
+          projectTitle: 'Alpha Project',
+          documentTypeKey: `type-${index}`,
+        },
+      ],
+      subsections: [
+        {
+          key: 'alpha',
+          title: 'Alpha Project',
+          description: 'Alpha Project docs',
+          count: 1,
+          items: [
+            {
+              sourceId: 'workspace',
+              path: `project-docs/alpha/doc-${index}.md`,
+              name: `alpha-doc-${index}`,
+              title: `Alpha Doc ${index}`,
+              description: 'Project document',
+              docType: 'project',
+              tags: [],
+              categories: ['projects'],
+              techStack: [],
+              projectId: 'alpha',
+              projectTitle: 'Alpha Project',
+              documentTypeKey: `type-${index}`,
+            },
+          ],
+        },
+      ],
+    }))
+
+    renderWithRouter(
+      <HomeCommandCenter
+        activeSourceId="workspace"
+        activeTag={null}
+        catalog={{ ...catalog, sections: workspaceSections }}
+        docSet="workspace"
+        graphFocusPath={null}
+        onClearSelectedFile={vi.fn()}
+        onOpenExplorer={vi.fn()}
+        onOpenItem={vi.fn()}
+        onTagSelect={vi.fn()}
+        searchQuery=""
+        selectedFile={null}
+        source={sources[0]}
+        sources={sources}
+      />,
+    )
+
+    expect(within(screen.getByLabelText('侧边栏导航')).getByText('Workspace Type 4')).toBeInTheDocument()
+    const firstSection = screen.getByLabelText('Workspace Type 0')
+    expect(within(firstSection).getByRole('button', { name: /Alpha Project/ })).toHaveAttribute('aria-expanded', 'false')
+    expect(within(firstSection).queryByRole('button', { name: 'Alpha Doc 0' })).not.toBeInTheDocument()
+  })
+
   it('opens skill section overview cards as documents instead of the removed category graph', () => {
     const onOpenExplorer = vi.fn()
     const onOpenItem = vi.fn()

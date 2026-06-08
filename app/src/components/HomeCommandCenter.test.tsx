@@ -189,6 +189,36 @@ describe('HomeCommandCenter', () => {
     expect(screen.queryByText('PROJECTS')).not.toBeInTheDocument()
   })
 
+  it('exposes page navigation through a narrow-screen disclosure', () => {
+    renderWithRouter(
+      <HomeCommandCenter
+        activeTag={null}
+        catalog={catalog}
+        graphFocusPath={null}
+        fileContent={zhGuideMarkdown}
+        onClearSelectedFile={vi.fn()}
+        onOpenExplorer={vi.fn()}
+        onOpenItem={vi.fn()}
+        onTagSelect={vi.fn()}
+        searchQuery=""
+        selectedFile={null}
+        source={sources[0]}
+        sources={sources}
+      />,
+    )
+
+    const toggle = screen.getByRole('button', { name: '页面导航' })
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.queryByRole('region', { name: '移动页面导航' })).not.toBeInTheDocument()
+
+    fireEvent.click(toggle)
+    expect(toggle).toHaveAttribute('aria-expanded', 'true')
+
+    const mobileOutline = screen.getByRole('region', { name: '移动页面导航' })
+    expect(within(mobileOutline).getByRole('button', { name: '启动本地站点' })).toBeInTheDocument()
+    expect(within(mobileOutline).getByText('未锁定来源')).toBeInTheDocument()
+  })
+
   it('renders a nav-level skills document set with its own sidebar pages', () => {
     const onOpenItem = vi.fn()
     renderWithRouter(

@@ -193,6 +193,7 @@ export function HomeCommandCenter({
     [isWorkspaceDocSet, primarySections],
   )
   const [selectedWorkspaceDocumentTypeKey, setSelectedWorkspaceDocumentTypeKey] = useState<string | null>(null)
+  const [mobileOutlineOpen, setMobileOutlineOpen] = useState(false)
   const activeWorkspaceDocumentTypeKey = workspaceDocumentTypeSections.some((section) => section.key === selectedWorkspaceDocumentTypeKey)
     ? selectedWorkspaceDocumentTypeKey
     : workspaceDocumentTypeSections[0]?.key || null
@@ -340,6 +341,38 @@ export function HomeCommandCenter({
     )
   }
 
+  const renderOutlineContent = () => (
+    isGuideDocSet ? (
+      <div className="axi-docs-home__outline-card axi-docs-home__outline-card--toc">
+        <TableOfContents
+          content={fileContent || ''}
+          headingRootSelector=".axi-docs-home__guide-reader .doc-body"
+          label={homeCopy.pageNavigation}
+          scrollContainerSelector=".axi-docs-home__content"
+        />
+      </div>
+    ) : (
+      <div className="axi-docs-home__outline-card">
+        <span className="axi-docs-home__nav-label">{homeCopy.pageNavigation}</span>
+        <a href="#doc-set-overview">{guideLocale === 'zh' ? '文档集概览' : 'Docs Overview'}</a>
+        {featuredDocs.length > 0 && <a href="#recent-docs">{guideLocale === 'zh' ? '最近更新' : 'Recent Updates'}</a>}
+      </div>
+    )
+  )
+
+  const renderSourceOutlineContent = () => (
+    <div className="axi-docs-home__outline-card">
+      <span className="axi-docs-home__nav-label">{explicitSource ? homeCopy.currentSource : homeCopy.docSources}</span>
+      <strong>{explicitSource ? currentSourceName : homeCopy.unlockedSource}</strong>
+      <p>
+        {explicitSource
+          ? explicitSource.description || '当前文档集已经接入 Axi Docs。'
+          : homeCopy.defaultSourceHint}
+      </p>
+      {explicitSource && recentProjects.length > 0 && <small>{recentProjects.length} 个近期项目入口</small>}
+    </div>
+  )
+
   return (
     <PageShell className={`axi-docs-home${isWorkspaceDocSet ? ' axi-docs-home--workspace' : ''}`} compact>
       <aside className="axi-docs-home__sidebar" aria-label={homeCopy.sidebarLabel}>
@@ -398,6 +431,29 @@ export function HomeCommandCenter({
       </aside>
 
       <main className="axi-docs-home__content">
+        <div className="axi-docs-home__mobile-outline">
+          <button
+            aria-controls="axi-docs-mobile-page-navigation"
+            aria-expanded={mobileOutlineOpen}
+            className="axi-docs-home__mobile-outline-toggle"
+            onClick={() => setMobileOutlineOpen((open) => !open)}
+            type="button"
+          >
+            <span>{homeCopy.pageNavigation}</span>
+            <span aria-hidden="true" className="axi-docs-home__mobile-outline-caret"></span>
+          </button>
+          {mobileOutlineOpen && (
+            <div
+              aria-label={guideLocale === 'zh' ? '移动页面导航' : 'Mobile page navigation'}
+              className="axi-docs-home__mobile-outline-panel"
+              id="axi-docs-mobile-page-navigation"
+              role="region"
+            >
+              {renderOutlineContent()}
+              {renderSourceOutlineContent()}
+            </div>
+          )}
+        </div>
         {isWorkspaceDocSet && workspaceDocumentTypeSections.length > 0 && (
           <nav className="axi-docs-home__type-bar" aria-label={guideLocale === 'zh' ? '文档类型' : 'Document types'}>
             <div className="axi-docs-home__type-tabs">
@@ -540,33 +596,8 @@ export function HomeCommandCenter({
       </main>
 
       <aside className="axi-docs-home__outline" aria-label={homeCopy.outlineLabel}>
-        {isGuideDocSet ? (
-          <div className="axi-docs-home__outline-card axi-docs-home__outline-card--toc">
-            <TableOfContents
-              content={fileContent || ''}
-              headingRootSelector=".axi-docs-home__guide-reader .doc-body"
-              label={homeCopy.pageNavigation}
-              scrollContainerSelector=".axi-docs-home__content"
-            />
-          </div>
-        ) : (
-          <div className="axi-docs-home__outline-card">
-            <span className="axi-docs-home__nav-label">{homeCopy.pageNavigation}</span>
-            <a href="#doc-set-overview">{guideLocale === 'zh' ? '文档集概览' : 'Docs Overview'}</a>
-            {featuredDocs.length > 0 && <a href="#recent-docs">{guideLocale === 'zh' ? '最近更新' : 'Recent Updates'}</a>}
-          </div>
-        )}
-
-        <div className="axi-docs-home__outline-card" id="sources">
-          <span className="axi-docs-home__nav-label">{explicitSource ? homeCopy.currentSource : homeCopy.docSources}</span>
-          <strong>{explicitSource ? currentSourceName : homeCopy.unlockedSource}</strong>
-          <p>
-            {explicitSource
-              ? explicitSource.description || '当前文档集已经接入 Axi Docs。'
-              : homeCopy.defaultSourceHint}
-          </p>
-          {explicitSource && recentProjects.length > 0 && <small>{recentProjects.length} 个近期项目入口</small>}
-        </div>
+        {renderOutlineContent()}
+        {renderSourceOutlineContent()}
       </aside>
     </PageShell>
   )

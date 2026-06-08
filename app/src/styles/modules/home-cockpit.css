@@ -782,10 +782,22 @@ html[data-axi-docs-theme='light'] .app-main--home {
 }
 
 .axi-docs-home__mobile-outline-panel {
+  position: absolute;
+  top: 48px;
+  right: 0;
+  left: 0;
+  z-index: 2;
   display: grid;
   gap: 0;
-  padding: 8px 0 14px;
-  border-top: 1px solid var(--axi-doc-vp-c-divider);
+  max-height: min(calc(100vh - var(--axi-doc-vp-nav-height) - 48px - 24px), 440px);
+  padding: 8px 32px 14px;
+  border: 1px solid var(--axi-doc-vp-c-border);
+  border-right: 0;
+  border-left: 0;
+  border-radius: 0 0 8px 8px;
+  background: var(--axi-doc-vp-c-bg-soft);
+  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.32);
+  overflow: auto;
 }
 
 .axi-docs-home__mobile-outline-panel .axi-docs-home__outline-card {
@@ -872,6 +884,11 @@ html[data-axi-docs-theme='light'] .app-main--home {
   .axi-docs-home__mobile-outline {
     margin: -36px -24px 24px;
     padding: 0 24px;
+  }
+
+  .axi-docs-home__mobile-outline-panel {
+    padding-right: 24px;
+    padding-left: 24px;
   }
 
   .axi-docs-home--workspace .axi-docs-home__type-bar {

@@ -213,10 +213,8 @@ describe('HomeCommandCenter', () => {
     expect(screen.getByRole('heading', { name: 'Axi Skills', level: 1 })).toBeInTheDocument()
     expect(within(screen.getByLabelText('侧边栏导航')).getByText('Frontend')).toBeInTheDocument()
     const frontendSection = screen.getByLabelText('Frontend')
-    const frontendToggle = within(frontendSection).getByRole('button', { name: /Frontend/ })
-    expect(frontendToggle).toHaveAttribute('aria-expanded', 'false')
-    expect(within(frontendSection).queryByRole('button', { name: 'Frontend Dev' })).not.toBeInTheDocument()
-    fireEvent.click(frontendToggle)
+    const frontendToggle = within(frontendSection).getByRole('button', { name: /^Frontend$/ })
+    expect(frontendToggle).toHaveAttribute('aria-expanded', 'true')
     expect(within(frontendSection).getByRole('button', { name: 'Frontend Dev' })).toHaveAttribute('title', 'Frontend workflow skill')
     expect(within(frontendSection).queryByText('Frontend workflow skill')).not.toBeInTheDocument()
     expect(within(screen.getByLabelText('侧边栏导航')).getAllByRole('button', { name: 'Frontend Dev' })).toHaveLength(1)
@@ -357,7 +355,6 @@ describe('HomeCommandCenter', () => {
     )
 
     const frontendSection = screen.getByLabelText('Frontend')
-    fireEvent.click(within(frontendSection).getByRole('button', { name: /Frontend/ }))
     const subsectionToggle = within(frontendSection).getByRole('button', { name: /组件与样式/ })
 
     expect(subsectionToggle).toHaveAttribute('aria-expanded', 'false')

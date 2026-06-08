@@ -62,7 +62,7 @@ export function DocumentDetailPage({
   const toggleSection = (sectionId: string) => {
     setOpenSections((current) => ({ ...current, [sectionId]: !current[sectionId] }))
   }
-  const isSectionOpen = (sectionId: string) => openSections[sectionId] ?? (sectionId.split(':').length > 2 || (source.kind === 'skill-library' && sectionId.startsWith('catalog:')) ? false : true)
+  const isSectionOpen = (sectionId: string) => openSections[sectionId] ?? (sectionId.split(':').length <= 2)
   const hasDocumentSetSidebar = sidebarSections.length > 0
   const tocContent = useMemo(
     () => prepareDocumentDisplayMarkdown(fileContent || '', source, selectedFile),

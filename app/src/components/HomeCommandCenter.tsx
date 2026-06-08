@@ -161,7 +161,7 @@ export function HomeCommandCenter({
   const toggleSection = (sectionId: SidebarSectionId) => {
     setOpenSections((current) => ({ ...current, [sectionId]: !current[sectionId] }))
   }
-  const isSectionOpen = (sectionId: SidebarSectionId) => openSections[sectionId] ?? (sectionId.split(':').length > 2 || isSkillsDocSet ? false : true)
+  const isSectionOpen = (sectionId: SidebarSectionId) => openSections[sectionId] ?? (sectionId.split(':').length <= 2)
 
   const renderCatalogSidebarSection = (section: NonNullable<KnowledgeCatalog['sections']>[number]) => {
     const sectionId = `catalog:${section.key}`

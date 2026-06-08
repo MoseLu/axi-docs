@@ -202,10 +202,7 @@ describe('DocumentDetailPage', () => {
 
     const section = screen.getByLabelText('Agent 编排与协作')
     const toggle = within(section).getByRole('button', { name: /Agent 编排与协作/ })
-    expect(toggle).toHaveAttribute('aria-expanded', 'false')
-    expect(within(section).queryByRole('link', { name: '条目 14' })).not.toBeInTheDocument()
-
-    fireEvent.click(toggle)
+    expect(toggle).toHaveAttribute('aria-expanded', 'true')
     expect(within(section).getByRole('link', { name: '条目 14' })).toBeInTheDocument()
   })
 
@@ -267,7 +264,6 @@ describe('DocumentDetailPage', () => {
     )
 
     const section = screen.getByLabelText('Agent 编排与协作')
-    fireEvent.click(within(section).getByRole('button', { name: /Agent 编排与协作/ }))
     const subsection = within(section).getByRole('button', { name: /团队与子代理/ })
 
     expect(subsection).toHaveAttribute('aria-expanded', 'false')

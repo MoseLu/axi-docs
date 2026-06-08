@@ -77,6 +77,7 @@ export function Header({
   const localeConfig = getSiteLocaleConfig(currentLocale)
   const uiCopy = localeConfig.ui.header
   const pageCopy = getPageCopy(currentLocale)
+  const mobileMenuLabel = currentLocale === 'zh' ? '菜单' : 'Menu'
   const currentDocSet = activeDocSet || getCurrentDocSet(location.pathname)
   const guideHref = getDefaultGuideRoute(currentLocale)
   const documentSuggestions = suggestions.filter((suggestion) => suggestion.kind === 'document')
@@ -510,9 +511,12 @@ export function Header({
               onClick={() => setNavOpen((current) => !current)}
               type="button"
             >
-              <span />
-              <span />
-              <span />
+              <span className="header-vp-menu__icon" aria-hidden="true">
+                <span />
+                <span />
+                <span />
+              </span>
+              <span className="header-vp-menu__label">{mobileMenuLabel}</span>
             </button>
           </>
         )}

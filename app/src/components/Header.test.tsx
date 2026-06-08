@@ -103,6 +103,13 @@ describe('Header', () => {
     expect(screen.queryByText('简体中文')).not.toBeInTheDocument()
   })
 
+  it('keeps a visible mobile menu label for the narrow docs utility row', () => {
+    renderHeader({ pageMode: 'home' }, '/zh/guide/getting-started')
+
+    expect(screen.getByRole('button', { name: '打开导航菜单' })).toBeInTheDocument()
+    expect(screen.getByText('菜单')).toBeInTheDocument()
+  })
+
   it('keeps the guide nav active even when a stale source query is present', () => {
     renderHeader({ pageMode: 'home' }, '/zh/guide/getting-started?source=obsidian')
 

@@ -364,52 +364,129 @@ describe('HomeCommandCenter', () => {
     expect(within(frontendSection).getByRole('button', { name: 'Frontend Dev' })).toBeInTheDocument()
   })
 
-  it('renders workspace document types as a content bar crossed with project sidebar sections', () => {
+  it('renders workspace project labels from localized overview titles', () => {
+    const workspaceSections: KnowledgeCatalog['sections'] = [
+      {
+        key: 'workspace-overview',
+        title: '项目入口',
+        description: 'README workspace document type',
+        count: 2,
+        items: [
+          {
+            sourceId: 'workspace',
+            path: 'project-docs/alpha/README.md',
+            name: 'alpha-overview',
+            title: '阿尔法项目',
+            description: 'Alpha project document',
+            docType: 'project',
+            tags: [],
+            categories: ['projects'],
+            techStack: [],
+            projectId: 'alpha',
+            projectTitle: 'Alpha Project',
+            documentTypeKey: 'overview',
+          },
+          {
+            sourceId: 'workspace',
+            path: 'project-docs/beta/README.md',
+            name: 'beta-overview',
+            title: '贝塔项目',
+            description: 'Beta project document',
+            docType: 'project',
+            tags: [],
+            categories: ['projects'],
+            techStack: [],
+            projectId: 'beta',
+            projectTitle: 'Beta Project',
+            documentTypeKey: 'overview',
+          },
+        ],
+      },
+      {
+        key: 'workspace-requirements',
+        title: '需求文档 PRD',
+        description: 'PRD workspace document type',
+        count: 1,
+        items: [
+          {
+            sourceId: 'workspace',
+            path: 'project-docs/beta/PRD.md',
+            name: 'beta-prd',
+            title: '贝塔项目 PRD',
+            description: 'Beta PRD document',
+            docType: 'project',
+            tags: [],
+            categories: ['projects'],
+            techStack: [],
+            projectId: 'beta',
+            projectTitle: 'Beta Project',
+            documentTypeKey: 'requirements',
+          },
+        ],
+      },
+    ]
+
+    renderWithRouter(
+      <HomeCommandCenter
+        activeSourceId="workspace"
+        activeTag={null}
+        catalog={{ ...catalog, sections: workspaceSections }}
+        docSet="workspace"
+        graphFocusPath={null}
+        onClearSelectedFile={vi.fn()}
+        onOpenExplorer={vi.fn()}
+        onOpenItem={vi.fn()}
+        onTagSelect={vi.fn()}
+        searchQuery=""
+        selectedFile={null}
+        source={sources[0]}
+        sources={sources}
+      />,
+    )
+
+    const documentTypes = screen.getByRole('navigation', { name: '文档类型' })
+    expect(within(documentTypes).getByRole('button', { name: /项目入口/ })).toHaveAttribute('aria-pressed', 'true')
+    expect(within(documentTypes).getByRole('button', { name: /需求文档 PRD/ })).toHaveAttribute('aria-pressed', 'false')
+
+    const sidebar = screen.getByLabelText('侧边栏导航')
+    const projectLabels = () => within(sidebar)
+      .getAllByRole('navigation')
+      .map((element) => element.getAttribute('aria-label'))
+
+    expect(within(sidebar).queryByText('项目入口')).not.toBeInTheDocument()
+    expect(projectLabels()).toEqual(['阿尔法项目', '贝塔项目'])
+    expect(within(sidebar).queryByLabelText('Alpha Project')).not.toBeInTheDocument()
+    expect(within(sidebar).queryByLabelText('Beta Project')).not.toBeInTheDocument()
+
+    fireEvent.click(within(documentTypes).getByRole('button', { name: /需求文档 PRD/ }))
+    expect(within(documentTypes).getByRole('button', { name: /需求文档 PRD/ })).toHaveAttribute('aria-pressed', 'true')
+    expect(projectLabels()).toEqual(['阿尔法项目', '贝塔项目'])
+    expect(within(sidebar).getByLabelText('阿尔法项目')).toBeInTheDocument()
+    expect(within(sidebar).getByLabelText('贝塔项目')).toBeInTheDocument()
+    expect(within(sidebar).getByText('暂无需求文档 PRD')).toBeInTheDocument()
+    expect(within(sidebar).getByRole('button', { name: '贝塔项目 PRD' })).toBeInTheDocument()
+  })
+
+  it('keeps workspace project order stable when active document type item order differs', () => {
     const workspaceSections: KnowledgeCatalog['sections'] = ['README', 'TDD'].map((type, index) => ({
       key: `workspace-section-${index}`,
       title: `Workspace Type ${index}`,
       description: `${type} workspace document type`,
-      count: 1,
-      items: [
-        {
-          sourceId: 'workspace',
-          path: `project-docs/alpha/doc-${index}.md`,
-          name: `alpha-doc-${index}`,
-          title: `Alpha ${type}`,
-          description: 'Project document',
-          docType: 'project',
-          tags: [],
-          categories: ['projects'],
-          techStack: [],
-          projectId: 'alpha',
-          projectTitle: 'Alpha Project',
-          documentTypeKey: `type-${index}`,
-        },
-      ],
-      subsections: [
-        {
-          key: 'alpha',
-          title: 'Alpha Project',
-          description: 'Alpha Project docs',
-          count: 1,
-          items: [
-            {
-              sourceId: 'workspace',
-              path: `project-docs/alpha/doc-${index}.md`,
-              name: `alpha-doc-${index}`,
-              title: `Alpha ${type}`,
-              description: 'Project document',
-              docType: 'project',
-              tags: [],
-              categories: ['projects'],
-              techStack: [],
-              projectId: 'alpha',
-              projectTitle: 'Alpha Project',
-              documentTypeKey: `type-${index}`,
-            },
-          ],
-        },
-      ],
+      count: 2,
+      items: (index === 0 ? ['alpha', 'beta'] : ['beta', 'alpha']).map((projectId) => ({
+        sourceId: 'workspace',
+        path: `project-docs/${projectId}/doc-${index}.md`,
+        name: `${projectId}-doc-${index}`,
+        title: `${projectId === 'alpha' ? 'Alpha' : 'Beta'} ${type}`,
+        description: 'Project document',
+        docType: 'project',
+        tags: [],
+        categories: ['projects'],
+        techStack: [],
+        projectId,
+        projectTitle: `${projectId === 'alpha' ? 'Alpha' : 'Beta'} Project`,
+        documentTypeKey: `type-${index}`,
+      })),
     }))
 
     renderWithRouter(
@@ -431,17 +508,16 @@ describe('HomeCommandCenter', () => {
     )
 
     const documentTypes = screen.getByRole('navigation', { name: '文档类型' })
-    expect(within(documentTypes).getByRole('button', { name: /Workspace Type 0/ })).toHaveAttribute('aria-pressed', 'true')
-    expect(within(documentTypes).getByRole('button', { name: /Workspace Type 1/ })).toHaveAttribute('aria-pressed', 'false')
-
     const sidebar = screen.getByLabelText('侧边栏导航')
-    expect(within(sidebar).queryByText('Workspace Type 0')).not.toBeInTheDocument()
-    expect(within(sidebar).getByLabelText('Alpha Project')).toBeInTheDocument()
-    expect(within(sidebar).getByRole('button', { name: 'Alpha README' })).toBeInTheDocument()
-    expect(within(sidebar).queryByRole('button', { name: 'Alpha TDD' })).not.toBeInTheDocument()
+    const projectLabels = () => within(sidebar)
+      .getAllByRole('navigation')
+      .map((element) => element.getAttribute('aria-label'))
+
+    expect(projectLabels()).toEqual(['Alpha', 'Beta'])
 
     fireEvent.click(within(documentTypes).getByRole('button', { name: /Workspace Type 1/ }))
     expect(within(documentTypes).getByRole('button', { name: /Workspace Type 1/ })).toHaveAttribute('aria-pressed', 'true')
+    expect(projectLabels()).toEqual(['Alpha', 'Beta'])
     expect(within(sidebar).getByRole('button', { name: 'Alpha TDD' })).toBeInTheDocument()
     expect(within(sidebar).queryByRole('button', { name: 'Alpha README' })).not.toBeInTheDocument()
   })

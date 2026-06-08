@@ -17,6 +17,13 @@ export type GuideLocale = SiteLocale
 export type { DocSetId, GuidePageId }
 type CatalogSection = KnowledgeCatalog['sections'][number]
 
+interface WorkspaceProjectIndexEntry {
+  key: string
+  title: string
+  description: string
+  order: number
+}
+
 export interface QuickKnowledgeItemLike {
   sourceId: string
   path: string
@@ -57,29 +64,70 @@ function workspaceProjectGroupKey(item: KnowledgeCatalogItem): string {
   return pathParts[0] || item.name
 }
 
-function buildWorkspaceProjectSections(section: CatalogSection | undefined): CatalogSection[] {
-  if (!section) return []
+function normalizeWorkspaceProjectTitle(title: string): string {
+  return title
+    .replace(/\s*(?:README|PRD|TDD|TODO|INDEX|CHANGELOG|SECURITY|MILESTONES)\s*(?:文档)?$/i, '')
+    .replace(/\s*(?:需求文档|技术设计|Agent 指南|任务清单|里程碑|变更记录|文档索引|安全策略)$/i, '')
+    .trim() || title
+}
 
-  const grouped = new Map<string, { title: string, description: string, items: KnowledgeCatalogItem[] }>()
-  for (const item of section.items) {
-    const key = workspaceProjectGroupKey(item)
-    const title = item.projectTitle || item.title || key
-    const description = item.description || section.description
-    if (!grouped.has(key)) {
-      grouped.set(key, { title, description, items: [] })
+function workspaceProjectDisplayTitle(key: string, items: KnowledgeCatalogItem[], guideLocale: GuideLocale): string {
+  const overview = items.find((item) => item.documentTypeKey === 'overview' || item.path.endsWith('/README.md'))
+  if (guideLocale === 'zh') {
+    return normalizeWorkspaceProjectTitle(overview?.title || items[0]?.title || items[0]?.projectTitle || key)
+  }
+  return items[0]?.projectTitle || overview?.rawTitle || overview?.title || key
+}
+
+function buildWorkspaceProjectIndex(sections: CatalogSection[], guideLocale: GuideLocale): WorkspaceProjectIndexEntry[] {
+  const grouped = new Map<string, { description: string, items: KnowledgeCatalogItem[], order: number }>()
+  let order = 0
+
+  for (const section of sections) {
+    for (const item of section.items) {
+      const key = workspaceProjectGroupKey(item)
+      const description = item.description || section.description
+      if (!grouped.has(key)) {
+        grouped.set(key, { description, items: [], order })
+      }
+      grouped.get(key)!.items.push(item)
+      order += 1
     }
-    grouped.get(key)!.items.push(item)
   }
 
   return [...grouped.entries()]
-    .sort((left, right) => left[1].title.localeCompare(right[1].title, 'zh-CN'))
+    .sort((left, right) => left[1].order - right[1].order)
     .map(([key, group]) => ({
-      key: `workspace-project-${key}`,
-      title: group.title,
+      key,
+      title: workspaceProjectDisplayTitle(key, group.items, guideLocale),
       description: group.description,
-      count: group.items.length,
-      items: group.items,
+      order: group.order,
     }))
+}
+
+function buildWorkspaceProjectSections(projectIndex: WorkspaceProjectIndexEntry[], section: CatalogSection | undefined): CatalogSection[] {
+  const activeItemsByProject = new Map<string, KnowledgeCatalogItem[]>()
+  if (section) {
+    for (const item of section.items) {
+      const key = workspaceProjectGroupKey(item)
+      if (!activeItemsByProject.has(key)) {
+        activeItemsByProject.set(key, [])
+      }
+      activeItemsByProject.get(key)!.push(item)
+    }
+  }
+
+  return projectIndex.map((project) => {
+    const items = activeItemsByProject.get(project.key) || []
+    const description = items[0]?.description || project.description
+    return {
+      key: `workspace-project-${project.key}`,
+      title: project.title,
+      description,
+      count: items.length,
+      items,
+    }
+  })
 }
 
 export function HomeCommandCenter({
@@ -140,17 +188,29 @@ export function HomeCommandCenter({
       })
       .filter((section) => section.items.length > 0)
   }, [catalog?.sections, isStructuredDocSet])
-  const workspaceDocumentTypeSections = isWorkspaceDocSet ? primarySections : []
+  const workspaceDocumentTypeSections = useMemo(
+    () => isWorkspaceDocSet ? primarySections : [],
+    [isWorkspaceDocSet, primarySections],
+  )
   const [selectedWorkspaceDocumentTypeKey, setSelectedWorkspaceDocumentTypeKey] = useState<string | null>(null)
   const activeWorkspaceDocumentTypeKey = workspaceDocumentTypeSections.some((section) => section.key === selectedWorkspaceDocumentTypeKey)
     ? selectedWorkspaceDocumentTypeKey
     : workspaceDocumentTypeSections[0]?.key || null
   const activeWorkspaceDocumentType = workspaceDocumentTypeSections.find((section) => section.key === activeWorkspaceDocumentTypeKey)
+  const workspaceProjectIndex = useMemo(
+    () => buildWorkspaceProjectIndex(workspaceDocumentTypeSections, guideLocale),
+    [guideLocale, workspaceDocumentTypeSections],
+  )
   const workspaceProjectSections = useMemo(
-    () => buildWorkspaceProjectSections(activeWorkspaceDocumentType),
-    [activeWorkspaceDocumentType],
+    () => buildWorkspaceProjectSections(workspaceProjectIndex, activeWorkspaceDocumentType),
+    [activeWorkspaceDocumentType, workspaceProjectIndex],
+  )
+  const workspaceAvailableProjectSections = useMemo(
+    () => workspaceProjectSections.filter((section) => section.items.length > 0),
+    [workspaceProjectSections],
   )
   const navigationSections = isWorkspaceDocSet ? workspaceProjectSections : primarySections
+  const overviewSections = isWorkspaceDocSet ? workspaceAvailableProjectSections : primarySections
   const featuredDocs = catalog?.recentDocs.slice(0, 4) || []
   const explicitSource = activeSourceId ? sources.find((item) => item.id === activeSourceId) || null : null
   const currentSourceName = explicitSource?.name || source.name || '当前文档库'
@@ -214,6 +274,9 @@ export function HomeCommandCenter({
     const itemLimit = section.items.length
     const hiddenItemCount = Math.max(0, section.items.length - itemLimit)
     const hasSubsections = section.subsections && section.subsections.length > 0
+    const emptySectionTitle = isWorkspaceDocSet && activeWorkspaceDocumentType
+      ? (guideLocale === 'zh' ? `暂无${activeWorkspaceDocumentType.title}` : `No ${activeWorkspaceDocumentType.title}`)
+      : (guideLocale === 'zh' ? '浏览目录' : 'Browse Directory')
     const renderCatalogItemButton = (item: NonNullable<KnowledgeCatalog['sections']>[number]['items'][number]) => (
       <button
         key={`${item.sourceId}:${item.path}`}
@@ -267,7 +330,7 @@ export function HomeCommandCenter({
             )}
             {section.items.length === 0 && (
               <div className="axi-docs-home__nav-card" role="note">
-                <span>{guideLocale === 'zh' ? '浏览目录' : 'Browse Directory'}</span>
+                <span>{emptySectionTitle}</span>
                 <small>{section.description}</small>
               </div>
             )}
@@ -438,9 +501,9 @@ export function HomeCommandCenter({
                   </p>
                 </div>
               )}
-              {navigationSections.length > 0 && (
+              {overviewSections.length > 0 && (
                 <div className="axi-docs-home__result-list">
-                  {navigationSections.map((section) => (
+                  {overviewSections.map((section) => (
                     <button
                       key={section.key}
                       onClick={() => {

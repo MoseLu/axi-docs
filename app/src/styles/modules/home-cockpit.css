@@ -806,6 +806,11 @@ html[data-axi-docs-theme='light'] .app-main--home {
     overflow: visible;
   }
 
+  .axi-docs-home--workspace .axi-docs-home__type-bar {
+    margin-right: 0;
+    margin-left: 0;
+  }
+
   .axi-docs-home__doc h1 {
     margin-bottom: 32px;
     font-size: 30px;

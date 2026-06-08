@@ -17,6 +17,7 @@ vi.mock('./Icons', () => ({
   FileIcon: () => <span data-testid="file-icon">📄</span>,
   GitHubIcon: () => <span data-testid="github-icon">GitHub</span>,
   LanguageIcon: () => <span data-testid="language-icon">Language</span>,
+  MoonIcon: () => <span data-testid="moon-icon">Moon</span>,
   TagIcon: () => <span data-testid="tag-icon">🏷️</span>,
   ThemeIcon: () => <span data-testid="theme-icon">Theme</span>,
 }))

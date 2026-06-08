@@ -13,7 +13,7 @@ import {
   type DocSetId,
   type SiteLocale,
 } from '../config/siteConfig'
-import { BookIcon, FileIcon, GitHubIcon, LanguageIcon, SearchIcon, TagIcon, ThemeIcon } from './Icons'
+import { BookIcon, FileIcon, GitHubIcon, LanguageIcon, MoonIcon, SearchIcon, TagIcon, ThemeIcon } from './Icons'
 
 interface HeaderProps {
   activeDocSet?: DocSetId
@@ -488,7 +488,7 @@ export function Header({
               >
                 <span className="header-vp-theme-toggle__track" aria-hidden="true">
                   <span className="header-vp-theme-toggle__thumb">
-                    <ThemeIcon />
+                    {themeMode === 'dark' ? <ThemeIcon /> : <MoonIcon />}
                   </span>
                 </span>
               </button>

@@ -182,7 +182,7 @@ describe('HomeCommandCenter', () => {
     expect(within(screen.getByLabelText('侧边栏导航')).getByRole('link', { name: '快速开始' })).toHaveAttribute('href', '/zh/guide/getting-started')
     expect(within(screen.getByLabelText('侧边栏导航')).getByRole('link', { name: '什么是 Axi Docs？' })).toHaveAttribute('href', '/zh/guide/what-is-axi-docs')
     expect(within(screen.getByLabelText('页面导航')).getByRole('button', { name: '启动本地站点' })).toBeInTheDocument()
-    expect(screen.getByText('未锁定来源')).toBeInTheDocument()
+    expect(screen.queryByText('未锁定来源')).not.toBeInTheDocument()
     expect(screen.getByRole('heading', { name: '文档结构' })).toBeInTheDocument()
     expect(screen.getByRole('navigation', { name: '内容与写作' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: '下一页导航与路由' })).toHaveAttribute('href', '/zh/guide/routing')
@@ -215,8 +215,9 @@ describe('HomeCommandCenter', () => {
     expect(toggle).toHaveAttribute('aria-expanded', 'true')
 
     const mobileOutline = screen.getByRole('region', { name: '移动页面导航' })
+    expect(within(mobileOutline).getByRole('link', { name: '回到顶部' })).toHaveAttribute('href', '#overview')
     expect(within(mobileOutline).getByRole('button', { name: '启动本地站点' })).toBeInTheDocument()
-    expect(within(mobileOutline).getByText('未锁定来源')).toBeInTheDocument()
+    expect(within(mobileOutline).queryByText('未锁定来源')).not.toBeInTheDocument()
   })
 
   it('renders a nav-level skills document set with its own sidebar pages', () => {

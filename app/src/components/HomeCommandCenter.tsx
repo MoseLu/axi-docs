@@ -341,9 +341,14 @@ export function HomeCommandCenter({
     )
   }
 
-  const renderOutlineContent = () => (
+  const renderOutlineContent = ({ includeTopLink = false }: { includeTopLink?: boolean } = {}) => (
     isGuideDocSet ? (
       <div className="axi-docs-home__outline-card axi-docs-home__outline-card--toc">
+        {includeTopLink && (
+          <a className="axi-docs-home__top-link" href="#overview">
+            {guideLocale === 'zh' ? '回到顶部' : 'Return to top'}
+          </a>
+        )}
         <TableOfContents
           content={fileContent || ''}
           headingRootSelector=".axi-docs-home__guide-reader .doc-body"
@@ -360,7 +365,7 @@ export function HomeCommandCenter({
     )
   )
 
-  const renderSourceOutlineContent = () => (
+  const renderSourceOutlineContent = () => isGuideDocSet ? null : (
     <div className="axi-docs-home__outline-card">
       <span className="axi-docs-home__nav-label">{explicitSource ? homeCopy.currentSource : homeCopy.docSources}</span>
       <strong>{explicitSource ? currentSourceName : homeCopy.unlockedSource}</strong>
@@ -449,7 +454,7 @@ export function HomeCommandCenter({
               id="axi-docs-mobile-page-navigation"
               role="region"
             >
-              {renderOutlineContent()}
+              {renderOutlineContent({ includeTopLink: isGuideDocSet })}
               {renderSourceOutlineContent()}
             </div>
           )}

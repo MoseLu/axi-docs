@@ -1678,7 +1678,8 @@ html[data-axi-docs-theme='light'] .app-main--home {
   background: transparent;
 }
 
-.axi-docs-home__outline-card#sources {
+.axi-docs-home__outline-card#sources,
+.axi-docs-home__outline-card:empty {
   display: none;
 }
 
@@ -1699,7 +1700,8 @@ html[data-axi-docs-theme='light'] .app-main--home {
 
 .axi-docs-home__guide-reader.document-detail-page__reader .doc-header,
 .axi-docs-home__guide-reader.document-detail-page__reader .doc-body {
-  width: 100%;
+  width: min(100%, var(--axi-doc-vp-doc-content-width));
+  margin: 0 auto;
 }
 
 .axi-docs-home__guide-reader.document-detail-page__reader .doc-header {
@@ -1713,6 +1715,10 @@ html[data-axi-docs-theme='light'] .app-main--home {
 
 .axi-docs-home__guide-reader.document-detail-page__reader .doc-description {
   margin: 8px 0 0;
+}
+
+.axi-docs-home__top-link {
+  display: none;
 }
 
 .axi-docs-home__search-results {
@@ -1765,4 +1771,57 @@ html[data-axi-docs-theme='light'] .app-main--home {
 .axi-docs-home__outline-card--toc .toc-level-3,
 .axi-docs-home__outline-card--toc .toc-level-4 {
   padding-left: 12px;
+}
+
+@media (max-width: 1279px) {
+  .axi-docs-home__mobile-outline-panel {
+    top: 40px;
+    right: 16px;
+    left: 16px;
+    display: grid;
+    gap: 1px;
+    max-height: calc(100vh - var(--axi-doc-vp-nav-height) - 86px);
+    padding: 0;
+    border: 1px solid var(--axi-doc-vp-c-border);
+    border-radius: 8px;
+    background: var(--axi-doc-vp-c-gutter);
+    box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1), 0 2px 6px rgba(0, 0, 0, 0.08);
+    overflow: hidden auto;
+  }
+
+  .axi-docs-home__mobile-outline-panel .axi-docs-home__outline-card {
+    padding: 8px 0;
+    margin: 0;
+    border-left: 0;
+    background: var(--axi-doc-vp-c-bg-soft);
+  }
+
+  .axi-docs-home__mobile-outline-panel .axi-docs-home__outline-card--toc {
+    gap: 0;
+  }
+
+  .axi-docs-home__mobile-outline-panel .axi-docs-home__outline-card--toc .toc-header {
+    display: none;
+  }
+
+  .axi-docs-home__mobile-outline-panel .axi-docs-home__top-link {
+    display: block;
+    padding: 0 16px;
+    color: var(--axi-doc-vp-c-brand-1);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 48px;
+    text-decoration: none;
+  }
+
+  .axi-docs-home__mobile-outline-panel .toc-nav {
+    padding: 8px 0;
+  }
+
+  .axi-docs-home__mobile-outline-panel .toc-item {
+    min-height: 32px;
+    padding: 6px 16px;
+    font-size: 14px;
+    line-height: 20px;
+  }
 }

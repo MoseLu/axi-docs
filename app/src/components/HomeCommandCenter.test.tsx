@@ -404,7 +404,7 @@ describe('HomeCommandCenter', () => {
       },
       {
         key: 'workspace-requirements',
-        title: '需求文档 PRD',
+        title: '需求文档',
         description: 'PRD workspace document type',
         count: 1,
         items: [
@@ -412,7 +412,7 @@ describe('HomeCommandCenter', () => {
             sourceId: 'workspace',
             path: 'project-docs/beta/PRD.md',
             name: 'beta-prd',
-            title: '贝塔项目 PRD',
+            title: '贝塔项目 需求文档',
             description: 'Beta PRD document',
             docType: 'project',
             tags: [],
@@ -446,7 +446,8 @@ describe('HomeCommandCenter', () => {
 
     const documentTypes = screen.getByRole('navigation', { name: '文档类型' })
     expect(within(documentTypes).getByRole('button', { name: /项目入口/ })).toHaveAttribute('aria-pressed', 'true')
-    expect(within(documentTypes).getByRole('button', { name: /需求文档 PRD/ })).toHaveAttribute('aria-pressed', 'false')
+    expect(within(documentTypes).getByRole('button', { name: /^需求文档$/ })).toHaveAttribute('aria-pressed', 'false')
+    expect(within(documentTypes).queryByRole('button', { name: /PRD|TDD|TODO|Agent/ })).not.toBeInTheDocument()
 
     const sidebar = screen.getByLabelText('侧边栏导航')
     const projectLabels = () => within(sidebar)
@@ -458,13 +459,13 @@ describe('HomeCommandCenter', () => {
     expect(within(sidebar).queryByLabelText('Alpha Project')).not.toBeInTheDocument()
     expect(within(sidebar).queryByLabelText('Beta Project')).not.toBeInTheDocument()
 
-    fireEvent.click(within(documentTypes).getByRole('button', { name: /需求文档 PRD/ }))
-    expect(within(documentTypes).getByRole('button', { name: /需求文档 PRD/ })).toHaveAttribute('aria-pressed', 'true')
+    fireEvent.click(within(documentTypes).getByRole('button', { name: /^需求文档$/ }))
+    expect(within(documentTypes).getByRole('button', { name: /^需求文档$/ })).toHaveAttribute('aria-pressed', 'true')
     expect(projectLabels()).toEqual(['阿尔法项目', '贝塔项目'])
     expect(within(sidebar).getByLabelText('阿尔法项目')).toBeInTheDocument()
     expect(within(sidebar).getByLabelText('贝塔项目')).toBeInTheDocument()
-    expect(within(sidebar).getByText('暂无需求文档 PRD')).toBeInTheDocument()
-    expect(within(sidebar).getByRole('button', { name: '贝塔项目 PRD' })).toBeInTheDocument()
+    expect(within(sidebar).getByText('暂无需求文档')).toBeInTheDocument()
+    expect(within(sidebar).getByRole('button', { name: '贝塔项目 需求文档' })).toBeInTheDocument()
   })
 
   it('keeps workspace project order stable when active document type item order differs', () => {

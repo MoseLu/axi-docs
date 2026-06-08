@@ -624,13 +624,19 @@ describe('knowledge base local index', () => {
     const agentSection = catalog.sections.find((section) => section.key === 'workspace-agent-guides')
     expect(catalog.sections.map((section) => section.title)).toEqual(expect.arrayContaining([
       '项目入口',
+      '需求文档',
+      '技术设计',
+      '智能体指南',
+      '任务清单',
+      '里程碑',
+      '变更记录',
+      '文档索引',
+    ]))
+    expect(catalog.sections.map((section) => section.title)).not.toEqual(expect.arrayContaining([
       '需求文档 PRD',
       '技术设计 TDD',
       'Agent 指南',
       '任务清单 TODO',
-      '里程碑',
-      '变更记录',
-      '文档索引',
     ]))
     expect(catalog.sections.some((section) => section.title === '项目知识')).toBe(false)
     expect(catalog.sections.some((section) => section.title === '架构决策')).toBe(false)

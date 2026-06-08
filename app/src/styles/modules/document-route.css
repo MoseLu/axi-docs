@@ -372,30 +372,77 @@ html[data-axi-docs-theme='light'] .app-main--document {
 }
 
 .header-vp-menu {
-  width: 40px;
-  height: 40px;
+  width: 48px;
+  height: var(--axi-doc-vp-nav-height);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 7px;
-  border-radius: 8px;
-  color: var(--axi-doc-vp-c-text-2);
+  border-radius: 0;
+  color: var(--axi-doc-vp-c-text-1);
   font-size: 14px;
   font-weight: 500;
   line-height: 1;
 }
 
 .header-vp-menu__icon {
-  width: 14px;
-  display: grid;
-  gap: 3px;
+  position: relative;
+  width: 16px;
+  height: 14px;
+  display: block;
 }
 
 .header-vp-menu__icon span {
-  width: 14px;
-  height: 1.5px;
+  position: absolute;
+  left: 0;
+  width: 16px;
+  height: 2px;
   border-radius: 999px;
   background: currentColor;
+  transition: top 0.25s, background-color 0.5s, transform 0.25s;
+  transform-origin: center;
+}
+
+.header-vp-menu__icon span:nth-child(1) {
+  top: 0;
+  transform: translateX(0);
+}
+
+.header-vp-menu__icon span:nth-child(2) {
+  top: 6px;
+  transform: translateX(8px);
+}
+
+.header-vp-menu__icon span:nth-child(3) {
+  top: 12px;
+  transform: translateX(4px);
+}
+
+.header-vp-menu.active .header-vp-menu__icon span:nth-child(1) {
+  top: 6px;
+  transform: translateX(0) rotate(-135deg);
+}
+
+.header-vp-menu.active .header-vp-menu__icon span:nth-child(2) {
+  top: 6px;
+  transform: translateX(16px);
+}
+
+.header-vp-menu.active .header-vp-menu__icon span:nth-child(3) {
+  top: 6px;
+  transform: translateX(0) rotate(135deg);
+}
+
+.header-vp-doc-menu .header-vp-menu__icon {
+  width: 14px;
+  height: 14px;
+  background: currentColor;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M15 12H3m14 6H3M21 6H3'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat;
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='none' stroke='black' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M15 12H3m14 6H3M21 6H3'/%3E%3C/svg%3E") 0 0 / 100% 100% no-repeat;
+}
+
+.header-vp-doc-menu .header-vp-menu__icon span {
+  display: none;
 }
 
 .header-vp-menu__label {
@@ -404,8 +451,16 @@ html[data-axi-docs-theme='light'] .app-main--document {
 
 .header-vp-menu:hover,
 .header-vp-menu.active {
-  color: var(--axi-doc-vp-c-brand-1);
-  background: var(--axi-doc-vp-c-bg-soft);
+  color: var(--axi-doc-vp-c-text-1);
+  background: transparent;
+}
+
+.header-vp-menu.active .header-vp-menu__icon span {
+  transition: top 0.25s, background-color 0.25s, transform 0.25s;
+}
+
+.header-vp-doc-menu {
+  display: none;
 }
 
 .header-vp-screen {
@@ -414,7 +469,7 @@ html[data-axi-docs-theme='light'] .app-main--document {
   right: 0;
   left: 0;
   z-index: 29;
-  padding: 18px 24px 22px;
+  padding: 0 24px;
   border-bottom: 1px solid var(--axi-doc-vp-c-divider);
   background: var(--axi-doc-vp-c-bg);
   box-shadow: 0 18px 42px rgba(0, 0, 0, 0.32);
@@ -424,16 +479,26 @@ html[data-axi-docs-theme='light'] .app-main--document {
   display: none;
 }
 
+.header-vp-screen__content {
+  width: min(100%, 288px);
+  margin: 0 auto;
+  padding: 24px 0 32px;
+}
+
 .header-vp-screen nav {
   display: grid;
-  gap: 4px;
+  gap: 0;
 }
 
 .header-vp-screen__link {
-  padding: 10px 0;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--axi-doc-vp-c-divider);
   color: var(--axi-doc-vp-c-text-1);
   font-size: 14px;
   font-weight: 600;
+  line-height: 20px;
   text-decoration: none;
 }
 
@@ -441,6 +506,67 @@ html[data-axi-docs-theme='light'] .app-main--document {
 .header-vp-screen__link.active {
   color: var(--axi-doc-vp-c-brand-1);
   text-decoration: none;
+}
+
+.header-vp-screen__group {
+  padding-top: 12px;
+}
+
+.header-vp-screen__group-title {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  border-bottom: 1px solid var(--axi-doc-vp-c-divider);
+  color: var(--axi-doc-vp-c-text-1);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.header-vp-screen__locale-list {
+  display: grid;
+  gap: 0;
+}
+
+.header-vp-screen__group--tools {
+  display: grid;
+  gap: 20px;
+}
+
+.header-vp-screen__theme-row {
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 16px;
+  border-radius: 8px;
+  background: var(--axi-doc-vp-c-bg-soft);
+  color: var(--axi-doc-vp-c-text-2);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.header-vp-screen__social-link {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  justify-self: center;
+  border-radius: 999px;
+  color: var(--axi-doc-vp-c-text-2);
+  text-decoration: none;
+}
+
+.header-vp-screen__social-link:hover {
+  color: var(--axi-doc-vp-c-text-1);
+  background: var(--axi-doc-vp-c-bg-soft);
+  text-decoration: none;
+}
+
+.header-vp-screen__social-link svg {
+  width: 20px;
+  height: 20px;
 }
 
 @media (min-width: 768px) {
@@ -507,30 +633,34 @@ html[data-axi-docs-theme='light'] .app-main--document {
 }
 
 @media (max-width: 959px) {
-  .app-layout--home .header-vp-menu,
-  .app-layout--document .header-vp-menu {
+  .app-layout--home .header-vp-doc-menu,
+  .app-layout--document .header-vp-doc-menu {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 7px;
     position: absolute;
     top: var(--axi-doc-vp-nav-height);
     left: 24px;
-    z-index: 31;
+    z-index: 30;
     width: auto;
     min-width: 0;
     height: 48px;
     padding: 0;
     border-radius: 0;
     background: transparent;
+    color: var(--axi-doc-vp-c-text-2);
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1;
   }
 
-  .app-layout--home .header-vp-menu:hover,
-  .app-layout--home .header-vp-menu.active,
-  .app-layout--document .header-vp-menu:hover,
-  .app-layout--document .header-vp-menu.active {
+  .app-layout--home .header-vp-doc-menu:hover,
+  .app-layout--home .header-vp-doc-menu.active,
+  .app-layout--document .header-vp-doc-menu:hover,
+  .app-layout--document .header-vp-doc-menu.active {
+    color: var(--axi-doc-vp-c-brand-1);
     background: transparent;
-  }
-
-  .app-layout--home .header-vp-menu__label,
-  .app-layout--document .header-vp-menu__label {
-    display: inline;
   }
 
   .app-layout--home .header-vp-screen,

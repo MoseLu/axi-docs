@@ -60,7 +60,8 @@ export function Header({
     window.localStorage.getItem('axi-docs-theme') === 'light' ? 'light' : 'dark'
   ))
   const [inputValue, setInputValue] = useState(searchQuery)
-  const [navOpen, setNavOpen] = useState(false)
+  const [docNavOpen, setDocNavOpen] = useState(false)
+  const [siteNavOpen, setSiteNavOpen] = useState(false)
   const [localeOpen, setLocaleOpen] = useState(false)
   const [searchOpen, setSearchOpen] = useState(false)
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([])
@@ -98,6 +99,8 @@ export function Header({
   }, [searchOpen, searchQuery])
 
   useEffect(() => {
+    setDocNavOpen(false)
+    setSiteNavOpen(false)
     setLocaleOpen(false)
   }, [location.pathname, location.search])
 
@@ -124,16 +127,16 @@ export function Header({
 
   useEffect(() => {
     if (pageMode === 'category') {
-      setNavOpen(false)
+      setDocNavOpen(false)
       document.documentElement.classList.remove('axi-doc-nav-open')
       return undefined
     }
 
-    document.documentElement.classList.toggle('axi-doc-nav-open', navOpen)
+    document.documentElement.classList.toggle('axi-doc-nav-open', docNavOpen)
     return () => {
       document.documentElement.classList.remove('axi-doc-nav-open')
     }
-  }, [navOpen, pageMode])
+  }, [docNavOpen, pageMode])
 
   useEffect(() => {
     document.documentElement.classList.toggle('axi-search-open', searchOpen)
@@ -440,7 +443,10 @@ export function Header({
                 <Link
                   key={item.label}
                   className={`header-vp-nav__link${item.active ? ' active' : ''}`}
-                  onClick={() => setNavOpen(false)}
+                  onClick={() => {
+                    setDocNavOpen(false)
+                    setSiteNavOpen(false)
+                  }}
                   to={item.to}
                 >
                   {item.label}
@@ -505,10 +511,10 @@ export function Header({
               </a>
             </div>
             <button
-              aria-expanded={navOpen}
-              aria-label={navOpen ? uiCopy.closeMenu : uiCopy.openMenu}
-              className={`header-vp-menu${navOpen ? ' active' : ''}`}
-              onClick={() => setNavOpen((current) => !current)}
+              aria-expanded={siteNavOpen}
+              aria-label={siteNavOpen ? uiCopy.closeMenu : uiCopy.openMenu}
+              className={`header-vp-menu${siteNavOpen ? ' active' : ''}`}
+              onClick={() => setSiteNavOpen((current) => !current)}
               type="button"
             >
               <span className="header-vp-menu__icon" aria-hidden="true">
@@ -516,34 +522,97 @@ export function Header({
                 <span />
                 <span />
               </span>
-              <span className="header-vp-menu__label">{mobileMenuLabel}</span>
             </button>
           </>
         )}
       </div>
 
-      {pageMode !== 'category' && navOpen && (
+      {pageMode !== 'category' && (
+        <button
+          aria-expanded={docNavOpen}
+          className={`header-vp-doc-menu${docNavOpen ? ' active' : ''}`}
+          onClick={() => setDocNavOpen((current) => !current)}
+          type="button"
+        >
+          <span className="header-vp-menu__icon" aria-hidden="true">
+            <span />
+            <span />
+            <span />
+          </span>
+          <span>{mobileMenuLabel}</span>
+        </button>
+      )}
+
+      {pageMode !== 'category' && siteNavOpen && (
         <>
           <button
             aria-label={currentLocale === 'zh' ? '关闭导航遮罩' : 'Close navigation backdrop'}
             className="header-vp-nav-backdrop"
             data-testid="header-nav-backdrop"
-            onClick={() => setNavOpen(false)}
+            onClick={() => setSiteNavOpen(false)}
             type="button"
           />
           <div className="header-vp-screen">
-            <nav aria-label="移动端顶部导航">
-              {topNavItems.map((item) => (
-                <Link
-                  key={`${item.label}:screen`}
-                  className={`header-vp-screen__link${item.active ? ' active' : ''}`}
-                  onClick={() => setNavOpen(false)}
-                  to={item.to}
+            <div className="header-vp-screen__content">
+              <nav aria-label="移动端顶部导航">
+                {topNavItems.map((item) => (
+                  <Link
+                    key={`${item.label}:screen`}
+                    className={`header-vp-screen__link${item.active ? ' active' : ''}`}
+                    onClick={() => setSiteNavOpen(false)}
+                    to={item.to}
+                  >
+                    {item.label}
+                  </Link>
+                ))}
+              </nav>
+              <div className="header-vp-screen__group" aria-label={uiCopy.languageLabel}>
+                <span className="header-vp-screen__group-title">{localeConfig.label}</span>
+                <div className="header-vp-screen__locale-list">
+                  {localeOptions
+                    .filter((locale) => locale.code !== currentLocale)
+                    .map((locale) => (
+                      <Link
+                        key={`${locale.code}:screen`}
+                        className="header-vp-screen__link"
+                        onClick={() => setSiteNavOpen(false)}
+                        to={buildLocaleHref(location.pathname, location.search, locale.code)}
+                      >
+                        {locale.label}
+                      </Link>
+                    ))}
+                </div>
+              </div>
+              <div className="header-vp-screen__group header-vp-screen__group--tools" aria-label={uiCopy.siteToolsLabel}>
+                <div className="header-vp-screen__theme-row">
+                  <span>{currentLocale === 'zh' ? '主题' : 'Theme'}</span>
+                  <button
+                    aria-label={themeMode === 'dark' ? uiCopy.switchToLight : uiCopy.switchToDark}
+                    aria-checked={themeMode === 'dark'}
+                    className={`header-vp-tool header-vp-tool--theme header-vp-theme-toggle header-vp-theme-toggle--${themeMode}`}
+                    onClick={toggleThemeMode}
+                    role="switch"
+                    title={themeMode === 'dark' ? uiCopy.switchToLightTitle : uiCopy.switchToDarkTitle}
+                    type="button"
+                  >
+                    <span className="header-vp-theme-toggle__track" aria-hidden="true">
+                      <span className="header-vp-theme-toggle__thumb">
+                        {themeMode === 'dark' ? <MoonIcon /> : <ThemeIcon />}
+                      </span>
+                    </span>
+                  </button>
+                </div>
+                <a
+                  aria-label="GitHub"
+                  className="header-vp-screen__social-link"
+                  href="https://github.com/axiomaticworld/axi-docs"
+                  rel="noreferrer"
+                  target="_blank"
                 >
-                  {item.label}
-                </Link>
-              ))}
-            </nav>
+                  <GitHubIcon />
+                </a>
+              </div>
+            </div>
           </div>
         </>
       )}

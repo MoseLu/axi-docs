@@ -532,6 +532,11 @@
     --axi-doc-vp-content-right: 0px;
   }
 
+  .app-main--home,
+  .app-main--document {
+    padding-top: 48px;
+  }
+
   .document-detail-page {
     padding-right: 24px;
     padding-left: 24px;
@@ -543,7 +548,7 @@
 
   .axi-doc-nav-open .document-detail-page__sidebar {
     position: fixed;
-    top: var(--axi-doc-vp-nav-height);
+    top: calc(var(--axi-doc-vp-nav-height) + 48px);
     bottom: 0;
     left: 0;
     z-index: 28;
@@ -566,13 +571,9 @@
     display: none;
   }
 
-  .axi-doc-nav-open .app-layout--home .header-vp-screen {
-    display: none;
-  }
-
   .axi-doc-nav-open .axi-docs-home__sidebar {
     position: fixed;
-    top: var(--axi-doc-vp-nav-height);
+    top: calc(var(--axi-doc-vp-nav-height) + 48px);
     bottom: 0;
     left: 0;
     z-index: 30;
@@ -614,6 +615,106 @@
 }
 
 @media (max-width: 767px) {
+  .app-layout--home .app-header--command,
+  .app-layout--document .app-header--command {
+    height: var(--axi-doc-vp-nav-height);
+    min-height: var(--axi-doc-vp-nav-height);
+    flex-wrap: nowrap;
+    gap: 0;
+    padding: 0;
+  }
+
+  .app-layout--home .app-logo,
+  .app-layout--document .app-logo {
+    width: auto;
+    min-width: 0;
+    flex: 1 1 auto;
+    padding: 0 12px 0 20px;
+    border-bottom: 0;
+  }
+
+  .app-layout--home .app-logo__copy span,
+  .app-layout--document .app-logo__copy span {
+    max-width: 42vw;
+    overflow: hidden;
+    display: block;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .app-layout--home .header-actions,
+  .app-layout--document .header-actions {
+    width: auto;
+    min-width: 0;
+    flex: 0 0 auto;
+    height: var(--axi-doc-vp-nav-height);
+    padding: 0 14px 0 0;
+    justify-content: flex-end;
+    gap: 4px;
+  }
+
+  .app-layout--home .header-search--global,
+  .app-layout--document .header-search--global {
+    display: flex;
+    flex: 0 0 40px;
+    width: 40px;
+    max-width: 40px;
+    min-width: 0;
+    margin-right: 0;
+  }
+
+  .app-layout--home .header-search__trigger,
+  .app-layout--document .header-search__trigger {
+    width: 40px;
+    height: 40px;
+    min-height: 40px;
+    grid-template-columns: 1fr;
+    justify-items: center;
+    gap: 0;
+    padding: 0;
+    background: transparent;
+  }
+
+  .app-layout--home .header-search__trigger .search-icon-wrap,
+  .app-layout--document .header-search__trigger .search-icon-wrap {
+    justify-self: center;
+  }
+
+  .app-layout--home .header-search__trigger-text,
+  .app-layout--home .header-search__trigger kbd,
+  .app-layout--document .header-search__trigger-text,
+  .app-layout--document .header-search__trigger kbd {
+    display: none;
+  }
+
+  .app-layout--home .header-vp-menu,
+  .app-layout--document .header-vp-menu {
+    position: static;
+    top: auto;
+    left: auto;
+    z-index: auto;
+    width: 48px;
+    height: var(--axi-doc-vp-nav-height);
+    padding: 0;
+    border-radius: 0;
+  }
+
+  .app-layout--home .header-vp-screen,
+  .app-layout--document .header-vp-screen {
+    position: fixed;
+    top: var(--axi-doc-vp-nav-height);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 31;
+    overflow-y: auto;
+  }
+
+  .app-layout--home .header-vp-nav-backdrop,
+  .app-layout--document .header-vp-nav-backdrop {
+    inset: var(--axi-doc-vp-nav-height) 0 0 0;
+  }
+
   .document-detail-page {
     padding-right: 0;
     padding-left: 0;
@@ -624,38 +725,6 @@
     padding-left: 0;
   }
 
-  .app-layout--document .app-header--command {
-    height: var(--axi-doc-vp-nav-height);
-    min-height: var(--axi-doc-vp-nav-height);
-    flex-wrap: nowrap;
-    padding: 0;
-  }
-
-  .app-layout--document .app-logo {
-    width: auto;
-    min-width: 0;
-    flex: 1;
-    padding: 0 16px 0 24px;
-  }
-
-  .app-layout--document .header-actions {
-    flex: 0 0 auto;
-    width: auto;
-    padding: 0 16px 0 0;
-    gap: 8px;
-  }
-
-  .app-layout--document .header-search--global {
-    display: none;
-  }
-
-  .app-layout--document .app-logo__copy span {
-    max-width: 42vw;
-    overflow: hidden;
-    display: block;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
 }
 
 @media (max-width: 720px) {

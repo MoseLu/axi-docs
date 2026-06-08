@@ -216,7 +216,10 @@ describe('HomeCommandCenter', () => {
 
     const mobileOutline = screen.getByRole('region', { name: '移动页面导航' })
     expect(within(mobileOutline).getByRole('link', { name: '回到顶部' })).toHaveAttribute('href', '#overview')
-    expect(within(mobileOutline).getByRole('button', { name: '启动本地站点' })).toBeInTheDocument()
+    fireEvent.click(within(mobileOutline).getByRole('button', { name: '启动本地站点' }))
+
+    expect(toggle).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.queryByRole('region', { name: '移动页面导航' })).not.toBeInTheDocument()
     expect(within(mobileOutline).queryByText('未锁定来源')).not.toBeInTheDocument()
   })
 

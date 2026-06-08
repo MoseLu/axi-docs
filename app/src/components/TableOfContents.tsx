@@ -6,6 +6,7 @@ interface TableOfContentsProps {
   scrollContainerSelector?: string
   headingRootSelector?: string
   label?: string
+  onItemSelect?: () => void
 }
 
 function extractHeadings(markdown: string): TocHeading[] {
@@ -46,11 +47,29 @@ function getRenderedHeadingText(el: Element): string {
   return clone.textContent?.trim() || ''
 }
 
+function hasScrollableY(el: HTMLElement): boolean {
+  return el.scrollHeight > el.clientHeight + 1
+}
+
+function resolveScrollContainer(selector: string): HTMLElement | null {
+  const selected = document.querySelector(selector)
+  if (!(selected instanceof HTMLElement)) return null
+
+  let current: HTMLElement | null = selected
+  while (current) {
+    if (hasScrollableY(current)) return current
+    current = current.parentElement
+  }
+
+  return selected
+}
+
 export function TableOfContents({
   content,
   scrollContainerSelector = '.app-main',
   headingRootSelector = '.doc-body',
   label = '目录',
+  onItemSelect,
 }: TableOfContentsProps) {
   const [headings, setHeadings] = useState<TocHeading[]>([])
   const [activeId, setActiveId] = useState<string>('')
@@ -65,8 +84,8 @@ export function TableOfContents({
       const docBody = document.querySelector(headingRootSelector)
       if (!docBody) return
 
-      const scrollContainer = document.querySelector(scrollContainerSelector)
-      const activationTop = scrollContainer instanceof HTMLElement
+      const scrollContainer = resolveScrollContainer(scrollContainerSelector)
+      const activationTop = scrollContainer
         ? scrollContainer.getBoundingClientRect().top + 32
         : 120
       const allHeadings = docBody.querySelectorAll('h1, h2, h3, h4, h5, h6')
@@ -81,7 +100,7 @@ export function TableOfContents({
       setActiveId(current)
     }
 
-    const scrollContainer = document.querySelector(scrollContainerSelector)
+    const scrollContainer = resolveScrollContainer(scrollContainerSelector)
     handleScroll()
     scrollContainer?.addEventListener('scroll', handleScroll)
     return () => scrollContainer?.removeEventListener('scroll', handleScroll)
@@ -94,18 +113,24 @@ export function TableOfContents({
     const allHeadings = docBody.querySelectorAll('h1, h2, h3, h4, h5, h6')
     for (const el of allHeadings) {
       if (getRenderedHeadingText(el) === heading.text) {
-        const scrollContainer = document.querySelector(scrollContainerSelector)
-        if (scrollContainer instanceof HTMLElement) {
+        const scrollContainer = resolveScrollContainer(scrollContainerSelector)
+        if (scrollContainer) {
           const containerTop = scrollContainer.getBoundingClientRect().top
           const headingTop = el.getBoundingClientRect().top
-          scrollContainer.scrollTo({
-            top: scrollContainer.scrollTop + headingTop - containerTop - 24,
-            behavior: 'smooth',
-          })
+          const top = scrollContainer.scrollTop + headingTop - containerTop - 24
+          if (typeof scrollContainer.scrollTo === 'function') {
+            scrollContainer.scrollTo({
+              top,
+              behavior: 'smooth',
+            })
+          } else {
+            scrollContainer.scrollTop = top
+          }
         } else {
           el.scrollIntoView({ behavior: 'smooth', block: 'start' })
         }
         setActiveId(heading.id)
+        onItemSelect?.()
         break
       }
     }

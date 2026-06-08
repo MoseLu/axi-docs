@@ -523,20 +523,29 @@ export function Header({
       </div>
 
       {pageMode !== 'category' && navOpen && (
-        <div className="header-vp-screen">
-          <nav aria-label="移动端顶部导航">
-            {topNavItems.map((item) => (
-              <Link
-                key={`${item.label}:screen`}
-                className={`header-vp-screen__link${item.active ? ' active' : ''}`}
-                onClick={() => setNavOpen(false)}
-                to={item.to}
-              >
-                {item.label}
-              </Link>
-            ))}
-          </nav>
-        </div>
+        <>
+          <button
+            aria-label={currentLocale === 'zh' ? '关闭导航遮罩' : 'Close navigation backdrop'}
+            className="header-vp-nav-backdrop"
+            data-testid="header-nav-backdrop"
+            onClick={() => setNavOpen(false)}
+            type="button"
+          />
+          <div className="header-vp-screen">
+            <nav aria-label="移动端顶部导航">
+              {topNavItems.map((item) => (
+                <Link
+                  key={`${item.label}:screen`}
+                  className={`header-vp-screen__link${item.active ? ' active' : ''}`}
+                  onClick={() => setNavOpen(false)}
+                  to={item.to}
+                >
+                  {item.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+        </>
       )}
 
       {searchModal}

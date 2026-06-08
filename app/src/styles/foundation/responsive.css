@@ -556,14 +556,6 @@
     overscroll-behavior: contain;
   }
 
-  .axi-doc-nav-open .document-detail-page::before {
-    position: fixed;
-    inset: var(--axi-doc-vp-nav-height) 0 0 0;
-    z-index: 27;
-    background: rgba(0, 0, 0, 0.42);
-    content: "";
-  }
-
   .cockpit-shell.axi-docs-home {
     display: block;
     padding: 0;
@@ -593,14 +585,6 @@
     border-bottom: 0;
     box-shadow: 0 18px 48px rgba(0, 0, 0, 0.34);
     overscroll-behavior: contain;
-  }
-
-  .axi-doc-nav-open .axi-docs-home::before {
-    position: fixed;
-    inset: var(--axi-doc-vp-nav-height) 0 0 0;
-    z-index: 29;
-    background: rgba(0, 0, 0, 0.42);
-    content: "";
   }
 
   .axi-docs-home__content {

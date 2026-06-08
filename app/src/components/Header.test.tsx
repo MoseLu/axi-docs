@@ -110,6 +110,18 @@ describe('Header', () => {
     expect(screen.getByText('菜单')).toBeInTheDocument()
   })
 
+  it('closes the narrow navigation when clicking the backdrop', () => {
+    renderHeader({ pageMode: 'home' }, '/zh/guide/getting-started')
+
+    fireEvent.click(screen.getByRole('button', { name: '打开导航菜单' }))
+    expect(screen.getByRole('button', { name: '关闭导航菜单' })).toHaveAttribute('aria-expanded', 'true')
+
+    fireEvent.click(screen.getByTestId('header-nav-backdrop'))
+
+    expect(screen.getByRole('button', { name: '打开导航菜单' })).toHaveAttribute('aria-expanded', 'false')
+    expect(screen.queryByTestId('header-nav-backdrop')).not.toBeInTheDocument()
+  })
+
   it('keeps the guide nav active even when a stale source query is present', () => {
     renderHeader({ pageMode: 'home' }, '/zh/guide/getting-started?source=obsidian')
 

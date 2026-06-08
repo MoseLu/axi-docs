@@ -413,7 +413,6 @@ export function HomeCommandCenter({
                     type="button"
                   >
                     <span>{section.title}</span>
-                    <small>{section.count}</small>
                   </button>
                 )
               })}

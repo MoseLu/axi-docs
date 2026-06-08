@@ -443,7 +443,7 @@ html[data-axi-docs-theme='light'] .app-main--document {
   text-decoration: none;
 }
 
-@media (min-width: 960px) {
+@media (min-width: 768px) {
   .header-vp-nav {
     display: flex;
   }
@@ -452,9 +452,50 @@ html[data-axi-docs-theme='light'] .app-main--document {
     display: inline-flex;
   }
 
-  .header-vp-menu,
   .header-vp-screen {
     display: none;
+  }
+}
+
+@media (min-width: 960px) {
+  .header-vp-menu {
+    display: none;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 959px) {
+  .header-vp-nav {
+    gap: 18px;
+  }
+
+  .header-vp-tools {
+    gap: 8px;
+  }
+
+  .header-vp-separator {
+    height: 20px;
+  }
+
+  .header-vp-tool {
+    width: 30px;
+    height: 30px;
+  }
+
+  .header-vp-tool--locale {
+    width: auto;
+    padding: 0 6px;
+  }
+
+  .header-vp-theme-toggle {
+    width: 40px;
+  }
+
+  .header-vp-theme-toggle__track {
+    width: 40px;
+  }
+
+  .header-vp-theme-toggle--dark .header-vp-theme-toggle__thumb {
+    transform: translateX(16px);
   }
 }
 

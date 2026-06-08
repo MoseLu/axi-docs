@@ -6,7 +6,7 @@ import { localDocsPlugin } from './vite.config.plugin'
 
 const DEFAULT_CHUNK_WARNING_LIMIT_KB = 1000
 const WEBGL_CHUNK_WARNING_LIMIT_KB = 2000
-const hostedBase = process.env.AXI_APP_BASE || process.env.VITE_AXI_APP_BASE || './'
+const hostedBase = process.env.AXI_APP_BASE || process.env.VITE_AXI_APP_BASE || '/'
 
 function isJsChunk(chunk: OutputChunk): boolean {
   return chunk.type === 'chunk' && chunk.fileName.endsWith('.js')

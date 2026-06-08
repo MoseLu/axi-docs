@@ -20,14 +20,15 @@ const STATIC_KNOWLEDGE_ROOT = 'generated/knowledge'
 const manifestCache = { promise: null as Promise<StaticKnowledgeManifest> | null }
 const bundleCache = new Map<string, Promise<LoadedSourceBundle>>()
 
-function buildAssetUrl(relativePath: string): string {
-  const base = import.meta.env.BASE_URL || '/'
+export function resolveStaticKnowledgeAssetUrl(relativePath: string, base = import.meta.env.BASE_URL || '/'): string {
+  const normalizedPath = relativePath.replace(/^\/+/, '')
+  if (!base || base === '.' || base === './') return `/${normalizedPath}`
   const normalizedBase = base.endsWith('/') ? base : `${base}/`
-  return `${normalizedBase}${relativePath.replace(/^\/+/, '')}`
+  return `${normalizedBase}${normalizedPath}`
 }
 
 async function fetchJson<T>(relativePath: string): Promise<T> {
-  const response = await fetch(buildAssetUrl(relativePath))
+  const response = await fetch(resolveStaticKnowledgeAssetUrl(relativePath))
   if (!response.ok) {
     throw new Error(`HTTP ${response.status} for ${relativePath}`)
   }

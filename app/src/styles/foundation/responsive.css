@@ -532,9 +532,12 @@
     --axi-doc-vp-content-right: 0px;
   }
 
-  .app-main--home,
   .app-main--document {
     padding-top: 48px;
+  }
+
+  .app-main--home {
+    padding-top: 0;
   }
 
   .document-detail-page {

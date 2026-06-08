@@ -398,8 +398,9 @@ html[data-axi-docs-theme='light'] .app-main--document {
   width: 16px;
   height: 2px;
   border-radius: 999px;
+  opacity: 1;
   background: currentColor;
-  transition: top 0.25s, background-color 0.5s, transform 0.25s;
+  transition: top 0.25s, opacity 0.2s, background-color 0.5s, transform 0.25s;
   transform-origin: center;
 }
 
@@ -410,27 +411,28 @@ html[data-axi-docs-theme='light'] .app-main--document {
 
 .header-vp-menu__icon span:nth-child(2) {
   top: 6px;
-  transform: translateX(8px);
+  transform: translateX(0);
 }
 
 .header-vp-menu__icon span:nth-child(3) {
   top: 12px;
-  transform: translateX(4px);
+  transform: translateX(0);
 }
 
 .header-vp-menu.active .header-vp-menu__icon span:nth-child(1) {
   top: 6px;
-  transform: translateX(0) rotate(-135deg);
+  transform: rotate(-135deg);
 }
 
 .header-vp-menu.active .header-vp-menu__icon span:nth-child(2) {
   top: 6px;
-  transform: translateX(16px);
+  opacity: 0;
+  transform: scaleX(0.2);
 }
 
 .header-vp-menu.active .header-vp-menu__icon span:nth-child(3) {
   top: 6px;
-  transform: translateX(0) rotate(135deg);
+  transform: rotate(135deg);
 }
 
 .header-vp-doc-menu .header-vp-menu__icon {
@@ -456,7 +458,7 @@ html[data-axi-docs-theme='light'] .app-main--document {
 }
 
 .header-vp-menu.active .header-vp-menu__icon span {
-  transition: top 0.25s, background-color 0.25s, transform 0.25s;
+  transition: top 0.25s, opacity 0.2s, background-color 0.25s, transform 0.25s;
 }
 
 .header-vp-doc-menu {

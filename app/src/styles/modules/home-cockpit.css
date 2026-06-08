@@ -149,6 +149,10 @@ html[data-axi-docs-theme='light'] .app-main--home {
   background: var(--axi-doc-vp-c-bg);
 }
 
+.axi-docs-home--workspace {
+  padding-top: 0;
+}
+
 .axi-docs-home__sidebar,
 .axi-docs-home__outline {
   min-height: 0;
@@ -370,22 +374,22 @@ html[data-axi-docs-theme='light'] .app-main--home {
   position: sticky;
   top: 0;
   z-index: 12;
-  min-height: 44px;
+  min-height: 40px;
   display: flex;
   align-items: center;
-  margin: 0 -32px 32px;
+  margin: 0 -32px 24px;
   padding: 0 32px;
   border-bottom: 1px solid var(--axi-doc-vp-c-divider);
-  background: color-mix(in srgb, var(--axi-doc-vp-c-bg) 92%, transparent);
+  background: color-mix(in srgb, var(--axi-doc-vp-c-bg) 96%, transparent);
   backdrop-filter: blur(10px);
 }
 
 .axi-docs-home__type-tabs {
-  width: min(100%, var(--axi-doc-vp-doc-content-width));
+  width: 100%;
   display: flex;
   align-items: center;
-  gap: 4px;
-  margin: 0 auto;
+  gap: 0;
+  margin: 0;
   overflow-x: auto;
   scrollbar-width: none;
 }
@@ -395,38 +399,52 @@ html[data-axi-docs-theme='light'] .app-main--home {
 }
 
 .axi-docs-home__type-tab {
-  min-height: 32px;
+  position: relative;
+  min-height: 40px;
   display: inline-flex;
   flex: 0 0 auto;
   align-items: center;
-  gap: 8px;
-  padding: 0 12px;
+  gap: 6px;
+  padding: 0 14px;
   border: 0;
-  border-radius: 6px;
+  border-radius: 0;
   background: transparent;
   color: var(--axi-doc-vp-c-text-2);
-  font-size: 13px;
+  font-size: 14px;
   font-weight: 600;
   line-height: 1;
   white-space: nowrap;
   cursor: pointer;
 }
 
-.axi-docs-home__type-tab small {
-  min-width: 18px;
-  padding: 2px 6px;
+.axi-docs-home__type-tab::after {
+  position: absolute;
+  right: 14px;
+  bottom: -1px;
+  left: 14px;
+  height: 2px;
   border-radius: 999px;
-  background: var(--axi-doc-vp-c-bg-soft);
+  background: transparent;
+  content: '';
+  transform: scaleX(0.5);
+  opacity: 0;
+  transition: background 0.16s ease, opacity 0.16s ease, transform 0.16s ease;
+}
+
+.axi-docs-home__type-tab small {
+  min-width: 0;
+  padding: 0;
+  border-radius: 0;
+  background: transparent;
   color: var(--axi-doc-vp-c-text-3);
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
-  line-height: 1.2;
+  line-height: 1;
   text-align: center;
 }
 
 .axi-docs-home__type-tab:hover,
 .axi-docs-home__type-tab.active {
-  background: var(--axi-doc-vp-c-bg-soft);
   color: var(--axi-doc-vp-c-text-1);
 }
 
@@ -434,8 +452,13 @@ html[data-axi-docs-theme='light'] .app-main--home {
   color: var(--axi-doc-vp-c-brand-1);
 }
 
+.axi-docs-home__type-tab.active::after {
+  background: var(--axi-doc-vp-c-brand-1);
+  opacity: 1;
+  transform: scaleX(1);
+}
+
 .axi-docs-home__type-tab.active small {
-  background: color-mix(in srgb, var(--axi-doc-vp-c-brand-1) 16%, transparent);
   color: var(--axi-doc-vp-c-brand-1);
 }
 

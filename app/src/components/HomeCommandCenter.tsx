@@ -278,7 +278,7 @@ export function HomeCommandCenter({
   }
 
   return (
-    <PageShell className="axi-docs-home" compact>
+    <PageShell className={`axi-docs-home${isWorkspaceDocSet ? ' axi-docs-home--workspace' : ''}`} compact>
       <aside className="axi-docs-home__sidebar" aria-label={homeCopy.sidebarLabel}>
         {isGuideDocSet ? (
           guideSections.map((section) => {

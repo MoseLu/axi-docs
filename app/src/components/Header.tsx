@@ -63,6 +63,7 @@ export function Header({
   const [docNavOpen, setDocNavOpen] = useState(false)
   const [siteNavOpen, setSiteNavOpen] = useState(false)
   const [localeOpen, setLocaleOpen] = useState(false)
+  const [screenLocaleOpen, setScreenLocaleOpen] = useState(true)
   const [searchOpen, setSearchOpen] = useState(false)
   const [suggestions, setSuggestions] = useState<SearchSuggestion[]>([])
   const [activeIndex, setActiveIndex] = useState(-1)
@@ -103,6 +104,10 @@ export function Header({
     setSiteNavOpen(false)
     setLocaleOpen(false)
   }, [location.pathname, location.search])
+
+  useEffect(() => {
+    if (siteNavOpen) setScreenLocaleOpen(true)
+  }, [siteNavOpen])
 
   useEffect(() => {
     if (!localeOpen) return undefined
@@ -566,22 +571,36 @@ export function Header({
                   </Link>
                 ))}
               </nav>
-              <div className="header-vp-screen__group" aria-label={uiCopy.languageLabel}>
-                <span className="header-vp-screen__group-title">{localeConfig.label}</span>
-                <div className="header-vp-screen__locale-list">
-                  {localeOptions
-                    .filter((locale) => locale.code !== currentLocale)
-                    .map((locale) => (
-                      <Link
-                        key={`${locale.code}:screen`}
-                        className="header-vp-screen__link"
-                        onClick={() => setSiteNavOpen(false)}
-                        to={buildLocaleHref(location.pathname, location.search, locale.code)}
-                      >
-                        {locale.label}
-                      </Link>
-                    ))}
-                </div>
+              <div className="header-vp-screen__group header-vp-screen__group--locale" aria-label={uiCopy.languageLabel} role="group">
+                <button
+                  aria-controls="header-vp-screen-locale-list"
+                  aria-expanded={screenLocaleOpen}
+                  className="header-vp-screen__locale-trigger"
+                  onClick={() => setScreenLocaleOpen((current) => !current)}
+                  type="button"
+                >
+                  <span className="header-vp-screen__locale-current">
+                    <LanguageIcon />
+                    <span>{localeConfig.label}</span>
+                  </span>
+                  <span aria-hidden="true" className="header-vp-screen__locale-caret">⌄</span>
+                </button>
+                {screenLocaleOpen && (
+                  <div className="header-vp-screen__locale-list" id="header-vp-screen-locale-list">
+                    {localeOptions
+                      .filter((locale) => locale.code !== currentLocale)
+                      .map((locale) => (
+                        <Link
+                          key={`${locale.code}:screen`}
+                          className="header-vp-screen__link header-vp-screen__locale-link"
+                          onClick={() => setSiteNavOpen(false)}
+                          to={buildLocaleHref(location.pathname, location.search, locale.code)}
+                        >
+                          {locale.label}
+                        </Link>
+                      ))}
+                  </div>
+                )}
               </div>
               <div className="header-vp-screen__group header-vp-screen__group--tools" aria-label={uiCopy.siteToolsLabel}>
                 <div className="header-vp-screen__theme-row">

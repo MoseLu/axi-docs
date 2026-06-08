@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { Header } from './Header'
 
@@ -120,6 +120,23 @@ describe('Header', () => {
 
     expect(screen.getByRole('button', { name: '打开导航菜单' })).toHaveAttribute('aria-expanded', 'false')
     expect(screen.queryByTestId('header-nav-backdrop')).not.toBeInTheDocument()
+  })
+
+  it('renders mobile language switching as an expandable locale group', () => {
+    renderHeader({ pageMode: 'home' }, '/zh/guide/getting-started')
+
+    fireEvent.click(screen.getByRole('button', { name: '打开导航菜单' }))
+
+    const localeGroup = screen.getByRole('group', { name: '选择语言' })
+    const localeTrigger = within(localeGroup).getByRole('button', { name: /简体中文/i })
+    expect(localeTrigger).toHaveAttribute('aria-expanded', 'true')
+    expect(within(localeTrigger).getByTestId('language-icon')).toBeInTheDocument()
+    expect(within(localeGroup).getByRole('link', { name: 'English' })).toHaveAttribute('href', '/en/guide/getting-started')
+
+    fireEvent.click(localeTrigger)
+
+    expect(localeTrigger).toHaveAttribute('aria-expanded', 'false')
+    expect(within(localeGroup).queryByRole('link', { name: 'English' })).not.toBeInTheDocument()
   })
 
   it('keeps the guide nav active even when a stale source query is present', () => {

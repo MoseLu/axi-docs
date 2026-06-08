@@ -1,0 +1,15 @@
+{
+  "$schema": "https://axi.local/schemas/axi-docs-sources-lock.v1.json",
+  "version": 1,
+  "sources": {
+    "axi-skills": {
+      "repo": "https://github.com/MoseLu/axi-skills.git",
+      "ref": "dev",
+      "commit": "2e5c2d6eb795a99807f6d8e5c17d264a2c11045b",
+      "localPathEnv": "AXI_SKILLS_PATH",
+      "defaultLocalPath": "/Volumes/code/workspace/shared/axi-skills",
+      "ciPath": "../sources/axi-skills",
+      "requiredForBuild": true
+    }
+  }
+}

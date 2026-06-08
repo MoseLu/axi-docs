@@ -72,6 +72,8 @@ function normalizeWorkspaceProjectTitle(title: string): string {
 }
 
 function workspaceProjectDisplayTitle(key: string, items: KnowledgeCatalogItem[], guideLocale: GuideLocale): string {
+  const translated = getSiteLocaleConfig(guideLocale).themeConfig.workspaceProjects[key]
+  if (translated) return translated
   const overview = items.find((item) => item.documentTypeKey === 'overview' || item.path.endsWith('/README.md'))
   if (guideLocale === 'zh') {
     return normalizeWorkspaceProjectTitle(overview?.title || items[0]?.title || items[0]?.projectTitle || key)

@@ -108,6 +108,7 @@ export interface SiteLocaleConfig {
     guidePages: LocaleGuidePage[]
     guideSections: LocaleGuideSection[]
     docSets: LocaleDocSet[]
+    workspaceProjects: Record<string, string>
   }
   ui: LocaleUiCopy
 }
@@ -141,6 +142,7 @@ function buildLocaleConfig(locale: SiteLocale, options: {
   guidePages: Record<GuidePageId, string>
   guideSections: Record<GuideSectionId, string>
   docSets: Record<DocSetId, string>
+  workspaceProjects: Record<string, string>
   ui: LocaleUiCopy
 }): SiteLocaleConfig {
   return {
@@ -180,6 +182,7 @@ function buildLocaleConfig(locale: SiteLocale, options: {
             ? `axi-docs-${locale}`
             : 'workspace',
       })),
+      workspaceProjects: options.workspaceProjects,
     },
     ui: options.ui,
   }
@@ -221,6 +224,32 @@ export const siteConfig = {
         guide: '指南',
         skills: '技能库',
         workspace: '工作区',
+      },
+      workspaceProjects: {
+        'axi-agent-platform': 'Axi 智能体平台',
+        'axi-docs': 'Axi 文档站',
+        'axi-image-preview': 'Axi 图片预览',
+        'axi-local-registry': 'Axi 本地注册表',
+        'axi-notify-mobile': 'Axi 移动通知',
+        'axi-pet': 'Axi Pet 文档',
+        'axi-proxy-companion': 'Axi 代理助手',
+        'axi-skills': 'Axi 技能库',
+        'axi-tauri-starter': 'Axi Tauri 启动模板',
+        'axi-ui': 'Axi 界面组件',
+        'axi-video-downloader': 'Axi 视频下载器',
+        'axi-workbench': 'Axi Workbench 文档',
+        'axi-workspace-governance': 'Axi 工作区治理',
+        'blinko-reference': 'Blinko Reference 文档',
+        'cliproxyapi-reference': 'CLIProxyAPI Reference 文档',
+        'cockpit-tools-reference': 'Cockpit Tools Reference 文档',
+        'comfyui-reference': 'Comfy界面Reference',
+        'ielts-vocabulary': 'IELTS 词汇',
+        'image2prompt-reference': 'Image2Prompt Reference 文档',
+        'opencodex-reference': 'OpenCodex Reference 文档',
+        'sports-management': '运动管理',
+        'sub2api-reference': 'Sub2API Reference 文档',
+        'governance': '工作区项目目录',
+        'WORKSPACE_INDEX.md': 'Axi 工作区索引',
       },
       ui: {
         skipToContent: '跳到主内容',
@@ -310,6 +339,32 @@ export const siteConfig = {
         guide: 'Guide',
         skills: 'Skills',
         workspace: 'Workspace',
+      },
+      workspaceProjects: {
+        'axi-agent-platform': 'Axi Agent Platform',
+        'axi-docs': 'Axi Docs',
+        'axi-image-preview': 'Axi Image Preview',
+        'axi-local-registry': 'Axi Local Registry',
+        'axi-notify-mobile': 'Axi Notify / Mobile',
+        'axi-pet': 'Axi Pet',
+        'axi-proxy-companion': 'Axi Proxy Companion',
+        'axi-skills': 'Axi Skills',
+        'axi-tauri-starter': 'Axi Tauri Starter',
+        'axi-ui': 'Axi UI',
+        'axi-video-downloader': 'Axi Video Downloader',
+        'axi-workbench': 'Axi Workbench',
+        'axi-workspace-governance': 'Axi Workspace Governance',
+        'blinko-reference': 'Blinko Reference',
+        'cliproxyapi-reference': 'CLIProxyAPI Reference',
+        'cockpit-tools-reference': 'Cockpit Tools Reference',
+        'comfyui-reference': 'ComfyUI Reference',
+        'ielts-vocabulary': 'IELTS Vocabulary',
+        'image2prompt-reference': 'Image2Prompt Reference',
+        'opencodex-reference': 'OpenCodex Reference',
+        'sports-management': 'Sports Management',
+        'sub2api-reference': 'Sub2API Reference',
+        'governance': 'Workspace Project Catalog',
+        'WORKSPACE_INDEX.md': 'Workspace Index',
       },
       ui: {
         skipToContent: 'Skip to content',

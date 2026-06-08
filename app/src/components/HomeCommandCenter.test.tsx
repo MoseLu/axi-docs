@@ -502,6 +502,55 @@ describe('HomeCommandCenter', () => {
     expect(within(sidebar).getByRole('button', { name: '贝塔项目 需求文档' })).toBeInTheDocument()
   })
 
+  it('uses workspaceProjects translation map to override project labels per locale', () => {
+    const workspaceSections: KnowledgeCatalog['sections'] = [
+      {
+        key: 'workspace-overview',
+        title: '项目入口',
+        description: 'README workspace document type',
+        count: 1,
+        items: [
+          {
+            sourceId: 'workspace',
+            path: 'project-docs/axi-docs/README.md',
+            name: 'axi-docs-overview',
+            title: '原始中文名（不应显示）',
+            description: 'Axi Docs document',
+            docType: 'project',
+            tags: [],
+            categories: ['projects'],
+            techStack: [],
+            projectId: 'axi-docs',
+            projectTitle: 'Axi Docs',
+            documentTypeKey: 'overview',
+          },
+        ],
+      },
+    ]
+
+    renderWithRouter(
+      <HomeCommandCenter
+        activeSourceId="workspace"
+        activeTag={null}
+        catalog={{ ...catalog, sections: workspaceSections }}
+        docSet="workspace"
+        graphFocusPath={null}
+        onClearSelectedFile={vi.fn()}
+        onOpenExplorer={vi.fn()}
+        onOpenItem={vi.fn()}
+        onTagSelect={vi.fn()}
+        searchQuery=""
+        selectedFile={null}
+        source={sources[0]}
+        sources={sources}
+      />,
+    )
+
+    const sidebar = screen.getByLabelText('侧边栏导航')
+    expect(within(sidebar).getByLabelText('Axi 文档站')).toBeInTheDocument()
+    expect(within(sidebar).queryByLabelText('Axi Docs')).not.toBeInTheDocument()
+  })
+
   it('keeps workspace project order stable when active document type item order differs', () => {
     const workspaceSections: KnowledgeCatalog['sections'] = ['README', 'TDD'].map((type, index) => ({
       key: `workspace-section-${index}`,

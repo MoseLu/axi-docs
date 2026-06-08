@@ -453,9 +453,24 @@ html[data-axi-docs-theme='light'] .app-main--home {
   transform: scaleX(1);
 }
 
+@media (min-width: 960px) {
+  .axi-docs-home--workspace .axi-docs-home__content {
+    padding-left: 0;
+  }
+
+  .axi-docs-home--workspace .axi-docs-home__type-bar {
+    margin-left: 0;
+  }
+}
+
 .axi-docs-home__doc {
   width: min(100%, var(--axi-doc-vp-doc-content-width));
   margin: 0 auto;
+}
+
+.axi-docs-home--workspace .axi-docs-home__doc {
+  margin-right: auto;
+  margin-left: 0;
 }
 
 .axi-docs-home__doc h1 {

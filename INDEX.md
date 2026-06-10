@@ -18,10 +18,12 @@
 | `MILESTONES.md` | Delivery milestones and evidence. |
 | `PRD.md` | Product/project requirements and non-goals. |
 | `TDD.md` | Technical/test design and verification commands. |
+| `ARCHITECTURE-AXI-STACK.md` | Axi Skills × Axi Rules × Axi Docs 共享栈架构拓扑（能力 / 行为 / 知识三层）。 |
 
 ## Top-Level Inventory
 
 - `AGENTS.md`
+- `ARCHITECTURE-AXI-STACK.md`
 - `CHANGELOG.md`
 - `CHANGELOG.zh-CN.md`
 - `MILESTONES.md`

@@ -16,11 +16,12 @@
 
 ## Project Boundary
 
-Axi Docs 是 **「文档枢纽 + 知识图谱 + MCP 文档总线」三合一** 的项目：
+Axi Docs 是 **「文档枢纽 + 知识图谱 + MCP 文档总线 + 工作区项目门面镜像」四合一** 的项目：
 
 1. **文档枢纽（Knowledge Hub）**：聚合多份文档源（Obsidian、Blinko、workspace registry、Axi Skills），通过统一适配器在 Web 端展示。
 2. **知识图谱（Knowledge Graph UI）**：把文档之间的标签/链接关系可视化为力导向图，辅助跨文档检索。
 3. **MCP 文档总线（MCP Document Bus）**：通过 `axi_docs_*` 语义化工具，让 AI 代理从外部以结构化方式访问本仓库文档。
+4. **工作区项目门面镜像（Workspace Project Dossier Mirror）**：跨 5 个分区（`projects/` / `shared/` / `infra/` / `products/` / `tools/`）的 Axi 项目级档案由 `app/scripts/build-projects-index.mjs` 维护：必选 7 件套 + 源存在性驱动的 4 件可选 + 2 件 passthrough（详见 `docs/axi-workspace-governance/audits/axi-docs-coverage-2026-06-10.md`）。
 
 **项目边界**（即本 agent 的修改半径）：
 
@@ -102,4 +103,4 @@ pnpm --dir app build
 
 ---
 
-*最后更新：2026-06-07 — 根级 AGENTS 首版，由 workspace-docs-gap 子代理 A4 落地。*
+*最后更新：2026-06-10 — 扩展"三合一"为"四合一"：增加"工作区项目门面镜像"作为第 4 项职责，由 workspace-docs-gap 子代理 C7 落地。*

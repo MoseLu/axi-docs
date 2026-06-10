@@ -41,3 +41,9 @@ coverage/
 
 # Nested workspaces
 blinko/
+
+# OMX / OMO orchestrator runtime state (per root AGENTS.md House Rules)
+.omx/
+.omx/metrics.json
+.omx/state/
+.omo/

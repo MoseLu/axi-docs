@@ -1,0 +1,42 @@
+---
+id: axi-docs-en-projects-axi-video-downloader
+title: Axi Video Downloader
+type: project
+status: draft
+tags: [Axi Docs, Projects, tools, shared]
+created: 2026-06-10
+modified: 2026-06-10
+graph-title: Axi Video Downloader
+graph-tags: [Projects, tools]
+description: Local video download utility.
+project:
+  id: axi-video-downloader
+  partition: tools
+  path: /Volumes/code/workspace/tools/axi-video-downloader
+  source-section: shared
+---
+
+# Axi Video Downloader — PRD Slice
+
+> Axi Docs PRD slice for **Axi Video Downloader**. This is *not* the project PRD; it captures Axi Docs's own requirements for presenting this project.
+
+## REQ-PROJ-AXI-VIDEO-DOWNLOADER-001
+
+| Field | Value |
+| --- | --- |
+| Requirement | Maintain a discoverable Axi Docs dossier for Axi Video Downloader. |
+| Acceptance | `docs/content/{en,zh}/projects/axi-video-downloader/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONES.md, PRD.md, TDD.md` exist with valid frontmatter. |
+| Source | `WORKSPACE_INDEX.md` (workspace policy). |
+
+## REQ-PROJ-AXI-VIDEO-DOWNLOADER-002
+
+| Field | Value |
+| --- | --- |
+| Requirement | Dossier reflects the canonical workspace path, partition, and purpose statement. |
+| Acceptance | `pnpm --dir app projects:check --project=axi-video-downloader` succeeds. |
+| Source | `WORKSPACE_INDEX.md` partition table. |
+
+## Non-Goals
+
+- Axi Docs does not own the project; it only indexes it.
+- Axi Docs does not duplicate the project's internal design, tests, or roadmap.

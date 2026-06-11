@@ -4,7 +4,7 @@
  *
  * Parses the workspace-level `WORKSPACE_INDEX.md` and emits a machine-readable
  * project list (`docs/projects.index.json`) plus eight-piece Markdown dossiers
- * (README / AGENTS / INDEX / TODO / MILESTONES / PRD / TDD / CHANGELOG-light)
+ * (README / AGENTS / INDEX / TODO / MILESTONE / PRD / TDD / CHANGELOG-light)
  * for every project under `docs/content/{en,zh}/projects/<id>/`.
  *
  * Usage:
@@ -38,21 +38,22 @@ const SECTIONS = [
   { key: 'reference', heading: /^## Reference Repos\s*$/m },
 ];
 
-// Eight-piece dossier filenames. CHANGELOG is optional (root AGENTS says it's
-// a face-level document but many small projects don't have one yet).
+// Eleven-piece dossier filenames. Seven are required (generated for every
+// project from `PIECE_TEMPLATES`); six are optional / source-driven
+// (generated only when the project root has the corresponding file).
 //
-// As of 2026-06-10, the dossier was extended to an 11-piece set:
-//   - The 7 "required" pieces below are generated for every project.
-//   - The 4 "optional" pieces (CHANGELOG / SECURITY / README.zh-CN / AGENTS.zh-CN)
-//     are generated only when the corresponding source file exists at the
-//     project root. The --check mode treats optional pieces as soft
-//     (informational) and never exits non-zero for them.
+// The 4 "source-driven" optional pieces (CHANGELOG / SECURITY /
+// README.zh-CN / AGENTS.zh-CN) are generated as dossier stubs that point
+// back at the source file. The 2 "passthrough" optional pieces (CHANGE /
+// CLAUDE) are copied verbatim with the standard frontmatter prepended, so
+// downstream consumers see the original markdown unchanged.
 //
-// Two more optional files (CHANGE.md, CLAUDE.md) are recognised by name
-// (presence-based mirror) but are rare enough that they do not appear in
-// PIECE_TEMPLATES; if a project root has them, `mirrorAdditionalFiles`
-// copies them through verbatim with frontmatter prepended.
-const PIECES = ['README.md', 'AGENTS.md', 'INDEX.md', 'TODO.md', 'MILESTONES.md', 'PRD.md', 'TDD.md'];
+// Note: per workspace template (`projects/axi-workbench/docs/templates/
+// project-docs/`), the canonical milestone file name is the singular
+// `MILESTONE.md` — not the plural form. Earlier revisions of this script
+// used the plural; the rename keeps the build output aligned with the
+// template source of truth.
+const PIECES = ['README.md', 'AGENTS.md', 'INDEX.md', 'TODO.md', 'MILESTONE.md', 'PRD.md', 'TDD.md'];
 const OPTIONAL_PIECES = ['CHANGELOG.md', 'SECURITY.md', 'README.zh-CN.md', 'AGENTS.zh-CN.md'];
 const PASSTHROUGH_FILES = ['CHANGE.md', 'CLAUDE.md']; // copied verbatim when present
 
@@ -366,7 +367,7 @@ const PIECE_TEMPLATES = {
     '',
   ].join('\n'),
 
-  'MILESTONES.md': (ctx) => [
+  'MILESTONE.md': (ctx) => [
     `# ${ctx.project.name} — Milestones`,
     '',
     '> Dossier milestones. Tracks the **public surface** of this project as seen from Axi Docs.',

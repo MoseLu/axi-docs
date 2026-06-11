@@ -4,14 +4,14 @@ title: Axi Workspace Repo Topology
 type: reference
 status: evergreen
 tags: [workspace, topology, architecture]
-created: 2026-05-31
-modified: 2026-05-31
+created: 2026-06-10
+modified: 2026-06-10
 agent-readable: true
 ---
 
 # Axi Workspace Repo Topology
 
-最后生成：2026-05-31
+最后生成：2026-06-10
 
 ## 控制面
 
@@ -39,11 +39,13 @@ agent-readable: true
   remote: https://github.com/axiomaticworld/axi-image-preview.git
 - `../../projects/axi-notify` | Axi Notify / Mobile | branch=`dev` | canonical=yes | compliance=`android-fullstack`
   remote: https://github.com/axiomaticworld/axi-notify.git
+- `../../projects/axi-pet` | Axi Pet | branch=`main` | canonical=yes | compliance=`node-monorepo-approved`
+  remote: https://github.com/moeru-ai/airi.git
+- `../../projects/axi-sports-management-app` | 体育管理应用 | branch=`dev` | canonical=yes | compliance=`polyrepo-mixed-stack`
+  remote: https://github.com/axiomaticworld/sports-management-app.git
 - `../../projects/axi-workbench` | Axi Workbench | branch=`dev` | canonical=yes | compliance=`node-monorepo-approved`
   remote: https://github.com/axiomaticworld/axi-workbench.git
   upstream: https://github.com/BellisGit/enterprise-project-automation-platform.git
-- `../../projects/sports-management-app` | 体育管理应用 | branch=`dev` | canonical=yes | compliance=`polyrepo-mixed-stack`
-  remote: https://github.com/axiomaticworld/sports-management-app.git
 
 ## Products
 
@@ -52,6 +54,7 @@ agent-readable: true
 
 ## Shared
 
+- `../../projects/axi-rules` | Axi Rules | branch=`main` | canonical=yes | compliance=`constraint-index`
 - `../../shared/axi-tauri-starter` | Axi Tauri Starter | branch=`dev` | canonical=yes | compliance=`template-reference`
   remote: https://github.com/axiomaticworld/axi-tauri-starter.git
 - `../../shared/axi-ui` | Axi UI | branch=`dev` | canonical=yes | compliance=`node-monorepo-approved`
@@ -59,6 +62,8 @@ agent-readable: true
 
 ## Tools
 
+- `../../tools/axi-feishu-codex-bridge` | Axi Feishu Codex Bridge | branch=`dev` | canonical=yes | compliance=`python-tool-local-runtime`
+  remote: https://github.com/MoseLu/axi-feishu-codex-bridge.git
 - `../../tools/axi-proxy-companion` | Axi Proxy Companion | branch=`dev` | canonical=yes | compliance=`swift-tool`
   remote: https://github.com/axiomaticworld/axi-proxy-companion.git
 - `../../tools/axi-video-downloader` | Axi Video Downloader | branch=`-` | canonical=yes | compliance=`python-tool`
@@ -67,5 +72,6 @@ agent-readable: true
 
 - `../../projects/axi-workbench`
 - `../../projects/axi-docs`
+- `../../projects/axi-pet`
 - `../../products/ielts-vocab`
 - `../../shared/axi-ui`

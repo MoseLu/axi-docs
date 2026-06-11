@@ -12,6 +12,7 @@
     "tdd": "docs/TDD.md",
     "memory": "docs/MEMORY.md",
     "adr": "docs/ADR",
+    "error": "ERROR.md",
     "manifest": "docs/project-docs.manifest.json"
   },
   "owners": {

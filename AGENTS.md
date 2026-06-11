@@ -32,7 +32,7 @@ Axi Docs 是 **「文档枢纽 + 知识图谱 + MCP 文档总线 + 工作区项�
 | `docs/content/zh/` | 是 | 产品内容源（简体中文），与 `en/` 同构翻译 |
 | `docs/axi-workspace-governance/` | 是 | 工作区治理文档的本地镜像（只读快照） |
 | `docs/project-docs.manifest.json` | 是 | 项目文档清单，标明各文档的归属路径 |
-| `SECURITY.md`, `TODO.md`, `AGENTS.md`, `CHANGELOG.md` | 是 | 根级项目门面文档 |
+| `SECURITY.md`, `TODO.md`, `AGENTS.md`, `CHANGELOG.md`, `ERROR.md` (`ERROR.zh-CN.md` 为中文镜像) | 是 | 根级项目门面文档 |
 | `references/*`（工作区级） | 否 | 由 `infra/axi-workspace-governance/` 治理，本项目不翻译、不编辑 |
 | `blinko/`（symlink 到 `../blinko`） | 否 | 外部依赖，不在本项目所有权内 |
 
@@ -51,6 +51,7 @@ Axi Docs 是 **「文档枢纽 + 知识图谱 + MCP 文档总线 + 工作区项�
 | 项目待办与 P0~P3 路线图 | [`TODO.md`](TODO.md) |
 | 文档清单与责任归属 | [`docs/project-docs.manifest.json`](docs/project-docs.manifest.json) |
 | 变更历史 | [`CHANGELOG.md`](CHANGELOG.md) |
+| 错误复盘（结构性缺陷的根因分析与记录） | [`ERROR.md`](ERROR.md) |
 | 工作区治理镜像 | `docs/axi-workspace-governance/`（只读，权威源是 `infra/axi-workspace-governance/`） |
 
 > **优先级冲突时**：根级 `AGENTS.md` > `app/AGENTS.md` > 治理镜像 > 个人记忆。

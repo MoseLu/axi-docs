@@ -4,19 +4,19 @@ title: Axi Workspace Project Completion
 type: reference
 status: evergreen
 tags: [workspace, completion, status]
-created: 2026-05-31
-modified: 2026-05-31
+created: 2026-06-10
+modified: 2026-06-10
 agent-readable: true
 ---
 
 # Axi Workspace Project Completion
 
-最后生成：2026-05-31
+最后生成：2026-06-10
 
 ## 摘要
 
-- 已登记项目：27
-- Axi 项目：14
+- 已登记项目：28
+- Axi 项目：15
 - 完成：1
 - 可用及以上：7
 - 阻塞：0
@@ -37,37 +37,38 @@ agent-readable: true
 | Project | Stage | Confidence | Docs | Evidence | Remaining |
 |---|---|---|---|---|---|
 | `axi-accounts` | 未评估 | 低 | missing | verify:test -f /Volumes/code/workspace/docs/axi/AXI_ACCOUNTS_SHARED_SCHEMA.md<br>health:test -f /Volumes/code/workspace/docs/axi/AXI_ACCOUNTS_SHARED_SCHEMA.md<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
-| `axi-agent` | 建设中 | 中 | legacy | Workspace verify covers runtime API smoke tests plus MCP, transport, bridge, and todo packages.<br>Governance source still classifies the project as development.<br>... | Consolidate agent runtime completion evidence into project docs.<br>Keep MCP/transport/bridge consumer checks green as Axi Coder grows.<br>... |
+| `axi-agent` | 建设中 | 中 | partial | Workspace verify covers runtime API smoke tests plus MCP, transport, bridge, and todo packages.<br>Governance source still classifies the project as development.<br>... | Consolidate agent runtime completion evidence into project docs.<br>Keep MCP/transport/bridge consumer checks green as Axi Coder grows.<br>... |
 | `axi-coder` | 建设中 | 中 | legacy | Product surface and workspace E2E contract tests define the Axi Coder capability boundary.<br>Hosted dashboard registration exposes Axi Coder under /apps/axi-coder/overview.<br>... | Keep the completion panel wired to generated workspace evidence.<br>Add native Tauri completion command only if the static snapshot stops being sufficient.<br>... |
-| `axi-docs` | 可用 | 中 | legacy | Workspace graph registers app verification and MCP/document contracts.<br>Workspace governance docs are mirrored into the Axi Docs source tree.<br>... | Keep generated project completion Markdown indexed in the docs hub.<br>Close existing Axi Docs TODO/security backlog before raising confidence.<br>... |
-| `axi-image-preview` | 完成 | 高 | legacy | README documents dev/build/preview and wallpaper MCP commands.<br>package.json exposes test, build, and mcp:wallpapers scripts.<br>... | polish/content expansion |
+| `axi-docs` | 可用 | 中 | partial | Workspace graph registers app verification and MCP/document contracts.<br>Workspace governance docs are mirrored into the Axi Docs source tree.<br>... | Keep generated project completion Markdown indexed in the docs hub.<br>Close existing Axi Docs TODO/security backlog before raising confidence.<br>... |
+| `axi-image-preview` | 完成 | 高 | partial | README documents dev/build/preview and wallpaper MCP commands.<br>package.json exposes test, build, and mcp:wallpapers scripts.<br>... | polish/content expansion |
 | `axi-model-gateway` | 可用 | 中 | legacy | ProviderProfile tests guard credential-ref routing without plaintext secrets.<br>Axi Coder proxy handles OpenAI, Claude Messages, and Gemini request shapes.<br>... | Keep gateway status as an infrastructure contract, not a separate product UI.<br>补齐 docs/project-docs.manifest.json 文档接入清单。<br>... |
-| `axi-notify` | 可用 | 中 | partial | Relay and local smoke verification are registered in the workspace graph.<br>Axi Coder consumes Notify for mobile companion task and notification return paths.<br>... | Keep mobile workbench evidence and goal artifacts discoverable from project docs.<br>补齐 docs/project-docs.manifest.json 文档接入清单。<br>... |
-| `axi-proxy-companion` | 未评估 | 低 | legacy | docs:legacy<br>verify:swift build<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
-| `axi-registry` | 可用 | 中 | legacy | Workspace graph registers registry health verification.<br>Axi UI declares the registry as its package distribution boundary.<br>... | Keep registry health visible when shared packages are published or consumed.<br>补齐 docs/project-docs.manifest.json 文档接入清单。<br>... |
-| `axi-tauri-starter` | 未评估 | 低 | legacy | docs:legacy<br>verify:test -f scripts/tauri-env.sh<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
-| `axi-ui` | 可用 | 中 | legacy | Workspace verify covers file-line guard, typecheck, and tests.<br>Axi Coder and dashboard surfaces consume linked @axi packages.<br>... | Continue additive package hardening without breaking @axi/* style/runtime contracts.<br>补齐 docs/project-docs.manifest.json 文档接入清单。<br>... |
-| `axi-video-downloader` | 未评估 | 低 | legacy | docs:legacy<br>verify:python3 -m py_compile app.py<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
-| `axi-workbench` | 建设中 | 中 | legacy | DevSvc Dashboard and Axi Coder are registered as hosted workbench surfaces.<br>Workspace verify covers dashboard, Axi Coder, verification inbox, and fleet console.<br>... | Finish the project completion data and UI loop for Axi Coder.<br>Continue consolidating dashboard/control-plane documentation and evidence.<br>... |
-| `axi-workspace-governance` | 可用 | 中 | legacy | workspace:docs:sync generates catalog and completion docs.<br>workspace-project validate remains the root graph sanity check.<br>... | Keep generated docs, graph, and mirrored Axi Docs sources synchronized after project moves.<br>补齐 docs/project-docs.manifest.json 文档接入清单。<br>... |
+| `axi-notify` | 可用 | 中 | partial | Relay and local smoke verification are registered in the workspace graph.<br>Axi Coder consumes Notify for mobile companion task and notification return paths.<br>... | Keep mobile workbench evidence and goal artifacts discoverable from project docs.<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
+| `axi-pet` | 未评估 | 中 | partial | Project now lives under /Volumes/code/workspace/projects/axi-pet.<br>Local verification covers stage-web, stage-ui, and stage-layouts typechecks.<br>... | Decide whether to keep upstream AIRI branding internally or run a separate package/product rename pass.<br>Promote local STT helper into a documented project script if it becomes durable.<br>... |
+| `axi-proxy-companion` | 未评估 | 低 | partial | docs:partial<br>verify:swift build<br>... | 补齐 MILESTONE.md，让待办和里程碑可审计。 |
+| `axi-registry` | 可用 | 中 | partial | Workspace graph registers registry health verification.<br>Axi UI declares the registry as its package distribution boundary.<br>... | Keep registry health visible when shared packages are published or consumed.<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
+| `axi-tauri-starter` | 未评估 | 低 | partial | docs:partial<br>verify:test -f scripts/tauri-env.sh<br>... | 补齐 MILESTONE.md，让待办和里程碑可审计。 |
+| `axi-ui` | 可用 | 中 | partial | Workspace verify covers file-line guard, typecheck, and tests.<br>Axi Coder and dashboard surfaces consume linked @axi packages.<br>... | Continue additive package hardening without breaking @axi/* style/runtime contracts.<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
+| `axi-video-downloader` | 未评估 | 低 | partial | docs:partial<br>verify:python3 -m py_compile app.py<br>... | 补齐 MILESTONE.md，让待办和里程碑可审计。 |
+| `axi-workbench` | 建设中 | 中 | partial | DevSvc Dashboard and Axi Coder are registered as hosted workbench surfaces.<br>Workspace verify covers dashboard, Axi Coder, verification inbox, and fleet console.<br>... | Finish the project completion data and UI loop for Axi Coder.<br>Continue consolidating dashboard/control-plane documentation and evidence.<br>... |
+| `axi-workspace-governance` | 可用 | 中 | partial | workspace:docs:sync generates catalog and completion docs.<br>workspace-project validate remains the root graph sanity check.<br>... | Keep generated docs, graph, and mirrored Axi Docs sources synchronized after project moves.<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
 
 ## 其他纳管项目
 
 | Project | Stage | Confidence | Docs | Evidence | Remaining |
 |---|---|---|---|---|---|
 | `ai-capability` | 未评估 | 低 | missing | verify:/Users/mose/.cc-connect/bin/ai-capability status --json<br>health:/Users/mose/.cc-connect/bin/ai-capability status --json<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
-| `blinko` | 未评估 | 低 | legacy | docs:legacy<br>verify:test -f package.json<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
-| `cliproxyapi` | 未评估 | 低 | legacy | docs:legacy<br>verify:test -f go.mod \| test -f README.md<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
-| `cockpit-tools` | 未评估 | 低 | legacy | docs:legacy<br>verify:npm run typecheck \| npm run release:preflight<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
-| `codex-app-projects` | 未评估 | 低 | legacy | docs:legacy<br>verify:/Volumes/code/workspace/scripts/workspace-project validate<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
-| `comfyui` | 未评估 | 低 | legacy | docs:legacy<br>verify:python3 -m py_compile main.py<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
-| `ielts-vocab` | 未评估 | 低 | partial | docs:partial<br>verify:pnpm --dir frontend verify:repo-guards \| python -m pytest backend/tests/test_speech_transcribe.py backend/tests/test_speech_socketio.py<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。 |
-| `image2prompt` | 未评估 | 低 | legacy | docs:legacy<br>verify:test -f README.md \| test -f manifest.json<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
+| `blinko` | 未评估 | 低 | partial | docs:partial<br>verify:test -f package.json<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
+| `cliproxyapi` | 未评估 | 低 | partial | docs:partial<br>verify:test -f go.mod \| test -f README.md<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
+| `cockpit-tools` | 未评估 | 低 | partial | docs:partial<br>verify:npm run typecheck \| npm run release:preflight<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
+| `codex-app-projects` | 未评估 | 低 | partial | docs:partial<br>verify:/Volumes/code/workspace/scripts/workspace-project validate<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
+| `comfyui` | 未评估 | 低 | partial | docs:partial<br>verify:python3 -m py_compile main.py<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
+| `ielts-vocab` | 未评估 | 低 | partial | docs:partial<br>verify:pnpm --dir frontend verify:repo-guards \| python -m pytest backend/tests/test_speech_transcribe.py backend/tests/test_speech_socketio.py<br>... | - |
+| `image2prompt` | 未评估 | 低 | partial | docs:partial<br>verify:test -f README.md \| test -f manifest.json<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
 | `minimax-tokenplan` | 未评估 | 低 | missing | verify:/Users/mose/.cc-connect/bin/minimax-tokenplan tools<br>health:/Users/mose/.cc-connect/bin/minimax-tokenplan tools<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
 | `ollama-local` | 未评估 | 低 | missing | verify:/Users/mose/.cc-connect/bin/ollama-local embed --model mxbai-embed-large:latest --text smoke<br>health:/Users/mose/.cc-connect/bin/ollama-local models<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
-| `opencodex` | 未评估 | 低 | legacy | docs:legacy<br>verify:test -f README.md \| test -f package.json \| test -f scripts/build-macos-app.sh<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
-| `sports-management` | 未评估 | 低 | legacy | docs:legacy<br>verify:pnpm test<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
-| `sub2api` | 未评估 | 低 | legacy | docs:legacy<br>verify:test -d .<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
+| `opencodex` | 未评估 | 低 | partial | docs:partial<br>verify:test -f README.md \| test -f package.json \| test -f scripts/build-macos-app.sh<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
+| `sports-management` | 未评估 | 低 | partial | docs:partial<br>verify:pnpm test<br>... | 补齐 MILESTONE.md，让待办和里程碑可审计。 |
+| `sub2api` | 未评估 | 低 | partial | docs:partial<br>verify:test -d .<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
 
 ## 备注
 

@@ -10,6 +10,7 @@ import type { DocSource, KnowledgeCatalog, KnowledgeCatalogItem, SelectedFile } 
 import { DocumentFooter } from './DocumentFooter'
 import { FileIcon } from './Icons'
 import { DocumentView } from './DocumentView'
+import { ProjectHandoffCard } from './ProjectHandoffCard'
 import { TableOfContents } from './TableOfContents'
 
 interface DocumentDetailPageProps {
@@ -239,6 +240,9 @@ export function DocumentDetailPage({
 
       <main className="document-detail-page__main">
         <div className="document-detail-page__reader">
+          {selectedCatalogItem?.documentTypeKey === 'overview' && selectedCatalogItem.projectId && (
+            <ProjectHandoffCard projectId={selectedCatalogItem.projectId} />
+          )}
           <DocumentView
             content={fileContent}
             fileName={fileName}

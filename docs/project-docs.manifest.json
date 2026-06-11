@@ -225,7 +225,8 @@
     "changelogZh": "CHANGELOG.zh-CN.md",
     "security": "SECURITY.md",
     "error": "ERROR.md",
-    "manifest": "docs/project-docs.manifest.json"
+    "manifest": "docs/project-docs.manifest.json",
+    "verification": "VERIFICATION.md"
   },
   "owners": {
     "primary": "AxiomaticWorld workspace owner",

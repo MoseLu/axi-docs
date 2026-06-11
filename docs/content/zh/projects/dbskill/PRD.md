@@ -27,7 +27,7 @@ project:
 | 字段 | 值 |
 | --- | --- |
 | 需求 | 为 dbskill 维护一份可发现的 Axi Docs 档案。 |
-| 验收 | `docs/content/{en,zh}/projects/dbskill/{README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONES.md, PRD.md, TDD.md, README.zh-CN.md}` 全部存在且 frontmatter 有效。 |
+| 验收 | `docs/content/{en,zh}/projects/dbskill/{README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md, README.zh-CN.md}` 全部存在且 frontmatter 有效。 |
 | 来源 | `docs/axi-workspace-governance/audits/axi-docs-coverage-2026-06-10.md`（覆盖缺口 #1）。 |
 
 ## REQ-PROJ-DBSKILL-002

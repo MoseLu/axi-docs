@@ -25,7 +25,7 @@ project:
 | 字段 | 值 |
 | --- | --- |
 | 需求 | 为 Blinko Reference 维护一份可被发现的 Axi Docs 档案。 |
-| 验收 | `docs/content/{en,zh}/projects/blinko-reference/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONES.md, PRD.md, TDD.md` 均存在，且 frontmatter 有效。 |
+| 验收 | `docs/content/{en,zh}/projects/blinko-reference/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md` 均存在，且 frontmatter 有效。 |
 | 依据 | `WORKSPACE_INDEX.md`（工作区策略）。 |
 
 ## REQ-PROJ-BLINKO-REFERENCE-002

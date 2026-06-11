@@ -22,7 +22,7 @@ project:
 
 ## 单元检查
 
-- `pnpm --dir app projects:check` 遍历 `docs/content/{en,zh}/projects/ielts-vocabulary/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONES.md, PRD.md, TDD.md`，断言每个期望的文件都存在且 frontmatter 合法。
+- `pnpm --dir app projects:check` 遍历 `docs/content/{en,zh}/projects/ielts-vocabulary/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md`，断言每个期望的文件都存在且 frontmatter 合法。
 - `pnpm --dir app projects:check --project=ielts-vocabulary` 在本项目范围内执行同样的检查。
 
 ## 手工检查

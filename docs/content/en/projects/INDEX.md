@@ -4,8 +4,8 @@ title: Workspace Project Dossiers
 type: index
 status: draft
 tags: [Axi Docs, Projects, Index, English]
-created: 2026-06-10
-modified: 2026-06-10
+created: 2026-06-11
+modified: 2026-06-11
 graph-title: Workspace Project Dossiers
 graph-tags: [Projects, Index]
 description: Axi Docs keeps a per-project dossier for every active entry in `WORKSPACE_INDEX.md`. The dossier is generated from the workspace index; re-run `pnpm --dir app projects:build` to refresh it.
@@ -34,8 +34,8 @@ description: Axi Docs keeps a per-project dossier for every active entry in `WOR
 | [Axi Pet](./axi-pet/README.md) | `projects/` | development | Vue, TypeScript, Vite, Electron, Pinia, Live2D, Python | Local workspace project renamed at the directory level; upstream package and brand identifiers may still say AIRI until a separate product rename pass. |
 | [Axi Docs](./axi-docs/README.md) | `projects/` | active | React, TypeScript, Vite, Node.js, MCP, Markdown | Canonical active project; application code lives in `app/`. |
 | [Axi Rules](./axi-rules/README.md) | `projects/` | active constraint index | Markdown, JSON, Python, React, TypeScript, Vite, three.js | Use before `axi-docs`; frontend app lives in `frontend/` and may need a non-5173 Vite port if DevSvc is already listening. |
-| [IELTS Vocabulary](./ielts-vocabulary/README.md) | `products/` | active product | React, TypeScript, Vite, Flask, SQLite, microservices | Non-Axi product; retained outside the Axi consolidation. Static IELTS PDFs/audio live in `reference-materials/raw/` and are gitignored. |
-| [Sports Management](./sports-management/README.md) | `projects/` | development product | Quasar, Vue 3, Go, Capacitor, UniApp | Treated as an independent product, not folded into the Axi mainline. |
+| [IELTS Vocabulary](./ielts-vocabulary/README.md) | `products/` | active product | React, TypeScript, Vite, Flask, SQLite, microservices | AxiomaticWorld spun-out product; sits under AxiomaticWorld governance but outside the `Axi` product line, the way Fliggy / Tmall sit under Alibaba Group. Static IELTS PDFs/audio live in `reference-materials/raw/` and are |
+| [Sports Management](./sports-management/README.md) | `projects/` | development product | Quasar, Vue 3, Go, Capacitor, UniApp | Axi product-line project, kept as a development-stage business app inside the `Axi` product line until it is ready to spin out. |
 | [Axi Proxy Companion](./axi-proxy-companion/README.md) | `tools/` | local tool | SwiftPM, Swift | Independent Axi-prefixed local tool retained outside the Axi monorepos. |
 | [Axi Feishu Codex Bridge](./axi-feishu-codex-bridge/README.md) | `tools/` | local tool | Python, FastAPI, Feishu OpenAPI, WebSocket, PostgreSQL, Ollama | Source project only; runtime install and secrets stay under `/Users/mose/.local/share/codex-feishu-bridge`. |
 

@@ -25,7 +25,7 @@ project:
 | Field | Value |
 | --- | --- |
 | Requirement | Maintain a discoverable Axi Docs dossier for Axi Feishu Codex Bridge. |
-| Acceptance | `docs/content/{en,zh}/projects/axi-feishu-codex-bridge/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONES.md, PRD.md, TDD.md` exist with valid frontmatter. |
+| Acceptance | `docs/content/{en,zh}/projects/axi-feishu-codex-bridge/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md` exist with valid frontmatter. |
 | Source | `WORKSPACE_INDEX.md` (workspace policy). |
 
 ## REQ-PROJ-AXI-FEISHU-CODEX-BRIDGE-002

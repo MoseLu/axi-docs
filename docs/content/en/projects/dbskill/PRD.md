@@ -27,7 +27,7 @@ project:
 | Field | Value |
 | --- | --- |
 | Requirement | Maintain a discoverable Axi Docs dossier for dbskill. |
-| Acceptance | `docs/content/{en,zh}/projects/dbskill/{README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONES.md, PRD.md, TDD.md, README.zh-CN.md}` exist with valid frontmatter. |
+| Acceptance | `docs/content/{en,zh}/projects/dbskill/{README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md, README.zh-CN.md}` exist with valid frontmatter. |
 | Source | `docs/axi-workspace-governance/audits/axi-docs-coverage-2026-06-10.md` (coverage gap #1). |
 
 ## REQ-PROJ-DBSKILL-002

@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-06-10T16:18:03.169Z",
+  "generated_at": "2026-06-11T01:52:21.418Z",
   "source": "WORKSPACE_INDEX.md",
   "count": 25,
   "preservedAddenda": [
@@ -92,7 +92,7 @@
       "purpose": "IELTS vocabulary learning app, backend services, frontend, deploy and learning workflows.",
       "stack": "React, TypeScript, Vite, Flask, SQLite, microservices",
       "status": "active product",
-      "notes": "Non-Axi product; retained outside the Axi consolidation. Static IELTS PDFs/audio live in `reference-materials/raw/` and are gitignored.",
+      "notes": "AxiomaticWorld spun-out product; sits under AxiomaticWorld governance but outside the `Axi` product line, the way Fliggy / Tmall sit under Alibaba Group. Static IELTS PDFs/audio live in `reference-materials/raw/` and are gitignored.",
       "section": "core"
     },
     {
@@ -103,7 +103,7 @@
       "purpose": "Sports management app with web/mobile/backend surfaces.",
       "stack": "Quasar, Vue 3, Go, Capacitor, UniApp",
       "status": "development product",
-      "notes": "Treated as an independent product, not folded into the Axi mainline.",
+      "notes": "Axi product-line project, kept as a development-stage business app inside the `Axi` product line until it is ready to spin out.",
       "section": "core"
     },
     {
@@ -268,7 +268,7 @@
       "purpose": "dontbesilent 商业诊断工具箱 — 21 Agent skills distilled from 12,307 tweets; usable in Claude Code / Codex / Cursor / Trae Solo.",
       "stack": "Markdown skills, JSONL atomic library, CC BY-NC 4.0",
       "status": "hand-curated mirror (not auto-generated)",
-      "notes": "Not listed in WORKSPACE_INDEX.md. Mirror is hand-curated: docs/content/{en,zh}/projects/dbskill/{README,AGENTS,INDEX,TODO,MILESTONES,PRD,TDD}.md (+README.zh-CN.md for zh). Promote to auto-generation after WORKSPACE_INDEX.md adds this project.",
+      "notes": "Not listed in WORKSPACE_INDEX.md. Mirror is hand-curated: docs/content/{en,zh}/projects/dbskill/{README,AGENTS,INDEX,TODO,PRD,TDD}.md (+README.zh-CN.md for zh). Promote to auto-generation after WORKSPACE_INDEX.md adds this project.",
       "section": "shared"
     },
     {

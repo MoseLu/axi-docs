@@ -24,7 +24,7 @@ project:
 - [`AGENTS.md`](./AGENTS.md)
 - [`INDEX.md`](./INDEX.md)
 - [`TODO.md`](./TODO.md)
-- [`MILESTONES.md`](./MILESTONES.md)
+- [`MILESTONE.md`](./MILESTONE.md)
 - [`PRD.md`](./PRD.md)
 - [`TDD.md`](./TDD.md)
 

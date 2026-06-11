@@ -22,7 +22,7 @@ project:
 
 ## 单元检查
 
-- `pnpm --dir app projects:check` 会遍历 `docs/content/{en,zh}/projects/image2prompt-reference/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONES.md, PRD.md, TDD.md`，并断言每个期望文件都存在且 frontmatter 有效。
+- `pnpm --dir app projects:check` 会遍历 `docs/content/{en,zh}/projects/image2prompt-reference/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md`，并断言每个期望文件都存在且 frontmatter 有效。
 - `pnpm --dir app projects:check --project=image2prompt-reference` 会在该项目范围内运行同样的检查。
 
 ## 手工检查

@@ -25,7 +25,7 @@ project:
 | 字段 | 值 |
 | --- | --- |
 | Requirement | 为 Axi Agent Platform 维护一份可被发现的 Axi Docs 档案。 |
-| Acceptance | `docs/content/{en,zh}/projects/axi-agent-platform/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONES.md, PRD.md, TDD.md` 均存在且 frontmatter 合法。 |
+| Acceptance | `docs/content/{en,zh}/projects/axi-agent-platform/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md` 均存在且 frontmatter 合法。 |
 | Source | `WORKSPACE_INDEX.md`（工作区策略）。 |
 
 ## REQ-PROJ-AXI-AGENT-PLATFORM-002

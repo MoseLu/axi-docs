@@ -25,7 +25,7 @@ project:
 | Field | Value |
 | --- | --- |
 | Requirement | Maintain a discoverable Axi Docs dossier for Cockpit Tools Reference. |
-| Acceptance | `docs/content/{en,zh}/projects/cockpit-tools-reference/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONES.md, PRD.md, TDD.md` exist with valid frontmatter. |
+| Acceptance | `docs/content/{en,zh}/projects/cockpit-tools-reference/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md` exist with valid frontmatter. |
 | Source | `WORKSPACE_INDEX.md` (workspace policy). |
 
 ## REQ-PROJ-COCKPIT-TOOLS-REFERENCE-002

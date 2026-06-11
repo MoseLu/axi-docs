@@ -29,7 +29,7 @@ description: 介绍 Axi Docs 如何为工作区索引中的每个 active 项目�
 | `AGENTS.md` | 阅读顺序、边界、更新节奏。 |
 | `INDEX.md` | 档案内目录。 |
 | `TODO.md` | Axi Docs 还需要补齐的内容。 |
-| `MILESTONES.md` | 档案级里程碑与转正条件。 |
+| `MILESTONE.md` | 档案级里程碑与转正条件。 |
 | `PRD.md` | Axi Docs 自身对该项目展示层的需求。 |
 | `TDD.md` | 档案本身的验证设计。 |
 
@@ -71,7 +71,7 @@ pnpm --dir app projects:check   # 校验全部 322 个档案文件就位
 
 | 分组 | 文件 | 行为 |
 | --- | --- | --- |
-| 必选 | `README.md`, `AGENTS.md`, `INDEX.md`, `TODO.md`, `MILESTONES.md`, `PRD.md`, `TDD.md` | 总是生成。 |
+| 必选 | `README.md`, `AGENTS.md`, `INDEX.md`, `TODO.md`, `MILESTONE.md`, `PRD.md`, `TDD.md` | 总是生成。 |
 | 可选 | `CHANGELOG.md`, `SECURITY.md`, `README.zh-CN.md`, `AGENTS.zh-CN.md` | 项目根有源文件时才生成。 |
 | 透传 | `CHANGE.md`, `CLAUDE.md` | 存在时按 verbatim 复制（前置 frontmatter）。 |
 

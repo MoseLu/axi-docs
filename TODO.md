@@ -331,3 +331,191 @@
 - [ ] Revalidate the manifest after source-adapter, MCP, build, document-suite,
       or ownership changes so repository evidence remains sufficient for a
       zero-context handoff.
+
+## Zero-context architecture follow-up（2026-06-11 复探）
+
+> 范围：只记录 `axi-docs` 与 `axi-rules` 在零上下文接手架构中的后续任务。
+> 本节不实施架构改动；每项任务都应能被新 Agent 独立领取、验证和关闭。
+
+### ZC-DOCS-001 | 将项目 dossier 生成源切到 handoff snapshot | TODO
+
+Priority: P0
+
+Problem:
+`app/scripts/build-projects-index.mjs` 和 `app/src/lib/knowledgeBase.ts`
+仍从 `/Volumes/code/workspace/WORKSPACE_INDEX.md` 解析项目列表并生成
+project dossier。零上下文治理已经产生
+`.workspace/project-handoff.json` 与 `workspace-project handoff --json`，
+继续保留 `WORKSPACE_INDEX.md` 作为生成权威会形成双源。
+
+Solution:
+新增 handoff snapshot 读取层，优先从
+`/Volumes/code/workspace/.workspace/project-handoff.json` 或
+`workspace-project handoff --json` 读取项目 readiness、manifest、命令、
+当前任务和已知故障。`WORKSPACE_INDEX.md` 只保留为降级输入和历史引用。
+
+Expected Result:
+Axi Docs 的 project dossier、`docs/projects.index.json`、workspace source
+虚拟文档与治理 handoff 输出一致，不再出现项目数量、状态或命令来源漂移。
+
+Acceptance:
+- [ ] `projects:build` 或后续等价命令从 handoff snapshot 生成项目索引。
+- [ ] 单测覆盖缺失 snapshot、过期 snapshot、reference/cockpit 排除、local-only
+      项目四种情况。
+- [ ] `pnpm --dir app docs:check` 与 `pnpm --dir app verify` 通过。
+- [ ] 生成结果中 15 个活跃项目的 readiness 与
+      `workspace-project handoff --json` 一致。
+
+Evidence:
+- `app/scripts/build-projects-index.mjs` 顶部注释和常量当前声明解析
+  `WORKSPACE_INDEX.md`。
+- `app/src/lib/knowledgeBase.ts` 的 workspace source 仍构造
+  `WORKSPACE_INDEX.md` 项目文档。
+- 本轮治理验证已产生 15 个 `verified 10/10` handoff 条目。
+
+Dependencies:
+- `infra/axi-workspace-governance` 的 `.workspace/project-handoff.json`
+  生成契约保持稳定。
+
+Status: TODO
+
+### ZC-DOCS-002 | 把 axi-rules 纳入一级文档源与 source lock | TODO
+
+Priority: P0
+
+Problem:
+`app/src/config/documentSources.ts` 当前有 workspace、axi-skills、
+axi-skills-zh、axi-docs-en、axi-docs-zh、dbskill、obsidian、blinko，
+但没有 `axi-rules` source。Axi Rules 只能作为项目 dossier 被读到，
+不是规则索引、规则文本和 TODO 契约的一级知识源。
+
+Solution:
+新增 `axi-rules` 本地只读 source，读取
+`/Volumes/code/workspace/projects/axi-rules`，并在
+`docs/sources.lock.json` 固定提交。适配器应优先索引
+`index/docs-source.json`（由 axi-rules 任务生成），再补充
+`rules/*/AGENTS.md`、`index/*.json`、`todo/*.md`。
+
+Expected Result:
+Web 搜索、知识图谱和 MCP 都能直接回答“某条 agent 规则来自哪里、优先级是什么、
+如何验证”，而不需要先进入项目 dossier 再人工拼接。
+
+Acceptance:
+- [ ] `axi_docs_list_sources` 返回 `axi-rules`。
+- [ ] `source:check` 校验 `axi-rules` 的锁定提交。
+- [ ] 搜索 `AR-ROUTING-001` 或 `TD-HDOC-001` 能返回 `axi-rules` source。
+- [ ] `pnpm --dir app test:run` 覆盖 source 注册、锁定和搜索路径。
+
+Evidence:
+- `app/src/config/documentSources.ts` 未注册 `axi-rules`。
+- `axi-rules` 已有 `index/rules.json`、`index/sources.json` 和
+  `todo/index.json`，但 Axi Docs 未按规则源消费。
+
+Dependencies:
+- Axi Rules `TD-HDOC-002` 发布 `index/docs-source.json`。
+
+Status: TODO
+
+### ZC-DOCS-003 | 在项目页渲染 HANDOFF 卡片 | TODO
+
+Priority: P1
+
+Problem:
+Axi Docs 已保存 `app/public/workspace-project-handoff.json`，但项目页的核心
+dossier 仍围绕 README/AGENTS/PRD/TDD/TODO 等镜像文件。新 Agent 进入项目页
+时不能直接看到 read order、entrypoints、commands、current work、known failures
+和 verification evidence 的统一接手卡片。
+
+Solution:
+在项目详情页和 knowledge catalog 中加入 `HANDOFF` 卡片数据模型，读取
+handoff snapshot 的项目条目并渲染两分钟接手视图。MCP 的
+`axi_docs_project_summary` 也返回同一字段。
+
+Expected Result:
+人类和 Agent 在 Axi Docs 中打开任一活跃项目，即可看到与
+`workspace-project onboard <id>` 同源的接手摘要。
+
+Acceptance:
+- [ ] `axi-docs` 和 `axi-rules` 项目页展示 readiness、score、read order、
+      entrypoints、smoke command、current work 和 known failures。
+- [ ] `axi_docs_project_summary` JSON/文本输出包含 handoff 字段。
+- [ ] 快照缺失时 UI 显示可诊断的 stale/missing 状态，而不是空白。
+- [ ] 组件测试覆盖正常、缺失、stale 三种状态。
+
+Evidence:
+- `app/public/workspace-project-handoff.json` 已由治理同步生成。
+- MCP 当前只有 `axi_docs_project_summary`，未显式输出 onboard/handoff 字段。
+
+Dependencies:
+- ZC-DOCS-001。
+
+Status: TODO
+
+### ZC-DOCS-004 | 暴露 workspace-project onboard / handoff-check MCP 工具 | TODO
+
+Priority: P1
+
+Problem:
+Axi Docs MCP 当前提供 `axi_docs_list_sources`、`axi_docs_search`、
+`axi_docs_read`、`axi_docs_skill_search`、`axi_docs_workspace_status`、
+`axi_docs_project_summary`。Agent 若想执行零上下文接手检查，仍需离开
+MCP 再调用本地 `workspace-project` CLI。
+
+Solution:
+新增只读 MCP 工具：`axi_docs_project_onboard` 与
+`axi_docs_handoff_check`。工具内部调用治理 CLI 或读取 snapshot；默认不执行
+破坏性命令，`--smoke` 需显式参数并只运行 manifest 声明的 smoke。
+
+Expected Result:
+MCP 客户端可以通过 Axi Docs 完成“定位项目、读取接手摘要、检查 handoff、
+可选 smoke”的闭环。
+
+Acceptance:
+- [ ] `tools/list` 暴露两个新工具及输入 schema。
+- [ ] `axi_docs_project_onboard` 输出与
+      `workspace-project onboard <id> --json` 字段兼容。
+- [ ] `axi_docs_handoff_check` 默认不运行 smoke；传入 `smoke: true` 才运行。
+- [ ] 单测覆盖未知项目、snapshot 缺失、smoke=false、smoke=true 四种路径。
+
+Evidence:
+- `app/src/mcp/server.ts` 当前未出现 `handoff` 或 `onboard` 工具名。
+
+Dependencies:
+- ZC-DOCS-001。
+
+Status: TODO
+
+### ZC-DOCS-005 | 拆分旧审计 TODO 与当前架构 backlog | TODO
+
+Priority: P2
+
+Problem:
+根 `TODO.md` 混合了 2026-03 代码审计、2026-06 文档覆盖补齐计划、零上下文
+handoff 治理和后续架构任务。新 Agent 很难区分真实当前架构缺口、已完成审计
+项、owner action 和历史归档。
+
+Solution:
+保留根 `TODO.md` 作为 facade，新增 `todo/` 目录或分节索引，把旧审计、
+文档覆盖、zero-context architecture follow-up、security/ops backlog 分开。
+每个 P0/P1 任务必须包含 Problem、Solution、Expected Result、Acceptance、
+Evidence、Dependencies、Status。
+
+Expected Result:
+Agent 可以在 2 分钟内判断当前最高优先级任务，而不会被已完成审计清单或历史
+统计误导。
+
+Acceptance:
+- [ ] 根 `TODO.md` 不再超过约 120 行，主要作为任务索引。
+- [ ] 历史审计项迁入 archive 或 legacy 文件。
+- [ ] 当前 P0/P1 任务都包含统一原子字段。
+- [ ] `docs/project-docs.manifest.json.currentWork.active` 指向当前任务组。
+
+Evidence:
+- 当前 `TODO.md` 同时包含旧审计统计、完成项、owner action 和新 handoff
+  governance 项。
+- `axi-rules` 已有 `todo/` 分类目录，可作为结构参考。
+
+Dependencies:
+- 无。
+
+Status: TODO

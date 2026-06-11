@@ -322,3 +322,12 @@
 ---
 
 *追加于 2026-06-10 — 由 axi-docs 维护者从工作区状态现场整理。*
+
+## Zero-context handoff governance
+
+- [x] Migrate `docs/project-docs.manifest.json` to schema v2 with verified
+      read order, entrypoints, commands, environment metadata, contracts, and
+      troubleshooting guidance.
+- [ ] Revalidate the manifest after source-adapter, MCP, build, document-suite,
+      or ownership changes so repository evidence remains sufficient for a
+      zero-context handoff.

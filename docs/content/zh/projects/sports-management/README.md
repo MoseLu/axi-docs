@@ -38,7 +38,7 @@ Quasar、Vue 3、Go、Capacitor、UniApp
 
 ## 说明
 
-独立的体育应用。未并入任何此前的独立仓库。
+Axi 产品线项目；当前处于 development 阶段，保留在 `Axi` 产品线内，待产品成熟后会 spin out 到 `products/` 目录成为 AxiomaticWorld 集团下的独立成品业务。
 
 ## 验证（建议）
 

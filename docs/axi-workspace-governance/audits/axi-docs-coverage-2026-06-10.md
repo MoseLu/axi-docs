@@ -48,7 +48,7 @@ axi-docs 对工作区**不是完全覆盖**，存在 3 类缺口：
 
 ### 3.2 根级门面文件镜像不完整（7 → 11 件套）
 
-`build-projects-index.mjs` 当前 `PIECES = ['README.md','AGENTS.md','INDEX.md','TODO.md','MILESTONES.md','PRD.md','TDD.md']`，每个项目只生成 7 件套。但工作区里大多数 Axi 项目实际有 8–13 个根级门面：
+`build-projects-index.mjs` 当前 `PIECES = ['README.md','AGENTS.md','INDEX.md','TODO.md','MILESTONE.md','PRD.md','TDD.md']`，每个项目只生成 7 件套。但工作区里大多数 Axi 项目实际有 8–13 个根级门面：
 
 | 缺失件 | 涉及项目（举例）|
 |---|---|
@@ -81,7 +81,7 @@ repo-topology.md
 **漏掉** 9 个 governance 仓库**自身的根级门面**（在 `infra/axi-workspace-governance/` 根级）：
 
 ```
-AGENTS.md, CHANGELOG.md, INDEX.md, MILESTONES.md, PRD.md,
+AGENTS.md, CHANGELOG.md, INDEX.md, MILESTONE.md, PRD.md,
 README.zh-CN.md, SECURITY.md, TDD.md, TODO.md
 ```
 
@@ -99,7 +99,7 @@ README.zh-CN.md, SECURITY.md, TDD.md, TODO.md
 - **生成物**：`docs/projects.index.json` + `docs/content/{en,zh}/projects/<id>/{7 件套}`
 - **存在检测**：`writeIfMissing`，不覆盖已存在文件；需 `--force` 才覆盖
 - **跳过规则**：`infra/axi-workspace-governance` 与 `infra/axi-registry`（脚本 line 196-198）
-- **PIECES 数量**：7 件套（line 16: `['README.md','AGENTS.md','INDEX.md','TODO.md','MILESTONES.md','PRD.md','TDD.md']`）
+- **PIECES 数量**：7 件套（line 16: `['README.md','AGENTS.md','INDEX.md','TODO.md','MILESTONE.md','PRD.md','TDD.md']`）
 - **触发**：`pnpm --dir app projects:build` / `pnpm --dir app projects:check`
 
 ### 4.2 手工补全（references + 治理）
@@ -142,10 +142,10 @@ mkdir -p /Volumes/code/workspace/projects/axi-docs/docs/content/{en,zh}/projects
 
 ```js
 // 改前
-const PIECES = ['README.md', 'AGENTS.md', 'INDEX.md', 'TODO.md', 'MILESTONES.md', 'PRD.md', 'TDD.md'];
+const PIECES = ['README.md', 'AGENTS.md', 'INDEX.md', 'TODO.md', 'MILESTONE.md', 'PRD.md', 'TDD.md'];
 
 // 改后
-const PIECES = ['README.md', 'AGENTS.md', 'INDEX.md', 'TODO.md', 'MILESTONES.md', 'PRD.md', 'TDD.md'];
+const PIECES = ['README.md', 'AGENTS.md', 'INDEX.md', 'TODO.md', 'MILESTONE.md', 'PRD.md', 'TDD.md'];
 const OPTIONAL_PIECES = [
   { name: 'CHANGELOG.md', required: false },
   { name: 'SECURITY.md', required: false },
@@ -184,7 +184,7 @@ pnpm --dir app projects:build
 
 ```bash
 # 1. 从源复制（最简单）
-for f in AGENTS.md CHANGELOG.md INDEX.md MILESTONES.md PRD.md README.zh-CN.md SECURITY.md TDD.md TODO.md; do
+for f in AGENTS.md CHANGELOG.md INDEX.md MILESTONE.md PRD.md README.zh-CN.md SECURITY.md TDD.md TODO.md; do
   cp /Volumes/code/workspace/infra/axi-workspace-governance/$f \
      /Volumes/code/workspace/projects/axi-docs/docs/axi-workspace-governance/$f
 done

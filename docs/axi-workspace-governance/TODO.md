@@ -5,8 +5,8 @@ Tasks are grouped by inferred requirements. P0/P1 items include test cases.
 ## P0
 
 - [ ] REQ-DOC-001: Keep the root documentation suite complete and current.
-  - Test: verify `README.md README.zh-CN.md AGENTS.md CHANGELOG.md TODO.md MILESTONES.md INDEX.md PRD.md TDD.md` exist in `/Volumes/code/workspace/infra/axi-workspace-governance`.
-  - Test: run `rg -n "REQ-DOC-001|PRD|TDD|Milestone" README.md PRD.md TDD.md MILESTONES.md INDEX.md`.
+  - Test: verify `README.md README.zh-CN.md AGENTS.md CHANGELOG.md TODO.md MILESTONE.md INDEX.md PRD.md TDD.md` exist in `/Volumes/code/workspace/infra/axi-workspace-governance`.
+  - Test: run `rg -n "REQ-DOC-001|PRD|TDD|Milestone" README.md PRD.md TDD.md MILESTONE.md INDEX.md`.
 
 ## P1
 
@@ -19,4 +19,4 @@ Tasks are grouped by inferred requirements. P0/P1 items include test cases.
 ## P2
 
 - [ ] REQ-DOC-002: Add deeper module docs only where source ownership and repeated workflows justify them.
-- [ ] REQ-MILESTONE-001: Update `MILESTONES.md` after each verified delivery batch.
+- [ ] REQ-MILESTONE-001: Update `MILESTONE.md` after each verified delivery batch.

@@ -38,7 +38,7 @@ React, TypeScript, Vite, Flask, SQLite, microservices
 
 ## Notes
 
-Non-Axi product; retained outside the Axi consolidation. Static IELTS PDFs/audio live in `reference-materials/raw/` and are gitignored.
+AxiomaticWorld spun-out product; sits under AxiomaticWorld governance but outside the `Axi` product line, the way Fliggy / Tmall sit under Alibaba Group. Static IELTS PDFs/audio live in `reference-materials/raw/` and are gitignored.
 
 ## Verification (suggested)
 

@@ -56,7 +56,7 @@ pnpm completion:test          # 跑治理自测（Node test runner）
 
 - 完整产品需求：`PRD.md`
 - 技术设计：`TDD.md`
-- 任务与里程碑：`TODO.md` / `MILESTONES.md`
+- 任务与里程碑：`TODO.md` / `MILESTONE.md`
 - 文档索引：`INDEX.md`
 - 变更记录：`CHANGELOG.md`
 - Agent 协作规则：`AGENTS.md`

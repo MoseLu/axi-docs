@@ -15,7 +15,7 @@ The root docs form a lightweight control plane:
 2. `PRD.md` defines requirements and non-goals.
 3. `TDD.md` defines verification strategy.
 4. `TODO.md` maps requirements to tasks and tests.
-5. `MILESTONES.md` records delivery evidence.
+5. `MILESTONE.md` records delivery evidence.
 6. `INDEX.md` maps documents and source-of-truth ownership.
 
 ## Verification Commands
@@ -27,8 +27,8 @@ The root docs form a lightweight control plane:
 Minimum documentation check:
 
 ```bash
-for f in README.md README.zh-CN.md AGENTS.md CHANGELOG.md TODO.md MILESTONES.md INDEX.md PRD.md TDD.md; do test -f "/Volumes/code/workspace/infra/axi-workspace-governance/$f" || exit 1; done
-rg -n "REQ-DOC-001|PRD|TDD|Milestone" "/Volumes/code/workspace/infra/axi-workspace-governance/PRD.md" "/Volumes/code/workspace/infra/axi-workspace-governance/TDD.md" "/Volumes/code/workspace/infra/axi-workspace-governance/TODO.md" "/Volumes/code/workspace/infra/axi-workspace-governance/MILESTONES.md" "/Volumes/code/workspace/infra/axi-workspace-governance/INDEX.md"
+for f in README.md README.zh-CN.md AGENTS.md CHANGELOG.md TODO.md MILESTONE.md INDEX.md PRD.md TDD.md; do test -f "/Volumes/code/workspace/infra/axi-workspace-governance/$f" || exit 1; done
+rg -n "REQ-DOC-001|PRD|TDD|Milestone" "/Volumes/code/workspace/infra/axi-workspace-governance/PRD.md" "/Volumes/code/workspace/infra/axi-workspace-governance/TDD.md" "/Volumes/code/workspace/infra/axi-workspace-governance/TODO.md" "/Volumes/code/workspace/infra/axi-workspace-governance/MILESTONE.md" "/Volumes/code/workspace/infra/axi-workspace-governance/INDEX.md"
 ```
 
 ## Risk Cases

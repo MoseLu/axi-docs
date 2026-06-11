@@ -25,7 +25,7 @@ project:
 | Field | Value |
 | --- | --- |
 | Requirement | Maintain a discoverable Axi Docs dossier for ComfyUI Reference. |
-| Acceptance | `docs/content/{en,zh}/projects/comfyui-reference/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONES.md, PRD.md, TDD.md` exist with valid frontmatter. |
+| Acceptance | `docs/content/{en,zh}/projects/comfyui-reference/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md` exist with valid frontmatter. |
 | Source | `WORKSPACE_INDEX.md` (workspace policy). |
 
 ## REQ-PROJ-COMFYUI-REFERENCE-002

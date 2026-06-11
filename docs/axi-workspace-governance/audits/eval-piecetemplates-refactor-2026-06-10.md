@@ -7,7 +7,7 @@
 
 ## 1. 现状
 
-`app/scripts/build-projects-index.mjs` 的 `PIECE_TEMPLATES` 是 179 行的内联对象，键为 piece 名（`README.md` / `AGENTS.md` / `INDEX.md` / `TODO.md` / `MILESTONES.md` / `PRD.md` / `TDD.md`），值是返回字符串数组的箭头函数（`ctx` 注入 project 上下文）。所有 7 件套共用同一上下文 `ctx = { project, locale, pieces: PIECES }`。
+`app/scripts/build-projects-index.mjs` 的 `PIECE_TEMPLATES` 是 179 行的内联对象，键为 piece 名（`README.md` / `AGENTS.md` / `INDEX.md` / `TODO.md` / `MILESTONE.md` / `PRD.md` / `TDD.md`），值是返回字符串数组的箭头函数（`ctx` 注入 project 上下文）。所有 7 件套共用同一上下文 `ctx = { project, locale, pieces: PIECES }`。
 
 **优点**：
 - 字符串数组 + `\n.join` 是 Node.js 最朴素的模板机制，零依赖、零运行时开销。

@@ -22,7 +22,7 @@ project:
 
 ## Unit checks
 
-- `pnpm --dir app projects:check` walks `docs/content/{en,zh}/projects/axi-agent-platform/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONES.md, PRD.md, TDD.md` and asserts every expected piece exists with valid frontmatter.
+- `pnpm --dir app projects:check` walks `docs/content/{en,zh}/projects/axi-agent-platform/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md` and asserts every expected piece exists with valid frontmatter.
 - `pnpm --dir app projects:check --project=axi-agent-platform` runs the same checks scoped to this project.
 
 ## Manual checks

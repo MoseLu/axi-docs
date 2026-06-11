@@ -38,7 +38,7 @@ React, TypeScript, Vite, Flask, SQLite, microservices
 
 ## 说明
 
-非 Axi 产品，保留在 Axi 整合范围之外。静态 IELTS PDF 与音频位于 `reference-materials/raw/`，已加入 gitignore。
+AxiomaticWorld 集团下的独立成品业务(spun-out product):在 AxiomaticWorld 治理之下,但不在 `Axi` 产品线下,类似阿里巴巴集团下的飞猪 / 天猫。静态 IELTS PDF 与音频位于 `reference-materials/raw/`,已加入 gitignore。
 
 ## 验证（建议）
 

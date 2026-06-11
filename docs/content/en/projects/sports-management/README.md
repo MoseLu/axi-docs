@@ -38,7 +38,7 @@ Quasar, Vue 3, Go, Capacitor, UniApp
 
 ## Notes
 
-Treated as an independent product, not folded into the Axi mainline.
+Axi product-line project, kept as a development-stage business app inside the `Axi` product line until it is ready to spin out into `products/`.
 
 ## Verification (suggested)
 

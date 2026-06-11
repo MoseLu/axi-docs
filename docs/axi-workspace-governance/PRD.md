@@ -19,7 +19,7 @@ The project needs a complete root documentation suite so humans and agents can u
 | REQ-DOC-001 | Maintain the full root documentation suite. | All required docs exist and are internally consistent. |
 | REQ-VERIFY-001 | Document runnable verification. | `TDD.md` lists concrete commands or exact blockers. |
 | REQ-BOUNDARY-001 | Preserve ownership boundaries. | `AGENTS.md` explains writable scope and cross-project limits. |
-| REQ-MILESTONE-001 | Track delivery status. | `MILESTONES.md` records current state and exit criteria. |
+| REQ-MILESTONE-001 | Track delivery status. | `MILESTONE.md` records current state and exit criteria. |
 
 ## Non-Goals
 

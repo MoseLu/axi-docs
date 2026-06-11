@@ -29,7 +29,7 @@ The eight-piece structure (per `app/AGENTS.md`):
 | `AGENTS.md` | Read order, boundary, update cadence. |
 | `INDEX.md` | Dossier index. |
 | `TODO.md` | What Axi Docs still needs to surface. |
-| `MILESTONES.md` | Dossier-level milestones and exit criteria. |
+| `MILESTONE.md` | Dossier-level milestones and exit criteria. |
 | `PRD.md` | Axi Docs' requirements for presenting the project. |
 | `TDD.md` | Verification design for the dossier itself. |
 
@@ -71,7 +71,7 @@ The dossier was extended from 7 to **11 pieces** by [coverage audit 2026-06-10](
 
 | Group | Files | Behaviour |
 | --- | --- | --- |
-| Required | `README.md`, `AGENTS.md`, `INDEX.md`, `TODO.md`, `MILESTONES.md`, `PRD.md`, `TDD.md` | Always generated. |
+| Required | `README.md`, `AGENTS.md`, `INDEX.md`, `TODO.md`, `MILESTONE.md`, `PRD.md`, `TDD.md` | Always generated. |
 | Optional | `CHANGELOG.md`, `SECURITY.md`, `README.zh-CN.md`, `AGENTS.zh-CN.md` | Generated only when project root has the source file. |
 | Passthrough | `CHANGE.md`, `CLAUDE.md` | Copied verbatim (with frontmatter) when present. |
 

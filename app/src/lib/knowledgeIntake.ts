@@ -22,6 +22,16 @@ export interface KnowledgeIntakeResult {
   issues: KnowledgeIntakeIssue[]
 }
 
+export interface KnowledgeIntakeOptions {
+  /**
+   * When `true`, missing `frontmatter` and required-fields issues are
+   * downgraded to warnings instead of blocking acceptance. Used for
+   * read-only source repos (e.g. `axi-rules`) whose canonical documents
+   * predate the Axi Docs frontmatter contract and cannot be edited.
+   */
+  allowUnannotated?: boolean
+}
+
 export function normalizeStringArray(value: unknown): string[] {
   if (Array.isArray(value)) {
     return value
@@ -81,7 +91,7 @@ function resolveSourceTags(frontmatter: Frontmatter): string[] {
   return [...new Set(normalizeStringArray(frontmatter.tags))]
 }
 
-export function runKnowledgeIntake(frontmatter: Frontmatter): KnowledgeIntakeResult {
+export function runKnowledgeIntake(frontmatter: Frontmatter, options: KnowledgeIntakeOptions = {}): KnowledgeIntakeResult {
   const issues: KnowledgeIntakeIssue[] = []
   const hasAnyFrontmatter = Object.keys(frontmatter).length > 0
 
@@ -156,7 +166,7 @@ export function runKnowledgeIntake(frontmatter: Frontmatter): KnowledgeIntakeRes
     || issue.code === 'missing-fields'
     || (issue.code === 'missing-graph-title' && !graphTitle)
     || (issue.code === 'missing-graph-tags' && graphTags.length === 0)
-  ))
+  )) && !options.allowUnannotated
 
   return {
     accepted: !hasBlockingIssues,

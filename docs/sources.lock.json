@@ -5,10 +5,19 @@
     "axi-skills": {
       "repo": "https://github.com/MoseLu/axi-skills.git",
       "ref": "dev",
-      "commit": "2e5c2d6eb795a99807f6d8e5c17d264a2c11045b",
+      "commit": "ab40fdea8ccb44425dd8a63d5d8c45b4440a8d2a",
       "localPathEnv": "AXI_SKILLS_PATH",
       "defaultLocalPath": "/Volumes/code/workspace/shared/axi-skills",
       "ciPath": "../sources/axi-skills",
+      "requiredForBuild": true
+    },
+    "axi-rules": {
+      "repo": "file:///Volumes/code/workspace/projects/axi-rules",
+      "ref": "agent/zero-context-handoff-20260611",
+      "commit": "18725e4bf065115961c1f45cddebd71615c471df",
+      "localPathEnv": "AXI_RULES_PATH",
+      "defaultLocalPath": "/Volumes/code/workspace/projects/axi-rules",
+      "ciPath": "../projects/axi-rules",
       "requiredForBuild": true
     }
   }

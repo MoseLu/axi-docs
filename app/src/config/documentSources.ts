@@ -29,6 +29,10 @@ export function getDocumentSourceRegistry(): DocumentSourceConfig[] {
     process.env.DBSKILL_PATH || '',
     resolveWorkspacePath('shared', 'dbskill'),
   )
+  const axiRulesPath = existingOrFallback(
+    process.env.AXI_RULES_PATH || '',
+    resolveWorkspacePath('projects', 'axi-rules'),
+  )
   const axiDocsContentPath = existingOrFallback(
     process.env.AXI_DOCS_CONTENT_PATH || '',
     resolveProjectPath('docs', 'content'),
@@ -79,6 +83,27 @@ export function getDocumentSourceRegistry(): DocumentSourceConfig[] {
       icon: 'folder',
       skillRoot: 'skills.zh',
       locale: 'zh',
+    },
+    {
+      // Zero-context handoff governance: agent rules, TODO contracts, and
+      // source locks live in `axi-rules` and must be searchable as a
+      // first-class source (not only via the per-project dossier). The
+      // `index/docs-source.json` sidecar is consumed separately by
+      // `axi_docs_project_onboard` and is intentionally NOT re-parsed
+      // through the markdown adapter here.
+      id: 'axi-rules',
+      name: 'Axi Rules',
+      description: 'Agent 规则、TODO 契约和源锁的一级知识源（rules/、todo/）。',
+      path: axiRulesPath,
+      enabled: process.env.AXI_RULES_ENABLED !== 'false',
+      type: 'local',
+      kind: 'markdown-vault',
+      adapter: 'markdown',
+      audience: ['agent', 'human'],
+      readOnly: true,
+      organizationHint: 'axi-rules',
+      icon: 'folder',
+      locale: 'en',
     },
     {
       id: 'axi-docs-en',

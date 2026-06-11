@@ -32,7 +32,7 @@ export interface DocSource {
   locale?: SkillSourceLocale
   includeSkillAssets?: boolean
   includeSupportDocs?: boolean
-  organizationHint?: 'dbskill' | 'skill-families'
+  organizationHint?: 'dbskill' | 'skill-families' | 'axi-rules'
   apiUrl?: string
   apiToken?: string
   icon?: 'obsidian' | 'blinko' | 'folder'

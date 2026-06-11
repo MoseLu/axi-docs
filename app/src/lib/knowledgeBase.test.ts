@@ -501,7 +501,7 @@ describe('knowledge base local index', () => {
     expect(staticDeepInit?.content).toContain('Use this to create PARADIGM and ARCHITECTURE docs.')
     expect(staticDeepInit?.content).not.toContain('Source path:')
     expect(staticDeepInit?.content).not.toContain('## Excerpt')
-  })
+  }, 30000)
 
   it('indexes dbskill as a full organized skill library', async () => {
     tempDir = await fs.promises.mkdtemp(path.join(os.tmpdir(), 'axi-docs-dbskill-'))

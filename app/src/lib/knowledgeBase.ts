@@ -1536,7 +1536,7 @@ const WORKSPACE_DOCUMENT_TYPE_DEFINITIONS: WorkspaceDocumentTypeDefinition[] = [
   },
   {
     key: 'milestones',
-    fileNames: ['MILESTONES.md'],
+    fileNames: ['MILESTONE.md'],
     title: '里程碑',
     description: '项目阶段、交付证据和退出标准。',
     itemTitleSuffix: '里程碑',

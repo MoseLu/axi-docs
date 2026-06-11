@@ -601,7 +601,7 @@ describe('knowledge base local index', () => {
     await fs.promises.writeFile(path.join(projectRoot, 'TDD.md'), '# Axi Docs TDD\n\nReact, TypeScript\n', 'utf-8')
     await fs.promises.writeFile(path.join(projectRoot, 'AGENTS.md'), '# Axi Docs Agent Guide\n\nTODO.md\n', 'utf-8')
     await fs.promises.writeFile(path.join(projectRoot, 'TODO.md'), '# Axi Docs TODO\n\nREQ-DOC-001\n', 'utf-8')
-    await fs.promises.writeFile(path.join(projectRoot, 'MILESTONES.md'), '# Axi Docs Milestones\n\nMilestone\n', 'utf-8')
+    await fs.promises.writeFile(path.join(projectRoot, 'MILESTONE.md'), '# Axi Docs Milestones\n\nMilestone\n', 'utf-8')
     await fs.promises.writeFile(path.join(projectRoot, 'CHANGELOG.md'), '# Axi Docs Changelog\n\nChanged\n', 'utf-8')
     await fs.promises.writeFile(path.join(projectRoot, 'INDEX.md'), '# Axi Docs Index\n\nPRD / TDD\n', 'utf-8')
 

@@ -24,7 +24,7 @@ project:
 
 ## 单元检查
 
-- `docs/content/{en,zh}/projects/dbskill/{README,AGENTS,INDEX,TODO,MILESTONES,PRD,TDD,README.zh-CN}.md` 全部存在且 frontmatter 有效。
+- `docs/content/{en,zh}/projects/dbskill/{README,AGENTS,INDEX,TODO,MILESTONE,PRD,TDD,README.zh-CN}.md` 全部存在且 frontmatter 有效。
 - 两个语种的 `frontmatter.project.path` 都等于 `/Volumes/code/workspace/shared/dbskill`。
 
 ## 手动检查

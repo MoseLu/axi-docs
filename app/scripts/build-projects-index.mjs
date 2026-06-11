@@ -384,9 +384,9 @@ const PIECE_TEMPLATES = {
   ].join('\n'),
 
   'MILESTONE.md': (ctx) => [
-    `# ${ctx.project.name} — Milestones`,
+    `# ${ctx.project.name} — Milestone`,
     '',
-    '> Dossier milestones. Tracks the **public surface** of this project as seen from Axi Docs.',
+    '> Dossier milestone. Tracks the **public surface** of this project as seen from Axi Docs.',
     '',
     '## Current State',
     '',

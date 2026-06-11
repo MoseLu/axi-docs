@@ -15,7 +15,7 @@
 | `AGENTS.md` | Agent rules, boundaries, verification, read order. |
 | `CHANGELOG.md` | Human-visible change log. |
 | `TODO.md` | Task facade pointing at `todo/01-current-architecture.md` (current backlog), `todo/02-legacy-audit.md`, `todo/03-coverage-remediation.md`, `todo/04-roadmap.md`. |
-| `MILESTONE.md` | Delivery milestones and evidence. |
+| `MILESTONE.md` | Delivery milestone and evidence. |
 | `PRD.md` | Product/project requirements and non-goals. |
 | `TDD.md` | Technical/test design and verification commands. |
 | `ARCHITECTURE-AXI-STACK.md` | Axi Skills × Axi Rules × Axi Docs 共享栈架构拓扑（能力 / 行为 / 知识三层）。 |

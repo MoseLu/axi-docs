@@ -29,7 +29,7 @@ The eight-piece structure (per `app/AGENTS.md`):
 | `AGENTS.md` | Read order, boundary, update cadence. |
 | `INDEX.md` | Dossier index. |
 | `TODO.md` | What Axi Docs still needs to surface. |
-| `MILESTONE.md` | Dossier-level milestones and exit criteria. |
+| `MILESTONE.md` | Dossier-level milestone and exit criteria. |
 | `PRD.md` | Axi Docs' requirements for presenting the project. |
 | `TDD.md` | Verification design for the dossier itself. |
 
@@ -89,5 +89,5 @@ If you re-run `projects:build`, the JSON's `preservedAddenda` field lists which 
 ## Out of scope
 
 - The dossier is **not** a copy of the project's documentation. Duplicate content drifts.
-- The dossier is **not** the project PRD / TDD / MILESTONES — those live in the project root.
+- The dossier is **not** the project PRD / TDD / MILESTONE — those live in the project root.
 - The dossier is **not** translated content for the *project itself*. Per the root `AGENTS.md`, `references/*` is not translated. Dossiers are metadata about projects, not project content, so they are translated like any other Axi Docs page.

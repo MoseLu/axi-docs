@@ -49,9 +49,9 @@ not versioned.
   （`INDEX.md`、`TODO.md`、`MILESTONE.md`、`PRD.md`、`TDD.md`），
   按三 surface（codex-exec / codex-app-ws / codex-plus-cdp）填充。
 - 2026-06-11: 统一里程碑命名为单数 `MILESTONE.md`：13 个项目根级
-  `MILESTONES.md` 重命名为 `MILESTONE.md`，并批量更新 231 个文件内部
+  `MILESTONE.md` 重命名为 `MILESTONE.md`，并批量更新 231 个文件内部
   文本引用（PRD/TODO/TDD/INDEX/CHANGELOG/AGENTS 等）；同步处理
-  `products/ielts-vocab` 的复数孤儿 `MILESTONES.md` 并修正
+  `products/ielts-vocab` 的复数孤儿 `MILESTONE.md` 并修正
   `docs/projects.index.json` 中 dbskill hand-curated mirror 备注里残留的
   复数文件名。16 个 Axi 项目 7 件套全部 7/7 满。
 - 2026-06-11: 标准化 14 处 `PULL_REQUEST_TEMPLATE.md`（原以为分裂在 yml vs md，

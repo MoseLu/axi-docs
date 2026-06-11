@@ -16,9 +16,9 @@ project:
   source-section: shared
 ---
 
-# Workspace Dev Services — Milestones
+# Workspace Dev Services — Milestone
 
-> Dossier milestones. Tracks the **public surface** of this project as seen from Axi Docs.
+> Dossier milestone. Tracks the **public surface** of this project as seen from Axi Docs.
 
 ## Current State
 

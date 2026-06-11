@@ -60,19 +60,19 @@ agent-readable: true
 | Project | Stage | Confidence | Docs | Evidence | Remaining |
 |---|---|---|---|---|---|
 | `ai-capability` | 未评估 | 低 | missing | handoff:unready<br>verify:/Users/mose/.cc-connect/bin/ai-capability status --json<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
-| `blinko` | 未评估 | 低 | partial | docs:partial<br>handoff:unready<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
-| `cliproxyapi` | 未评估 | 低 | partial | docs:partial<br>handoff:unready<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
-| `cockpit-tools` | 未评估 | 低 | partial | docs:partial<br>handoff:unready<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
+| `blinko` | 未评估 | 低 | partial | docs:partial<br>handoff:unready<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。 |
+| `cliproxyapi` | 未评估 | 低 | partial | docs:partial<br>handoff:unready<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。 |
+| `cockpit-tools` | 未评估 | 低 | partial | docs:partial<br>handoff:unready<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。 |
 | `codex-app-projects` | 维护 | 高 | not-applicable | WORKSPACE_INDEX.md declares the root contract.<br>AGENTS.md declares that git work belongs to owning project repositories.<br>... | - |
-| `comfyui` | 未评估 | 低 | partial | docs:partial<br>handoff:unready<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
+| `comfyui` | 未评估 | 低 | partial | docs:partial<br>handoff:unready<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。 |
 | `dbskill` | 未评估 | 低 | partial | docs:partial<br>handoff:unready<br>... | 补齐 TODO.md，让待办和里程碑可审计。<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
 | `ielts-vocab` | 未评估 | 低 | partial | docs:partial<br>handoff:verified<br>... | - |
-| `image2prompt` | 未评估 | 低 | partial | docs:partial<br>handoff:unready<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
+| `image2prompt` | 未评估 | 低 | partial | docs:partial<br>handoff:unready<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。 |
 | `minimax-tokenplan` | 未评估 | 低 | missing | handoff:unready<br>verify:/Users/mose/.cc-connect/bin/minimax-tokenplan tools<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
 | `ollama-local` | 未评估 | 低 | missing | handoff:unready<br>verify:/Users/mose/.cc-connect/bin/ollama-local embed --model mxbai-embed-large:latest --text smoke<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
-| `opencodex` | 未评估 | 低 | partial | docs:partial<br>handoff:unready<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
+| `opencodex` | 未评估 | 低 | partial | docs:partial<br>handoff:unready<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。 |
 | `sports-management` | 未评估 | 低 | partial | docs:partial<br>handoff:verified<br>... | - |
-| `sub2api` | 未评估 | 低 | partial | docs:partial<br>handoff:unready<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
+| `sub2api` | 未评估 | 低 | partial | docs:partial<br>handoff:unready<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。 |
 
 ## 备注
 

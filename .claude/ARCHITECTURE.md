@@ -8,7 +8,7 @@
    - `README.md`
    - `AGENTS.md`
    - `TODO.md`
-   - `MILESTONES.md`
+   - `MILESTONE.md`
    - `docs/project-docs.manifest.json`
 
 2. Application package
@@ -32,7 +32,7 @@
 
 - L1: `.claude/PARADIGM.md`
 - L2: `.claude/ARCHITECTURE.md`
-- L3: `AGENTS.md`, `app/AGENTS.md`, `docs/content/README.md`, `TODO.md`, `MILESTONES.md`
+- L3: `AGENTS.md`, `app/AGENTS.md`, `docs/content/README.md`, `TODO.md`, `MILESTONE.md`
 - Verification: `app/scripts/check-docs.mjs`, `app/scripts/check-source-locks.mjs`, `pnpm --dir app verify`
 
 ## Change Boundaries

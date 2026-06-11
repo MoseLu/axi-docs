@@ -66,7 +66,7 @@ function workspaceProjectGroupKey(item: KnowledgeCatalogItem): string {
 
 function normalizeWorkspaceProjectTitle(title: string): string {
   return title
-    .replace(/\s*(?:README|PRD|TDD|TODO|INDEX|CHANGELOG|SECURITY|MILESTONES)\s*(?:文档)?$/i, '')
+    .replace(/\s*(?:README|PRD|TDD|TODO|INDEX|CHANGELOG|SECURITY|MILESTONE)\s*(?:文档)?$/i, '')
     .replace(/\s*(?:需求文档|技术设计|Agent 指南|智能体指南|任务清单|里程碑|变更记录|文档索引|安全策略)$/i, '')
     .trim() || title
 }

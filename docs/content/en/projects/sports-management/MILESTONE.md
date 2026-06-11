@@ -16,9 +16,9 @@ project:
   source-section: core
 ---
 
-# Sports Management — Milestones
+# Sports Management — Milestone
 
-> Dossier milestones. Tracks the **public surface** of this project as seen from Axi Docs.
+> Dossier milestone. Tracks the **public surface** of this project as seen from Axi Docs.
 
 ## Current State
 

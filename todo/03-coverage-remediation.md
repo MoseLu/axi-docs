@@ -41,7 +41,7 @@
 
 ## P1：补 governance 根级门面镜像
 
-- [x] 在 `docs/axi-workspace-governance/` 下补 9 个根级门面（AGENTS / CHANGELOG / INDEX / MILESTONES / PRD / README.zh-CN / SECURITY / TDD / TODO）—— 从 `infra/axi-workspace-governance/` 复制
+- [x] 在 `docs/axi-workspace-governance/` 下补 9 个根级门面（AGENTS / CHANGELOG / INDEX / MILESTONE / PRD / README.zh-CN / SECURITY / TDD / TODO）—— 从 `infra/axi-workspace-governance/` 复制
 - [x] 镜像 `README.md` 追加说明"包含 governance 根级门面（10 件）" + 引用新加的 9 个文件
 - [x] 注：build 脚本对 governance 显式 skip 保持不变，governance 走镜像目录
 

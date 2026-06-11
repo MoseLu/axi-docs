@@ -16,9 +16,9 @@ project:
   source-section: shared
 ---
 
-# Axi UI — Milestones
+# Axi UI — Milestone
 
-> Dossier milestones. Tracks the **public surface** of this project as seen from Axi Docs.
+> Dossier milestone. Tracks the **public surface** of this project as seen from Axi Docs.
 
 ## Current State
 

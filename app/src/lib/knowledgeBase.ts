@@ -1570,7 +1570,7 @@ const WORKSPACE_DOCUMENT_TYPE_DEFINITIONS: WorkspaceDocumentTypeDefinition[] = [
     sourceTags: ['todo', 'tasks', 'project', 'workspace'],
   },
   {
-    key: 'milestones',
+    key: 'milestone',
     fileNames: ['MILESTONE.md'],
     title: '里程碑',
     description: '项目阶段、交付证据和退出标准。',

@@ -44,7 +44,7 @@ axi-docs 对工作区**不是完全覆盖**，存在 3 类缺口：
 |---|---|---|---|
 | **dbskill** | `/Volumes/code/workspace/shared/dbskill` | `README.md`, `README.zh-CN.md`, `LICENSE`, `VERSION`, `demo.gif`, `docs/`, `scripts/`, `skills/`, `tools/`, `知识库/` | 轻量镜像：7 件套 + 实际有的 README.zh-CN.md（合计 8 件）|
 | **codex-plus-app** | `/Volumes/code/workspace/tools/codex-plus-app` | 仅 `outputs/`, `work/`, `.omx/metrics.json`（**无任何门面**）| 拉入镜像：仅 README + AGENTS + INDEX 3 件最小目录，README 标注"项目待填充" |
-| **infra/axi-registry** | `/Volumes/code/workspace/infra/axi-registry` | AGENTS/CHANGELOG/INDEX/MILESTONES/PRD/README/README.zh-CN/SECURITY/TDD/TODO 10 件 | **保留 build 脚本 skip 行为**（governance 范围）—— 不强行纳入 7 件套项目镜像，靠 governance 镜像目录治理（见 §3.3）|
+| **infra/axi-registry** | `/Volumes/code/workspace/infra/axi-registry` | AGENTS/CHANGELOG/INDEX/MILESTONE/PRD/README/README.zh-CN/SECURITY/TDD/TODO 10 件 | **保留 build 脚本 skip 行为**（governance 范围）—— 不强行纳入 7 件套项目镜像，靠 governance 镜像目录治理（见 §3.3）|
 
 ### 3.2 根级门面文件镜像不完整（7 → 11 件套）
 
@@ -180,7 +180,7 @@ pnpm --dir app projects:build
 
 ### P1：补 governance 根级门面镜像
 
-**目标**：在 `docs/axi-workspace-governance/` 下补 9 个根级门面（AGENTS/CHANGELOG/INDEX/MILESTONES/PRD/README.zh-CN/SECURITY/TDD/TODO）。
+**目标**：在 `docs/axi-workspace-governance/` 下补 9 个根级门面（AGENTS/CHANGELOG/INDEX/MILESTONE/PRD/README.zh-CN/SECURITY/TDD/TODO）。
 
 ```bash
 # 1. 从源复制（最简单）
@@ -189,7 +189,7 @@ for f in AGENTS.md CHANGELOG.md INDEX.md MILESTONE.md PRD.md README.zh-CN.md SEC
      /Volumes/code/workspace/projects/axi-docs/docs/axi-workspace-governance/$f
 done
 
-# 2. 镜像 README 中追加一句"包含 governance 根级门面（AGENTS/CHANGELOG/INDEX/MILESTONES/PRD/SECURITY/TDD/TODO + README.zh-CN）"
+# 2. 镜像 README 中追加一句"包含 governance 根级门面（AGENTS/CHANGELOG/INDEX/MILESTONE/PRD/SECURITY/TDD/TODO + README.zh-CN）"
 ```
 
 **注意**：axi-registry 不补镜像（脚本 skip 行为保持）；它本身已有 governance 镜像目录可承载。

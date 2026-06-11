@@ -16,9 +16,9 @@ project:
   source-section: shared
 ---
 
-# Workspace Relationship Graph — Milestones
+# Workspace Relationship Graph — Milestone
 
-> Dossier milestones. Tracks the **public surface** of this project as seen from Axi Docs.
+> Dossier milestone. Tracks the **public surface** of this project as seen from Axi Docs.
 
 ## Current State
 

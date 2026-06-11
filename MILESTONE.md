@@ -1,4 +1,4 @@
-# Axi Docs Milestones
+# Axi Docs Milestone
 
 <!-- deep-init:layer=L3 -->
 

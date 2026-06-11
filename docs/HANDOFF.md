@@ -58,7 +58,7 @@
 - Milestone: `MILESTONE.md`
 - Active: Keep the project documentation contract and generated dossier coverage complete.
 - Active: Maintain workspace registry coverage and locked documentation sources.
-- Active: Continue the VitePress-aligned reader experience and source governance milestones.
+- Active: Continue the VitePress-aligned reader experience and source governance milestone.
 - Known failure: TODO.md records remaining security, asynchronous I/O, CORS, architecture, UX, and test-coverage work.
 - Known failure: Live Blinko, AI analysis, and OSS integrations require their corresponding external services and credentials.
 

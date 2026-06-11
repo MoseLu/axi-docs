@@ -24,7 +24,7 @@ project:
 
 ## Unit checks
 
-- `docs/content/{en,zh}/projects/dbskill/{README,AGENTS,INDEX,TODO,MILESTONES,PRD,TDD,README.zh-CN}.md` all exist with valid frontmatter.
+- `docs/content/{en,zh}/projects/dbskill/{README,AGENTS,INDEX,TODO,MILESTONE,PRD,TDD,README.zh-CN}.md` all exist with valid frontmatter.
 - The `frontmatter.project.path` matches `/Volumes/code/workspace/shared/dbskill` for both locales.
 
 ## Manual checks

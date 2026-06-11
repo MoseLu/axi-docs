@@ -89,5 +89,5 @@ pnpm --dir app projects:check   # 校验全部 322 个档案文件就位
 ## 范围外
 
 - 档案**不是**项目文档的复制品，复制会漂移。
-- 档案**不是**项目自身的 PRD / TDD / MILESTONES——那些在项目根。
+- 档案**不是**项目自身的 PRD / TDD / MILESTONE——那些在项目根。
 - 档案**不是**项目内容的翻译。按根 `AGENTS.md`，`references/*` 不被翻译；档案是关于项目的元数据，所以它们像其他 Axi Docs 页面一样正常双语。

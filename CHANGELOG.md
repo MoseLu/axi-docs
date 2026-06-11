@@ -22,6 +22,50 @@ not versioned.
   `docs/audit/workspace-i18n-audit-2026-06-07.md`（覆盖 `docs/content/{en,zh}/` 双语化与 frontmatter 守恒检查）。
 - 2026-06-07: 根级文档清单 `docs/project-docs.manifest.json` 与「workspace-docs-gap-audit」对齐，明确各门面文档归属路径与验证方式。
 - 2026-06-07: 新增 `docs/sources.lock.json` 与 `pnpm source:check`，用锁定 commit 管理 `axi-skills` 外部仓库快照，替代 Git submodule 方案。
+- 2026-06-11: 根级 `ERROR.md` 创建，作为跨项目结构性缺陷（命名漂移、目录归属错误、read/write 路径不一致等）的根因分析与复盘记录。首条记录
+  `2026-06-11-01` 收录 `products/ielts-vocab` 的 `mac-app` 单复数漂移及
+  `microservices-mac` 重命名为 `app-services-mac` 的全过程。
+- 2026-06-11: `ERROR.md` 重构为按 `P0`（必修）/ `P1`（强烈建议）/ `P2`
+  （经验性观察）三个等级分章节的形式，配套补充等级判定表、编号规则、
+  `open`/`fixed`/`accepted-as-limitation` 状态约定，并预留 P1/P2 候选方
+  向。`AGENTS.md` 同步在根级门面文档清单与「Authoritative Sources」表
+  中登记 `ERROR.md`。
+- 2026-06-11: 增设 `ERROR.zh-CN.md` 中文镜像（与根级其他门面文档
+  `README/CHANGELOG/SECURITY/TODO` 保持英文权威 + `.zh-CN.md` 镜像模式）；
+  新增 `app/scripts/lint-error-doc.mjs`，校验 ERROR 文档的结构（编号、
+  索引/正文对齐、anchor、必填字段、5 段子标题、状态枚举），并接入
+  `pnpm governance:check` 链（`error-doc:lint`）；
+  `docs/project-docs.manifest.json` 增加 `error: ERROR.md` 登记项；
+  `AGENTS.md` 在门面清单注释 `ERROR.zh-CN.md` 为中文镜像。
+- 2026-06-11: 调整 `app/scripts/build-projects-index.mjs` 的 `PIECES` 数组，
+  将里程碑文件名从复数 `MILESTONE.md` 改为单数 `MILESTONE.md`，与工作区
+  模板源 `projects/axi-workbench/docs/templates/project-docs/MILESTONE.md`
+  对齐；同步清理 `docs/content/{en,zh}/projects/*/MILESTONE.md` 共 48 个
+  旧产物。注释从「8/11-piece」改为准确的「7 必选 + 4 源驱动可选 + 2
+  passthrough = 13 件」。`projects:check` 验证 336 件 dossier 文件齐全。
+- 2026-06-11: 补齐 `projects/axi-rules` 的 4 件缺失门面（`TODO.md`、
+  `MILESTONE.md`、`PRD.md`、`TDD.md`），按项目实际内容填充。
+- 2026-06-11: 补齐 `tools/axi-feishu-codex-bridge` 的 5 件缺失门面
+  （`INDEX.md`、`TODO.md`、`MILESTONE.md`、`PRD.md`、`TDD.md`），
+  按三 surface（codex-exec / codex-app-ws / codex-plus-cdp）填充。
+- 2026-06-11: 统一里程碑命名为单数 `MILESTONE.md`：13 个项目根级
+  `MILESTONES.md` 重命名为 `MILESTONE.md`，并批量更新 231 个文件内部
+  文本引用（PRD/TODO/TDD/INDEX/CHANGELOG/AGENTS 等）；同步处理
+  `products/ielts-vocab` 的复数孤儿 `MILESTONES.md` 并修正
+  `docs/projects.index.json` 中 dbskill hand-curated mirror 备注里残留的
+  复数文件名。16 个 Axi 项目 7 件套全部 7/7 满。
+- 2026-06-11: 标准化 14 处 `PULL_REQUEST_TEMPLATE.md`（原以为分裂在 yml vs md，
+  实际全是 md）到 workbench 5 段结构（Intent / Workflow Link / Verification
+  / Release Gate / Operator Notes）。`projects/axi-pet` 原生是 GitHub 默认
+  风格（269 字节、无 checklist），升到 workbench 风格（451 字节，含
+  `## Verification` 3 项 CI / 本地 / secret 自检清单）。
+  `projects/axi-image-preview` 保留其独有的 release-manifest 扩展
+  checklist（694 字节）。
+- 2026-06-11: 补齐 12 个 Axi 项目 + `products/ielts-vocab` 的 Issue 模板
+  （原只有 `task.yml` 单表单）。新增 `bug_report.yml` 与
+  `feature_request.yml`（结构化字段：summary / repro / expected / actual
+  / environment / logs / self-check），共 26 个新文件。`projects/axi-pet`
+  保留 4 个 yaml（typo / ai-task 等特色），references/* 不动。
 
 ### Changed
 - 2026-06-08: Workspace adapter 从“每个项目一个单页”扩展为“每个项目一套虚拟文档”

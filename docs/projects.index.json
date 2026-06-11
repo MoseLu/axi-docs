@@ -1,143 +1,255 @@
 {
-  "generated_at": "2026-06-11T01:52:21.418Z",
-  "source": "WORKSPACE_INDEX.md",
-  "count": 25,
+  "generated_at": "2026-06-11T06:50:56.827Z",
+  "source": "handoff",
+  "handoffSource": true,
+  "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+  "handoffPath": "/Volumes/code/workspace/.workspace/project-handoff.json",
+  "handoffMaxAgeDays": 14,
+  "count": 26,
   "preservedAddenda": [
     "dbskill",
     "codex-plus-app"
   ],
   "projects": [
     {
-      "id": "axi-workbench",
-      "name": "Axi Workbench",
-      "partition": "projects",
-      "path": "/Volumes/code/workspace/projects/axi-workbench",
-      "purpose": "Canonical Axi workbench monorepo for workstation control plane, DevSvc dashboard, Axi Coder, verification inbox, app/docs search, fleet console, Ollama menu assistant, and Axi App CLI.",
-      "stack": "React, TypeScript, Tauri, Rust, Node.js, Python, Ansible, Swift",
-      "status": "active",
-      "notes": "Absorbed former standalone roots `axi-workstation`, `axi-devsvc-dashboard`, `axi-coder`, `axi-verification-inbox`, `app-search-system`, `axi-ollama-menu-assistant`, `infra/fleet-console`, and `tools/axi-app-cli`.",
-      "section": "core"
-    },
-    {
       "id": "axi-agent-platform",
       "name": "Axi Agent Platform",
       "partition": "projects",
       "path": "/Volumes/code/workspace/projects/axi-agent-platform",
-      "purpose": "Canonical Axi agent monorepo for runtime/API surfaces, MCP service, terminal transport, Codex remote bridge, and Axi Todo.",
-      "stack": "Python, FastAPI, React, TypeScript, Node.js, MCP, WebSocket",
-      "status": "active",
-      "notes": "Absorbed former standalone roots `infra/axi-agent-mcp`, `infra/axi-agent-transport`, `infra/codex-remote-bridge`, and `tools/axi-todo`.",
-      "section": "core"
-    },
-    {
-      "id": "axi-notify-mobile",
-      "name": "Axi Notify / Mobile",
-      "partition": "projects",
-      "path": "/Volumes/code/workspace/projects/axi-notify",
-      "purpose": "Canonical Axi notify/mobile monorepo for relay, Android client, event inbox, mobile workbench, and donor migration material.",
-      "stack": "Android, Kotlin, Jetpack Compose, Go, SQLite, Firebase",
-      "status": "active",
-      "notes": "Absorbed former standalone donor roots `android-workspace-app` and `feiyu-agentflow`; legacy repo/package identifiers may remain until install/data migration is planned.",
-      "section": "core"
-    },
-    {
-      "id": "axi-image-preview",
-      "name": "Axi Image Preview",
-      "partition": "projects",
-      "path": "/Volumes/code/workspace/projects/axi-image-preview",
-      "purpose": "Active Axi image and wallpaper gallery preview app for visual reference, hover/detail interaction, and preview experiments.",
-      "stack": "React, TypeScript, Vite",
-      "status": "active",
-      "notes": "Canonical active project; use this path and repository name only.",
-      "section": "core"
-    },
-    {
-      "id": "axi-pet",
-      "name": "Axi Pet",
-      "partition": "projects",
-      "path": "/Volumes/code/workspace/projects/axi-pet",
-      "purpose": "Local Axi pet/virtual companion project migrated from moeru-ai/airi, with stage-web, Live2D, provider configuration, and local STT experiments.",
-      "stack": "Vue, TypeScript, Vite, Electron, Pinia, Live2D, Python",
-      "status": "development",
-      "notes": "Local workspace project renamed at the directory level; upstream package and brand identifiers may still say AIRI until a separate product rename pass.",
-      "section": "core"
+      "purpose": "Multi-agent collaboration platform combining a FastAPI backend, React dashboard, SubAgent worktree isolation, an MCP model swarm, and the Axi Todo tool.",
+      "stack": "",
+      "status": "verified",
+      "notes": "",
+      "section": "core",
+      "kind": "project",
+      "lifecycle": "active-canonical",
+      "verification": "cd backend && pytest tests/; pnpm --dir frontend build; pnpm --dir infra/axi-agent-mcp test; pnpm --dir tools/axi-todo verify",
+      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffManifestPath": "/Volumes/code/workspace/projects/axi-agent-platform/docs/project-docs.manifest.json"
     },
     {
       "id": "axi-docs",
       "name": "Axi Docs",
       "partition": "projects",
       "path": "/Volumes/code/workspace/projects/axi-docs",
-      "purpose": "Active Axi documentation hub for docs browsing, sync surfaces, knowledge graph UI, and MCP document access.",
-      "stack": "React, TypeScript, Vite, Node.js, MCP, Markdown",
-      "status": "active",
-      "notes": "Canonical active project; application code lives in `app/`.",
-      "section": "core"
-    },
-    {
-      "id": "axi-rules",
-      "name": "Axi Rules",
-      "partition": "projects",
-      "path": "/Volumes/code/workspace/projects/axi-rules",
-      "purpose": "Fast local authority for Axi agent behavior, project routing, memory source precedence, verification rules, safety boundaries, and the frontend 3D memory recall pipeline.",
-      "stack": "Markdown, JSON, Python, React, TypeScript, Vite, three.js",
-      "status": "active constraint index",
-      "notes": "Use before `axi-docs`; frontend app lives in `frontend/` and may need a non-5173 Vite port if DevSvc is already listening.",
-      "section": "core"
-    },
-    {
-      "id": "ielts-vocabulary",
-      "name": "IELTS Vocabulary",
-      "partition": "products",
-      "path": "/Volumes/code/workspace/products/ielts-vocab",
-      "purpose": "IELTS vocabulary learning app, backend services, frontend, deploy and learning workflows.",
-      "stack": "React, TypeScript, Vite, Flask, SQLite, microservices",
-      "status": "active product",
-      "notes": "AxiomaticWorld spun-out product; sits under AxiomaticWorld governance but outside the `Axi` product line, the way Fliggy / Tmall sit under Alibaba Group. Static IELTS PDFs/audio live in `reference-materials/raw/` and are gitignored.",
-      "section": "core"
-    },
-    {
-      "id": "sports-management",
-      "name": "Sports Management",
-      "partition": "projects",
-      "path": "/Volumes/code/workspace/projects/axi-sports-management-app",
-      "purpose": "Sports management app with web/mobile/backend surfaces.",
-      "stack": "Quasar, Vue 3, Go, Capacitor, UniApp",
-      "status": "development product",
-      "notes": "Axi product-line project, kept as a development-stage business app inside the `Axi` product line until it is ready to spin out.",
-      "section": "core"
-    },
-    {
-      "id": "axi-proxy-companion",
-      "name": "Axi Proxy Companion",
-      "partition": "tools",
-      "path": "/Volumes/code/workspace/tools/axi-proxy-companion",
-      "purpose": "macOS proxy companion for controlling and checking a local proxy backend.",
-      "stack": "SwiftPM, Swift",
-      "status": "local tool",
-      "notes": "Independent Axi-prefixed local tool retained outside the Axi monorepos.",
-      "section": "core"
+      "purpose": "Workspace documentation hub combining a React reader, knowledge-source adapters, knowledge graph, MCP document bus, and generated project dossier mirrors.",
+      "stack": "",
+      "status": "verified",
+      "notes": "",
+      "section": "core",
+      "kind": "project",
+      "lifecycle": "active-canonical",
+      "verification": "pnpm --dir app verify; pnpm --dir app test:run",
+      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffManifestPath": "/Volumes/code/workspace/projects/axi-docs/docs/project-docs.manifest.json"
     },
     {
       "id": "axi-feishu-codex-bridge",
       "name": "Axi Feishu Codex Bridge",
       "partition": "tools",
       "path": "/Volumes/code/workspace/tools/axi-feishu-codex-bridge",
-      "purpose": "Local Feishu IM bridge for routing bot messages to Codex CLI, Codex App, or Codex Plus CDP with axi-rules memory integration.",
-      "stack": "Python, FastAPI, Feishu OpenAPI, WebSocket, PostgreSQL, Ollama",
-      "status": "local tool",
-      "notes": "Source project only; runtime install and secrets stay under `/Users/mose/.local/share/codex-feishu-bridge`.",
-      "section": "core"
+      "purpose": "Local Feishu IM bridge that routes messages to Codex CLI, Codex App WebSocket, or Codex Plus CDP execution surfaces and returns replies to Feishu.",
+      "stack": "",
+      "status": "verified",
+      "notes": "",
+      "section": "reference",
+      "kind": "tool",
+      "lifecycle": "active-tool-local-runtime",
+      "verification": "PYTHONPATH=src .venv/bin/python -m unittest discover -s tests",
+      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffManifestPath": "/Volumes/code/workspace/tools/axi-feishu-codex-bridge/docs/project-docs.manifest.json"
+    },
+    {
+      "id": "axi-image-preview",
+      "name": "Axi Image Preview",
+      "partition": "projects",
+      "path": "/Volumes/code/workspace/projects/axi-image-preview",
+      "purpose": "Vite and React image preview UI with a local wallpaper library, a stdio MCP upload server, and a reserved macOS Swift desktop shell.",
+      "stack": "",
+      "status": "verified",
+      "notes": "",
+      "section": "core",
+      "kind": "project",
+      "lifecycle": "active-canonical",
+      "verification": "pnpm build && pnpm test",
+      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffManifestPath": "/Volumes/code/workspace/projects/axi-image-preview/docs/project-docs.manifest.json"
+    },
+    {
+      "id": "axi-notify-mobile",
+      "name": "Axi Notify / Mobile",
+      "partition": "projects",
+      "path": "/Volumes/code/workspace/projects/axi-notify",
+      "purpose": "Workflow contracts, a Go and SQLite notification Relay, and the Axi Mobile Android client for cloud event to FCM to device delivery.",
+      "stack": "",
+      "status": "verified",
+      "notes": "",
+      "section": "core",
+      "kind": "project",
+      "lifecycle": "active-canonical",
+      "verification": "make test-relay; make smoke-relay-local; make android-agent-verify; git check-ignore android-app/app/google-services.json",
+      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffManifestPath": "/Volumes/code/workspace/projects/axi-notify/docs/project-docs.manifest.json"
+    },
+    {
+      "id": "axi-pet",
+      "name": "Axi Pet",
+      "partition": "projects",
+      "path": "/Volumes/code/workspace/projects/axi-pet",
+      "purpose": "A large Project AIRI-derived monorepo for browser, Electron, mobile, server, plugin, rendering, and bot surfaces for LLM-driven virtual characters.",
+      "stack": "",
+      "status": "verified",
+      "notes": "",
+      "section": "core",
+      "kind": "project",
+      "lifecycle": "active-local",
+      "verification": "pnpm test:run && pnpm typecheck",
+      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffManifestPath": "/Volumes/code/workspace/projects/axi-pet/docs/project-docs.manifest.json"
+    },
+    {
+      "id": "axi-proxy-companion",
+      "name": "Axi Proxy Companion",
+      "partition": "tools",
+      "path": "/Volumes/code/workspace/tools/axi-proxy-companion",
+      "purpose": "Native macOS AppKit companion that starts, stops, inspects, and reports traffic for registered local proxy backends without changing the macOS system proxy.",
+      "stack": "",
+      "status": "verified",
+      "notes": "",
+      "section": "reference",
+      "kind": "tool",
+      "lifecycle": "active-tool",
+      "verification": "swift build; rg -n \"networksetup|HTTP_PROXY|HTTPS_PROXY|ALL_PROXY|launchctl\" Sources/ must return no matches; for f in README.md README.zh-CN.md AGENTS.md CHANGELOG.md TODO.md MILESTONE.md INDEX.md PRD.md TDD.md; do test -f \"$f\" || exit 1; done",
+      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffManifestPath": "/Volumes/code/workspace/tools/axi-proxy-companion/docs/project-docs.manifest.json"
+    },
+    {
+      "id": "axi-registry",
+      "name": "Axi Local Registry",
+      "partition": "infra",
+      "path": "/Volumes/code/workspace/infra/axi-registry",
+      "purpose": "Local-only Verdaccio registry for authenticated publication and local consumption of @axi/* runtime packages.",
+      "stack": "",
+      "status": "verified",
+      "notes": "",
+      "section": "shared",
+      "kind": "infra",
+      "lifecycle": "active-infra",
+      "verification": "node -e \"JSON.parse(require('fs').readFileSync('docs/project-docs.manifest.json','utf8'))\"; for f in README.md README.zh-CN.md AGENTS.md CHANGELOG.md TODO.md MILESTONE.md INDEX.md PRD.md TDD.md; do test -f \"$f\" || exit 1; done",
+      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffManifestPath": "/Volumes/code/workspace/infra/axi-registry/docs/project-docs.manifest.json"
+    },
+    {
+      "id": "axi-rules",
+      "name": "Axi Rules",
+      "partition": "projects",
+      "path": "/Volumes/code/workspace/projects/axi-rules",
+      "purpose": "Local authority for Axi agent routing, memory, safety, verification, and generated project/rule indexes, with a React visualization of the memory pipeline.",
+      "stack": "",
+      "status": "verified",
+      "notes": "",
+      "section": "shared",
+      "kind": "shared",
+      "lifecycle": "active-shared-provider",
+      "verification": "make rules; pnpm --dir frontend typecheck; pnpm --dir frontend test; pnpm --dir frontend build",
+      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffManifestPath": "/Volumes/code/workspace/projects/axi-rules/docs/project-docs.manifest.json"
+    },
+    {
+      "id": "axi-tauri-starter",
+      "name": "Axi Tauri Starter",
+      "partition": "shared",
+      "path": "/Volumes/code/workspace/shared/axi-tauri-starter",
+      "purpose": "Shared reference for Tauri 2 desktop-shell layout, command conventions, and reusable npm, pnpm, Cargo, and Rust cache bootstrap.",
+      "stack": "",
+      "status": "verified",
+      "notes": "",
+      "section": "shared",
+      "kind": "shared",
+      "lifecycle": "active-shared-reference",
+      "verification": "rg -n \"TODO|PRD|TDD\" README.md TODO.md MILESTONE.md PRD.md TDD.md",
+      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffManifestPath": "/Volumes/code/workspace/shared/axi-tauri-starter/docs/project-docs.manifest.json"
     },
     {
       "id": "axi-ui",
       "name": "Axi UI",
       "partition": "shared",
       "path": "/Volumes/code/workspace/shared/axi-ui",
-      "purpose": "Axi brand tokens, shared core primitives, dashboard shell, settings, CRUD, widgets, and addon runtime packages.",
-      "stack": "pnpm, TypeScript, React, Ant Design",
-      "status": "shared provider",
-      "notes": "Shared runtime only, not a product project; publishes `@axi/*` packages to the local registry.",
-      "section": "shared"
+      "purpose": "Shared Axi design tokens, presets, React primitives, shell, settings, CRUD, widgets, addons, and Vite tooling published as @axi packages.",
+      "stack": "",
+      "status": "verified",
+      "notes": "",
+      "section": "shared",
+      "kind": "shared",
+      "lifecycle": "active-shared-provider",
+      "verification": "pnpm test",
+      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffManifestPath": "/Volumes/code/workspace/shared/axi-ui/docs/project-docs.manifest.json"
+    },
+    {
+      "id": "axi-video-downloader",
+      "name": "Axi Video Downloader",
+      "partition": "tools",
+      "path": "/Volumes/code/workspace/tools/axi-video-downloader",
+      "purpose": "Local Python tool that coordinates a Flask UI, Android device automation, mitmproxy capture, downloads, and SQLite tracking for personal-device video capture.",
+      "stack": "",
+      "status": "verified",
+      "notes": "",
+      "section": "reference",
+      "kind": "tool",
+      "lifecycle": "active-tool",
+      "verification": "python3 -m py_compile app.py main.py config.py database.py adb_controller.py mitm_proxy.py uicontroller.py __init__.py modules/*.py utils/*.py; for f in README.md README.zh-CN.md AGENTS.md CHANGELOG.md TODO.md MILESTONE.md INDEX.md PRD.md TDD.md; do test -f \"$f\" || exit 1; done",
+      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffManifestPath": "/Volumes/code/workspace/tools/axi-video-downloader/docs/project-docs.manifest.json"
+    },
+    {
+      "id": "axi-workbench",
+      "name": "Axi Workbench",
+      "partition": "projects",
+      "path": "/Volumes/code/workspace/projects/axi-workbench",
+      "purpose": "Canonical AxiomaticWorld workbench for the six-layer control plane, dashboard applications, shared contracts, local services, AI integrations, fleet tooling, and app scaffolding.",
+      "stack": "",
+      "status": "verified",
+      "notes": "",
+      "section": "core",
+      "kind": "project",
+      "lifecycle": "active-canonical",
+      "verification": "pnpm type-check; pnpm test; pnpm test:workstation; pnpm --dir apps/devsvc-dashboard typecheck; pnpm --dir apps/axi-coder typecheck; npm --prefix apps/verification-inbox run typecheck",
+      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffManifestPath": "/Volumes/code/workspace/projects/axi-workbench/docs/project-docs.manifest.json"
+    },
+    {
+      "id": "ielts-vocab",
+      "name": "IELTS Vocabulary",
+      "partition": "products",
+      "path": "/Volumes/code/workspace/products/ielts-vocab",
+      "purpose": "Full-stack IELTS vocabulary learning product with web, mobile, shared client packages, gateway, split backend services, speech, and production operations.",
+      "stack": "",
+      "status": "verified",
+      "notes": "",
+      "section": "reference",
+      "kind": "product",
+      "lifecycle": "active-product",
+      "verification": "pnpm --dir frontend verify:repo-guards",
+      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffManifestPath": "/Volumes/code/workspace/products/ielts-vocab/docs/project-docs.manifest.json"
+    },
+    {
+      "id": "sports-management",
+      "name": "体育管理应用",
+      "partition": "projects",
+      "path": "/Volumes/code/workspace/projects/axi-sports-management-app",
+      "purpose": "Quasar and Vue 3 sports-management application skeleton with Pinia, Vue Router, Vue I18n, and a Capacitor Android wrapper; the backend directory is only a placeholder.",
+      "stack": "",
+      "status": "verified",
+      "notes": "",
+      "section": "core",
+      "kind": "project",
+      "lifecycle": "active-product",
+      "verification": "pnpm lint && pnpm build",
+      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffManifestPath": "/Volumes/code/workspace/projects/axi-sports-management-app/docs/project-docs.manifest.json"
     },
     {
       "id": "workspace-relationship-graph",
@@ -148,7 +260,8 @@
       "stack": "JSON, Node CLI, MCP stdio",
       "status": "active registry",
       "notes": "Use before cross-project edits.",
-      "section": "shared"
+      "section": "shared",
+      "supplementary": true
     },
     {
       "id": "workspace-dev-services",
@@ -159,29 +272,8 @@
       "stack": "JSON, Node.js, PM2, LaunchAgent",
       "status": "active registry",
       "notes": "Runtime state lives under `.devsvc`; use the config and wrapper as editable entrypoints.",
-      "section": "shared"
-    },
-    {
-      "id": "axi-tauri-starter",
-      "name": "Axi Tauri Starter",
-      "partition": "shared",
-      "path": "/Volumes/code/workspace/shared/axi-tauri-starter",
-      "purpose": "Workspace-level reference for the shared Tauri 2 shell shape and cache bootstrap used by desktop shells.",
-      "stack": "Bash, Markdown",
-      "status": "shared reference",
-      "notes": "Copy patterns into current product subapps rather than treating this as a product.",
-      "section": "shared"
-    },
-    {
-      "id": "axi-video-downloader",
-      "name": "Axi Video Downloader",
-      "partition": "tools",
-      "path": "/Volumes/code/workspace/tools/axi-video-downloader",
-      "purpose": "Local video download utility.",
-      "stack": "Python, Flask, SQLite, mitmproxy",
-      "status": "local active",
-      "notes": "Retained as an independent Axi-prefixed local utility.",
-      "section": "shared"
+      "section": "shared",
+      "supplementary": true
     },
     {
       "id": "cockpit-tools-reference",
@@ -192,7 +284,8 @@
       "stack": "Tauri, Vite, TypeScript, Rust",
       "status": "reference",
       "notes": "Keep the product name as Cockpit Tools and do not rename it into Axi.",
-      "section": "reference"
+      "section": "reference",
+      "supplementary": true
     },
     {
       "id": "sub2api-reference",
@@ -203,7 +296,8 @@
       "stack": "Go, Vue, PostgreSQL, Redis, Docker",
       "status": "reference",
       "notes": "Upstream third-party service repo; not an Axi owner or Axi application.",
-      "section": "reference"
+      "section": "reference",
+      "supplementary": true
     },
     {
       "id": "cliproxyapi-reference",
@@ -214,7 +308,8 @@
       "stack": "Go, Docker",
       "status": "reference",
       "notes": "Imported without `.git`, local binaries, live config, auth material, or runtime output. Use as a reference only.",
-      "section": "reference"
+      "section": "reference",
+      "supplementary": true
     },
     {
       "id": "image2prompt-reference",
@@ -225,7 +320,8 @@
       "stack": "JavaScript, browser extension",
       "status": "reference",
       "notes": "Optional prompting UX reference; not an Axi owner or active application.",
-      "section": "reference"
+      "section": "reference",
+      "supplementary": true
     },
     {
       "id": "opencodex-reference",
@@ -236,7 +332,8 @@
       "stack": "Node.js, TypeScript, Swift/AppKit, WebKit",
       "status": "reference",
       "notes": "Upstream AITabby reference repo with local wrapper edits; not an Axi owner or active application.",
-      "section": "reference"
+      "section": "reference",
+      "supplementary": true
     },
     {
       "id": "blinko-reference",
@@ -247,7 +344,8 @@
       "stack": "Bun, TypeScript, Docker",
       "status": "reference",
       "notes": "Use this canonical reference path directly.",
-      "section": "reference"
+      "section": "reference",
+      "supplementary": true
     },
     {
       "id": "comfyui-reference",
@@ -258,7 +356,8 @@
       "stack": "Python, PyTorch",
       "status": "reference",
       "notes": "Former path `/Volumes/code/models/comfyui/ComfyUI` is a compatibility symlink.",
-      "section": "reference"
+      "section": "reference",
+      "supplementary": true
     },
     {
       "id": "dbskill",

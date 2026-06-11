@@ -35,6 +35,8 @@
     "commit:check:last": "pnpm exec commitlint --last --verbose",
     "commit:lint:range": "node ./scripts/check-commit-range.mjs",
     "docs:check": "node ./scripts/check-docs.mjs",
+    "projects:build": "node ./scripts/build-projects-index.mjs",
+    "projects:check": "node ./scripts/build-projects-index.mjs --check",
     "error-doc:lint": "node ./scripts/lint-error-doc.mjs",
     "source:check": "node ./scripts/check-source-locks.mjs",
     "git:bootstrap": "node ./scripts/setup-git-governance.mjs",

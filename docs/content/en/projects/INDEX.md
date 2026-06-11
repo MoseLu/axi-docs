@@ -23,36 +23,37 @@ description: Axi Docs keeps a per-project dossier for every active entry in `WOR
 - Locale source: `docs/content/en/projects/<id>/`.
 - Other locale: `docs/content/zh/projects/<id>/`.
 
-## Core Active Projects (11)
+## Core Active Projects (7)
 
 | Project | Partition | Status | Stack | Notes |
 | --- | --- | --- | --- | --- |
-| [Axi Workbench](./axi-workbench/README.md) | `projects/` | active | React, TypeScript, Tauri, Rust, Node.js, Python, Ansible, Swift | Absorbed former standalone roots `axi-workstation`, `axi-devsvc-dashboard`, `axi-coder`, `axi-verification-inbox`, `app-search-system`, `axi-ollama-menu-assistant`, `infra/fleet-console`, and `tools/axi-app-cli`. |
-| [Axi Agent Platform](./axi-agent-platform/README.md) | `projects/` | active | Python, FastAPI, React, TypeScript, Node.js, MCP, WebSocket | Absorbed former standalone roots `infra/axi-agent-mcp`, `infra/axi-agent-transport`, `infra/codex-remote-bridge`, and `tools/axi-todo`. |
-| [Axi Notify / Mobile](./axi-notify-mobile/README.md) | `projects/` | active | Android, Kotlin, Jetpack Compose, Go, SQLite, Firebase | Absorbed former standalone donor roots `android-workspace-app` and `feiyu-agentflow`; legacy repo/package identifiers may remain until install/data migration is planned. |
-| [Axi Image Preview](./axi-image-preview/README.md) | `projects/` | active | React, TypeScript, Vite | Canonical active project; use this path and repository name only. |
-| [Axi Pet](./axi-pet/README.md) | `projects/` | development | Vue, TypeScript, Vite, Electron, Pinia, Live2D, Python | Local workspace project renamed at the directory level; upstream package and brand identifiers may still say AIRI until a separate product rename pass. |
-| [Axi Docs](./axi-docs/README.md) | `projects/` | active | React, TypeScript, Vite, Node.js, MCP, Markdown | Canonical active project; application code lives in `app/`. |
-| [Axi Rules](./axi-rules/README.md) | `projects/` | active constraint index | Markdown, JSON, Python, React, TypeScript, Vite, three.js | Use before `axi-docs`; frontend app lives in `frontend/` and may need a non-5173 Vite port if DevSvc is already listening. |
-| [IELTS Vocabulary](./ielts-vocabulary/README.md) | `products/` | active product | React, TypeScript, Vite, Flask, SQLite, microservices | AxiomaticWorld spun-out product; sits under AxiomaticWorld governance but outside the `Axi` product line, the way Fliggy / Tmall sit under Alibaba Group. Static IELTS PDFs/audio live in `reference-materials/raw/` and are |
-| [Sports Management](./sports-management/README.md) | `projects/` | development product | Quasar, Vue 3, Go, Capacitor, UniApp | Axi product-line project, kept as a development-stage business app inside the `Axi` product line until it is ready to spin out. |
-| [Axi Proxy Companion](./axi-proxy-companion/README.md) | `tools/` | local tool | SwiftPM, Swift | Independent Axi-prefixed local tool retained outside the Axi monorepos. |
-| [Axi Feishu Codex Bridge](./axi-feishu-codex-bridge/README.md) | `tools/` | local tool | Python, FastAPI, Feishu OpenAPI, WebSocket, PostgreSQL, Ollama | Source project only; runtime install and secrets stay under `/Users/mose/.local/share/codex-feishu-bridge`. |
+| [Axi Agent Platform](./axi-agent-platform/README.md) | `projects/` | verified |  |  |
+| [Axi Docs](./axi-docs/README.md) | `projects/` | verified |  |  |
+| [Axi Image Preview](./axi-image-preview/README.md) | `projects/` | verified |  |  |
+| [Axi Notify / Mobile](./axi-notify-mobile/README.md) | `projects/` | verified |  |  |
+| [Axi Pet](./axi-pet/README.md) | `projects/` | verified |  |  |
+| [Axi Workbench](./axi-workbench/README.md) | `projects/` | verified |  |  |
+| [体育管理应用](./sports-management/README.md) | `projects/` | verified |  |  |
 
-## Shared and Infrastructure (5)
+## Shared and Infrastructure (6)
 
 | Project | Partition | Status | Stack | Notes |
 | --- | --- | --- | --- | --- |
-| [Axi UI](./axi-ui/README.md) | `shared/` | shared provider | pnpm, TypeScript, React, Ant Design | Shared runtime only, not a product project; publishes `@axi/*` packages to the local registry. |
+| [Axi Local Registry](./axi-registry/README.md) | `infra/` | verified |  |  |
+| [Axi Rules](./axi-rules/README.md) | `projects/` | verified |  |  |
+| [Axi Tauri Starter](./axi-tauri-starter/README.md) | `shared/` | verified |  |  |
+| [Axi UI](./axi-ui/README.md) | `shared/` | verified |  |  |
 | [Workspace Relationship Graph](./workspace-relationship-graph/README.md) | `infra/` | active registry | JSON, Node CLI, MCP stdio | Use before cross-project edits. |
 | [Workspace Dev Services](./workspace-dev-services/README.md) | `infra/` | active registry | JSON, Node.js, PM2, LaunchAgent | Runtime state lives under `.devsvc`; use the config and wrapper as editable entrypoints. |
-| [Axi Tauri Starter](./axi-tauri-starter/README.md) | `shared/` | shared reference | Bash, Markdown | Copy patterns into current product subapps rather than treating this as a product. |
-| [Axi Video Downloader](./axi-video-downloader/README.md) | `tools/` | local active | Python, Flask, SQLite, mitmproxy | Retained as an independent Axi-prefixed local utility. |
 
-## Reference Repos (7)
+## Reference Repos (11)
 
 | Project | Partition | Status | Stack | Notes |
 | --- | --- | --- | --- | --- |
+| [Axi Feishu Codex Bridge](./axi-feishu-codex-bridge/README.md) | `tools/` | verified |  |  |
+| [Axi Proxy Companion](./axi-proxy-companion/README.md) | `tools/` | verified |  |  |
+| [Axi Video Downloader](./axi-video-downloader/README.md) | `tools/` | verified |  |  |
+| [IELTS Vocabulary](./ielts-vocab/README.md) | `products/` | verified |  |  |
 | [Cockpit Tools Reference](./cockpit-tools-reference/README.md) | `references/` | reference | Tauri, Vite, TypeScript, Rust | Keep the product name as Cockpit Tools and do not rename it into Axi. |
 | [Sub2API Reference](./sub2api-reference/README.md) | `references/` | reference | Go, Vue, PostgreSQL, Redis, Docker | Upstream third-party service repo; not an Axi owner or Axi application. |
 | [CLIProxyAPI Reference](./cliproxyapi-reference/README.md) | `references/` | reference | Go, Docker | Imported without `.git`, local binaries, live config, auth material, or runtime output. Use as a reference only. |
@@ -63,4 +64,4 @@ description: Axi Docs keeps a per-project dossier for every active entry in `WOR
 
 ## Total
 
-**23** dossiers under this locale tree。
+**24** dossiers under this locale tree。

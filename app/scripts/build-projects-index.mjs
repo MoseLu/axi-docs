@@ -2,15 +2,25 @@
 /**
  * build-projects-index.mjs
  *
- * Parses the workspace-level `WORKSPACE_INDEX.md` and emits a machine-readable
- * project list (`docs/projects.index.json`) plus eight-piece Markdown dossiers
+ * Parses the workspace project list and emits a machine-readable project
+ * index (`docs/projects.index.json`) plus eight-piece Markdown dossiers
  * (README / AGENTS / INDEX / TODO / MILESTONE / PRD / TDD / CHANGELOG-light)
  * for every project under `docs/content/{en,zh}/projects/<id>/`.
+ *
+ * Source precedence (zero-context handoff governance):
+ *   1. `/Volumes/code/workspace/.workspace/project-handoff.json` (preferred;
+ *      produced by `infra/axi-workspace-governance/scripts/project-handoff.mjs`).
+ *      All 15 active projects' readiness, commands, current work, and known
+ *      failures are sourced from here.
+ *   2. `/Volumes/code/workspace/WORKSPACE_INDEX.md` (fallback). Used only when
+ *      the handoff snapshot is missing or unparseable. `WORKSPACE_INDEX.md`
+ *      remains the human-authored registry and is not modified by this script.
  *
  * Usage:
  *   node app/scripts/build-projects-index.mjs            # build English (source) and Chinese scaffolds
  *   node app/scripts/build-projects-index.mjs --locale en # English only
  *   node app/scripts/build-projects-index.mjs --check    # verify all dossiers exist; exit 1 on miss
+ *   node app/scripts/build-projects-index.mjs --strict   # exit 1 when handoff snapshot is unavailable
  *
  * The script is deterministic: it never overwrites an existing dossier unless
  * the corresponding `--force` flag is supplied. It uses the frontmatter
@@ -21,9 +31,15 @@ import { readFile, writeFile, mkdir, access } from 'node:fs/promises';
 import { constants as FS } from 'node:fs';
 import path from 'node:path';
 import process from 'node:process';
+import {
+  extractProjectsFromHandoff,
+  readHandoffSnapshot,
+  HANDOFF_PATH,
+  HANDOFF_MAX_AGE_DAYS,
+  WORKSPACE_FALLBACK_PATH,
+} from '../src/lib/buildProjectsIndex.mjs';
 
 const REPO_ROOT = path.resolve(new URL('../..', import.meta.url).pathname);
-const WORKSPACE_INDEX = '/Volumes/code/workspace/WORKSPACE_INDEX.md';
 const CONTENT_ROOT = path.join(REPO_ROOT, 'docs', 'content');
 const INDEX_JSON = path.join(REPO_ROOT, 'docs', 'projects.index.json');
 const INDEX_PAGES = ['en', 'zh'].map((locale) => ({
@@ -547,18 +563,107 @@ async function main() {
   const flags = new Set(argv.filter((a) => a.startsWith('--')));
   const localeArg = (argv.find((a) => !a.startsWith('--')) || 'all').toLowerCase();
   const locales = localeArg === 'all' ? ['en', 'zh'] : [localeArg];
+  const strict = flags.has('--strict');
 
-  const indexMarkdown = await readFile(WORKSPACE_INDEX, 'utf8');
-  const projects = extractProjects(indexMarkdown);
+  // Handoff-first: prefer the governance snapshot. Even when the snapshot
+  // succeeds, we still consult the legacy WORKSPACE_INDEX.md table to pick
+  // up supplementary projects (workspace-level virtual projects and
+  // `references/*` entries) that the snapshot deliberately does not
+  // include. The handoff's id set is authoritative for active Axi projects;
+  // markdown-only entries are unioned in with `supplementary: true` so
+  // downstream consumers can tell the two groups apart.
+  let projects = [];
+  let sourceLabel = '';
+  let handoffSource = false;
+  let handoffGeneratedAt = null;
+  let handoffIds = new Set();
+
+  const handoff = await readHandoffSnapshot();
+  if (handoff.snapshot) {
+    if (handoff.stale) {
+      console.warn(
+        `[projects:build] handoff snapshot is ${handoff.ageDays.toFixed(1)} days old ` +
+          `(> ${HANDOFF_MAX_AGE_DAYS} day threshold); continuing with stale data. ` +
+          `Re-run \`workspace-project handoff --json\` to refresh.`,
+      );
+    }
+    try {
+      projects = extractProjectsFromHandoff(handoff.snapshot, new Date());
+      handoffIds = new Set(projects.map((p) => p.id));
+      sourceLabel = 'handoff';
+      handoffSource = true;
+      handoffGeneratedAt = handoff.snapshot.generatedAt || null;
+    } catch (snapshotError) {
+      console.warn(
+        `[projects:build] handoff snapshot could not be parsed (${snapshotError.message}); ` +
+          `falling back to ${WORKSPACE_FALLBACK_PATH}.`,
+      );
+    }
+  } else if (strict) {
+    console.error(
+      `[projects:build] --strict set but handoff snapshot is unavailable at ${HANDOFF_PATH} ` +
+        `(${handoff.error.message}). Refusing to fall back to ${WORKSPACE_FALLBACK_PATH}.`,
+    );
+    process.exit(1);
+  } else {
+    console.warn(
+      `[projects:build] handoff snapshot unavailable at ${HANDOFF_PATH} ` +
+        `(${handoff.error.message}); falling back to ${WORKSPACE_FALLBACK_PATH}.`,
+    );
+  }
+
   if (projects.length === 0) {
-    throw new Error(`No projects parsed from ${WORKSPACE_INDEX}. Aborting.`);
+    if (handoffSource) {
+      // Handoff loaded but yielded zero projects — refuse to silently fall
+      // through to a stale table; this is a real upstream contract change.
+      throw new Error('handoff snapshot parsed successfully but produced zero projects. Aborting.');
+    }
+    const indexMarkdown = await readFile(WORKSPACE_FALLBACK_PATH, 'utf8');
+    projects = extractProjects(indexMarkdown);
+    sourceLabel = WORKSPACE_FALLBACK_PATH;
+    handoffSource = false;
+    handoffGeneratedAt = null;
+  } else if (handoffSource && !flags.has('--no-supplementary')) {
+    // Union in markdown-only entries (references, workspace virtual
+    // projects, etc.) that the handoff does not list. A markdown id that
+    // differs from any handoff id only by trailing characters (e.g. an
+    // extra "y") still represents the same project — drop the markdown
+    // duplicate by comparing the handoff ids normalised to the same slug
+    // rule (lowercase, hyphenate). The build script's markdown parser
+    // already produces that slug via `makeSlug`, so a simple
+    // Set comparison is enough.
+    let supplementary = [];
+    try {
+      const indexMarkdown = await readFile(WORKSPACE_FALLBACK_PATH, 'utf8');
+      // Compare by canonical path (the only stable identifier both sides
+      // share), not by `id` — handoff ids are owner-curated and may
+      // shorten the slug in ways that `makeSlug` would not produce
+      // (e.g. `ielts-vocab` vs `ielts-vocabulary`). Path collisions get
+      // deduped; id differences survive on the handoff side and are
+      // discarded here.
+      const handoffPaths = new Set(projects.map((p) => p.path));
+      supplementary = extractProjects(indexMarkdown).filter((entry) => !handoffPaths.has(entry.path));
+    } catch {
+      // WORKSPACE_INDEX.md missing or unreadable — the union simply
+      // becomes the handoff list. Operators see a single warning above.
+    }
+    if (supplementary.length > 0) {
+      projects = [
+        ...projects,
+        ...supplementary.map((entry) => ({ ...entry, supplementary: true })),
+      ];
+    }
+  }
+
+  if (projects.length === 0) {
+    throw new Error(`No projects parsed from ${sourceLabel || 'available sources'}. Aborting.`);
   }
 
   // Emit the machine-readable index. Preserve any hand-curated addenda that
   // the previous run (or a manual edit) added — projects whose `id` is not
   // present in the freshly-parsed list. This lets us keep dbskill /
   // codex-plus-app (and any future hand-curated mirrors) across rebuilds
-  // without polluting the WORKSPACE_INDEX.md source.
+  // without polluting the handoff snapshot or WORKSPACE_INDEX.md.
   if (!flags.has('--no-index')) {
     let preserved = [];
     if (await exists(INDEX_JSON)) {
@@ -580,7 +685,11 @@ async function main() {
       JSON.stringify(
         {
           generated_at: new Date().toISOString(),
-          source: 'WORKSPACE_INDEX.md',
+          source: sourceLabel,
+          handoffSource,
+          handoffGeneratedAt,
+          handoffPath: HANDOFF_PATH,
+          handoffMaxAgeDays: HANDOFF_MAX_AGE_DAYS,
           count: merged.length,
           preservedAddenda: preserved.map((p) => p.id),
           projects: merged,
@@ -652,14 +761,14 @@ async function main() {
     }
   }
   // Always (re)write the locale-level INDEX.md from the parsed project list.
-  // This keeps the table in lockstep with `WORKSPACE_INDEX.md` without
-  // requiring a hand-edited summary.
+  // This keeps the table in lockstep with the handoff snapshot (or markdown
+  // fallback) without requiring a hand-edited summary.
   for (const { locale, path: indexPath } of INDEX_PAGES) {
     await writeFile(indexPath, indexPageBody({ locale, projects }), 'utf8');
     summary.written += 1;
   }
   console.log(
-    `[projects:build] ${projects.length} projects × ${locales.length} locales × ${PIECES.length} pieces. ` +
+    `[projects:build] source=${sourceLabel} ${projects.length} projects × ${locales.length} locales × ${PIECES.length} pieces. ` +
       `wrote=${summary.written}, skipped=${summary.skipped}, index=${INDEX_JSON}`,
   );
 }

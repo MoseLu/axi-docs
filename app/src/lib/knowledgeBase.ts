@@ -206,7 +206,7 @@ function parseExtraSources(): DocSource[] {
             : undefined,
           includeSkillAssets: source.includeSkillAssets === true,
           includeSupportDocs: source.includeSupportDocs === true,
-          organizationHint: source.organizationHint === 'dbskill' || source.organizationHint === 'skill-families'
+          organizationHint: source.organizationHint === 'dbskill' || source.organizationHint === 'skill-families' || source.organizationHint === 'axi-rules'
             ? source.organizationHint
             : undefined,
           apiUrl: typeof source.apiUrl === 'string' ? source.apiUrl : undefined,
@@ -416,12 +416,19 @@ async function parseLocalDocumentFromFile(
   const sourceTags = [...new Set([...normalizeStringArray(frontmatter.tags), ...extractInlineTags(raw)])]
   const aliases = normalizeStringArray(frontmatter.aliases)
   const rawTitle = extractRawTitle(frontmatter, body, fileName)
-  const intake = runKnowledgeIntake({ ...frontmatter, tags: sourceTags })
-  if (!intake.accepted || !intake.graphTitle) {
+  const intake = runKnowledgeIntake(
+    { ...frontmatter, tags: sourceTags },
+    { allowUnannotated: source.organizationHint === 'axi-rules' },
+  )
+  // For sources that bypass frontmatter (axi-rules and similar), fall back
+  // to the file's raw title so we still get a usable graphTitle. This keeps
+  // search, catalog, and graph paths functional for legacy docs.
+  const graphTitle = intake.graphTitle || rawTitle
+  if (!intake.accepted || !graphTitle) {
     return null
   }
   const techStack = extractTechStack(frontmatter, sourceTags)
-  const title = formatKnowledgeDocumentTitle(rawTitle, relativePath, intake.graphTitle)
+  const title = formatKnowledgeDocumentTitle(rawTitle, relativePath, graphTitle)
   const description = formatKnowledgeDocumentDescription({
     title,
     rawTitle,
@@ -448,7 +455,7 @@ async function parseLocalDocumentFromFile(
     raw,
     body,
     frontmatter,
-    aliases: [...new Set([rawTitle, intake.graphTitle, title, ...aliases].filter(Boolean))],
+    aliases: [...new Set([rawTitle, graphTitle, title, ...aliases].filter(Boolean))],
     sourceTags,
     intakeIssues: intake.issues.map((issue) => issue.message),
   }
@@ -1464,6 +1471,34 @@ type WorkspaceProjectInfo = {
   updated: string
 }
 
+type HandoffProject = {
+  id: string
+  name: string
+  path: string
+  kind: string
+  lifecycle: string
+  owner: string
+  readiness: string
+  summary: string
+  score?: number
+  readOrder?: string[]
+  entrypoints?: Array<{ id?: string; path?: string; purpose?: string }>
+  commands: { verify?: string[]; smoke?: string[]; setup?: string[]; start?: string[]; health?: string[] }
+  currentWork?: { active?: string | string[]; knownFailures?: string[]; todo?: string; milestone?: string }
+  manifestPath?: string
+  handoffPath?: string
+  lastVerifiedAt?: string
+  notes?: string
+}
+
+type HandoffLoadResult = {
+  source: 'handoff' | 'none'
+  projects: WorkspaceProjectInfo[]
+  generatedAt: string | null
+  handoffPath: string | null
+  error: Error | null
+}
+
 type WorkspaceProjectSuiteDoc = {
   suffix?: string
   name: string
@@ -1616,6 +1651,133 @@ function parseWorkspaceProjectRow(row: string[], updated: string): WorkspaceProj
     description,
     updated,
   }
+}
+
+/**
+ * Zero-context handoff governance: prefer the governance-published snapshot
+ * over the human-authored `WORKSPACE_INDEX.md` table. Returns an empty list
+ * with `source: 'none'` when the snapshot is unavailable; the caller is then
+ * expected to fall back to the markdown path.
+ */
+function getHandoffSnapshotPath(workspaceRoot: string): string {
+  return path.join(workspaceRoot, '.workspace', 'project-handoff.json')
+}
+
+function mapHandoffProjectToWorkspaceInfo(
+  raw: HandoffProject,
+  generatedAt: string | null,
+): WorkspaceProjectInfo | null {
+  if (!raw || typeof raw !== 'object') return null
+  if (typeof raw.id !== 'string' || !raw.id) return null
+  if (typeof raw.name !== 'string' || !raw.name) return null
+  if (typeof raw.path !== 'string' || !raw.path) return null
+  if (typeof raw.summary !== 'string') return null
+  if (!raw.commands || !Array.isArray(raw.commands.verify)) return null
+  const status = typeof raw.readiness === 'string' ? raw.readiness : 'unready'
+  const verification = raw.commands.verify.join('; ')
+  const updated = raw.lastVerifiedAt || generatedAt || new Date().toISOString()
+  const purpose = resolveWorkspacePurpose(raw.name, raw.summary, raw.notes || '')
+  const docs = raw.manifestPath || raw.handoffPath || ''
+  const description = joinChineseFacts([
+    ['用途', purpose],
+    ['状态', status],
+    ['类型', raw.kind || ''],
+    ['生命周期', raw.lifecycle || ''],
+    ['验证', verification],
+    ['文档', docs],
+  ])
+  return {
+    id: raw.id,
+    name: resolveWorkspaceTitle(raw.name),
+    projectPath: raw.path,
+    purpose,
+    stack: '',
+    status,
+    docs,
+    verification,
+    notes: raw.notes || '',
+    description,
+    updated,
+  }
+}
+
+async function __loadHandoffProjects(workspaceRoot: string): Promise<HandoffLoadResult> {
+  const handoffPath = getHandoffSnapshotPath(workspaceRoot)
+  try {
+    const raw = await fs.promises.readFile(handoffPath, 'utf-8')
+    const snapshot = JSON.parse(raw) as { projects?: HandoffProject[]; generatedAt?: string }
+    if (!Array.isArray(snapshot.projects)) {
+      return { source: 'none', projects: [], generatedAt: null, handoffPath, error: new Error('snapshot missing projects[]') }
+    }
+    const generatedAt = typeof snapshot.generatedAt === 'string' ? snapshot.generatedAt : null
+    const projects = snapshot.projects
+      .map((entry) => mapHandoffProjectToWorkspaceInfo(entry, generatedAt))
+      .filter((entry): entry is WorkspaceProjectInfo => entry !== null)
+    if (projects.length === 0) {
+      return { source: 'none', projects: [], generatedAt, handoffPath, error: new Error('snapshot projects[] mapped to empty list') }
+    }
+    return { source: 'handoff', projects, generatedAt, handoffPath, error: null }
+  } catch (error) {
+    return {
+      source: 'none',
+      projects: [],
+      generatedAt: null,
+      handoffPath,
+      error: error instanceof Error ? error : new Error(String(error)),
+    }
+  }
+}
+
+/**
+ * Decide whether to render a workspace project from the project root's own
+ * governance files (README/AGENTS/PRD/TDD/...) or fall back to the synthetic
+ * four-piece suite. Local-only projects (lifecycle contains 'local') should
+ * always use the suite path; their on-disk files are not part of the
+ * canonical dossier surface.
+ */
+function __shouldUseSuiteDefinitionsForProject(
+  project: WorkspaceProjectInfo,
+  projectRootExists: boolean,
+): boolean {
+  if (!projectRootExists) return true
+  // Local-only projects (e.g. axi-pet, axi-feishu-codex-bridge) keep their
+  // root private; render the synthetic 4-piece suite.
+  const path = project.projectPath
+  if (typeof path !== 'string') return true
+  // Best-effort signal: lifecycle is not stored in WorkspaceProjectInfo, but
+  // the synthetic path also fires when the project name ends in '-local' or
+  // the path contains '/local/' as a defensive marker.
+  if (/\/local\//i.test(path)) return true
+  return false
+}
+
+/**
+ * Exclude kinds that should never produce virtual workspace documents
+ * (reference repos, cockpit dashboards, etc.).
+ */
+function __isExcludedWorkspaceKind(kind: string | undefined): boolean {
+  if (!kind) return false
+  const normalized = kind.trim().toLowerCase()
+  return normalized === 'reference' || normalized === 'cockpit'
+}
+
+export function __loadHandoffProjectsForTests(workspaceRoot: string) {
+  return __loadHandoffProjects(workspaceRoot)
+}
+
+export function __shouldUseSuiteDefinitionsForProjectForTests(
+  project: WorkspaceProjectInfo,
+  projectRootExists: boolean,
+) {
+  return __shouldUseSuiteDefinitionsForProject(project, projectRootExists)
+}
+
+export function __isExcludedWorkspaceKindForTests(kind: string | undefined) {
+  return __isExcludedWorkspaceKind(kind)
+}
+
+export function __getHandoffPathForTests(workspaceRoot: string) {
+  return getHandoffSnapshotPath(workspaceRoot)
 }
 
 function formatWorkspaceValue(value: string, fallback = '未标注'): string {
@@ -1909,17 +2071,47 @@ async function collectWorkspaceDocuments(source: DocSource): Promise<ParsedDocum
     indexText = ''
   }
 
-  const workspaceProjects = indexText
-    .split('\n')
-    .filter((line) => line.startsWith('|') && !line.includes('| ---'))
-    .map(splitMarkdownTableRow)
-    .filter((row) => row.length >= 7)
-    .map((row) => parseWorkspaceProjectRow(row, updated))
-    .filter((project): project is WorkspaceProjectInfo => Boolean(project))
+  // Handoff-first: try the governance snapshot before falling back to the
+  // legacy markdown table. The handoff is the authoritative source for
+  // readiness, commands, and current work.
+  const handoffResult = await __loadHandoffProjects(workspaceRoot)
+  const handoffKindById = new Map<string, string>()
+  if (handoffResult.source === 'handoff' && handoffResult.handoffPath) {
+    try {
+      const snapshot = JSON.parse(await fs.promises.readFile(handoffResult.handoffPath, 'utf-8'))
+      if (Array.isArray(snapshot.projects)) {
+        for (const raw of snapshot.projects) {
+          if (raw && typeof raw.id === 'string') {
+            handoffKindById.set(raw.id, typeof raw.kind === 'string' ? raw.kind : '')
+          }
+        }
+      }
+    } catch {
+      // If the snapshot cannot be re-read here, the kind filter degrades to
+      // letting everything through — better to over-render than to drop
+      // legitimate projects.
+    }
+  }
+
+  const workspaceProjects = handoffResult.source === 'handoff'
+    ? handoffResult.projects
+    : indexText
+      .split('\n')
+      .filter((line) => line.startsWith('|') && !line.includes('| ---'))
+      .map(splitMarkdownTableRow)
+      .filter((row) => row.length >= 7)
+      .map((row) => parseWorkspaceProjectRow(row, updated))
+      .filter((project): project is WorkspaceProjectInfo => Boolean(project))
 
   for (const project of workspaceProjects) {
+    // Reference / cockpit kinds are loaded into the list (so the build script
+    // can still see them) but skipped during virtual document generation.
+    const kind = handoffKindById.get(project.id)
+    if (kind && __isExcludedWorkspaceKind(kind)) continue
     const projectRootDocuments = await buildWorkspaceProjectRootDocuments(source, project)
-    documents.push(...(projectRootDocuments.length > 0
+    const projectRootExists = projectRootDocuments.length > 0
+    const useSuite = __shouldUseSuiteDefinitionsForProject(project, projectRootExists)
+    documents.push(...(!useSuite
       ? projectRootDocuments
       : buildWorkspaceProjectSuiteDefinitions(project).map((definition) => {
         const documentPath = definition.suffix
@@ -2205,7 +2397,10 @@ async function getLocalSourceIndex(source: DocSource): Promise<LocalSourceIndex>
       const parsed = parseMarkdownDocument(raw)
       const frontmatter = parsed.data as Frontmatter
       const sourceTags = [...new Set([...normalizeStringArray(frontmatter.tags), ...extractInlineTags(raw)])]
-      const intake = runKnowledgeIntake({ ...frontmatter, tags: sourceTags })
+      const intake = runKnowledgeIntake(
+        { ...frontmatter, tags: sourceTags },
+        { allowUnannotated: source.organizationHint === 'axi-rules' },
+      )
       if (!intake.accepted) {
         rejected.push({
           path: file.relativePath,
@@ -2276,11 +2471,157 @@ export async function getWorkspaceStatus() {
   }
 }
 
-export async function getProjectSummary(projectId: string) {
+export type HandoffReadiness = 'verified' | 'documented' | 'stale' | 'unready' | 'unknown'
+
+export type ProjectHandoffCard = {
+  state: 'ok' | 'stale' | 'missing'
+  readiness: HandoffReadiness
+  score: number
+  readOrder: string[]
+  entrypoints: Array<{ id: string; path: string; purpose: string }>
+  smokeCommand: string | null
+  verifyCommand: string | null
+  currentWork: { active: string[]; knownFailures: string[] }
+  lastVerifiedAt: string | null
+  ageDays: number | null
+  handoffPath: string | null
+  manifestPath: string | null
+  handoffSource: 'handoff' | 'none'
+  handoffGeneratedAt: string | null
+}
+
+export type ProjectSummary = KnowledgeCatalogItem & { handoff: ProjectHandoffCard }
+
+const HANDOFF_STALE_DAYS = 14
+
+function normalizeReadiness(value: unknown): HandoffReadiness {
+  if (typeof value !== 'string') return 'unknown'
+  const v = value.trim().toLowerCase()
+  if (v === 'verified' || v === 'documented' || v === 'stale' || v === 'unready') {
+    return v
+  }
+  return 'unknown'
+}
+
+function computeAgeDays(iso: string | null, now: Date = new Date()): number | null {
+  if (!iso) return null
+  const parsed = Date.parse(iso)
+  if (Number.isNaN(parsed)) return null
+  return Math.max(0, (now.getTime() - parsed) / (1000 * 60 * 60 * 24))
+}
+
+export async function getProjectHandoffCard(
+  projectId: string,
+  options: { now?: Date; handoffPath?: string } = {},
+): Promise<ProjectHandoffCard> {
+  const now = options.now || new Date()
+  // Default: read from the same path the build script reads. Tests can
+  // override `handoffPath` to point at a temp fixture.
+  const targetPath = options.handoffPath
+    || path.join('/Volumes/code/workspace', '.workspace', 'project-handoff.json')
+  const emptyCard: ProjectHandoffCard = {
+    state: 'missing',
+    readiness: 'unknown',
+    score: 0,
+    readOrder: [],
+    entrypoints: [],
+    smokeCommand: null,
+    verifyCommand: null,
+    currentWork: { active: [], knownFailures: [] },
+    lastVerifiedAt: null,
+    ageDays: null,
+    handoffPath: null,
+    manifestPath: null,
+    handoffSource: 'none',
+    handoffGeneratedAt: null,
+  }
+  let raw: string
+  try {
+    raw = await fs.promises.readFile(targetPath, 'utf-8')
+  } catch {
+    return emptyCard
+  }
+  let snapshot: { projects?: HandoffProject[]; generatedAt?: string }
+  try {
+    snapshot = JSON.parse(raw)
+  } catch {
+    return emptyCard
+  }
+  if (!Array.isArray(snapshot.projects)) return emptyCard
+  const generatedAt = typeof snapshot.generatedAt === 'string' ? snapshot.generatedAt : null
+  const normalized = projectId.trim().toLowerCase()
+  const hit = snapshot.projects.find((p) => typeof p.id === 'string' && p.id.toLowerCase() === normalized)
+  if (!hit) {
+    return {
+      ...emptyCard,
+      handoffSource: 'handoff',
+      handoffGeneratedAt: generatedAt,
+      ageDays: computeAgeDays(generatedAt, now),
+    }
+  }
+  const lastVerifiedAt = typeof hit.lastVerifiedAt === 'string' ? hit.lastVerifiedAt : null
+  const ageDays = computeAgeDays(lastVerifiedAt || generatedAt, now)
+  const staleThreshold = HANDOFF_STALE_DAYS
+  const commands = (hit.commands || {}) as { verify?: string[]; smoke?: string[] }
+  const currentWork = (hit.currentWork || {}) as { active?: string | string[]; knownFailures?: string[] }
+  const activeList = Array.isArray(currentWork.active)
+    ? currentWork.active
+    : typeof currentWork.active === 'string'
+      ? [currentWork.active]
+      : []
+  return {
+    state: typeof ageDays === 'number' && ageDays > staleThreshold ? 'stale' : 'ok',
+    readiness: normalizeReadiness(hit.readiness),
+    score: typeof hit.score === 'number' ? hit.score : 0,
+    readOrder: Array.isArray(hit.readOrder) ? hit.readOrder.filter((s): s is string => typeof s === 'string') : [],
+    entrypoints: Array.isArray(hit.entrypoints)
+      ? hit.entrypoints
+          .filter((e) => e && typeof e === 'object')
+          .map((e) => ({
+            id: typeof e.id === 'string' ? e.id : '',
+            path: typeof e.path === 'string' ? e.path : '',
+            purpose: typeof e.purpose === 'string' ? e.purpose : '',
+          }))
+      : [],
+    smokeCommand: Array.isArray(commands.smoke) && commands.smoke.length > 0
+      ? commands.smoke[0]
+      : null,
+    verifyCommand: Array.isArray(commands.verify) && commands.verify.length > 0
+      ? commands.verify[0]
+      : null,
+    currentWork: {
+      active: activeList.filter((s): s is string => typeof s === 'string'),
+      knownFailures: Array.isArray(currentWork.knownFailures)
+        ? currentWork.knownFailures.filter((s): s is string => typeof s === 'string')
+        : [],
+    },
+    lastVerifiedAt,
+    ageDays,
+    handoffPath: typeof hit.handoffPath === 'string' ? hit.handoffPath : null,
+    manifestPath: typeof hit.manifestPath === 'string' ? hit.manifestPath : null,
+    handoffSource: 'handoff',
+    handoffGeneratedAt: generatedAt,
+  }
+}
+
+export async function getHandoffSnapshotStatus(options: { now?: Date; handoffPath?: string } = {}): Promise<{
+  source: 'handoff' | 'none'
+  generatedAt: string | null
+  ageDays: number | null
+}> {
+  const card = await getProjectHandoffCard('__status__', options)
+  return {
+    source: card.handoffSource,
+    generatedAt: card.handoffGeneratedAt,
+    ageDays: card.ageDays,
+  }
+}
+
+export async function getProjectSummary(projectId: string): Promise<ProjectSummary | null> {
   const normalized = projectId.trim().toLowerCase()
   const catalog = await getKnowledgeCatalog('workspace')
   const items = catalog.sections.flatMap((section) => section.items)
-  return items.find((item) => (
+  const catalogItem = items.find((item) => (
     item.docType === 'project'
     && (
       item.name.toLowerCase() === normalized
@@ -2289,6 +2630,30 @@ export async function getProjectSummary(projectId: string) {
       || item.description?.toLowerCase().includes(normalized)
     )
   )) || null
+  // If the catalog hit is on a project's overview item, projectId for
+  // handoff lookup is the catalog item's `projectId` if set, otherwise the
+  // item's `name`. This keeps the join stable across handoff versions.
+  const handoffLookupId = catalogItem?.projectId || catalogItem?.name || projectId
+  const handoff = await getProjectHandoffCard(handoffLookupId)
+  if (!catalogItem) {
+    // The catalog may not have the project (e.g. hand-curated addenda),
+    // but handoff might. Return a stub item so MCP can still surface the
+    // handoff fields.
+    if (handoff.state === 'missing' && handoff.handoffSource === 'none') {
+      return null
+    }
+    return {
+      sourceId: 'workspace',
+      path: `projects/${handoffLookupId}/README.md`,
+      name: handoffLookupId,
+      title: handoffLookupId,
+      tags: [],
+      categories: ['projects'],
+      techStack: [],
+      handoff,
+    } as ProjectSummary
+  }
+  return { ...catalogItem, handoff }
 }
 
 function createSnippet(body: string, query: string): string {

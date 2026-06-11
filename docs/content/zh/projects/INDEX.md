@@ -44,7 +44,7 @@ description: Axi Docs 为 `WORKSPACE_INDEX.md` 中每个 active 项目维护一�
 | [Axi Skills](./axi-skills/README.md) | `shared/` | verified |  |  |
 | [Axi Tauri Starter](./axi-tauri-starter/README.md) | `shared/` | verified |  |  |
 | [Axi UI](./axi-ui/README.md) | `shared/` | verified |  |  |
-| [Workspace Relationship Graph](./workspace-relationship-graph/README.md) | `infra/` | active registry | JSON, Node CLI, MCP stdio | Use before cross-project edits. |
+| [Workspace Relationship Graph](./workspace-relationship-graph/README.md) | `infra/` | workspace resource | JSON, Node CLI, MCP stdio | Use before cross-project edits; not a code project or git repo. |
 | [Workspace Dev Services](./workspace-dev-services/README.md) | `infra/` | active registry | JSON, Node.js, PM2, LaunchAgent | Runtime state lives under `.devsvc`; use the config and wrapper as editable entrypoints. |
 
 ## 参考仓库 (11)

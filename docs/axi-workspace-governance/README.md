@@ -15,7 +15,8 @@ agent-readable: true
 
 ## 摘要
 
-- 工作区根目录：`/Volumes/code/workspace/infra/axi-workspace-governance`
+- 工作区容器：`/Volumes/code/workspace`（非 Git 仓库 / 非代码提交单元）
+- 治理仓库根目录：`/Volumes/code/workspace/infra/axi-workspace-governance`
 - 治理仓库远端：`https://github.com/axiomaticworld/axi-workspace-governance.git`
 - 已登记条目：17
 - canonical 条目：17
@@ -40,6 +41,14 @@ agent-readable: true
 - [负责人矩阵](ownership-matrix.md)
 - [集成地图](integration-map.md)
 - [治理 ADR](adr/README.md)
+- [ADR-003: Workspace root is a non-git container](adr/ADR-003-workspace-root-is-non-git-container.md)
+
+## 工作区根目录契约
+
+- `/Volumes/code/workspace` 只承载项目目录、参考目录、生成快照和 launcher shim。
+- 不在 `/Volumes/code/workspace` 执行 `git init`，也不从根目录 commit / push / clean / reset。
+- 代码修改进入拥有该代码的项目仓库；治理修改进入 `infra/axi-workspace-governance`。
+- 根层 `WORKSPACE_INDEX.md`、`AGENTS.md`、`workspace.graph.json` 和 `.workspace/*.json` 是 agent 接手与路由表面，不是业务代码。
 
 ## 分发链路
 

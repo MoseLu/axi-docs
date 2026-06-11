@@ -17,6 +17,7 @@ agent-readable: true
 
 - [ADR-001-governance-repo-as-index-plane](ADR-001-governance-repo-as-index-plane.md)
 - [ADR-002-progressive-repository-naming-policy](ADR-002-progressive-repository-naming-policy.md)
+- [ADR-003-workspace-root-is-non-git-container](ADR-003-workspace-root-is-non-git-container.md)
 
 ## 约束
 

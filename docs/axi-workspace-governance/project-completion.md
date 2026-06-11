@@ -18,7 +18,7 @@ agent-readable: true
 - 已登记项目：32
 - Axi 项目：18
 - 完成：1
-- 可用及以上：8
+- 可用及以上：9
 - 阻塞：0
 
 ## 阶段口径
@@ -63,7 +63,7 @@ agent-readable: true
 | `blinko` | 未评估 | 低 | partial | docs:partial<br>handoff:unready<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
 | `cliproxyapi` | 未评估 | 低 | partial | docs:partial<br>handoff:unready<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
 | `cockpit-tools` | 未评估 | 低 | partial | docs:partial<br>handoff:unready<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
-| `codex-app-projects` | 未评估 | 低 | partial | docs:partial<br>handoff:unready<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
+| `codex-app-projects` | 维护 | 高 | not-applicable | WORKSPACE_INDEX.md declares the root contract.<br>AGENTS.md declares that git work belongs to owning project repositories.<br>... | - |
 | `comfyui` | 未评估 | 低 | partial | docs:partial<br>handoff:unready<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
 | `dbskill` | 未评估 | 低 | partial | docs:partial<br>handoff:unready<br>... | 补齐 TODO.md，让待办和里程碑可审计。<br>补齐 MILESTONE.md，让待办和里程碑可审计。 |
 | `ielts-vocab` | 未评估 | 低 | partial | docs:partial<br>handoff:verified<br>... | - |

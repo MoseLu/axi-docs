@@ -17,10 +17,17 @@ agent-readable: true
 
 | Component | Path | Role |
 |---|---|---|
+| workspace container | `/Volumes/code/workspace` | 非 Git 仓库；只承载项目目录、参考目录、生成快照和 launcher shim |
 | workspace.json | `/Volumes/code/workspace/infra/axi-workspace-governance/workspace.json` | 权威治理清单 |
 | registry | `/Volumes/code/workspace/infra/axi-workspace-governance/.workspace/registry.json` | 生成式注册表 |
 | docs source | `/Volumes/code/workspace/infra/axi-workspace-governance/docs` | 权威索引文档目录 |
 | axi-docs source | `/Volumes/code/workspace/projects/axi-docs/docs/axi-workspace-governance` | Axi Docs 镜像入口 |
+
+## 工作区根目录契约
+
+- `/Volumes/code/workspace` 不是 monorepo、代码仓库、提交单元或项目 handoff 目标。
+- 根层文件用于导航、生成快照、workspace graph、dev services 和 agent guidance。
+- `workspace-anchor`、`workspace.graph.json`、`dev-services.config.json` 等资源按工作区资源治理，不按普通项目文档套件计分。
 
 ## Infra
 

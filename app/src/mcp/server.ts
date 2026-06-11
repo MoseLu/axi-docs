@@ -715,7 +715,7 @@ Return exactly:
 
 // ─── 工具定义 ─────────────────────────────────────────────────────────────────
 
-function getToolSchemas() {
+export function getToolSchemas() {
   return [
     {
       name: 'obsidian_scan',
@@ -952,6 +952,34 @@ function getToolSchemas() {
         type: 'object',
         properties: {
           project: { type: 'string', description: '项目名、slug 或路径片段（必填）' },
+        },
+        required: ['project'],
+      },
+    },
+    {
+      // Zero-context handoff governance: Agent 想要在 Axi Docs 内完成
+      // 「定位项目 → 读 handoff → 检查 readiness」闭环，调用本工具即可。
+      // 不执行任何破坏性命令，不直接运行测试或 git，只读 handoff snapshot。
+      name: 'axi_docs_project_onboard',
+      description: '按项目 id 返回零上下文接手摘要（read order、entrypoints、smoke、current work、known failures）。与 workspace-project onboard <id> --json 同源。',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          project: { type: 'string', description: '项目 id（必填）' },
+        },
+        required: ['project'],
+      },
+    },
+    {
+      // Default 不运行 smoke；smoke=true 时才执行 manifest.commands.smoke
+      // 列表中的第一条命令。需要显式 opt-in，避免误触发长跑任务。
+      name: 'axi_docs_handoff_check',
+      description: '校验 handoff snapshot 是否对给定项目就绪：返回 readiness、score、ageDays、stale 标记。可选 smoke=true 触发 manifest 中的冒烟命令。',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          project: { type: 'string', description: '项目 id（必填）' },
+          smoke: { type: 'boolean', description: '显式启用时运行 manifest.commands.smoke[0]', default: false },
         },
         required: ['project'],
       },
@@ -1196,6 +1224,107 @@ export function createServer() {
           const summary = await knowledgeBase.getProjectSummary(project)
           if (!summary) return { content: [{ type: 'text', text: `未找到项目: ${project}` }], isError: true }
           return { content: [{ type: 'text', text: JSON.stringify(summary, null, 2) }] }
+        }
+
+        case 'axi_docs_project_onboard': {
+          const project = args?.project as string
+          if (!project) return { content: [{ type: 'text', text: '错误: project 参数必填' }], isError: true }
+          const card = await knowledgeBase.getProjectHandoffCard(project)
+          const summary = await knowledgeBase.getProjectSummary(project)
+          const manifestPath = card.manifestPath
+            || (summary && 'path' in summary ? `projects/${project}/docs/project-docs.manifest.json` : null)
+          return {
+            content: [{
+              type: 'text',
+              text: JSON.stringify({
+                project: {
+                  id: project,
+                  name: summary?.title || project,
+                  manifestPath,
+                  handoffPath: card.handoffPath,
+                },
+                readiness: card.readiness,
+                score: card.score,
+                readOrder: card.readOrder,
+                entrypoints: card.entrypoints,
+                smokeCommand: card.smokeCommand,
+                verifyCommand: card.verifyCommand,
+                currentWork: card.currentWork,
+                lastVerifiedAt: card.lastVerifiedAt,
+                ageDays: card.ageDays,
+                state: card.state,
+              }, null, 2),
+            }],
+          }
+        }
+
+        case 'axi_docs_handoff_check': {
+          const project = args?.project as string
+          const smoke = args?.smoke === true
+          if (!project) return { content: [{ type: 'text', text: '错误: project 参数必填' }], isError: true }
+          const card = await knowledgeBase.getProjectHandoffCard(project)
+          const snapshotStatus = await knowledgeBase.getHandoffSnapshotStatus()
+          const result: Record<string, unknown> = {
+            project,
+            snapshot: {
+              source: snapshotStatus.source,
+              generatedAt: snapshotStatus.generatedAt,
+              ageDays: snapshotStatus.ageDays,
+            },
+            handoff: {
+              state: card.state,
+              readiness: card.readiness,
+              score: card.score,
+              ageDays: card.ageDays,
+              lastVerifiedAt: card.lastVerifiedAt,
+              manifestPath: card.manifestPath,
+              handoffPath: card.handoffPath,
+            },
+            smoke: {
+              enabled: smoke,
+              ran: false,
+              command: card.smokeCommand,
+              exitCode: null as number | null,
+              output: null as string | null,
+            },
+          }
+          if (smoke) {
+            if (!card.smokeCommand) {
+              result.smoke = {
+                ...(result.smoke as Record<string, unknown>),
+                ran: false,
+                output: 'no smoke command declared in manifest.commands.smoke[]',
+              }
+            } else {
+              const { execFileSync } = await import('node:child_process')
+              try {
+                const cwd = card.manifestPath
+                  ? card.manifestPath.replace(/\/docs\/project-docs\.manifest\.json$/, '')
+                  : process.cwd()
+                const output = execFileSync('sh', ['-c', card.smokeCommand], {
+                  cwd,
+                  encoding: 'utf8',
+                  timeout: 30_000,
+                  stdio: ['ignore', 'pipe', 'pipe'],
+                })
+                result.smoke = {
+                  ...(result.smoke as Record<string, unknown>),
+                  ran: true,
+                  exitCode: 0,
+                  output: output.slice(0, 4000),
+                }
+              } catch (error) {
+                const err = error as { status?: number; stdout?: string; stderr?: string; message: string }
+                result.smoke = {
+                  ...(result.smoke as Record<string, unknown>),
+                  ran: true,
+                  exitCode: typeof err.status === 'number' ? err.status : 1,
+                  output: ((err.stdout || '') + (err.stderr || '')).slice(0, 4000) || err.message,
+                }
+              }
+            }
+          }
+          return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
         }
 
         default:
@@ -1702,6 +1831,94 @@ async function handleToolCall(name: string, args: Record<string, unknown>) {
       const summary = await knowledgeBase.getProjectSummary(project)
       if (!summary) return { content: [{ type: 'text', text: `未找到项目: ${project}` }], isError: true }
       return { content: [{ type: 'text', text: JSON.stringify(summary, null, 2) }] }
+    }
+    case 'axi_docs_project_onboard': {
+      const project = args.project as string
+      if (!project) return { content: [{ type: 'text', text: '错误: project 参数必填' }], isError: true }
+      const card = await knowledgeBase.getProjectHandoffCard(project)
+      const summary = await knowledgeBase.getProjectSummary(project)
+      return {
+        content: [{
+          type: 'text',
+          text: JSON.stringify({
+            project: {
+              id: project,
+              name: summary?.title || project,
+              manifestPath: card.manifestPath,
+              handoffPath: card.handoffPath,
+            },
+            readiness: card.readiness,
+            score: card.score,
+            readOrder: card.readOrder,
+            entrypoints: card.entrypoints,
+            smokeCommand: card.smokeCommand,
+            verifyCommand: card.verifyCommand,
+            currentWork: card.currentWork,
+            lastVerifiedAt: card.lastVerifiedAt,
+            ageDays: card.ageDays,
+            state: card.state,
+          }, null, 2),
+        }],
+      }
+    }
+    case 'axi_docs_handoff_check': {
+      const project = args.project as string
+      const smoke = args.smoke === true
+      if (!project) return { content: [{ type: 'text', text: '错误: project 参数必填' }], isError: true }
+      const card = await knowledgeBase.getProjectHandoffCard(project)
+      const snapshotStatus = await knowledgeBase.getHandoffSnapshotStatus()
+      const result: Record<string, unknown> = {
+        project,
+        snapshot: {
+          source: snapshotStatus.source,
+          generatedAt: snapshotStatus.generatedAt,
+          ageDays: snapshotStatus.ageDays,
+        },
+        handoff: {
+          state: card.state,
+          readiness: card.readiness,
+          score: card.score,
+          ageDays: card.ageDays,
+          lastVerifiedAt: card.lastVerifiedAt,
+          manifestPath: card.manifestPath,
+          handoffPath: card.handoffPath,
+        },
+        smoke: {
+          enabled: smoke,
+          ran: false,
+          command: card.smokeCommand,
+          exitCode: null,
+          output: null,
+        },
+      }
+      if (smoke) {
+        if (!card.smokeCommand) {
+          result.smoke = { ...(result.smoke as Record<string, unknown>), ran: false, output: 'no smoke command declared in manifest.commands.smoke[]' }
+        } else {
+          const { execFileSync } = await import('node:child_process')
+          try {
+            const cwd = card.manifestPath
+              ? card.manifestPath.replace(/\/docs\/project-docs\.manifest\.json$/, '')
+              : process.cwd()
+            const output = execFileSync('sh', ['-c', card.smokeCommand], {
+              cwd,
+              encoding: 'utf8',
+              timeout: 30_000,
+              stdio: ['ignore', 'pipe', 'pipe'],
+            })
+            result.smoke = { ...(result.smoke as Record<string, unknown>), ran: true, exitCode: 0, output: output.slice(0, 4000) }
+          } catch (error) {
+            const err = error as { status?: number; stdout?: string; stderr?: string; message: string }
+            result.smoke = {
+              ...(result.smoke as Record<string, unknown>),
+              ran: true,
+              exitCode: typeof err.status === 'number' ? err.status : 1,
+              output: ((err.stdout || '') + (err.stderr || '')).slice(0, 4000) || err.message,
+            }
+          }
+        }
+      }
+      return { content: [{ type: 'text', text: JSON.stringify(result, null, 2) }] }
     }
     // ── Blinko 工具 ───────────────────────────────────────────────────────────
     case 'blinko_list_notes': {

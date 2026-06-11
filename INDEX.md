@@ -14,7 +14,7 @@
 | `README.zh-CN.md` | Simplified Chinese entrypoint. |
 | `AGENTS.md` | Agent rules, boundaries, verification, read order. |
 | `CHANGELOG.md` | Human-visible change log. |
-| `TODO.md` | Requirement-linked task queue. |
+| `TODO.md` | Task facade pointing at `todo/01-current-architecture.md` (current backlog), `todo/02-legacy-audit.md`, `todo/03-coverage-remediation.md`, `todo/04-roadmap.md`. |
 | `MILESTONE.md` | Delivery milestones and evidence. |
 | `PRD.md` | Product/project requirements and non-goals. |
 | `TDD.md` | Technical/test design and verification commands. |
@@ -29,6 +29,8 @@
 - `MILESTONE.md`
 - `README.md`
 - `README.zh-CN.md`
+- `TODO.md`
+- `todo/`
 - `SECURITY.md`
 - `SECURITY.zh-CN.md`
 - `TODO.md`

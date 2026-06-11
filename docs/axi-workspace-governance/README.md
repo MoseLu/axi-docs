@@ -17,16 +17,16 @@ agent-readable: true
 
 - 工作区根目录：`/Volumes/code/workspace/infra/axi-workspace-governance`
 - 治理仓库远端：`https://github.com/axiomaticworld/axi-workspace-governance.git`
-- 已登记条目：16
-- canonical 条目：16
-- active / active-* 条目：16
+- 已登记条目：17
+- canonical 条目：17
+- active / active-* 条目：17
 
 ## Section 统计
 
 - `infra`: 2
 - `projects`: 7
 - `products`: 1
-- `shared`: 3
+- `shared`: 4
 - `tools`: 3
 - `agent`: 0
 - `references`: 0

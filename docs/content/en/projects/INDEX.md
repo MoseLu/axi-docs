@@ -35,12 +35,13 @@ description: Axi Docs keeps a per-project dossier for every active entry in `WOR
 | [Axi Workbench](./axi-workbench/README.md) | `projects/` | verified |  |  |
 | [体育管理应用](./sports-management/README.md) | `projects/` | verified |  |  |
 
-## Shared and Infrastructure (6)
+## Shared and Infrastructure (7)
 
 | Project | Partition | Status | Stack | Notes |
 | --- | --- | --- | --- | --- |
 | [Axi Local Registry](./axi-registry/README.md) | `infra/` | verified |  |  |
 | [Axi Rules](./axi-rules/README.md) | `projects/` | verified |  |  |
+| [Axi Skills](./axi-skills/README.md) | `shared/` | verified |  |  |
 | [Axi Tauri Starter](./axi-tauri-starter/README.md) | `shared/` | verified |  |  |
 | [Axi UI](./axi-ui/README.md) | `shared/` | verified |  |  |
 | [Workspace Relationship Graph](./workspace-relationship-graph/README.md) | `infra/` | active registry | JSON, Node CLI, MCP stdio | Use before cross-project edits. |
@@ -64,4 +65,4 @@ description: Axi Docs keeps a per-project dossier for every active entry in `WOR
 
 ## Total
 
-**24** dossiers under this locale tree。
+**25** dossiers under this locale tree。

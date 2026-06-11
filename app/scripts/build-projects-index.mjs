@@ -10,8 +10,8 @@
  * Source precedence (zero-context handoff governance):
  *   1. `/Volumes/code/workspace/.workspace/project-handoff.json` (preferred;
  *      produced by `infra/axi-workspace-governance/scripts/project-handoff.mjs`).
- *      All 15 active projects' readiness, commands, current work, and known
- *      failures are sourced from here.
+ *      Active project readiness, commands, current work, and known failures
+ *      are sourced from here.
  *   2. `/Volumes/code/workspace/WORKSPACE_INDEX.md` (fallback). Used only when
  *      the handoff snapshot is missing or unparseable. `WORKSPACE_INDEX.md`
  *      remains the human-authored registry and is not modified by this script.

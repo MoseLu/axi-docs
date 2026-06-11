@@ -1,9 +1,9 @@
 # Workspace Project Handoff Readiness
 
-Generated: 2026-06-11T05:34:37.955Z
+Generated: 2026-06-11T09:45:22.329Z
 
-- Total: 15
-- Verified: 15
+- Total: 16
+- Verified: 16
 - Documented: 0
 - Stale: 0
 - Unready: 0
@@ -19,6 +19,7 @@ Generated: 2026-06-11T05:34:37.955Z
 | `axi-proxy-companion` | verified | 10/10 | 2026-06-11 | Keep the zero-context manifest aligned with backend definitions, local ports, runtime paths, and secret boundaries. |
 | `axi-registry` | verified | 10/10 | 2026-06-11 | Keep the zero-context manifest aligned with actual commands and package contracts. |
 | `axi-rules` | verified | 10/10 | 2026-06-11 | Maintain the frontend contract track registered in todo/index.json. |
+| `axi-skills` | verified | 10/10 | 2026-06-11 | Keep the shared skill catalog free of runtime artifacts, caches, secrets, and nested repository state. |
 | `axi-tauri-starter` | verified | 10/10 | 2026-06-11 | Keep the root documentation suite current. |
 | `axi-ui` | verified | 10/10 | 2026-06-11 | Keep the root documentation suite current. |
 | `axi-video-downloader` | verified | 10/10 | 2026-06-11 | Keep the zero-context manifest aligned with the actual Python entrypoints and hardware prerequisites. |

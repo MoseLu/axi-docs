@@ -35,12 +35,13 @@ description: Axi Docs 为 `WORKSPACE_INDEX.md` 中每个 active 项目维护一�
 | [Axi Workbench](./axi-workbench/README.md) | `projects/` | verified |  |  |
 | [体育管理应用](./sports-management/README.md) | `projects/` | verified |  |  |
 
-## 共享与基础设施 (6)
+## 共享与基础设施 (7)
 
 | 项目 | 分区 | 状态 | 技术栈 | 备注 |
 | --- | --- | --- | --- | --- |
 | [Axi Local Registry](./axi-registry/README.md) | `infra/` | verified |  |  |
 | [Axi Rules](./axi-rules/README.md) | `projects/` | verified |  |  |
+| [Axi Skills](./axi-skills/README.md) | `shared/` | verified |  |  |
 | [Axi Tauri Starter](./axi-tauri-starter/README.md) | `shared/` | verified |  |  |
 | [Axi UI](./axi-ui/README.md) | `shared/` | verified |  |  |
 | [Workspace Relationship Graph](./workspace-relationship-graph/README.md) | `infra/` | active registry | JSON, Node CLI, MCP stdio | Use before cross-project edits. |
@@ -64,4 +65,4 @@ description: Axi Docs 为 `WORKSPACE_INDEX.md` 中每个 active 项目维护一�
 
 ## Total
 
-**24** 份档案分布在本语种树下。
+**25** 份档案分布在本语种树下。

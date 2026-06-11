@@ -15,10 +15,10 @@ agent-readable: true
 
 ## 摘要
 
-- 已登记项目：31
-- Axi 项目：17
+- 已登记项目：32
+- Axi 项目：18
 - 完成：1
-- 可用及以上：7
+- 可用及以上：8
 - 阻塞：0
 
 ## 阶段口径
@@ -48,6 +48,7 @@ agent-readable: true
 | `axi-proxy-companion` | 未评估 | 低 | partial | docs:partial<br>handoff:verified<br>... | - |
 | `axi-registry` | 可用 | 中 | partial | Workspace graph registers registry health verification.<br>Axi UI declares the registry as its package distribution boundary.<br>... | Keep registry health visible when shared packages are published or consumed. |
 | `axi-rules` | 未评估 | 低 | partial | docs:partial<br>handoff:verified<br>... | - |
+| `axi-skills` | 可用 | 中 | ready | Repository verifier covers skill entrypoints, logical names, forbidden runtime artifacts, and generated index output.<br>i18n verifier protects the English runtime source while tracking translation batch coverage.<br>... | Keep the generated skill index and i18n batch manifest synchronized after skill catalog changes. |
 | `axi-tauri-starter` | 未评估 | 低 | partial | docs:partial<br>handoff:verified<br>... | - |
 | `axi-ui` | 可用 | 中 | partial | Workspace verify covers file-line guard, typecheck, and tests.<br>Axi Coder and dashboard surfaces consume linked @axi packages.<br>... | Continue additive package hardening without breaking @axi/* style/runtime contracts. |
 | `axi-video-downloader` | 未评估 | 低 | partial | docs:partial<br>handoff:verified<br>... | - |

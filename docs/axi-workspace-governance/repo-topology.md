@@ -54,7 +54,10 @@ agent-readable: true
 
 ## Shared
 
-- `../../projects/axi-rules` | Axi Rules | branch=`agent/zero-context-handoff-20260611` | canonical=yes | compliance=`constraint-index`
+- `../../projects/axi-rules` | Axi Rules | branch=`dev` | canonical=yes | compliance=`constraint-index`
+  remote: https://github.com/axiomaticworld/axi-rules.git
+- `../../shared/axi-skills` | Axi Skills | branch=`dev` | canonical=yes | compliance=`agent-skill-catalog`
+  remote: https://github.com/MoseLu/axi-skills.git
 - `../../shared/axi-tauri-starter` | Axi Tauri Starter | branch=`agent/zero-context-handoff-20260611` | canonical=yes | compliance=`template-reference`
   remote: https://github.com/axiomaticworld/axi-tauri-starter.git
 - `../../shared/axi-ui` | Axi UI | branch=`agent/zero-context-handoff-20260611` | canonical=yes | compliance=`node-monorepo-approved`

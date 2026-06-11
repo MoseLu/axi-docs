@@ -25,7 +25,8 @@ agent-readable: true
 | projects | sports-management | 体育管理应用 | hubu | development | active-product | agent/zero-context-handoff-20260611 | yes | `../../projects/axi-sports-management-app` | [link](https://github.com/axiomaticworld/sports-management-app.git) |
 | projects | axi-workbench | Axi Workbench | libu | active | active-canonical | agent/zero-context-handoff-20260611 | yes | `../../projects/axi-workbench` | [link](https://github.com/axiomaticworld/axi-workbench.git) |
 | products | ielts-vocab | IELTS Vocabulary | libu | active | active-product | agent/zero-context-handoff-20260611 | yes | `../../products/ielts-vocab` | [link](https://github.com/axiomaticworld/ielts-vocab.git) |
-| shared | axi-rules | Axi Rules | libu | active | active-shared-provider | agent/zero-context-handoff-20260611 | yes | `../../projects/axi-rules` | - |
+| shared | axi-rules | Axi Rules | libu | active | active-shared-provider | dev | yes | `../../projects/axi-rules` | - |
+| shared | axi-skills | Axi Skills | libu | active | active-shared-provider | dev | yes | `../../shared/axi-skills` | [link](https://github.com/MoseLu/axi-skills.git) |
 | shared | axi-tauri-starter | Axi Tauri Starter | libu | active | active-shared-reference | agent/zero-context-handoff-20260611 | yes | `../../shared/axi-tauri-starter` | [link](https://github.com/axiomaticworld/axi-tauri-starter.git) |
 | shared | axi-ui | Axi UI | libu | active | active-shared-provider | agent/zero-context-handoff-20260611 | yes | `../../shared/axi-ui` | [link](https://github.com/axiomaticworld/axi-ui.git) |
 | tools | axi-feishu-codex-bridge | Axi Feishu Codex Bridge | libu | active | active-tool-local-runtime | agent/zero-context-handoff-20260611 | yes | `../../tools/axi-feishu-codex-bridge` | [link](https://github.com/MoseLu/axi-feishu-codex-bridge.git) |

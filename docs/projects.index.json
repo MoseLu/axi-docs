@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-06-11T08:38:43.226Z",
+  "generated_at": "2026-06-11T09:48:13.422Z",
   "source": "handoff",
   "handoffSource": true,
-  "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+  "handoffGeneratedAt": "2026-06-11T09:45:22.329Z",
   "handoffPath": "/Volumes/code/workspace/.workspace/project-handoff.json",
   "handoffMaxAgeDays": 14,
-  "count": 26,
+  "count": 27,
   "preservedAddenda": [
     "dbskill",
     "codex-plus-app"
@@ -24,7 +24,7 @@
       "kind": "project",
       "lifecycle": "active-canonical",
       "verification": "cd backend && pytest tests/; pnpm --dir frontend build; pnpm --dir infra/axi-agent-mcp test; pnpm --dir tools/axi-todo verify",
-      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffGeneratedAt": "2026-06-11T09:45:22.329Z",
       "handoffManifestPath": "/Volumes/code/workspace/projects/axi-agent-platform/docs/project-docs.manifest.json"
     },
     {
@@ -40,7 +40,7 @@
       "kind": "project",
       "lifecycle": "active-canonical",
       "verification": "pnpm --dir app verify; pnpm --dir app test:run",
-      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffGeneratedAt": "2026-06-11T09:45:22.329Z",
       "handoffManifestPath": "/Volumes/code/workspace/projects/axi-docs/docs/project-docs.manifest.json"
     },
     {
@@ -56,7 +56,7 @@
       "kind": "tool",
       "lifecycle": "active-tool-local-runtime",
       "verification": "PYTHONPATH=src .venv/bin/python -m unittest discover -s tests",
-      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffGeneratedAt": "2026-06-11T09:45:22.329Z",
       "handoffManifestPath": "/Volumes/code/workspace/tools/axi-feishu-codex-bridge/docs/project-docs.manifest.json"
     },
     {
@@ -72,7 +72,7 @@
       "kind": "project",
       "lifecycle": "active-canonical",
       "verification": "pnpm build && pnpm test",
-      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffGeneratedAt": "2026-06-11T09:45:22.329Z",
       "handoffManifestPath": "/Volumes/code/workspace/projects/axi-image-preview/docs/project-docs.manifest.json"
     },
     {
@@ -88,7 +88,7 @@
       "kind": "project",
       "lifecycle": "active-canonical",
       "verification": "make test-relay; make smoke-relay-local; make android-agent-verify; git check-ignore android-app/app/google-services.json",
-      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffGeneratedAt": "2026-06-11T09:45:22.329Z",
       "handoffManifestPath": "/Volumes/code/workspace/projects/axi-notify/docs/project-docs.manifest.json"
     },
     {
@@ -104,7 +104,7 @@
       "kind": "project",
       "lifecycle": "active-local",
       "verification": "pnpm test:run && pnpm typecheck",
-      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffGeneratedAt": "2026-06-11T09:45:22.329Z",
       "handoffManifestPath": "/Volumes/code/workspace/projects/axi-pet/docs/project-docs.manifest.json"
     },
     {
@@ -120,7 +120,7 @@
       "kind": "tool",
       "lifecycle": "active-tool",
       "verification": "swift build; rg -n \"networksetup|HTTP_PROXY|HTTPS_PROXY|ALL_PROXY|launchctl\" Sources/ must return no matches; for f in README.md README.zh-CN.md AGENTS.md CHANGELOG.md TODO.md MILESTONE.md INDEX.md PRD.md TDD.md; do test -f \"$f\" || exit 1; done",
-      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffGeneratedAt": "2026-06-11T09:45:22.329Z",
       "handoffManifestPath": "/Volumes/code/workspace/tools/axi-proxy-companion/docs/project-docs.manifest.json"
     },
     {
@@ -136,7 +136,7 @@
       "kind": "infra",
       "lifecycle": "active-infra",
       "verification": "node -e \"JSON.parse(require('fs').readFileSync('docs/project-docs.manifest.json','utf8'))\"; for f in README.md README.zh-CN.md AGENTS.md CHANGELOG.md TODO.md MILESTONE.md INDEX.md PRD.md TDD.md; do test -f \"$f\" || exit 1; done",
-      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffGeneratedAt": "2026-06-11T09:45:22.329Z",
       "handoffManifestPath": "/Volumes/code/workspace/infra/axi-registry/docs/project-docs.manifest.json"
     },
     {
@@ -152,8 +152,24 @@
       "kind": "shared",
       "lifecycle": "active-shared-provider",
       "verification": "make rules; pnpm --dir frontend typecheck; pnpm --dir frontend test; pnpm --dir frontend build",
-      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffGeneratedAt": "2026-06-11T09:45:22.329Z",
       "handoffManifestPath": "/Volumes/code/workspace/projects/axi-rules/docs/project-docs.manifest.json"
+    },
+    {
+      "id": "axi-skills",
+      "name": "Axi Skills",
+      "partition": "shared",
+      "path": "/Volumes/code/workspace/shared/axi-skills",
+      "purpose": "Shared version-controlled skill catalog for Codex, Claude, Cursor, MiniMax, and compatible Axi agent runtimes, with verifier-backed runtime and i18n contracts.",
+      "stack": "",
+      "status": "verified",
+      "notes": "",
+      "section": "shared",
+      "kind": "shared",
+      "lifecycle": "active-shared-provider",
+      "verification": "python3 scripts/verify.py; python3 scripts/verify_i18n.py --check-manifest-only --forbid-english-diff",
+      "handoffGeneratedAt": "2026-06-11T09:45:22.329Z",
+      "handoffManifestPath": "/Volumes/code/workspace/shared/axi-skills/docs/project-docs.manifest.json"
     },
     {
       "id": "axi-tauri-starter",
@@ -168,7 +184,7 @@
       "kind": "shared",
       "lifecycle": "active-shared-reference",
       "verification": "rg -n \"TODO|PRD|TDD\" README.md TODO.md MILESTONE.md PRD.md TDD.md",
-      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffGeneratedAt": "2026-06-11T09:45:22.329Z",
       "handoffManifestPath": "/Volumes/code/workspace/shared/axi-tauri-starter/docs/project-docs.manifest.json"
     },
     {
@@ -184,7 +200,7 @@
       "kind": "shared",
       "lifecycle": "active-shared-provider",
       "verification": "pnpm test",
-      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffGeneratedAt": "2026-06-11T09:45:22.329Z",
       "handoffManifestPath": "/Volumes/code/workspace/shared/axi-ui/docs/project-docs.manifest.json"
     },
     {
@@ -200,7 +216,7 @@
       "kind": "tool",
       "lifecycle": "active-tool",
       "verification": "python3 -m py_compile app.py main.py config.py database.py adb_controller.py mitm_proxy.py uicontroller.py __init__.py modules/*.py utils/*.py; for f in README.md README.zh-CN.md AGENTS.md CHANGELOG.md TODO.md MILESTONE.md INDEX.md PRD.md TDD.md; do test -f \"$f\" || exit 1; done",
-      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffGeneratedAt": "2026-06-11T09:45:22.329Z",
       "handoffManifestPath": "/Volumes/code/workspace/tools/axi-video-downloader/docs/project-docs.manifest.json"
     },
     {
@@ -216,7 +232,7 @@
       "kind": "project",
       "lifecycle": "active-canonical",
       "verification": "pnpm type-check; pnpm test; pnpm test:workstation; pnpm --dir apps/devsvc-dashboard typecheck; pnpm --dir apps/axi-coder typecheck; npm --prefix apps/verification-inbox run typecheck",
-      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffGeneratedAt": "2026-06-11T09:45:22.329Z",
       "handoffManifestPath": "/Volumes/code/workspace/projects/axi-workbench/docs/project-docs.manifest.json"
     },
     {
@@ -232,7 +248,7 @@
       "kind": "product",
       "lifecycle": "active-product",
       "verification": "pnpm --dir frontend verify:repo-guards",
-      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffGeneratedAt": "2026-06-11T09:45:22.329Z",
       "handoffManifestPath": "/Volumes/code/workspace/products/ielts-vocab/docs/project-docs.manifest.json"
     },
     {
@@ -248,7 +264,7 @@
       "kind": "project",
       "lifecycle": "active-product",
       "verification": "pnpm lint && pnpm build",
-      "handoffGeneratedAt": "2026-06-11T05:34:37.955Z",
+      "handoffGeneratedAt": "2026-06-11T09:45:22.329Z",
       "handoffManifestPath": "/Volumes/code/workspace/projects/axi-sports-management-app/docs/project-docs.manifest.json"
     },
     {

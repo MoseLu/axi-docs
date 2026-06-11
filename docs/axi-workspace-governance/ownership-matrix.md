@@ -32,6 +32,7 @@ agent-readable: true
 | `../../projects/axi-workbench` | projects | active-canonical | yes | [link](https://github.com/axiomaticworld/axi-workbench.git) |
 | `../../products/ielts-vocab` | products | active-product | yes | [link](https://github.com/axiomaticworld/ielts-vocab.git) |
 | `../../projects/axi-rules` | shared | active-shared-provider | yes | - |
+| `../../shared/axi-skills` | shared | active-shared-provider | yes | [link](https://github.com/MoseLu/axi-skills.git) |
 | `../../shared/axi-tauri-starter` | shared | active-shared-reference | yes | [link](https://github.com/axiomaticworld/axi-tauri-starter.git) |
 | `../../shared/axi-ui` | shared | active-shared-provider | yes | [link](https://github.com/axiomaticworld/axi-ui.git) |
 | `../../tools/axi-feishu-codex-bridge` | tools | active-tool-local-runtime | yes | [link](https://github.com/MoseLu/axi-feishu-codex-bridge.git) |

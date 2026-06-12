@@ -32,7 +32,7 @@ Axi Docs 是 **「文档枢纽 + 知识图谱 + MCP 文档总线 + 工作区项�
 | `docs/content/zh/` | 是 | 产品内容源（简体中文），与 `en/` 同构翻译 |
 | `docs/axi-workspace-governance/` | 是 | 工作区治理文档的本地镜像（只读快照） |
 | `docs/project-docs.manifest.json` | 是 | 项目文档清单，标明各文档的归属路径 |
-| `SECURITY.md`, `TODO.md`, `AGENTS.md`, `CHANGELOG.md`, `ERROR.md` (`ERROR.zh-CN.md` 为中文镜像) | 是 | 根级项目门面文档 |
+| `docs/governance/SECURITY.md` / `SECURITY.zh-CN.md`, `docs/state/TODO.md` / `TODO.zh-CN.md`, `AGENTS.md`, `docs/state/CHANGELOG.md` / `CHANGELOG.zh-CN.md`, `docs/state/ERROR.md` (`ERROR.zh-CN.md` 为中文镜像) | 是 | 根级 / 治理 / 状态文档（按 docs/state 与 docs/governance 分桶） |
 | `references/*`（工作区级） | 否 | 由 `infra/axi-workspace-governance/` 治理，本项目不翻译、不编辑 |
 | `blinko/`（symlink 到 `../blinko`） | 否 | 外部依赖，不在本项目所有权内 |
 
@@ -47,11 +47,11 @@ Axi Docs 是 **「文档枢纽 + 知识图谱 + MCP 文档总线 + 工作区项�
 | 模块划分、技术栈、组件规则、API 规范、环境变量 | [`app/AGENTS.md`](app/AGENTS.md) |
 | 产品内容（用户可见的英文/中文文档） | `docs/content/en/README.md`, `docs/content/zh/README.md` |
 | 仓库治理（branch / commit / quality gate / release） | `app/docs/OPERATIONS.md`, `app/docs/GITHUB_FLOW.md`, `app/docs/BRANCH_PROTECTION.md`, `app/docs/COMMIT_CONVENTION.md`, `app/docs/RELEASE_OPERATIONS.md`, `app/docs/QUALITY_GATE.md` |
-| 安全策略 | [`SECURITY.md`](SECURITY.md) |
-| 项目待办与 P0~P3 路线图 | [`TODO.md`](TODO.md) |
+| 安全策略 | [`docs/governance/SECURITY.md`](docs/governance/SECURITY.md) |
+| 项目待办与 P0~P3 路线图 | [`docs/state/TODO.md`](docs/state/TODO.md) |
 | 文档清单与责任归属 | [`docs/project-docs.manifest.json`](docs/project-docs.manifest.json) |
-| 变更历史 | [`CHANGELOG.md`](CHANGELOG.md) |
-| 错误复盘（结构性缺陷的根因分析与记录） | [`ERROR.md`](ERROR.md) |
+| 变更历史 | [`docs/state/CHANGELOG.md`](docs/state/CHANGELOG.md) |
+| 错误复盘（结构性缺陷的根因分析与记录） | [`docs/state/ERROR.md`](docs/state/ERROR.md) |
 | 工作区治理镜像 | `docs/axi-workspace-governance/`（只读，权威源是 `infra/axi-workspace-governance/`） |
 
 > **优先级冲突时**：根级 `AGENTS.md` > `app/AGENTS.md` > 治理镜像 > 个人记忆。
@@ -87,7 +87,7 @@ pnpm --dir app build
 - 修改 `app/src/**` → 至少 `pnpm --dir app quality:check` 通过。
 - 修改 `app/src/mcp/**` → 至少 `pnpm --dir app verify` 通过（含 MCP 协议冒烟）。
 - 修改 `docs/content/{en,zh}/**` → 不需构建，但需保证 frontmatter 的 `id` 在两种语言下保持一致、相对路径镜像。
-- 修改本文件 / `CHANGELOG.md` / `TODO.md` / `SECURITY.md` / `docs/project-docs.manifest.json` → 不需构建，但需保持文件存在性。
+- 修改本文件 / `docs/state/CHANGELOG.md` / `docs/state/TODO.md` / `docs/governance/SECURITY.md` / `docs/project-docs.manifest.json` → 不需构建，但需保持文件存在性。
 
 ---
 
@@ -99,7 +99,7 @@ pnpm --dir app build
 - **不要**在没有 owner 显式指令的情况下合并到 `main`、推送标签、删除远程分支、发布正式 release。
 - **不要**把 `references/*` 或 `infra/axi-workspace-governance/` 的内容当作本项目可写范围。
 - **要**保持根级 `AGENTS.md` 与 `app/AGENTS.md` 的双层结构：根级谈边界与门面，应用包内谈实现与契约。
-- **要**在 `CHANGELOG.md` 记录对仓库结构、依赖、文档源的可见变更（与 Conventional Commits 配合，但不重复 commit 标题）。
+- **要**在 `docs/state/CHANGELOG.md` 记录对仓库结构、依赖、文档源的可见变更（与 Conventional Commits 配合，但不重复 commit 标题）。
 - **要**在改动跨项目契约前先查 `workspace-project consumers axi-docs`。
 
 ---

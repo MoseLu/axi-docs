@@ -28,3 +28,11 @@ Do not use this directory as a task queue. Axi Todo owns task status, scheduling
 ## Current documents
 
 - [Idea-to-Landing Plan Contract](idea-to-landing.md)
+- [Knowledge Hub Stability Plan](knowledge-hub-stability-plan.md) — draft, owner actions for sync I/O / CORS / Vite-MCP helper extraction (sourced from `todo/04-roadmap.md` and `todo/02-legacy-audit.md`)
+
+## Plan status legend
+
+- `draft` — idea is captured, grill-me in progress, no execution tasks yet.
+- `active` — grill-me closed, execution tasks live in Axi Todo, plan body stable.
+- `landed` — acceptance criteria have evidence, docs still explain the final shape.
+- `superseded` — replaced by a later plan; link to the successor from the body.

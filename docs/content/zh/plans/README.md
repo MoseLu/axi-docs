@@ -28,3 +28,11 @@ description: 长期保存“想法到落地”方案，执行任务则链接到 
 ## 当前文档
 
 - [想法到落地方案契约](idea-to-landing.md)
+- [知识中枢稳态化方案](knowledge-hub-stability-plan.md) —— 草稿，覆盖同步 I/O / CORS / Vite-MCP 重复抽取三项 owner action（底稿来自 `todo/04-roadmap.md` 与 `todo/02-legacy-audit.md`）
+
+## 方案状态说明
+
+- `draft` —— 想法已捕获，grill-me 进行中，尚未开执行任务。
+- `active` —— grill-me 已收敛，执行任务挂在 Axi Todo，方案正文稳定。
+- `landed` —— 验收标准有证据，文档仍能解释最终形态。
+- `superseded` —— 被后续方案替代，正文里链向继任方案。

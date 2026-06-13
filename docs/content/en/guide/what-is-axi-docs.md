@@ -5,7 +5,7 @@ type: guide
 status: published
 tags: [Axi Docs, guide, English]
 created: 2026-06-06
-modified: 2026-06-07
+modified: 2026-06-13
 graph-title: What is Axi Docs?
 graph-tags: [Axi Docs, Guide]
 description: Learn how Axi Docs organizes guides, skills, and workspace knowledge.
@@ -25,8 +25,8 @@ Top navigation selects the document set, the left sidebar moves between pages, a
 
 ## How content enters the site
 
-Sources are registered in `app/src/config/documentSources.ts`. Guide content lives under `docs/content/{locale}/guide`; Skills and Workspace read from their own local repositories. The server indexes these sources and exposes catalogs, content, search results, and relationship data to the UI.
+Sources are registered in `app/src/config/documentSources.ts`. Axi Docs-owned content lives under `docs/content/{locale}/guide`, `docs/content/{locale}/plans`, and `docs/content/{locale}/projects`; Skills and Workspace read from their own local repositories. The server indexes these sources and exposes catalogs, content, search results, and relationship data to the UI.
 
 ## Where to begin
 
-Start with [Getting Started](/en/guide/getting-started). For content maintenance, continue with [Document Sources](/en/guide/document-sources), [Writing Markdown](/en/guide/markdown), and [Frontmatter](/en/guide/frontmatter).
+Start with [Getting Started](/en/guide/getting-started). For content maintenance, continue with [Document Sources](/en/guide/document-sources), [Plans Library](/en/guide/plans), [Writing Markdown](/en/guide/markdown), and [Frontmatter](/en/guide/frontmatter).

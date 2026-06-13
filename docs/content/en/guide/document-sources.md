@@ -5,7 +5,7 @@ type: guide
 status: published
 tags: [Axi Docs, sources, documents, English]
 created: 2026-06-07
-modified: 2026-06-08
+modified: 2026-06-13
 graph-title: Document Sources
 graph-tags: [Axi Docs, Sources]
 description: Learn how Axi Docs registers, distinguishes, and reads local document sources.
@@ -17,7 +17,7 @@ description: Learn how Axi Docs registers, distinguishes, and reads local docume
 
 ## Built-in sources
 
-- `axi-docs-zh` and `axi-docs-en` contain this site's Markdown.
+- `axi-docs-zh` and `axi-docs-en` contain this site's Markdown: guides, plans, and project dossiers.
 - `axi-skills` and `axi-skills-zh` index the shared skills library.
 - `workspace` connects workspace governance and project indexes.
 - `dbskill`, `obsidian`, and `blinko` are additional configured knowledge sources.
@@ -29,3 +29,5 @@ Default paths resolve relative to the workspace. Environment variables such as `
 ## Add a source
 
 Prefer an existing adapter: `markdown`, `skills`, `workspace`, or `api`. After registration, run tests and a production build, then verify catalog loading, search, and document reading against the source.
+
+For idea-to-landing work, add durable plan pages under `docs/content/{locale}/plans/` and link execution tasks from Axi Todo back to those pages.

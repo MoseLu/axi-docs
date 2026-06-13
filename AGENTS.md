@@ -28,8 +28,8 @@ Axi Docs 是 **「文档枢纽 + 知识图谱 + MCP 文档总线 + 工作区项�
 | 路径 | 是否项目内 | 说明 |
 |------|------------|------|
 | `app/` | 是 | 应用包（React + Vite + MCP Server），规则在 `app/AGENTS.md` |
-| `docs/content/en/` | 是 | 产品内容源（英文），frontmatter 含 `id/type/status/tags` |
-| `docs/content/zh/` | 是 | 产品内容源（简体中文），与 `en/` 同构翻译 |
+| `docs/content/en/` | 是 | 产品内容源（英文），frontmatter 含 `id/type/status/tags`；`guide/` 写使用说明，`plans/` 写长期方案，`projects/` 写项目档案 |
+| `docs/content/zh/` | 是 | 产品内容源（简体中文），与 `en/` 同构翻译；`guide/`、`plans/`、`projects/` 语义保持一致 |
 | `docs/axi-workspace-governance/` | 是 | 工作区治理文档的本地镜像（只读快照） |
 | `docs/project-docs.manifest.json` | 是 | 项目文档清单，标明各文档的归属路径 |
 | `docs/governance/SECURITY.md` / `SECURITY.zh-CN.md`, `docs/state/TODO.md` / `TODO.zh-CN.md`, `AGENTS.md`, `docs/state/CHANGELOG.md` / `CHANGELOG.zh-CN.md`, `docs/state/ERROR.md` (`ERROR.zh-CN.md` 为中文镜像) | 是 | 根级 / 治理 / 状态文档（按 docs/state 与 docs/governance 分桶） |
@@ -46,6 +46,7 @@ Axi Docs 是 **「文档枢纽 + 知识图谱 + MCP 文档总线 + 工作区项�
 |------|----------|
 | 模块划分、技术栈、组件规则、API 规范、环境变量 | [`app/AGENTS.md`](app/AGENTS.md) |
 | 产品内容（用户可见的英文/中文文档） | `docs/content/en/README.md`, `docs/content/zh/README.md` |
+| 想法到落地方案库（长期方案 source of truth） | `docs/content/{en,zh}/plans/README.md`, `docs/content/{en,zh}/plans/idea-to-landing.md` |
 | 仓库治理（branch / commit / quality gate / release） | `app/docs/OPERATIONS.md`, `app/docs/GITHUB_FLOW.md`, `app/docs/BRANCH_PROTECTION.md`, `app/docs/COMMIT_CONVENTION.md`, `app/docs/RELEASE_OPERATIONS.md`, `app/docs/QUALITY_GATE.md` |
 | 安全策略 | [`docs/governance/SECURITY.md`](docs/governance/SECURITY.md) |
 | 项目待办与 P0~P3 路线图 | [`docs/state/TODO.md`](docs/state/TODO.md) |
@@ -87,6 +88,7 @@ pnpm --dir app build
 - 修改 `app/src/**` → 至少 `pnpm --dir app quality:check` 通过。
 - 修改 `app/src/mcp/**` → 至少 `pnpm --dir app verify` 通过（含 MCP 协议冒烟）。
 - 修改 `docs/content/{en,zh}/**` → 不需构建，但需保证 frontmatter 的 `id` 在两种语言下保持一致、相对路径镜像。
+- 修改 `docs/content/{en,zh}/plans/**` → 保持方案正文为长期决策/验收记录；执行状态只写入 Axi Todo，并从 Todo 链回方案页。
 - 修改本文件 / `docs/state/CHANGELOG.md` / `docs/state/TODO.md` / `docs/governance/SECURITY.md` / `docs/project-docs.manifest.json` → 不需构建，但需保持文件存在性。
 
 ---

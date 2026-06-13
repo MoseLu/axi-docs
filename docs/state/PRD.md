@@ -20,6 +20,7 @@ The project needs a complete root documentation suite so humans and agents can u
 | REQ-VERIFY-001 | Document runnable verification. | `TDD.md` lists concrete commands or exact blockers. |
 | REQ-BOUNDARY-001 | Preserve ownership boundaries. | `AGENTS.md` explains writable scope and cross-project limits. |
 | REQ-MILESTONE-001 | Track delivery status. | `MILESTONE.md` records current state and exit criteria. |
+| REQ-PLAN-001 | Keep durable idea-to-landing plans separate from task execution. | Canonical plans live under `docs/content/{en,zh}/plans/`; task status and next actions link through Axi Todo instead of replacing the plan record. |
 
 ## Non-Goals
 

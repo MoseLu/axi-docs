@@ -16,6 +16,15 @@ not versioned.
 ## [Unreleased]
 
 ### Added
+- 2026-06-13: 新增双语 `docs/content/{en,zh}/plans/` 方案库，明确
+  “Axi Docs = 长期方案 source of truth / Axi Todo = execution queue”的归属边界；
+  新增 `idea-to-landing.md` 方案契约与 `/guide/plans` 导航页，并在
+  `siteConfig`、根级 README、TODO facade、PRD、MILESTONE 和 manifest 中登记。
+- 2026-06-13: 补齐 manifest 已声明但缺失的 `docs/state/VERIFICATION.md`，
+  记录根级治理文档、项目档案、source lock、前端配置和方案库变更的验证入口。
+- 2026-06-13: 修正 `docs/project-docs.manifest.json` 的 readOrder/currentWork，
+  从不存在的根级 `TODO.md` / `MILESTONE.md` 指向真实的 `docs/state/*` 文件，
+  并把方案契约纳入接手阅读顺序。
 - 2026-06-07: 根级 `AGENTS.md` 创建（与 `app/AGENTS.md` 形成「根级门面 + 应用包内部规则」双层结构）。
 - 2026-06-07: 根级 `CHANGELOG.md` 创建（本文件，按 Keep a Changelog 1.1 规范）。
 - 2026-06-07: 8 份子代理 i18n 审计完成，审计报告见

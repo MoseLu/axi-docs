@@ -21,9 +21,10 @@ describe('siteConfig', () => {
     expect(zh.themeConfig.nav.map((item) => item.text)).toEqual(['指南', '技能库', '工作区'])
     expect(en.themeConfig.nav.map((item) => item.text)).toEqual(['Guide', 'Skills', 'Workspace'])
     expect(zh.themeConfig.guideSections.map((section) => section.text)).toEqual(['简介', '内容与写作', '知识系统', '运维与扩展'])
-    expect(zh.themeConfig.guideSections.flatMap((section) => section.items)).toHaveLength(12)
+    expect(zh.themeConfig.guideSections.flatMap((section) => section.items)).toHaveLength(13)
     expect(en.themeConfig.guideSections[1].items.map((item) => item.text)).toEqual([
       'Document Sources',
+      'Plans Library',
       'Writing Markdown',
       'Frontmatter',
       'Search and Indexing',

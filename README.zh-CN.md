@@ -5,7 +5,8 @@ Axi Docs 是面向 Axi 项目的 workspace 文档枢纽。它把 Vite React 阅�
 ## 范围
 
 - `app/` 持有 React/Vite 应用、MCP server、源适配器、测试与构建流水线。
-- `docs/content/en/` 与 `docs/content/zh/` 持有由应用渲染的产品文档页面。
+- `docs/content/en/` 与 `docs/content/zh/` 持有由应用渲染的产品文档页面，包括 `guide/`、`plans/` 与 `projects/`。
+- `docs/content/{en,zh}/plans/` 是长期“想法到落地”方案的权威来源；Axi Todo 负责执行状态和下一步动作。
 - `docs/axi-workspace-governance/` 是 workspace 治理文档的本地镜像；以 workspace 治理仓库为权威源。
 - `docs/project-docs.manifest.json` 记录项目文档契约。
 - `.claude/PARADIGM.md` 与 `.claude/ARCHITECTURE.md` 定义项目级 deep-init 契约。

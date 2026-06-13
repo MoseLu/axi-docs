@@ -2,6 +2,8 @@
 
 > 状态复核日期: 2026-06-11（ZC-DOCS-001~005 完成后重排）
 > 本文件是任务 facade；详细内容由 `todo/` 目录下的分节文件承担。
+> 方案正文不写在本文件。长期“想法到落地”方案写入 `docs/content/{en,zh}/plans/`；
+> 本文件和 Axi Todo 只承载执行队列、状态和下一步动作。
 
 ---
 
@@ -13,6 +15,7 @@
 | 旧审计清单 | [`todo/02-legacy-audit.md`](todo/02-legacy-audit.md) | 2026-03 代码审计 P0/P1/P2/P3 复核（owner action 表） |
 | 文档覆盖补齐 | [`todo/03-coverage-remediation.md`](todo/03-coverage-remediation.md) | 2026-06-10 文档覆盖补齐计划（已归档） |
 | 当前路线 | [`todo/04-roadmap.md`](todo/04-roadmap.md) | Axi Knowledge Hub 路线 + 下一轮重点 |
+| 方案库契约 | [`../content/zh/plans/idea-to-landing.md`](../content/zh/plans/idea-to-landing.md) / [`../content/en/plans/idea-to-landing.md`](../content/en/plans/idea-to-landing.md) | grill-me 产物、长期方案记录与 Axi Todo 执行任务的归属边界 |
 
 ---
 
@@ -26,6 +29,7 @@ ZC-DOCS-001~005 已于 2026-06-11 实施完成（见 `todo/01-current-architectu
 4. `todo/01-current-architecture.md` → 当前真实架构 backlog（5 项 P0/P1/P2，全部 COMPLETED）
 5. `todo/02-legacy-audit.md` → 待修 owner action 跟踪表
 6. `docs/HANDOFF.md` → Axi Docs 自身的 handoff 视图
+7. `docs/content/zh/plans/idea-to-landing.md` → 方案库与 Axi Todo 的边界
 
 ---
 

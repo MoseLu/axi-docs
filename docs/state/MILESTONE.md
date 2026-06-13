@@ -40,4 +40,14 @@
   - `.github/workflows/axi-ci.yml`
   - `app/.github/workflows/ci.yml`
 
+## M5: Idea-to-Landing Plan Library
+
+- Status: active
+- Goal: durable grill-me outputs and idea-to-landing plans have a canonical Axi Docs home, while Axi Todo remains the execution queue.
+- Evidence:
+  - `docs/content/{en,zh}/plans/README.md`
+  - `docs/content/{en,zh}/plans/idea-to-landing.md`
+  - `docs/content/{en,zh}/guide/plans.md`
+  - `app/src/config/siteConfig.ts`
+
 <!-- MANUAL: keep milestone statuses evidence-backed; do not mark complete without a fresh command or artifact. -->

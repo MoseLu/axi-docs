@@ -12,8 +12,9 @@
     "AGENTS.md",
     "README.md",
     "app/AGENTS.md",
-    "TODO.md",
-    "MILESTONE.md"
+    "docs/state/TODO.md",
+    "docs/state/MILESTONE.md",
+    "docs/content/en/plans/idea-to-landing.md"
   ],
   "entrypoints": [
     {
@@ -177,8 +178,8 @@
     ]
   },
   "currentWork": {
-    "todo": "TODO.md",
-    "milestone": "MILESTONE.md",
+    "todo": "docs/state/TODO.md",
+    "milestone": "docs/state/MILESTONE.md",
     "active": [
       "Keep the project documentation contract and generated dossier coverage complete.",
       "Maintain workspace registry coverage and locked documentation sources.",
@@ -228,7 +229,11 @@
     "error": "docs/state/ERROR.md",
     "errorZh": "docs/state/ERROR.zh-CN.md",
     "manifest": "docs/project-docs.manifest.json",
-    "verification": "docs/state/VERIFICATION.md"
+    "verification": "docs/state/VERIFICATION.md",
+    "plans": "docs/content/en/plans/README.md",
+    "plansZh": "docs/content/zh/plans/README.md",
+    "plansContract": "docs/content/en/plans/idea-to-landing.md",
+    "plansContractZh": "docs/content/zh/plans/idea-to-landing.md"
   },
   "owners": {
     "primary": "AxiomaticWorld workspace owner",

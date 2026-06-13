@@ -8,6 +8,7 @@ export type GuidePageId =
   | 'getting-started'
   | 'routing'
   | 'document-sources'
+  | 'plans'
   | 'markdown'
   | 'frontmatter'
   | 'search'
@@ -118,7 +119,7 @@ export const DEFAULT_GUIDE_PAGE_ID: GuidePageId = 'getting-started'
 
 const GUIDE_SECTION_DEFINITIONS: Array<{ id: GuideSectionId; pageIds: GuidePageId[] }> = [
   { id: 'introduction', pageIds: ['what-is-axi-docs', 'getting-started', 'routing'] },
-  { id: 'content', pageIds: ['document-sources', 'markdown', 'frontmatter', 'search'] },
+  { id: 'content', pageIds: ['document-sources', 'plans', 'markdown', 'frontmatter', 'search'] },
   { id: 'knowledge', pageIds: ['skills', 'workspace', 'knowledge-graph'] },
   { id: 'operations', pageIds: ['localization', 'configuration'] },
 ]
@@ -205,6 +206,7 @@ export const siteConfig = {
         'getting-started': '快速开始',
         routing: '导航与路由',
         'document-sources': '文档来源',
+        plans: '方案库',
         markdown: 'Markdown 写作',
         frontmatter: 'Frontmatter',
         search: '搜索与索引',
@@ -320,6 +322,7 @@ export const siteConfig = {
         'getting-started': 'Getting Started',
         routing: 'Navigation and Routing',
         'document-sources': 'Document Sources',
+        plans: 'Plans Library',
         markdown: 'Writing Markdown',
         frontmatter: 'Frontmatter',
         search: 'Search and Indexing',

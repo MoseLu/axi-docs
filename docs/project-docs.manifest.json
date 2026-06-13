@@ -12,6 +12,7 @@
     "AGENTS.md",
     "README.md",
     "app/AGENTS.md",
+    "plans/README.md",
     "docs/state/TODO.md",
     "docs/state/MILESTONE.md",
     "docs/content/en/plans/idea-to-landing.md"
@@ -230,6 +231,7 @@
     "errorZh": "docs/state/ERROR.zh-CN.md",
     "manifest": "docs/project-docs.manifest.json",
     "verification": "docs/state/VERIFICATION.md",
+    "planningIndex": "plans/README.md",
     "plans": "docs/content/en/plans/README.md",
     "plansZh": "docs/content/zh/plans/README.md",
     "plansContract": "docs/content/en/plans/idea-to-landing.md",

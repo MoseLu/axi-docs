@@ -28,6 +28,7 @@ Axi Docs 是 **「文档枢纽 + 知识图谱 + MCP 文档总线 + 工作区项�
 | 路径 | 是否项目内 | 说明 |
 |------|------------|------|
 | `app/` | 是 | 应用包（React + Vite + MCP Server），规则在 `app/AGENTS.md` |
+| `plans/` | 是 | 当前仓库根级规划入口；只做分类、定位与指针，不承载长期方案正文 |
 | `docs/content/en/` | 是 | 产品内容源（英文），frontmatter 含 `id/type/status/tags`；`guide/` 写使用说明，`plans/` 写长期方案，`projects/` 写项目档案 |
 | `docs/content/zh/` | 是 | 产品内容源（简体中文），与 `en/` 同构翻译；`guide/`、`plans/`、`projects/` 语义保持一致 |
 | `docs/axi-workspace-governance/` | 是 | 工作区治理文档的本地镜像（只读快照） |
@@ -46,6 +47,7 @@ Axi Docs 是 **「文档枢纽 + 知识图谱 + MCP 文档总线 + 工作区项�
 |------|----------|
 | 模块划分、技术栈、组件规则、API 规范、环境变量 | [`app/AGENTS.md`](app/AGENTS.md) |
 | 产品内容（用户可见的英文/中文文档） | `docs/content/en/README.md`, `docs/content/zh/README.md` |
+| 根级规划分类入口（给当前目录巡检 agent） | `plans/README.md` |
 | 想法到落地方案库（长期方案 source of truth） | `docs/content/{en,zh}/plans/README.md`, `docs/content/{en,zh}/plans/idea-to-landing.md` |
 | 仓库治理（branch / commit / quality gate / release） | `app/docs/OPERATIONS.md`, `app/docs/GITHUB_FLOW.md`, `app/docs/BRANCH_PROTECTION.md`, `app/docs/COMMIT_CONVENTION.md`, `app/docs/RELEASE_OPERATIONS.md`, `app/docs/QUALITY_GATE.md` |
 | 安全策略 | [`docs/governance/SECURITY.md`](docs/governance/SECURITY.md) |

@@ -5,6 +5,7 @@ Axi Docs is the workspace documentation hub for Axi projects. It combines a Vite
 ## Scope
 
 - `app/` owns the React/Vite app, MCP server, source adapters, tests, and build pipeline.
+- `plans/` is the root-level planning entrypoint for agents inspecting the current directory.
 - `docs/content/en/` and `docs/content/zh/` own the product documentation pages rendered by the app, including `guide/`, `plans/`, and `projects/`.
 - `docs/content/{en,zh}/plans/` is the source of truth for durable idea-to-landing plans; Axi Todo owns execution state and next actions.
 - `docs/axi-workspace-governance/` is a local mirror of workspace governance docs; treat the workspace governance repo as the source.

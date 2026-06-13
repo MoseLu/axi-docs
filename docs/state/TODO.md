@@ -4,6 +4,7 @@
 > 本文件是任务 facade；详细内容由 `todo/` 目录下的分节文件承担。
 > 方案正文不写在本文件。长期“想法到落地”方案写入 `docs/content/{en,zh}/plans/`；
 > 本文件和 Axi Todo 只承载执行队列、状态和下一步动作。
+> 当前目录下的规划分类入口是根级 `plans/README.md`。
 
 ---
 
@@ -15,6 +16,7 @@
 | 旧审计清单 | [`todo/02-legacy-audit.md`](todo/02-legacy-audit.md) | 2026-03 代码审计 P0/P1/P2/P3 复核（owner action 表） |
 | 文档覆盖补齐 | [`todo/03-coverage-remediation.md`](todo/03-coverage-remediation.md) | 2026-06-10 文档覆盖补齐计划（已归档） |
 | 当前路线 | [`todo/04-roadmap.md`](todo/04-roadmap.md) | Axi Knowledge Hub 路线 + 下一轮重点 |
+| 根级规划索引 | [`../../plans/README.md`](../../plans/README.md) | 当前目录下可见的规划分类入口 |
 | 方案库契约 | [`../content/zh/plans/idea-to-landing.md`](../content/zh/plans/idea-to-landing.md) / [`../content/en/plans/idea-to-landing.md`](../content/en/plans/idea-to-landing.md) | grill-me 产物、长期方案记录与 Axi Todo 执行任务的归属边界 |
 
 ---
@@ -25,11 +27,12 @@ ZC-DOCS-001~005 已于 2026-06-11 实施完成（见 `todo/01-current-architectu
 
 1. `AGENTS.md` → 项目职责与边界
 2. `README.md` → 入口与命令
-3. `MILESTONE.md` → 当前里程碑
-4. `todo/01-current-architecture.md` → 当前真实架构 backlog（5 项 P0/P1/P2，全部 COMPLETED）
-5. `todo/02-legacy-audit.md` → 待修 owner action 跟踪表
-6. `docs/HANDOFF.md` → Axi Docs 自身的 handoff 视图
-7. `docs/content/zh/plans/idea-to-landing.md` → 方案库与 Axi Todo 的边界
+3. `plans/README.md` → 当前目录下的规划分类
+4. `docs/state/MILESTONE.md` → 当前里程碑
+5. `todo/01-current-architecture.md` → 当前真实架构 backlog（5 项 P0/P1/P2，全部 COMPLETED）
+6. `todo/02-legacy-audit.md` → 待修 owner action 跟踪表
+7. `docs/HANDOFF.md` → Axi Docs 自身的 handoff 视图
+8. `docs/content/zh/plans/idea-to-landing.md` → 方案库与 Axi Todo 的边界
 
 ---
 

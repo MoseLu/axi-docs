@@ -20,6 +20,7 @@
 | `docs/state/TDD.md` | Technical/test design and verification commands. |
 | `docs/state/VERIFICATION.md` | Verification contract for docs, app config, source locks, and plans library changes. |
 | `ARCHITECTURE-AXI-STACK.md` | Axi Skills × Axi Rules × Axi Docs 共享栈架构拓扑（能力 / 行为 / 知识三层）。 |
+| `plans/README.md` | Root-level planning category index for agents inspecting the current directory. |
 | `docs/content/{en,zh}/plans/` | Durable idea-to-landing plan library; execution items link out to Axi Todo. |
 
 ## Top-Level Inventory
@@ -33,6 +34,7 @@
 - `README.zh-CN.md`
 - `docs/state/TODO.md`
 - `todo/`
+- `plans/`
 - `docs/governance/SECURITY.md`
 - `docs/governance/SECURITY.zh-CN.md`
 - `docs/state/TODO.md`

@@ -16,6 +16,9 @@ not versioned.
 ## [Unreleased]
 
 ### Added
+- 2026-06-13: 新增根级 `plans/README.md` 作为当前目录可见的规划分类入口，
+  解决只列仓库顶层时只能看到 `todo/`、看不到方案库的问题；同步登记到
+  README、INDEX、AGENTS、TODO facade 和 manifest readOrder。
 - 2026-06-13: 新增双语 `docs/content/{en,zh}/plans/` 方案库，明确
   “Axi Docs = 长期方案 source of truth / Axi Todo = execution queue”的归属边界；
   新增 `idea-to-landing.md` 方案契约与 `/guide/plans` 导航页，并在

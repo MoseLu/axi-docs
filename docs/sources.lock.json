@@ -13,8 +13,8 @@
     },
     "axi-rules": {
       "repo": "file:///Volumes/code/workspace/projects/axi-rules",
-      "ref": "agent/zero-context-handoff-20260611",
-      "commit": "9ce2250ea3ccac1e4c19841952954b2bc88b412e",
+      "ref": "dev",
+      "commit": "c6e481a6527051c769870f48e46b92e6d52e311e",
       "localPathEnv": "AXI_RULES_PATH",
       "defaultLocalPath": "/Volumes/code/workspace/projects/axi-rules",
       "ciPath": "../projects/axi-rules",

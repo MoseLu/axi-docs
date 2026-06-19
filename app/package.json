@@ -39,6 +39,8 @@
     "projects:check": "node ./scripts/build-projects-index.mjs --check",
     "error-doc:lint": "node ./scripts/lint-error-doc.mjs",
     "source:check": "node ./scripts/check-source-locks.mjs",
+    "source:age": "node ./scripts/check-source-locks-age.mjs",
+    "source:age:strict": "node ./scripts/check-source-locks-age.mjs --strict",
     "git:bootstrap": "node ./scripts/setup-git-governance.mjs",
     "governance:check": "pnpm branch:check && pnpm docs:check && pnpm error-doc:lint && pnpm source:check",
     "hooks:install": "node ./scripts/install-hooks.mjs",

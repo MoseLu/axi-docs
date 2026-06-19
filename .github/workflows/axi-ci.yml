@@ -62,6 +62,16 @@ jobs:
           run_if_script test
           run_if_script build
 
+      - name: Source lock age advisory
+        run: |
+          if node -e "const p=require('./package.json'); process.exit(p.scripts && p.scripts['source:age'] ? 0 : 1)" 2>/dev/null; then
+            echo "::group::source:age (advisory; warn-only)"
+            pnpm source:age || echo "::warning title=source lock drift::source:age reported drift above thresholds; review sources.lock.json and update if intentional"
+            echo "::endgroup::"
+          else
+            echo "skip missing script: source:age"
+          fi
+
 
 
 

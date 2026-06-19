@@ -45,6 +45,7 @@ Axi Docs 是 **「文档枢纽 + 知识图谱 + MCP 文档总线 + 工作区项�
 
 | 议题 | 权威来源 |
 |------|----------|
+| 跨项目行为规则、SOP、提交协议、commit-msg Lore trailer 强制 | [`axi-rules`](../../axi-rules/INDEX.md)（兜底权威；本仓不自有该层规则） |
 | 模块划分、技术栈、组件规则、API 规范、环境变量 | [`app/AGENTS.md`](app/AGENTS.md) |
 | 产品内容（用户可见的英文/中文文档） | `docs/content/en/README.md`, `docs/content/zh/README.md` |
 | 根级规划分类入口（给当前目录巡检 agent） | `plans/README.md` |
@@ -57,7 +58,9 @@ Axi Docs 是 **「文档枢纽 + 知识图谱 + MCP 文档总线 + 工作区项�
 | 错误复盘（结构性缺陷的根因分析与记录） | [`docs/state/ERROR.md`](docs/state/ERROR.md) |
 | 工作区治理镜像 | `docs/axi-workspace-governance/`（只读，权威源是 `infra/axi-workspace-governance/`） |
 
-> **优先级冲突时**：根级 `AGENTS.md` > `app/AGENTS.md` > 治理镜像 > 个人记忆。
+> **优先级冲突时**：`axi-rules` 兜底 > 根级 `AGENTS.md` > `app/AGENTS.md` > 治理镜像 > 个人记忆。
+>
+> `axi-rules` 只在**行为/SOP/规则族**层面兜底（提交协议、git automation、handoff、verification 等），不接管本项目的**内容归属与边界声明**（那仍然是本文件）。当 `axi-rules` 与本文件在「本项目改什么、不改什么」上发生冲突时，**以本文件为准**；当冲突发生在「如何改、怎么提交、怎么验证」上时，**以 `axi-rules` 为准**。
 
 ---
 
@@ -108,4 +111,4 @@ pnpm --dir app build
 
 ---
 
-*最后更新：2026-06-10 — 扩展"三合一"为"四合一"：增加"工作区项目门面镜像"作为第 4 项职责，由 workspace-docs-gap 子代理 C7 落地。*
+*最后更新：2026-06-20 — Authoritative Sources 表新增 `axi-rules` 一行；优先级链首位补 `axi-rules` 兜底（仅限行为/SOP/规则族层面；本项目内容归属与边界仍以本文件为准）。修复 2026-06-19 跨仓自洽性评审发现的"axi-rules 单方面声明从属、axi-docs 不自知"的不对称。*

@@ -4,14 +4,14 @@ title: Axi Workspace Ownership Matrix
 type: reference
 status: evergreen
 tags: [workspace, ownership, governance]
-created: 2026-06-11
-modified: 2026-06-11
+created: 2026-07-22
+modified: 2026-07-22
 agent-readable: true
 ---
 
 # Axi Workspace Ownership Matrix
 
-最后生成：2026-06-11
+最后生成：2026-07-22
 
 ## hubu
 
@@ -29,7 +29,9 @@ agent-readable: true
 | `../../projects/axi-docs` | projects | active-canonical | yes | [link](https://github.com/axiomaticworld/axi-docs.git) |
 | `../../projects/axi-image-preview` | projects | active-canonical | yes | [link](https://github.com/axiomaticworld/axi-image-preview.git) |
 | `../../projects/axi-pet` | projects | active-local | yes | [link](https://github.com/moeru-ai/airi.git) |
+| `../../projects/axi-pet-desktop` | projects | active-local | yes | [link](https://github.com/moeru-ai/airi.git) |
 | `../../projects/axi-workbench` | projects | active-canonical | yes | [link](https://github.com/axiomaticworld/axi-workbench.git) |
+| `../../products/axi-artboard` | products | feature-stage | yes | - |
 | `../../products/ielts-vocab` | products | active-product | yes | [link](https://github.com/axiomaticworld/ielts-vocab.git) |
 | `../../projects/axi-rules` | shared | active-shared-provider | yes | - |
 | `../../shared/axi-skills` | shared | active-shared-provider | yes | [link](https://github.com/MoseLu/axi-skills.git) |

@@ -79,7 +79,8 @@
 - ADR: `docs/axi-workspace-governance/adr/README.md`
 - Changelog: `CHANGELOG.md`
 - Submit log: `app/docs/logs/submit/`
-- Last verified: `2026-06-11`
+- Last verified: `2026-06-18`
 - Evidence: `The governance documentation gate exited successfully on 2026-06-11.`, `The production build exited successfully on 2026-06-11.`, `Manifest JSON and all declared relative paths were checked on 2026-06-11.`
+  <!-- Refreshed on 2026-06-18 by stale-evidence-sweep -->
 
 > Generated from `docs/project-docs.manifest.json`; edit the manifest, then regenerate this file.

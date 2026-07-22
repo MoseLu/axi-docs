@@ -107,6 +107,8 @@ not versioned.
 - (无)
 
 ### Fixed
+- 2026-07-23: 修正 `error-doc:lint` 的文档定位：ERROR 双语镜像已经由根目录
+  迁至 `docs/state/`，校验脚本现与项目清单一致，恢复 `quality:check` 的可执行性。
 - 2026-06-08: 修复 `docs/content/{en,zh}/` 下的 12 份错放翻译副本（`*.zh-CN.md` / `*.en.md`
   被错放到了相反语言目录，导致 `axi-docs-en` / `axi-docs-zh` Markdown adapter
   扫不到中文版 README、getting-started 的英文版、configuration / document-sources /
@@ -120,7 +122,10 @@ not versioned.
   README；`zh/README.md` 同步重写为描述中文内容树的中文 README。
 
 ### Security
-- (无)
+- 2026-07-23: 更新 `pnpm` overrides 与锁文件，修复经 `pnpm audit --json`
+  确认的 28 条传递依赖安全公告（原始严重度：12 high / 12 moderate / 4 low）。
+  覆盖 Hono、esbuild、undici、js-yaml、tmp、form-data、brace-expansion、
+  body-parser 与 fast-uri；升级后审计结果为 0 high / 0 moderate / 0 low。
 
 ---
 
@@ -159,7 +164,12 @@ not versioned.
 - 仓库治理与发布流程见 `app/docs/OPERATIONS.md`、
   `app/docs/RELEASE_OPERATIONS.md`、`app/docs/QUALITY_GATE.md`。
 - 本项目通过 `pnpm --dir app verify` 验证构建与契约一致性。
+- 2026-07-23: `pnpm --dir app quality:check` 的应用内 lint / 测试部分可单独执行；
+  完整门禁仍会被外部 `axi-skills` source lock 漂移阻断（当前
+  `7e8e446f3af253677d3541fc346bbc3c7c89bde9`，锁定
+  `c3fd7cea2ad1f90f03f7f86bbe52a1eb5c565923`）。该快照需在独立的源验证
+  任务中审阅后更新，未在本次依赖安全修复中改动。
 
 ---
 
-*最后更新：2026-06-08 — workspace adapter 项目文档套件化。*
+*最后更新：2026-07-23 — 修复传递依赖安全公告，并同步校准项目质量门禁路径。*

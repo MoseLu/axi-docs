@@ -1,11 +1,11 @@
-// Lint the root-level ERROR.md (and its ERROR.zh-CN.md mirror) so structural
+// Lint docs/state/ERROR.md (and its ERROR.zh-CN.md mirror) so structural
 // defects recorded there stay machine-checkable. Designed to plug into
 // `pnpm governance:check`.
 //
 // Run from `app/`: `node ./scripts/lint-error-doc.mjs`
 //
 // Validates:
-//1. Both `ERROR.md` and `ERROR.zh-CN.md` exist at the repo root.
+//1. Both `docs/state/ERROR.md` and `docs/state/ERROR.zh-CN.md` exist.
 //2. Each entry heading matches `<YYYY-MM-DD>-<NN> — <title>`.
 //3. Each entry contains the required front-matter lines (Severity /
 // Status / Affected project in EN;优先级 /状态 /涉及项目 in ZH) and
@@ -25,8 +25,9 @@ import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 
 const repoRoot = path.resolve(process.cwd(), '..');
-const errorDocEn = path.join(repoRoot, 'ERROR.md');
-const errorDocZh = path.join(repoRoot, 'ERROR.zh-CN.md');
+const stateDocsRoot = path.join(repoRoot, 'docs', 'state');
+const errorDocEn = path.join(stateDocsRoot, 'ERROR.md');
+const errorDocZh = path.join(stateDocsRoot, 'ERROR.zh-CN.md');
 
 const ENTRY_ID_RE = /^(?<id>\d{4}-\d{2}-\d{2}-\d{2}) — (?<title>.+)$/;
 const ALLOWED_STATUS = new Set(['open', 'fixed', 'accepted-as-limitation']);
@@ -229,7 +230,7 @@ try {
  await readFile(errorDocEn, 'utf8');
  await readFile(errorDocZh, 'utf8');
 } catch {
- allErrors.push('Both ERROR.md and ERROR.zh-CN.md must exist at the repo root.');
+ allErrors.push('Both docs/state/ERROR.md and docs/state/ERROR.zh-CN.md must exist.');
 }
 
 if (allErrors.length >0) {

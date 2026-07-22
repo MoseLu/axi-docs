@@ -3,30 +3,35 @@
 ## Architecture Assumptions
 
 - Root path: `/Volumes/code/workspace/projects/axi-docs`
-- Stack signals: document/config driven
-- Top-level entries: `AGENTS.md`, `CHANGELOG.md`, `CHANGELOG.zh-CN.md`, `MILESTONE.md`, `README.md`, `README.zh-CN.md`, `SECURITY.md`, `SECURITY.zh-CN.md`, `TODO.md`, `TODO.zh-CN.md`, `app/`, `blinko`, `docs/`
-- No package scripts detected at root.
+- Application package: `app/` (pnpm + Vite + React + TypeScript)
+- Project-state documents: `docs/state/`; governance documents: `docs/governance/`
+- Product-content sources: `docs/content/{en,zh}/`
 
 ## Technical Design
 
-The root docs form a lightweight control plane:
+The project docs form a lightweight control plane:
 
 1. `AGENTS.md` defines agent-safe boundaries.
-2. `PRD.md` defines requirements and non-goals.
-3. `TDD.md` defines verification strategy.
-4. `TODO.md` maps requirements to tasks and tests.
-5. `MILESTONE.md` records delivery evidence.
+2. `docs/state/PRD.md` defines requirements and non-goals.
+3. `docs/state/TDD.md` defines verification strategy.
+4. `docs/state/TODO.md` maps requirements to tasks and tests.
+5. `docs/state/MILESTONE.md` records delivery evidence.
 6. `INDEX.md` maps documents and source-of-truth ownership.
 
 ## Verification Commands
 
-- `rg -n "TODO|PRD|TDD" README.md TODO.md MILESTONE.md PRD.md TDD.md`
+- `pnpm --dir app error-doc:lint`
+- `pnpm --dir app docs:check`
+- `pnpm --dir app audit --json` after dependency changes
+- `pnpm --dir app verify` after application or dependency changes
+- `pnpm --dir app source:check` when the checked-in external source snapshot is
+  expected to match `docs/sources.lock.json`
 
 Minimum documentation check:
 
 ```bash
-for f in README.md README.zh-CN.md AGENTS.md CHANGELOG.md TODO.md MILESTONE.md INDEX.md PRD.md TDD.md; do test -f "/Volumes/code/workspace/projects/axi-docs/$f" || exit 1; done
-rg -n "REQ-DOC-001|PRD|TDD|Milestone" "/Volumes/code/workspace/projects/axi-docs/PRD.md" "/Volumes/code/workspace/projects/axi-docs/TDD.md" "/Volumes/code/workspace/projects/axi-docs/TODO.md" "/Volumes/code/workspace/projects/axi-docs/MILESTONE.md" "/Volumes/code/workspace/projects/axi-docs/INDEX.md"
+for f in AGENTS.md README.md INDEX.md docs/state/CHANGELOG.md docs/state/TODO.md docs/state/MILESTONE.md docs/state/PRD.md docs/state/TDD.md; do test -f "/Volumes/code/workspace/projects/axi-docs/$f" || exit 1; done
+rg -n "PRD|TDD|Milestone" "/Volumes/code/workspace/projects/axi-docs/docs/state/PRD.md" "/Volumes/code/workspace/projects/axi-docs/docs/state/TDD.md" "/Volumes/code/workspace/projects/axi-docs/docs/state/TODO.md" "/Volumes/code/workspace/projects/axi-docs/docs/state/MILESTONE.md" "/Volumes/code/workspace/projects/axi-docs/INDEX.md"
 ```
 
 ## Risk Cases
@@ -35,6 +40,9 @@ rg -n "REQ-DOC-001|PRD|TDD|Milestone" "/Volumes/code/workspace/projects/axi-docs
 - Agents edit outside `/Volumes/code/workspace/projects/axi-docs` without explicit scope.
 - Reference checkouts are mistaken for Axi-owned product surfaces.
 - Verification commands become stale after dependency or layout changes.
+- External source snapshots can advance independently; a failing `source:check`
+  is a source-lock maintenance blocker, not evidence that an app dependency
+  upgrade failed.
 
 ## Test Strategy
 

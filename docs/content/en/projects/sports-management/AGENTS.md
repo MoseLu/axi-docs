@@ -1,14 +1,14 @@
 ---
 id: axi-docs-en-projects-sports-management
-title: Sports Management
+title: 体育管理应用
 type: project
 status: draft
 tags: [Axi Docs, Projects, projects, core]
-created: 2026-06-10
-modified: 2026-06-10
-graph-title: Sports Management
+created: 2026-07-22
+modified: 2026-07-22
+graph-title: 体育管理应用
 graph-tags: [Projects, projects]
-description: Sports management app with web/mobile/backend surfaces.
+description: Quasar and Vue 3 sports-management application skeleton with Pinia, Vue Router, Vue I18n, and a Capacitor Android wrapper; the backend directory is only a placeholder.
 project:
   id: sports-management
   partition: projects
@@ -16,9 +16,9 @@ project:
   source-section: core
 ---
 
-# Sports Management — Agent Contract
+# 体育管理应用 — Agent Contract
 
-> This dossier is the Axi Docs agent contract for **Sports Management** (workspace path: `/Volumes/code/workspace/projects/axi-sports-management-app`).
+> This dossier is the Axi Docs agent contract for **体育管理应用** (workspace path: `/Volumes/code/workspace/projects/axi-sports-management-app`).
 > It does not replace the project root `AGENTS.md`. The project root always wins for project-local rules; this file only documents how Axi Docs *presents* the project.
 
 ## Read Order

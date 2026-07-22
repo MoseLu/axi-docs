@@ -4,11 +4,11 @@ title: Axi Pet
 type: project
 status: draft
 tags: [Axi Docs, Projects, projects, core]
-created: 2026-06-10
-modified: 2026-06-10
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Pet
 graph-tags: [Projects, projects]
-description: Local Axi pet/virtual companion project migrated from moeru-ai/airi, with stage-web, Live2D, provider configuration, and local STT experiments.
+description: A large Project AIRI-derived monorepo for browser, Electron, mobile, server, plugin, rendering, and bot surfaces for LLM-driven virtual characters.
 project:
   id: axi-pet
   partition: projects

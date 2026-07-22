@@ -1,14 +1,14 @@
 ---
 id: axi-docs-en-projects-sports-management
-title: Sports Management
+title: 体育管理应用
 type: project
 status: draft
 tags: [Axi Docs, Projects, projects, core]
-created: 2026-06-10
-modified: 2026-06-10
-graph-title: Sports Management
+created: 2026-07-22
+modified: 2026-07-22
+graph-title: 体育管理应用
 graph-tags: [Projects, projects]
-description: Sports management app with web/mobile/backend surfaces.
+description: Quasar and Vue 3 sports-management application skeleton with Pinia, Vue Router, Vue I18n, and a Capacitor Android wrapper; the backend directory is only a placeholder.
 project:
   id: sports-management
   partition: projects
@@ -16,29 +16,29 @@ project:
   source-section: core
 ---
 
-# Sports Management
+# 体育管理应用
 
 > Workspace project dossier. Source of truth: `/Volumes/code/workspace/projects/axi-sports-management-app`.
 > Section: core / Partition: `projects/`.
 
 ## Summary
 
-Sports management app with web/mobile/backend surfaces.
+Quasar and Vue 3 sports-management application skeleton with Pinia, Vue Router, Vue I18n, and a Capacitor Android wrapper; the backend directory is only a placeholder.
 
 ## Stack
 
-Quasar, Vue 3, Go, Capacitor, UniApp
+_Stack not recorded in WORKSPACE_INDEX.md._
 
 ## Authoritative Documents
 
-- Workspace entry: [`WORKSPACE_INDEX.md`](/Volumes/code/workspace/WORKSPACE_INDEX.md) — partition table row "Sports Management".
+- Workspace entry: [`WORKSPACE_INDEX.md`](/Volumes/code/workspace/WORKSPACE_INDEX.md) — partition table row "体育管理应用".
 - Project root: `/Volumes/code/workspace/projects/axi-sports-management-app`
 - Project `AGENTS.md`: `/Volumes/code/workspace/projects/axi-sports-management-app/AGENTS.md` (when present).
 - Project `README.md`: `/Volumes/code/workspace/projects/axi-sports-management-app/README.md` (when present).
 
 ## Notes
 
-Axi product-line project, kept as a development-stage business app inside the `Axi` product line until it is ready to spin out into `products/`.
+_No notes._
 
 ## Verification (suggested)
 

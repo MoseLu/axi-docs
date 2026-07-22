@@ -4,8 +4,8 @@ title: IELTS Vocabulary
 type: project
 status: draft
 tags: [Axi Docs, Projects, products, reference]
-created: 2026-06-11
-modified: 2026-06-11
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: IELTS Vocabulary
 graph-tags: [Projects, products]
 description: Full-stack IELTS vocabulary learning product with web, mobile, shared client packages, gateway, split backend services, speech, and production operations.

@@ -16,7 +16,23 @@ not versioned.
 ## [Unreleased]
 
 ### Added
-- 2026-06-13: 新增根级 `plans/README.md` 作为当前目录可见的规划分类入口，
+- 2026-07-22: 全量重建 `docs/content/{en,zh}/projects/` 下 17 个 handoff 项目档案
+  （axi-agent-platform、axi-workbench、axi-skills、axi-registry、axi-pet 等，除
+  已单独刷新的 axi-ui 外的全部 handoff 项目）。旧片段停留在 2026-06-10/06-11
+  `draft` scaffold，因生成器 `writeIfMissing` 从未被 2026-07-17 handoff 快照刷新；
+  本次删除旧片段后 `projects:build` 全量重建（wrote=312），frontmatter/描述现反映
+  各项目当前 purpose。preservedAddenda（dbskill、codex-plus-app）与参考项目档案
+  按设计未受影响。`projects:check` 通过（392 必选档案齐全）。
+- 2026-07-22: 删除 `docs/content/{en,zh}/projects/ielts-vocabulary/` 旧名孤儿档案
+  （不在当前 handoff/projects.index.json，path 重复指向 `products/ielts-vocab`，为
+  2026-06-10 旧名残留；canonical `ielts-vocab/` 档案已完整）。重跑 `projects:build`
+  同步 locale INDEX 表与机器索引，`projects:check` 通过（392 必选档案齐全）。
+- 2026-07-22: 基于 2026-07-17 handoff 快照重建 `docs/content/{en,zh}/projects/axi-ui/`
+  项目档案（`projects:build`）。旧片段停留在 2026-06-10 `draft` scaffold，因生成器
+  使用 `writeIfMissing` 从未被新快照刷新；本次删除旧片段后重建，frontmatter 与 Summary
+  现反映 axi-ui 的 Black Gold 设计令牌/主题运行时基线与 `@axi/*` 包表述。按源存在性
+  规则，镜像随之从 `CHANGELOG.md`/`SECURITY.md` 迁为 `CHANGE.md`（root 层结构迁移的
+  如实反映）。`projects:check` 通过（392 必选档案齐全），其余 27 个项目档案未受影响。
   解决只列仓库顶层时只能看到 `todo/`、看不到方案库的问题；同步登记到
   README、INDEX、AGENTS、TODO facade 和 manifest readOrder。
 - 2026-06-13: 新增双语 `docs/content/{en,zh}/plans/` 方案库，明确

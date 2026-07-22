@@ -1,14 +1,14 @@
 ---
 id: axi-docs-en-projects-sports-management
-title: Sports Management
+title: 体育管理应用
 type: project
 status: draft
 tags: [Axi Docs, Projects, projects, core]
-created: 2026-06-10
-modified: 2026-06-10
-graph-title: Sports Management
+created: 2026-07-22
+modified: 2026-07-22
+graph-title: 体育管理应用
 graph-tags: [Projects, projects]
-description: Sports management app with web/mobile/backend surfaces.
+description: Quasar and Vue 3 sports-management application skeleton with Pinia, Vue Router, Vue I18n, and a Capacitor Android wrapper; the backend directory is only a placeholder.
 project:
   id: sports-management
   partition: projects
@@ -16,9 +16,9 @@ project:
   source-section: core
 ---
 
-# Sports Management — TDD Slice
+# 体育管理应用 — TDD Slice
 
-> Axi Docs TDD slice for **Sports Management**. Describes the test design for the dossier itself, not the project.
+> Axi Docs TDD slice for **体育管理应用**. Describes the test design for the dossier itself, not the project.
 
 ## Unit checks
 

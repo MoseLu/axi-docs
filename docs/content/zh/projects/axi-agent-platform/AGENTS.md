@@ -3,12 +3,12 @@ id: axi-docs-zh-projects-axi-agent-platform
 title: Axi Agent Platform
 type: project
 status: draft
-tags: [Axi Docs, 项目, projects, core]
-created: 2026-06-10
-modified: 2026-06-10
+tags: [Axi Docs, Projects, projects, core]
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Agent Platform
-graph-tags: [项目, projects]
-description: Axi Agent 规范的 monorepo，承载运行时/API 表面、MCP 服务、终端传输、Codex remote bridge，以及 Axi Todo。
+graph-tags: [Projects, projects]
+description: Multi-agent collaboration platform combining a FastAPI backend, React dashboard, SubAgent worktree isolation, an MCP model swarm, and the Axi Todo tool.
 project:
   id: axi-agent-platform
   partition: projects
@@ -16,25 +16,25 @@ project:
   source-section: core
 ---
 
-# Axi Agent Platform — Agent 契约
+# Axi Agent Platform — Agent Contract
 
-> 本档案是 **Axi Agent Platform**（工作区路径：`/Volumes/code/workspace/projects/axi-agent-platform`）的 Axi Docs agent 契约。
-> 它不替代项目根目录的 `AGENTS.md`。项目根目录始终是项目级规则的唯一权威；本文件只记录 Axi Docs *如何呈现* 该项目。
+> This dossier is the Axi Docs agent contract for **Axi Agent Platform** (workspace path: `/Volumes/code/workspace/projects/axi-agent-platform`).
+> It does not replace the project root `AGENTS.md`. The project root always wins for project-local rules; this file only documents how Axi Docs *presents* the project.
 
-## 阅读顺序
+## Read Order
 
-1. 本文件（档案）。
-2. `docs/content/{en,zh}/projects/axi-agent-platform/README.md`（档案摘要）。
-3. 项目根目录的 `AGENTS.md`：`/Volumes/code/workspace/projects/axi-agent-platform/AGENTS.md`。
-4. 项目根目录的 `README.md`：`/Volumes/code/workspace/projects/axi-agent-platform/README.md`。
+1. This file (dossier).
+2. `docs/content/{en,zh}/projects/axi-agent-platform/README.md` (dossier summary).
+3. Project root `AGENTS.md` at `/Volumes/code/workspace/projects/axi-agent-platform/AGENTS.md`.
+4. Project root `README.md` at `/Volumes/code/workspace/projects/axi-agent-platform/README.md`.
 
-## 边界
+## Boundary
 
-- Axi Docs 将本项目视为**只读内容源**。
-- Axi Docs 从不修改 `/Volumes/code/workspace/projects/axi-agent-platform` 下的任何文件。
-- 任何修改都必须回流到所属项目（PR、issue，或 owner 交接）。
+- Axi Docs treats this project as **read-only content source**.
+- Axi Docs never edits files under `/Volumes/code/workspace/projects/axi-agent-platform`.
+- Modifications must be proposed back to the owning project (PR, issue, or owner handoff).
 
-## 更新节奏
+## Update Cadence
 
-- 每当 `WORKSPACE_INDEX.md` 变化时，重新执行 `pnpm --dir app projects:build`。
-- 仅当 Axi Docs 是该变更的*主要*展示面时（例如跨项目摘要、MCP 工具映射），才直接手工编辑本档案。
+- Re-run `pnpm --dir app projects:build` whenever `WORKSPACE_INDEX.md` changes.
+- Hand-edit this dossier only when Axi Docs is the *primary* surface for the change (e.g. cross-project summary, MCP tool mapping).

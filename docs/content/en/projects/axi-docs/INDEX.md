@@ -4,11 +4,11 @@ title: Axi Docs
 type: project
 status: draft
 tags: [Axi Docs, Projects, projects, core]
-created: 2026-06-10
-modified: 2026-06-10
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Docs
 graph-tags: [Projects, projects]
-description: Active Axi documentation hub for docs browsing, sync surfaces, knowledge graph UI, and MCP document access.
+description: Workspace documentation hub combining a React reader, knowledge-source adapters, knowledge graph, MCP document bus, and generated project dossier mirrors.
 project:
   id: axi-docs
   partition: projects

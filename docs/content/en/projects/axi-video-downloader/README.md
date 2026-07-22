@@ -3,31 +3,31 @@ id: axi-docs-en-projects-axi-video-downloader
 title: Axi Video Downloader
 type: project
 status: draft
-tags: [Axi Docs, Projects, tools, shared]
-created: 2026-06-10
-modified: 2026-06-10
+tags: [Axi Docs, Projects, tools, reference]
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Video Downloader
 graph-tags: [Projects, tools]
-description: Local video download utility.
+description: Local Python tool that coordinates a Flask UI, Android device automation, mitmproxy capture, downloads, and SQLite tracking for personal-device video capture.
 project:
   id: axi-video-downloader
   partition: tools
   path: /Volumes/code/workspace/tools/axi-video-downloader
-  source-section: shared
+  source-section: reference
 ---
 
 # Axi Video Downloader
 
 > Workspace project dossier. Source of truth: `/Volumes/code/workspace/tools/axi-video-downloader`.
-> Section: shared / Partition: `tools/`.
+> Section: reference / Partition: `tools/`.
 
 ## Summary
 
-Local video download utility.
+Local Python tool that coordinates a Flask UI, Android device automation, mitmproxy capture, downloads, and SQLite tracking for personal-device video capture.
 
 ## Stack
 
-Python, Flask, SQLite, mitmproxy
+_Stack not recorded in WORKSPACE_INDEX.md._
 
 ## Authoritative Documents
 
@@ -38,7 +38,7 @@ Python, Flask, SQLite, mitmproxy
 
 ## Notes
 
-Retained as an independent Axi-prefixed local utility.
+_No notes._
 
 ## Verification (suggested)
 

@@ -3,12 +3,12 @@ id: axi-docs-zh-projects-axi-tauri-starter
 title: Axi Tauri Starter
 type: project
 status: draft
-tags: [Axi Docs, 项目, shared, shared]
-created: 2026-06-10
-modified: 2026-06-10
+tags: [Axi Docs, Projects, shared, shared]
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Tauri Starter
-graph-tags: [项目, shared]
-description: 工作区级参考：桌面外壳使用的共享 Tauri 2 壳层结构与缓存引导。
+graph-tags: [Projects, shared]
+description: Shared reference for Tauri 2 desktop-shell layout, command conventions, and reusable npm, pnpm, Cargo, and Rust cache bootstrap.
 project:
   id: axi-tauri-starter
   partition: shared
@@ -16,25 +16,25 @@ project:
   source-section: shared
 ---
 
-# Axi Tauri Starter —— 代理契约
+# Axi Tauri Starter — Agent Contract
 
-> 本档案是 **Axi Tauri Starter**（工作区路径：`/Volumes/code/workspace/shared/axi-tauri-starter`）在 Axi Docs 中的代理契约。
-> 它不取代项目根目录的 `AGENTS.md`。项目级规则始终以项目根目录的 `AGENTS.md` 为准；本文件仅记录 Axi Docs 如何*呈现*该项目。
+> This dossier is the Axi Docs agent contract for **Axi Tauri Starter** (workspace path: `/Volumes/code/workspace/shared/axi-tauri-starter`).
+> It does not replace the project root `AGENTS.md`. The project root always wins for project-local rules; this file only documents how Axi Docs *presents* the project.
 
-## 阅读顺序
+## Read Order
 
-1. 本文件（档案）。
-2. `docs/content/{en,zh}/projects/axi-tauri-starter/README.md`（档案摘要）。
-3. 项目根目录的 `AGENTS.md`：`/Volumes/code/workspace/shared/axi-tauri-starter/AGENTS.md`。
-4. 项目根目录的 `README.md`：`/Volumes/code/workspace/shared/axi-tauri-starter/README.md`。
+1. This file (dossier).
+2. `docs/content/{en,zh}/projects/axi-tauri-starter/README.md` (dossier summary).
+3. Project root `AGENTS.md` at `/Volumes/code/workspace/shared/axi-tauri-starter/AGENTS.md`.
+4. Project root `README.md` at `/Volumes/code/workspace/shared/axi-tauri-starter/README.md`.
 
-## 边界
+## Boundary
 
-- Axi Docs 将本项目视为**只读的内容来源**。
-- Axi Docs 绝不编辑 `/Volumes/code/workspace/shared/axi-tauri-starter` 下的任何文件。
-- 任何修改都必须以 PR、issue 或所有者交接的方式回写到归属项目。
+- Axi Docs treats this project as **read-only content source**.
+- Axi Docs never edits files under `/Volumes/code/workspace/shared/axi-tauri-starter`.
+- Modifications must be proposed back to the owning project (PR, issue, or owner handoff).
 
-## 更新节奏
+## Update Cadence
 
-- 每当 `WORKSPACE_INDEX.md` 发生变化时，重新运行 `pnpm --dir app projects:build`。
-- 仅当 Axi Docs 是该变更的*主要*呈现面（例如跨项目摘要、MCP 工具映射）时，才手工编辑本档案。
+- Re-run `pnpm --dir app projects:build` whenever `WORKSPACE_INDEX.md` changes.
+- Hand-edit this dossier only when Axi Docs is the *primary* surface for the change (e.g. cross-project summary, MCP tool mapping).

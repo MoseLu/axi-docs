@@ -4,8 +4,8 @@ title: 工作区项目档案
 type: index
 status: draft
 tags: [Axi Docs, Projects, Index, i18n]
-created: 2026-06-11
-modified: 2026-06-11
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: 工作区项目档案
 graph-tags: [Projects, Index]
 description: Axi Docs 为 `WORKSPACE_INDEX.md` 中每个 active 项目维护一份档案。档案由工作区索引自动生成；变更后请运行 `pnpm --dir app projects:build` 重新生成。
@@ -23,39 +23,42 @@ description: Axi Docs 为 `WORKSPACE_INDEX.md` 中每个 active 项目维护一�
 - Locale source: `docs/content/zh/projects/<id>/`.
 - Other locale: `docs/content/en/projects/<id>/`.
 
-## 核心 active 项目 (7)
+## 核心 active 项目 (8)
 
 | 项目 | 分区 | 状态 | 技术栈 | 备注 |
 | --- | --- | --- | --- | --- |
-| [Axi Agent Platform](./axi-agent-platform/README.md) | `projects/` | verified |  |  |
-| [Axi Docs](./axi-docs/README.md) | `projects/` | verified |  |  |
+| [Axi Agent Platform](./axi-agent-platform/README.md) | `projects/` | unready |  |  |
+| [Axi Docs](./axi-docs/README.md) | `projects/` | unready |  |  |
 | [Axi Image Preview](./axi-image-preview/README.md) | `projects/` | verified |  |  |
-| [Axi Notify / Mobile](./axi-notify-mobile/README.md) | `projects/` | verified |  |  |
-| [Axi Pet](./axi-pet/README.md) | `projects/` | verified |  |  |
-| [Axi Workbench](./axi-workbench/README.md) | `projects/` | verified |  |  |
-| [体育管理应用](./sports-management/README.md) | `projects/` | verified |  |  |
+| [Axi Notify / Mobile](./axi-notify-mobile/README.md) | `projects/` | unready |  |  |
+| [Axi Pet](./axi-pet/README.md) | `projects/` | stale |  |  |
+| [Axi Pet Desktop](./axi-pet-desktop/README.md) | `projects/` | unready |  |  |
+| [Axi Workbench](./axi-workbench/README.md) | `projects/` | unready |  |  |
+| [体育管理应用](./sports-management/README.md) | `projects/` | unready |  |  |
 
 ## 共享与基础设施 (7)
 
 | 项目 | 分区 | 状态 | 技术栈 | 备注 |
 | --- | --- | --- | --- | --- |
-| [Axi Local Registry](./axi-registry/README.md) | `infra/` | verified |  |  |
-| [Axi Rules](./axi-rules/README.md) | `projects/` | verified |  |  |
-| [Axi Skills](./axi-skills/README.md) | `shared/` | verified |  |  |
-| [Axi Tauri Starter](./axi-tauri-starter/README.md) | `shared/` | verified |  |  |
+| [Axi Local Registry](./axi-registry/README.md) | `infra/` | unready |  |  |
+| [Axi Rules](./axi-rules/README.md) | `projects/` | stale |  |  |
+| [Axi Skills](./axi-skills/README.md) | `shared/` | unready |  |  |
+| [Axi Tauri Starter](./axi-tauri-starter/README.md) | `shared/` | unready |  |  |
 | [Axi UI](./axi-ui/README.md) | `shared/` | verified |  |  |
-| [Workspace Relationship Graph](./workspace-relationship-graph/README.md) | `infra/` | workspace resource | JSON, Node CLI, MCP stdio | Use before cross-project edits; not a code project or git repo. |
-| [Workspace Dev Services](./workspace-dev-services/README.md) | `infra/` | active registry | JSON, Node.js, PM2, LaunchAgent | Runtime state lives under `.devsvc`; use the config and wrapper as editable entrypoints. |
+| [Workspace Relationship Graph](./workspace-relationship-graph/README.md) | `infra/` | external-canonical | JSON, Node CLI, MCP stdio | Use before cross-project edits; not a code project or git repo. |
+| [Workspace Dev Services](./workspace-dev-services/README.md) | `infra/` | active | JSON, Node.js, PM2, LaunchAgent | Runtime state lives under `.devsvc`; use the config and wrapper as editable entrypoints. |
 
-## 参考仓库 (11)
+## 参考仓库 (13)
 
 | 项目 | 分区 | 状态 | 技术栈 | 备注 |
 | --- | --- | --- | --- | --- |
-| [Axi Feishu Codex Bridge](./axi-feishu-codex-bridge/README.md) | `tools/` | verified |  |  |
-| [Axi Proxy Companion](./axi-proxy-companion/README.md) | `tools/` | verified |  |  |
-| [Axi Video Downloader](./axi-video-downloader/README.md) | `tools/` | verified |  |  |
-| [IELTS Vocabulary](./ielts-vocab/README.md) | `products/` | verified |  |  |
+| [Axi Artboard](./axi-artboard/README.md) | `products/` | unready |  |  |
+| [Axi Feishu Codex Bridge](./axi-feishu-codex-bridge/README.md) | `tools/` | unready |  |  |
+| [Axi Proxy Companion](./axi-proxy-companion/README.md) | `tools/` | unready |  |  |
+| [Axi Video Downloader](./axi-video-downloader/README.md) | `tools/` | unready |  |  |
+| [IELTS Vocabulary](./ielts-vocab/README.md) | `products/` | unready |  |  |
 | [Cockpit Tools Reference](./cockpit-tools-reference/README.md) | `references/` | reference | Tauri, Vite, TypeScript, Rust | Keep the product name as Cockpit Tools and do not rename it into Axi. |
+| [DBSkill Reference](./dbskill-reference/README.md) | `references/` | reference | Shell, Markdown, Python | Keep as a reference only; do not promote to a workspace-owned product. |
 | [Sub2API Reference](./sub2api-reference/README.md) | `references/` | reference | Go, Vue, PostgreSQL, Redis, Docker | Upstream third-party service repo; not an Axi owner or Axi application. |
 | [CLIProxyAPI Reference](./cliproxyapi-reference/README.md) | `references/` | reference | Go, Docker | Imported without `.git`, local binaries, live config, auth material, or runtime output. Use as a reference only. |
 | [Image2Prompt Reference](./image2prompt-reference/README.md) | `references/` | reference | JavaScript, browser extension | Optional prompting UX reference; not an Axi owner or active application. |
@@ -65,4 +68,4 @@ description: Axi Docs 为 `WORKSPACE_INDEX.md` 中每个 active 项目维护一�
 
 ## Total
 
-**25** 份档案分布在本语种树下。
+**28** 份档案分布在本语种树下。

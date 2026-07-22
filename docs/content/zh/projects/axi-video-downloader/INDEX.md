@@ -3,22 +3,22 @@ id: axi-docs-zh-projects-axi-video-downloader
 title: Axi Video Downloader
 type: project
 status: draft
-tags: [Axi Docs, 项目, tools, shared]
-created: 2026-06-10
-modified: 2026-06-10
+tags: [Axi Docs, Projects, tools, reference]
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Video Downloader
-graph-tags: [项目, tools]
-description: 本地视频下载工具。
+graph-tags: [Projects, tools]
+description: Local Python tool that coordinates a Flask UI, Android device automation, mitmproxy capture, downloads, and SQLite tracking for personal-device video capture.
 project:
   id: axi-video-downloader
   partition: tools
   path: /Volumes/code/workspace/tools/axi-video-downloader
-  source-section: shared
+  source-section: reference
 ---
 
-# Axi Video Downloader —— 档案索引
+# Axi Video Downloader — Dossier Index
 
-## 本档案包含的文件
+## Pieces in this Dossier
 
 - [`README.md`](./README.md)
 - [`AGENTS.md`](./AGENTS.md)
@@ -28,8 +28,8 @@ project:
 - [`PRD.md`](./PRD.md)
 - [`TDD.md`](./TDD.md)
 
-## 档案路由
+## Dossier Routing
 
-- 语言根目录：`docs/content/zh/projects/`
-- 其他语言：`docs/content/en/projects/axi-video-downloader/`
-- 工作区条目：`/Volumes/code/workspace/tools/axi-video-downloader`
+- Locale root: `docs/content/zh/projects/`
+- Other locale: `docs/content/en/projects/axi-video-downloader/`
+- Workspace entry: `/Volumes/code/workspace/tools/axi-video-downloader`

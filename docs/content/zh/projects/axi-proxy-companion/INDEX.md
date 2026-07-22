@@ -3,22 +3,22 @@ id: axi-docs-zh-projects-axi-proxy-companion
 title: Axi Proxy Companion
 type: project
 status: draft
-tags: [Axi Docs, 项目, tools, core]
-created: 2026-06-10
-modified: 2026-06-10
+tags: [Axi Docs, Projects, tools, reference]
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Proxy Companion
-graph-tags: [项目, tools]
-description: 用于控制与检查本地 proxy 后端的 macOS proxy 伴生工具。
+graph-tags: [Projects, tools]
+description: Native macOS AppKit companion that starts, stops, inspects, and reports traffic for registered local proxy backends without changing the macOS system proxy.
 project:
   id: axi-proxy-companion
   partition: tools
   path: /Volumes/code/workspace/tools/axi-proxy-companion
-  source-section: core
+  source-section: reference
 ---
 
-# Axi Proxy Companion — 档案索引
+# Axi Proxy Companion — Dossier Index
 
-## 本档案包含的文件
+## Pieces in this Dossier
 
 - [`README.md`](./README.md)
 - [`AGENTS.md`](./AGENTS.md)
@@ -28,8 +28,8 @@ project:
 - [`PRD.md`](./PRD.md)
 - [`TDD.md`](./TDD.md)
 
-## 档案路由
+## Dossier Routing
 
-- 本地根目录：`docs/content/zh/projects/`
-- 另一语言版本：`docs/content/en/projects/axi-proxy-companion/`
-- 工作区条目：`/Volumes/code/workspace/tools/axi-proxy-companion`
+- Locale root: `docs/content/zh/projects/`
+- Other locale: `docs/content/en/projects/axi-proxy-companion/`
+- Workspace entry: `/Volumes/code/workspace/tools/axi-proxy-companion`

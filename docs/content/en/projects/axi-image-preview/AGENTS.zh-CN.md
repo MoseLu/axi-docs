@@ -4,11 +4,11 @@ title: Axi Image Preview
 type: project
 status: draft
 tags: [Axi Docs, Projects, projects, core]
-created: 2026-06-10
-modified: 2026-06-10
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Image Preview
 graph-tags: [Projects, projects]
-description: Active Axi image and wallpaper gallery preview app for visual reference, hover/detail interaction, and preview experiments.
+description: Vite and React image preview UI with a local wallpaper library, a stdio MCP upload server, and a reserved macOS Swift desktop shell.
 project:
   id: axi-image-preview
   partition: projects

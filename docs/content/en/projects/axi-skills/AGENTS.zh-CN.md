@@ -4,8 +4,8 @@ title: Axi Skills
 type: project
 status: draft
 tags: [Axi Docs, Projects, shared, shared]
-created: 2026-06-11
-modified: 2026-06-11
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Skills
 graph-tags: [Projects, shared]
 description: Shared version-controlled skill catalog for Codex, Claude, Cursor, MiniMax, and compatible Axi agent runtimes, with verifier-backed runtime and i18n contracts.

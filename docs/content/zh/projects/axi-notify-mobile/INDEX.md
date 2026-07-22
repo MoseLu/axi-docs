@@ -3,12 +3,12 @@ id: axi-docs-zh-projects-axi-notify-mobile
 title: Axi Notify / Mobile
 type: project
 status: draft
-tags: [Axi Docs, 项目, projects, core]
-created: 2026-06-10
-modified: 2026-06-10
+tags: [Axi Docs, Projects, projects, core]
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Notify / Mobile
-graph-tags: [项目, projects]
-description: Axi notify/mobile 规范的 monorepo，承载 relay、Android 客户端、事件收件箱、移动工作台，以及 donor 迁移资料。
+graph-tags: [Projects, projects]
+description: Workflow contracts, a Go and SQLite notification Relay, and the Axi Mobile Android client for cloud event to FCM to device delivery.
 project:
   id: axi-notify-mobile
   partition: projects
@@ -16,9 +16,9 @@ project:
   source-section: core
 ---
 
-# Axi Notify / Mobile — 档案索引
+# Axi Notify / Mobile — Dossier Index
 
-## 本档案包含的文件
+## Pieces in this Dossier
 
 - [`README.md`](./README.md)
 - [`AGENTS.md`](./AGENTS.md)
@@ -28,8 +28,8 @@ project:
 - [`PRD.md`](./PRD.md)
 - [`TDD.md`](./TDD.md)
 
-## 档案路由
+## Dossier Routing
 
-- 本地根目录：`docs/content/zh/projects/`
-- 另一语言版本：`docs/content/en/projects/axi-notify-mobile/`
-- 工作区条目：`/Volumes/code/workspace/projects/axi-notify`
+- Locale root: `docs/content/zh/projects/`
+- Other locale: `docs/content/en/projects/axi-notify-mobile/`
+- Workspace entry: `/Volumes/code/workspace/projects/axi-notify`

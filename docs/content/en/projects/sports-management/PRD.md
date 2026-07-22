@@ -1,14 +1,14 @@
 ---
 id: axi-docs-en-projects-sports-management
-title: Sports Management
+title: 体育管理应用
 type: project
 status: draft
 tags: [Axi Docs, Projects, projects, core]
-created: 2026-06-10
-modified: 2026-06-10
-graph-title: Sports Management
+created: 2026-07-22
+modified: 2026-07-22
+graph-title: 体育管理应用
 graph-tags: [Projects, projects]
-description: Sports management app with web/mobile/backend surfaces.
+description: Quasar and Vue 3 sports-management application skeleton with Pinia, Vue Router, Vue I18n, and a Capacitor Android wrapper; the backend directory is only a placeholder.
 project:
   id: sports-management
   partition: projects
@@ -16,15 +16,15 @@ project:
   source-section: core
 ---
 
-# Sports Management — PRD Slice
+# 体育管理应用 — PRD Slice
 
-> Axi Docs PRD slice for **Sports Management**. This is *not* the project PRD; it captures Axi Docs's own requirements for presenting this project.
+> Axi Docs PRD slice for **体育管理应用**. This is *not* the project PRD; it captures Axi Docs's own requirements for presenting this project.
 
 ## REQ-PROJ-SPORTS-MANAGEMENT-001
 
 | Field | Value |
 | --- | --- |
-| Requirement | Maintain a discoverable Axi Docs dossier for Sports Management. |
+| Requirement | Maintain a discoverable Axi Docs dossier for 体育管理应用. |
 | Acceptance | `docs/content/{en,zh}/projects/sports-management/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md` exist with valid frontmatter. |
 | Source | `WORKSPACE_INDEX.md` (workspace policy). |
 

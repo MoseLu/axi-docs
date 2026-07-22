@@ -4,11 +4,11 @@ title: Axi Workbench
 type: project
 status: draft
 tags: [Axi Docs, Projects, projects, core]
-created: 2026-06-10
-modified: 2026-06-10
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Workbench
 graph-tags: [Projects, projects]
-description: Canonical Axi workbench monorepo for workstation control plane, DevSvc dashboard, Axi Coder, verification inbox, app/docs search, fleet console, Ollama menu assistant, and Axi App CLI.
+description: Canonical AxiomaticWorld workbench for the six-layer control plane, dashboard applications, shared contracts, local services, AI integrations, fleet tooling, and app scaffolding.
 project:
   id: axi-workbench
   partition: projects
@@ -23,11 +23,11 @@ project:
 
 ## Summary
 
-Canonical Axi workbench monorepo for workstation control plane, DevSvc dashboard, Axi Coder, verification inbox, app/docs search, fleet console, Ollama menu assistant, and Axi App CLI.
+Canonical AxiomaticWorld workbench for the six-layer control plane, dashboard applications, shared contracts, local services, AI integrations, fleet tooling, and app scaffolding.
 
 ## Stack
 
-React, TypeScript, Tauri, Rust, Node.js, Python, Ansible, Swift
+_Stack not recorded in WORKSPACE_INDEX.md._
 
 ## Authoritative Documents
 
@@ -38,7 +38,7 @@ React, TypeScript, Tauri, Rust, Node.js, Python, Ansible, Swift
 
 ## Notes
 
-Absorbed former standalone roots `axi-workstation`, `axi-devsvc-dashboard`, `axi-coder`, `axi-verification-inbox`, `app-search-system`, `axi-ollama-menu-assistant`, `infra/fleet-console`, and `tools/axi-app-cli`.
+_No notes._
 
 ## Verification (suggested)
 

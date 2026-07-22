@@ -1,14 +1,14 @@
 ---
 id: axi-docs-zh-projects-sports-management
-title: Sports Management
+title: 体育管理应用
 type: project
 status: draft
-tags: [Axi Docs, 项目, projects, core]
-created: 2026-06-10
-modified: 2026-06-10
-graph-title: Sports Management
-graph-tags: [项目, projects]
-description: 体育管理应用，承载 Web/移动/后端表面。
+tags: [Axi Docs, Projects, projects, core]
+created: 2026-07-22
+modified: 2026-07-22
+graph-title: 体育管理应用
+graph-tags: [Projects, projects]
+description: Quasar and Vue 3 sports-management application skeleton with Pinia, Vue Router, Vue I18n, and a Capacitor Android wrapper; the backend directory is only a placeholder.
 project:
   id: sports-management
   partition: projects
@@ -16,9 +16,9 @@ project:
   source-section: core
 ---
 
-# Sports Management — 档案索引
+# 体育管理应用 — Dossier Index
 
-## 本档案包含的文件
+## Pieces in this Dossier
 
 - [`README.md`](./README.md)
 - [`AGENTS.md`](./AGENTS.md)
@@ -28,8 +28,8 @@ project:
 - [`PRD.md`](./PRD.md)
 - [`TDD.md`](./TDD.md)
 
-## 档案路由
+## Dossier Routing
 
-- 本地根目录：`docs/content/zh/projects/`
-- 另一语言版本：`docs/content/en/projects/sports-management/`
-- 工作区条目：`/Volumes/code/workspace/projects/axi-sports-management-app`
+- Locale root: `docs/content/zh/projects/`
+- Other locale: `docs/content/en/projects/sports-management/`
+- Workspace entry: `/Volumes/code/workspace/projects/axi-sports-management-app`

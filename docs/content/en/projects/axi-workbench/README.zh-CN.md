@@ -4,11 +4,11 @@ title: Axi Workbench
 type: project
 status: draft
 tags: [Axi Docs, Projects, projects, core]
-created: 2026-06-10
-modified: 2026-06-10
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Workbench
 graph-tags: [Projects, projects]
-description: Canonical Axi workbench monorepo for workstation control plane, DevSvc dashboard, Axi Coder, verification inbox, app/docs search, fleet console, Ollama menu assistant, and Axi App CLI.
+description: Canonical AxiomaticWorld workbench for the six-layer control plane, dashboard applications, shared contracts, local services, AI integrations, fleet tooling, and app scaffolding.
 project:
   id: axi-workbench
   partition: projects

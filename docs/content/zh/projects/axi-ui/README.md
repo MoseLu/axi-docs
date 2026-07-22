@@ -4,11 +4,11 @@ title: Axi UI
 type: project
 status: draft
 tags: [Axi Docs, Projects, shared, shared]
-created: 2026-06-10
-modified: 2026-06-10
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi UI
 graph-tags: [Projects, shared]
-description: Axi brand tokens, shared core primitives, dashboard shell, settings, CRUD, widgets, and addon runtime packages.
+description: Canonical Axi Black Gold design tokens and theme runtime, plus shared React primitives, shell, settings, CRUD, widgets, addons, and Vite tooling published as @axi packages.
 project:
   id: axi-ui
   partition: shared
@@ -23,11 +23,11 @@ project:
 
 ## Summary
 
-Axi brand tokens, shared core primitives, dashboard shell, settings, CRUD, widgets, and addon runtime packages.
+Canonical Axi Black Gold design tokens and theme runtime, plus shared React primitives, shell, settings, CRUD, widgets, addons, and Vite tooling published as @axi packages.
 
 ## Stack
 
-pnpm, TypeScript, React, Ant Design
+_Stack not recorded in WORKSPACE_INDEX.md._
 
 ## Authoritative Documents
 
@@ -38,7 +38,7 @@ pnpm, TypeScript, React, Ant Design
 
 ## Notes
 
-Shared runtime only, not a product project; publishes `@axi/*` packages to the local registry.
+_No notes._
 
 ## Verification (suggested)
 

@@ -8,7 +8,7 @@ Use it to find the right planning category before writing or updating work:
 | --- | --- | --- |
 | Durable plans | `docs/content/{en,zh}/plans/` | Idea-to-landing plans, grill-me findings, decisions, non-goals, acceptance criteria, and verification evidence. |
 | Execution queue | `todo/` and Axi Todo | Task slices, status, priority, owner, ordering, and next actions. |
-| Milestones | `docs/state/MILESTONE.md` | Delivery goals and evidence-backed milestone status. |
+| Delivery Log | `docs/state/MILESTONE.md` | Delivery goals and evidence-backed stage status. |
 | Requirements | `docs/state/PRD.md` | Product/project requirements and non-goals. |
 | Technical design and tests | `docs/state/TDD.md` | Implementation shape, test design, and verification commands. |
 | Verification contract | `docs/state/VERIFICATION.md` | Which checks prove each changed surface. |

@@ -3,12 +3,12 @@ id: axi-docs-zh-projects-axi-image-preview
 title: Axi Image Preview
 type: project
 status: draft
-tags: [Axi Docs, 项目, projects, core]
-created: 2026-06-10
-modified: 2026-06-10
+tags: [Axi Docs, Projects, projects, core]
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Image Preview
-graph-tags: [项目, projects]
-description: 活跃的 Axi 图像与壁纸画廊预览应用，承载视觉参考、悬停/详情交互，以及预览实验。
+graph-tags: [Projects, projects]
+description: Vite and React image preview UI with a local wallpaper library, a stdio MCP upload server, and a reserved macOS Swift desktop shell.
 project:
   id: axi-image-preview
   partition: projects
@@ -16,9 +16,9 @@ project:
   source-section: core
 ---
 
-# Axi Image Preview — 档案索引
+# Axi Image Preview — Dossier Index
 
-## 本档案包含的文件
+## Pieces in this Dossier
 
 - [`README.md`](./README.md)
 - [`AGENTS.md`](./AGENTS.md)
@@ -28,8 +28,8 @@ project:
 - [`PRD.md`](./PRD.md)
 - [`TDD.md`](./TDD.md)
 
-## 档案路由
+## Dossier Routing
 
-- 本地根目录：`docs/content/zh/projects/`
-- 另一语言版本：`docs/content/en/projects/axi-image-preview/`
-- 工作区条目：`/Volumes/code/workspace/projects/axi-image-preview`
+- Locale root: `docs/content/zh/projects/`
+- Other locale: `docs/content/en/projects/axi-image-preview/`
+- Workspace entry: `/Volumes/code/workspace/projects/axi-image-preview`

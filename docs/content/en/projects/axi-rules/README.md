@@ -3,31 +3,31 @@ id: axi-docs-en-projects-axi-rules
 title: Axi Rules
 type: project
 status: draft
-tags: [Axi Docs, Projects, projects, core]
-created: 2026-06-10
-modified: 2026-06-10
+tags: [Axi Docs, Projects, projects, shared]
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Rules
 graph-tags: [Projects, projects]
-description: Fast local authority for Axi agent behavior, project routing, memory source precedence, verification rules, safety boundaries, and the frontend 3D memory recall pipeline.
+description: Local authority for Axi agent routing, memory, safety, verification, and generated project/rule indexes, with a React visualization of the memory pipeline.
 project:
   id: axi-rules
   partition: projects
   path: /Volumes/code/workspace/projects/axi-rules
-  source-section: core
+  source-section: shared
 ---
 
 # Axi Rules
 
 > Workspace project dossier. Source of truth: `/Volumes/code/workspace/projects/axi-rules`.
-> Section: core / Partition: `projects/`.
+> Section: shared / Partition: `projects/`.
 
 ## Summary
 
-Fast local authority for Axi agent behavior, project routing, memory source precedence, verification rules, safety boundaries, and the frontend 3D memory recall pipeline.
+Local authority for Axi agent routing, memory, safety, verification, and generated project/rule indexes, with a React visualization of the memory pipeline.
 
 ## Stack
 
-Markdown, JSON, Python, React, TypeScript, Vite, three.js
+_Stack not recorded in WORKSPACE_INDEX.md._
 
 ## Authoritative Documents
 
@@ -38,7 +38,7 @@ Markdown, JSON, Python, React, TypeScript, Vite, three.js
 
 ## Notes
 
-Use before `axi-docs`; frontend app lives in `frontend/` and may need a non-5173 Vite port if DevSvc is already listening.
+_No notes._
 
 ## Verification (suggested)
 

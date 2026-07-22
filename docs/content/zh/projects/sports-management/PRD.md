@@ -1,14 +1,14 @@
 ---
 id: axi-docs-zh-projects-sports-management
-title: Sports Management
+title: 体育管理应用
 type: project
 status: draft
-tags: [Axi Docs, 项目, projects, core]
-created: 2026-06-10
-modified: 2026-06-10
-graph-title: Sports Management
-graph-tags: [项目, projects]
-description: 体育管理应用，承载 Web/移动/后端表面。
+tags: [Axi Docs, Projects, projects, core]
+created: 2026-07-22
+modified: 2026-07-22
+graph-title: 体育管理应用
+graph-tags: [Projects, projects]
+description: Quasar and Vue 3 sports-management application skeleton with Pinia, Vue Router, Vue I18n, and a Capacitor Android wrapper; the backend directory is only a placeholder.
 project:
   id: sports-management
   partition: projects
@@ -16,27 +16,27 @@ project:
   source-section: core
 ---
 
-# Sports Management — PRD 切片
+# 体育管理应用 — PRD Slice
 
-> Axi Docs 针对 **Sports Management** 的 PRD 切片。这*不是*项目本身的 PRD，它记录的是 Axi Docs 用于呈现该项目自身的需求。
+> Axi Docs PRD slice for **体育管理应用**. This is *not* the project PRD; it captures Axi Docs's own requirements for presenting this project.
 
 ## REQ-PROJ-SPORTS-MANAGEMENT-001
 
-| 字段 | 值 |
+| Field | Value |
 | --- | --- |
-| Requirement | 为 Sports Management 维护一份可被发现的 Axi Docs 档案。 |
-| Acceptance | `docs/content/{en,zh}/projects/sports-management/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md` 均存在且 frontmatter 合法。 |
-| Source | `WORKSPACE_INDEX.md`（工作区策略）。 |
+| Requirement | Maintain a discoverable Axi Docs dossier for 体育管理应用. |
+| Acceptance | `docs/content/{en,zh}/projects/sports-management/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md` exist with valid frontmatter. |
+| Source | `WORKSPACE_INDEX.md` (workspace policy). |
 
 ## REQ-PROJ-SPORTS-MANAGEMENT-002
 
-| 字段 | 值 |
+| Field | Value |
 | --- | --- |
-| Requirement | 档案反映权威的工作区路径、分区与用途陈述。 |
-| Acceptance | `pnpm --dir app projects:check --project=sports-management` 执行成功。 |
-| Source | `WORKSPACE_INDEX.md` 分区表。 |
+| Requirement | Dossier reflects the canonical workspace path, partition, and purpose statement. |
+| Acceptance | `pnpm --dir app projects:check --project=sports-management` succeeds. |
+| Source | `WORKSPACE_INDEX.md` partition table. |
 
-## 非目标
+## Non-Goals
 
-- Axi Docs 不拥有该项目，只对其进行索引。
-- Axi Docs 不复制项目内部的设计、测试或路线图。
+- Axi Docs does not own the project; it only indexes it.
+- Axi Docs does not duplicate the project's internal design, tests, or roadmap.

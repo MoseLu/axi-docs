@@ -4,11 +4,11 @@ title: Axi Notify / Mobile
 type: project
 status: draft
 tags: [Axi Docs, Projects, projects, core]
-created: 2026-06-10
-modified: 2026-06-10
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Notify / Mobile
 graph-tags: [Projects, projects]
-description: Canonical Axi notify/mobile monorepo for relay, Android client, event inbox, mobile workbench, and donor migration material.
+description: Workflow contracts, a Go and SQLite notification Relay, and the Axi Mobile Android client for cloud event to FCM to device delivery.
 project:
   id: axi-notify-mobile
   partition: projects

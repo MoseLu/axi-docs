@@ -3,12 +3,12 @@ id: axi-docs-zh-projects-axi-tauri-starter
 title: Axi Tauri Starter
 type: project
 status: draft
-tags: [Axi Docs, 项目, shared, shared]
-created: 2026-06-10
-modified: 2026-06-10
+tags: [Axi Docs, Projects, shared, shared]
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Tauri Starter
-graph-tags: [项目, shared]
-description: 工作区级参考：桌面外壳使用的共享 Tauri 2 壳层结构与缓存引导。
+graph-tags: [Projects, shared]
+description: Shared reference for Tauri 2 desktop-shell layout, command conventions, and reusable npm, pnpm, Cargo, and Rust cache bootstrap.
 project:
   id: axi-tauri-starter
   partition: shared
@@ -16,9 +16,9 @@ project:
   source-section: shared
 ---
 
-# Axi Tauri Starter —— 档案索引
+# Axi Tauri Starter — Dossier Index
 
-## 本档案包含的文件
+## Pieces in this Dossier
 
 - [`README.md`](./README.md)
 - [`AGENTS.md`](./AGENTS.md)
@@ -28,8 +28,8 @@ project:
 - [`PRD.md`](./PRD.md)
 - [`TDD.md`](./TDD.md)
 
-## 档案路由
+## Dossier Routing
 
-- 语言根目录：`docs/content/zh/projects/`
-- 其他语言：`docs/content/en/projects/axi-tauri-starter/`
-- 工作区条目：`/Volumes/code/workspace/shared/axi-tauri-starter`
+- Locale root: `docs/content/zh/projects/`
+- Other locale: `docs/content/en/projects/axi-tauri-starter/`
+- Workspace entry: `/Volumes/code/workspace/shared/axi-tauri-starter`

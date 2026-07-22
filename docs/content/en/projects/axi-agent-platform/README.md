@@ -4,11 +4,11 @@ title: Axi Agent Platform
 type: project
 status: draft
 tags: [Axi Docs, Projects, projects, core]
-created: 2026-06-10
-modified: 2026-06-10
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Agent Platform
 graph-tags: [Projects, projects]
-description: Canonical Axi agent monorepo for runtime/API surfaces, MCP service, terminal transport, Codex remote bridge, and Axi Todo.
+description: Multi-agent collaboration platform combining a FastAPI backend, React dashboard, SubAgent worktree isolation, an MCP model swarm, and the Axi Todo tool.
 project:
   id: axi-agent-platform
   partition: projects
@@ -23,11 +23,11 @@ project:
 
 ## Summary
 
-Canonical Axi agent monorepo for runtime/API surfaces, MCP service, terminal transport, Codex remote bridge, and Axi Todo.
+Multi-agent collaboration platform combining a FastAPI backend, React dashboard, SubAgent worktree isolation, an MCP model swarm, and the Axi Todo tool.
 
 ## Stack
 
-Python, FastAPI, React, TypeScript, Node.js, MCP, WebSocket
+_Stack not recorded in WORKSPACE_INDEX.md._
 
 ## Authoritative Documents
 
@@ -38,7 +38,7 @@ Python, FastAPI, React, TypeScript, Node.js, MCP, WebSocket
 
 ## Notes
 
-Absorbed former standalone roots `infra/axi-agent-mcp`, `infra/axi-agent-transport`, `infra/codex-remote-bridge`, and `tools/axi-todo`.
+_No notes._
 
 ## Verification (suggested)
 

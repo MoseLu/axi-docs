@@ -3,12 +3,12 @@ id: axi-docs-zh-projects-axi-agent-platform
 title: Axi Agent Platform
 type: project
 status: draft
-tags: [Axi Docs, 项目, projects, core]
-created: 2026-06-10
-modified: 2026-06-10
+tags: [Axi Docs, Projects, projects, core]
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Agent Platform
-graph-tags: [项目, projects]
-description: Axi Agent 规范的 monorepo，承载运行时/API 表面、MCP 服务、终端传输、Codex remote bridge，以及 Axi Todo。
+graph-tags: [Projects, projects]
+description: Multi-agent collaboration platform combining a FastAPI backend, React dashboard, SubAgent worktree isolation, an MCP model swarm, and the Axi Todo tool.
 project:
   id: axi-agent-platform
   partition: projects
@@ -18,34 +18,34 @@ project:
 
 # Axi Agent Platform
 
-> 工作区项目档案。权威来源：`/Volumes/code/workspace/projects/axi-agent-platform`。
-> 板块：core / 分区：`projects/`。
+> Workspace project dossier. Source of truth: `/Volumes/code/workspace/projects/axi-agent-platform`.
+> Section: core / Partition: `projects/`.
 
-## 摘要
+## Summary
 
-Axi Agent 规范的 monorepo，承载运行时/API 表面、MCP 服务、终端传输、Codex remote bridge，以及 Axi Todo。
+Multi-agent collaboration platform combining a FastAPI backend, React dashboard, SubAgent worktree isolation, an MCP model swarm, and the Axi Todo tool.
 
-## 技术栈
+## Stack
 
-Python、FastAPI、React、TypeScript、Node.js、MCP、WebSocket
+_Stack not recorded in WORKSPACE_INDEX.md._
 
-## 权威文档
+## Authoritative Documents
 
-- 工作区条目：[`WORKSPACE_INDEX.md`](/Volumes/code/workspace/WORKSPACE_INDEX.md) — 分区表中 "Axi Agent Platform" 行。
-- 项目根目录：`/Volumes/code/workspace/projects/axi-agent-platform`
-- 项目 `AGENTS.md`：`/Volumes/code/workspace/projects/axi-agent-platform/AGENTS.md`（若存在）。
-- 项目 `README.md`：`/Volumes/code/workspace/projects/axi-agent-platform/README.md`（若存在）。
+- Workspace entry: [`WORKSPACE_INDEX.md`](/Volumes/code/workspace/WORKSPACE_INDEX.md) — partition table row "Axi Agent Platform".
+- Project root: `/Volumes/code/workspace/projects/axi-agent-platform`
+- Project `AGENTS.md`: `/Volumes/code/workspace/projects/axi-agent-platform/AGENTS.md` (when present).
+- Project `README.md`: `/Volumes/code/workspace/projects/axi-agent-platform/README.md` (when present).
 
-## 说明
+## Notes
 
-已并入此前的独立仓库 `infra/axi-agent-mcp`、`infra/axi-agent-transport`、`infra/codex-remote-bridge` 与 `tools/axi-todo`。
+_No notes._
 
-## 验证（建议）
+## Verification (suggested)
 
-_请查阅项目根目录的 `AGENTS.md` 或 `package.json` 脚本以获取权威验证命令。始终从项目目录运行，而非从本档案目录运行。_
+_See project root `AGENTS.md` or `package.json` scripts for the canonical verification commands. Always run from the project directory, not from this dossier._
 
-## 交叉引用
+## Cross-References
 
-- `docs/content/{en,zh}/guide/workspace.md` — Axi Docs 如何消费工作区索引。
-- `docs/content/{en,zh}/guide/routing.md` — 工作区项目路由。
-- `app/src/config/documentSources.ts` — Axi Docs 文档源注册表。
+- `docs/content/{en,zh}/guide/workspace.md` — how Axi Docs consumes the workspace index.
+- `docs/content/{en,zh}/guide/routing.md` — workspace project routing.
+- `app/src/config/documentSources.ts` — Axi Docs source registry.

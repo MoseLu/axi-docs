@@ -3,40 +3,40 @@ id: axi-docs-zh-projects-axi-video-downloader
 title: Axi Video Downloader
 type: project
 status: draft
-tags: [Axi Docs, 项目, tools, shared]
-created: 2026-06-10
-modified: 2026-06-10
+tags: [Axi Docs, Projects, tools, reference]
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Video Downloader
-graph-tags: [项目, tools]
-description: 本地视频下载工具。
+graph-tags: [Projects, tools]
+description: Local Python tool that coordinates a Flask UI, Android device automation, mitmproxy capture, downloads, and SQLite tracking for personal-device video capture.
 project:
   id: axi-video-downloader
   partition: tools
   path: /Volumes/code/workspace/tools/axi-video-downloader
-  source-section: shared
+  source-section: reference
 ---
 
-# Axi Video Downloader —— PRD 分片
+# Axi Video Downloader — PRD Slice
 
-> Axi Video Downloader 在 Axi Docs 中的 PRD 分片。这*不是*项目自身的 PRD；它只记录 Axi Docs 呈现该项目时的自身需求。
+> Axi Docs PRD slice for **Axi Video Downloader**. This is *not* the project PRD; it captures Axi Docs's own requirements for presenting this project.
 
 ## REQ-PROJ-AXI-VIDEO-DOWNLOADER-001
 
-| 字段 | 值 |
+| Field | Value |
 | --- | --- |
-| 需求 | 为 Axi Video Downloader 维护一份可被发现的 Axi Docs 档案。 |
-| 验收 | `docs/content/{en,zh}/projects/axi-video-downloader/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md` 均存在，且 frontmatter 有效。 |
-| 依据 | `WORKSPACE_INDEX.md`（工作区策略）。 |
+| Requirement | Maintain a discoverable Axi Docs dossier for Axi Video Downloader. |
+| Acceptance | `docs/content/{en,zh}/projects/axi-video-downloader/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md` exist with valid frontmatter. |
+| Source | `WORKSPACE_INDEX.md` (workspace policy). |
 
 ## REQ-PROJ-AXI-VIDEO-DOWNLOADER-002
 
-| 字段 | 值 |
+| Field | Value |
 | --- | --- |
-| 需求 | 档案反映权威的工作区路径、分区与用途说明。 |
-| 验收 | `pnpm --dir app projects:check --project=axi-video-downloader` 通过。 |
-| 依据 | `WORKSPACE_INDEX.md` 分区表。 |
+| Requirement | Dossier reflects the canonical workspace path, partition, and purpose statement. |
+| Acceptance | `pnpm --dir app projects:check --project=axi-video-downloader` succeeds. |
+| Source | `WORKSPACE_INDEX.md` partition table. |
 
-## 非目标
+## Non-Goals
 
-- Axi Docs 不拥有该项目；它只索引该项目。
-- Axi Docs 不复制项目内部的设计、测试或路线图。
+- Axi Docs does not own the project; it only indexes it.
+- Axi Docs does not duplicate the project's internal design, tests, or roadmap.

@@ -3,49 +3,49 @@ id: axi-docs-zh-projects-axi-proxy-companion
 title: Axi Proxy Companion
 type: project
 status: draft
-tags: [Axi Docs, 项目, tools, core]
-created: 2026-06-10
-modified: 2026-06-10
+tags: [Axi Docs, Projects, tools, reference]
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Proxy Companion
-graph-tags: [项目, tools]
-description: 用于控制与检查本地 proxy 后端的 macOS proxy 伴生工具。
+graph-tags: [Projects, tools]
+description: Native macOS AppKit companion that starts, stops, inspects, and reports traffic for registered local proxy backends without changing the macOS system proxy.
 project:
   id: axi-proxy-companion
   partition: tools
   path: /Volumes/code/workspace/tools/axi-proxy-companion
-  source-section: core
+  source-section: reference
 ---
 
 # Axi Proxy Companion
 
-> 工作区项目档案。权威来源：`/Volumes/code/workspace/tools/axi-proxy-companion`。
-> 板块：core / 分区：`tools/`。
+> Workspace project dossier. Source of truth: `/Volumes/code/workspace/tools/axi-proxy-companion`.
+> Section: reference / Partition: `tools/`.
 
-## 摘要
+## Summary
 
-用于控制与检查本地 proxy 后端的 macOS proxy 伴生工具。
+Native macOS AppKit companion that starts, stops, inspects, and reports traffic for registered local proxy backends without changing the macOS system proxy.
 
-## 技术栈
+## Stack
 
-SwiftPM、Swift
+_Stack not recorded in WORKSPACE_INDEX.md._
 
-## 权威文档
+## Authoritative Documents
 
-- 工作区条目：[`WORKSPACE_INDEX.md`](/Volumes/code/workspace/WORKSPACE_INDEX.md) — 分区表中 "Axi Proxy Companion" 行。
-- 项目根目录：`/Volumes/code/workspace/tools/axi-proxy-companion`
-- 项目 `AGENTS.md`：`/Volumes/code/workspace/tools/axi-proxy-companion/AGENTS.md`（若存在）。
-- 项目 `README.md`：`/Volumes/code/workspace/tools/axi-proxy-companion/README.md`（若存在）。
+- Workspace entry: [`WORKSPACE_INDEX.md`](/Volumes/code/workspace/WORKSPACE_INDEX.md) — partition table row "Axi Proxy Companion".
+- Project root: `/Volumes/code/workspace/tools/axi-proxy-companion`
+- Project `AGENTS.md`: `/Volumes/code/workspace/tools/axi-proxy-companion/AGENTS.md` (when present).
+- Project `README.md`: `/Volumes/code/workspace/tools/axi-proxy-companion/README.md` (when present).
 
-## 说明
+## Notes
 
-位于 `tools/` 分区的独立工具。未并入任何此前的独立仓库。
+_No notes._
 
-## 验证（建议）
+## Verification (suggested)
 
-_请查阅项目根目录的 `AGENTS.md` 或 `package.json` 脚本以获取权威验证命令。始终从项目目录运行，而非从本档案目录运行。_
+_See project root `AGENTS.md` or `package.json` scripts for the canonical verification commands. Always run from the project directory, not from this dossier._
 
-## 交叉引用
+## Cross-References
 
-- `docs/content/{en,zh}/guide/workspace.md` — Axi Docs 如何消费工作区索引。
-- `docs/content/{en,zh}/guide/routing.md` — 工作区项目路由。
-- `app/src/config/documentSources.ts` — Axi Docs 文档源注册表。
+- `docs/content/{en,zh}/guide/workspace.md` — how Axi Docs consumes the workspace index.
+- `docs/content/{en,zh}/guide/routing.md` — workspace project routing.
+- `app/src/config/documentSources.ts` — Axi Docs source registry.

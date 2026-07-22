@@ -3,12 +3,12 @@ id: axi-docs-zh-projects-axi-workbench
 title: Axi Workbench
 type: project
 status: draft
-tags: [Axi Docs, 项目, projects, core]
-created: 2026-06-10
-modified: 2026-06-10
+tags: [Axi Docs, Projects, projects, core]
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Workbench
-graph-tags: [项目, projects]
-description: Axi 工作台规范的 monorepo，承载工作站控制平面、DevSvc 仪表盘、Axi Coder、验证收件箱、应用/文档搜索、舰队控制台、Ollama 菜单助手，以及 Axi App CLI。
+graph-tags: [Projects, projects]
+description: Canonical AxiomaticWorld workbench for the six-layer control plane, dashboard applications, shared contracts, local services, AI integrations, fleet tooling, and app scaffolding.
 project:
   id: axi-workbench
   partition: projects
@@ -16,9 +16,9 @@ project:
   source-section: core
 ---
 
-# Axi Workbench — 档案索引
+# Axi Workbench — Dossier Index
 
-## 本档案包含的文件
+## Pieces in this Dossier
 
 - [`README.md`](./README.md)
 - [`AGENTS.md`](./AGENTS.md)
@@ -28,8 +28,8 @@ project:
 - [`PRD.md`](./PRD.md)
 - [`TDD.md`](./TDD.md)
 
-## 档案路由
+## Dossier Routing
 
-- 本地根目录：`docs/content/zh/projects/`
-- 另一语言版本：`docs/content/en/projects/axi-workbench/`
-- 工作区条目：`/Volumes/code/workspace/projects/axi-workbench`
+- Locale root: `docs/content/zh/projects/`
+- Other locale: `docs/content/en/projects/axi-workbench/`
+- Workspace entry: `/Volumes/code/workspace/projects/axi-workbench`

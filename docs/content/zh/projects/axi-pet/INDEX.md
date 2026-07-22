@@ -3,12 +3,12 @@ id: axi-docs-zh-projects-axi-pet
 title: Axi Pet
 type: project
 status: draft
-tags: [Axi Docs, 项目, projects, core]
-created: 2026-06-10
-modified: 2026-06-10
+tags: [Axi Docs, Projects, projects, core]
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Pet
-graph-tags: [项目, projects]
-description: 本地 Axi 宠物/虚拟伴侣项目，从 moeru-ai/airi 迁移而来，包含 stage-web、Live2D、provider 配置以及本地 STT 实验。
+graph-tags: [Projects, projects]
+description: A large Project AIRI-derived monorepo for browser, Electron, mobile, server, plugin, rendering, and bot surfaces for LLM-driven virtual characters.
 project:
   id: axi-pet
   partition: projects
@@ -16,9 +16,9 @@ project:
   source-section: core
 ---
 
-# Axi Pet — 档案索引
+# Axi Pet — Dossier Index
 
-## 本档案包含的文件
+## Pieces in this Dossier
 
 - [`README.md`](./README.md)
 - [`AGENTS.md`](./AGENTS.md)
@@ -28,8 +28,8 @@ project:
 - [`PRD.md`](./PRD.md)
 - [`TDD.md`](./TDD.md)
 
-## 档案路由
+## Dossier Routing
 
-- 本地根目录：`docs/content/zh/projects/`
-- 另一语言版本：`docs/content/en/projects/axi-pet/`
-- 工作区条目：`/Volumes/code/workspace/projects/axi-pet`
+- Locale root: `docs/content/zh/projects/`
+- Other locale: `docs/content/en/projects/axi-pet/`
+- Workspace entry: `/Volumes/code/workspace/projects/axi-pet`

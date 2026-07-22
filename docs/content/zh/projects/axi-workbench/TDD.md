@@ -3,12 +3,12 @@ id: axi-docs-zh-projects-axi-workbench
 title: Axi Workbench
 type: project
 status: draft
-tags: [Axi Docs, 项目, projects, core]
-created: 2026-06-10
-modified: 2026-06-10
+tags: [Axi Docs, Projects, projects, core]
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Workbench
-graph-tags: [项目, projects]
-description: Axi 工作台规范的 monorepo，承载工作站控制平面、DevSvc 仪表盘、Axi Coder、验证收件箱、应用/文档搜索、舰队控制台、Ollama 菜单助手，以及 Axi App CLI。
+graph-tags: [Projects, projects]
+description: Canonical AxiomaticWorld workbench for the six-layer control plane, dashboard applications, shared contracts, local services, AI integrations, fleet tooling, and app scaffolding.
 project:
   id: axi-workbench
   partition: projects
@@ -16,22 +16,22 @@ project:
   source-section: core
 ---
 
-# Axi Workbench — TDD 切片
+# Axi Workbench — TDD Slice
 
-> Axi Docs 针对 **Axi Workbench** 的 TDD 切片。描述的是档案本身的测试设计，而非该项目的测试。
+> Axi Docs TDD slice for **Axi Workbench**. Describes the test design for the dossier itself, not the project.
 
-## 单元检查
+## Unit checks
 
-- `pnpm --dir app projects:check` 遍历 `docs/content/{en,zh}/projects/axi-workbench/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md`，断言每个期望的文件都存在且 frontmatter 合法。
-- `pnpm --dir app projects:check --project=axi-workbench` 在本项目范围内执行同样的检查。
+- `pnpm --dir app projects:check` walks `docs/content/{en,zh}/projects/axi-workbench/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md` and asserts every expected piece exists with valid frontmatter.
+- `pnpm --dir app projects:check --project=axi-workbench` runs the same checks scoped to this project.
 
-## 手工检查
+## Manual checks
 
-- 在 Axi Docs Web 应用中打开档案，确认其路由到 `/en/projects/axi-workbench`（以及 `/zh/...`）。
-- 验证知识图谱为本项目渲染出一个节点（`graph-title` 与 `graph-tags` 必须足够独特）。
+- Open the dossier in the Axi Docs web app and confirm it routes under `/en/projects/axi-workbench` (and `/zh/...`).
+- Verify the knowledge graph renders a node for this project (graph-title and graph-tags must be unique enough).
 
-## 失败模式
+## Failure modes
 
-- 文件缺失 → `projects:check` 以非零状态退出，错误信息中包含缺失路径。
-- 用途陈述过时 → 重新执行 `projects:build` 以从 `WORKSPACE_INDEX.md` 重新生成。
-- 项目根路径过时 → 先更新 `WORKSPACE_INDEX.md`，档案会自动跟随。
+- Missing piece → `projects:check` exits non-zero with the missing path in the error.
+- Stale purpose statement → re-run `projects:build` to regenerate from `WORKSPACE_INDEX.md`.
+- Stale project root path → update `WORKSPACE_INDEX.md` first; the dossier follows.

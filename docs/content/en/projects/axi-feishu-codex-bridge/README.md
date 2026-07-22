@@ -3,31 +3,31 @@ id: axi-docs-en-projects-axi-feishu-codex-bridge
 title: Axi Feishu Codex Bridge
 type: project
 status: draft
-tags: [Axi Docs, Projects, tools, core]
-created: 2026-06-10
-modified: 2026-06-10
+tags: [Axi Docs, Projects, tools, reference]
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Feishu Codex Bridge
 graph-tags: [Projects, tools]
-description: Local Feishu IM bridge for routing bot messages to Codex CLI, Codex App, or Codex Plus CDP with axi-rules memory integration.
+description: Local Feishu IM bridge that routes messages to Codex CLI, Codex App WebSocket, or Codex Plus CDP execution surfaces and returns replies to Feishu.
 project:
   id: axi-feishu-codex-bridge
   partition: tools
   path: /Volumes/code/workspace/tools/axi-feishu-codex-bridge
-  source-section: core
+  source-section: reference
 ---
 
 # Axi Feishu Codex Bridge
 
 > Workspace project dossier. Source of truth: `/Volumes/code/workspace/tools/axi-feishu-codex-bridge`.
-> Section: core / Partition: `tools/`.
+> Section: reference / Partition: `tools/`.
 
 ## Summary
 
-Local Feishu IM bridge for routing bot messages to Codex CLI, Codex App, or Codex Plus CDP with axi-rules memory integration.
+Local Feishu IM bridge that routes messages to Codex CLI, Codex App WebSocket, or Codex Plus CDP execution surfaces and returns replies to Feishu.
 
 ## Stack
 
-Python, FastAPI, Feishu OpenAPI, WebSocket, PostgreSQL, Ollama
+_Stack not recorded in WORKSPACE_INDEX.md._
 
 ## Authoritative Documents
 
@@ -38,7 +38,7 @@ Python, FastAPI, Feishu OpenAPI, WebSocket, PostgreSQL, Ollama
 
 ## Notes
 
-Source project only; runtime install and secrets stay under `/Users/mose/.local/share/codex-feishu-bridge`.
+_No notes._
 
 ## Verification (suggested)
 

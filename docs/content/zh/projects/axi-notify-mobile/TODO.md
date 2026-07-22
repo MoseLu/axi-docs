@@ -3,12 +3,12 @@ id: axi-docs-zh-projects-axi-notify-mobile
 title: Axi Notify / Mobile
 type: project
 status: draft
-tags: [Axi Docs, 项目, projects, core]
-created: 2026-06-10
-modified: 2026-06-10
+tags: [Axi Docs, Projects, projects, core]
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Notify / Mobile
-graph-tags: [项目, projects]
-description: Axi notify/mobile 规范的 monorepo，承载 relay、Android 客户端、事件收件箱、移动工作台，以及 donor 迁移资料。
+graph-tags: [Projects, projects]
+description: Workflow contracts, a Go and SQLite notification Relay, and the Axi Mobile Android client for cloud event to FCM to device delivery.
 project:
   id: axi-notify-mobile
   partition: projects
@@ -18,23 +18,23 @@ project:
 
 # Axi Notify / Mobile — TODO
 
-> 档案 TODO。追踪 Axi Docs 还需要为本项目展示什么内容。
+> Dossier TODO. Tracks what Axi Docs still needs to surface for this project.
 
 ## P0
 
-- [ ] 确认项目根目录的 `AGENTS.md` / `README.md` 仍然存在，并与 `WORKSPACE_INDEX.md` 保持一致。
-- [ ] 展示权威验证命令（从项目 `AGENTS.md` 或 `package.json` 中读取）。
+- [ ] Confirm project root `AGENTS.md` / `README.md` still exist and match `WORKSPACE_INDEX.md`.
+- [ ] Surface canonical verification commands (read from project `AGENTS.md` or `package.json`).
 
 ## P1
 
-- [ ] 若项目暴露了第一方 MCP 工具映射（例如 `axi_docs_*` 适配器、`workspace-project` 消费者），需记录。
-- [ ] 通过 `workspace.graph.json`（`workspace-project consumers <id>`）链接到活跃的消费者。
+- [ ] Capture first-party MCP tool mapping if the project exposes one (e.g. `axi_docs_*` adapters, `workspace-project` consumer).
+- [ ] Link to active consumers via `workspace.graph.json` (`workspace-project consumers <id>`).
 
 ## P2
 
-- [ ] 若该项目是 Dashboard 应用，添加缩略图或图标。
-- [ ] 当行为规则引用本项目时，交叉链接到 Axi Rules 条目（`rules/<family>/AGENTS.md`）。
+- [ ] Add a thumbnail or icon if the project is a Dashboard app.
+- [ ] Cross-link to Axi Rules entry (`rules/<family>/AGENTS.md`) when behavior rules reference this project.
 
-## 不在范围内
+## Out of Scope
 
-- 项目内部 TODO 存放在项目根目录，而不是这里。
+- Project-internal TODOs live in the project root, not here.

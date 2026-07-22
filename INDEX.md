@@ -3,8 +3,8 @@
 ## Ownership
 
 - Root: `/Volumes/code/workspace/projects/axi-docs`
-- Type: workspace project/tool
-- Stack signals: document/config driven
+- Type: workspace project (knowledge surface; `app/` holds the application code)
+- Stack signals: React + TypeScript + Vite + Node.js MCP + Markdown
 
 ## Document Map
 
@@ -13,37 +13,35 @@
 | `README.md` | English entrypoint and quickstart. |
 | `README.zh-CN.md` | Simplified Chinese entrypoint. |
 | `AGENTS.md` | Agent rules, boundaries, verification, read order. |
-| `docs/state/CHANGELOG.md` | Human-visible change log. |
-| `docs/state/TODO.md` | Task facade pointing at `todo/01-current-architecture.md` (current backlog), `todo/02-legacy-audit.md`, `todo/03-coverage-remediation.md`, `todo/04-roadmap.md`. |
-| `docs/state/MILESTONE.md` | Delivery milestone and evidence. |
+| `ARCHITECTURE-AXI-STACK.md` | Axi Skills × Axi Rules × Axi Docs shared-stack architecture (capability / behavior / knowledge layers). |
+| `plans/README.md` | Root-level planning category index for agents inspecting the current directory. |
+| `docs/content/{en,zh}/plans/` | Durable idea-to-landing plan library; execution items link out to Axi Todo. |
 | `docs/state/PRD.md` | Product/project requirements and non-goals. |
 | `docs/state/TDD.md` | Technical/test design and verification commands. |
 | `docs/state/VERIFICATION.md` | Verification contract for docs, app config, source locks, and plans library changes. |
-| `ARCHITECTURE-AXI-STACK.md` | Axi Skills × Axi Rules × Axi Docs 共享栈架构拓扑（能力 / 行为 / 知识三层）。 |
-| `plans/README.md` | Root-level planning category index for agents inspecting the current directory. |
-| `docs/content/{en,zh}/plans/` | Durable idea-to-landing plan library; execution items link out to Axi Todo. |
+| `docs/state/MILESTONE.md` | Delivery milestone and evidence. |
+| `docs/state/CHANGELOG.md` / `CHANGELOG.zh-CN.md` | Human-visible change log. |
+| `docs/state/TODO.md` / `TODO.zh-CN.md` | Task facade pointing at `todo/01-current-architecture.md` (current backlog), `todo/02-legacy-audit.md`, `todo/03-coverage-remediation.md`, `todo/04-roadmap.md`. |
+| `docs/state/ERROR.md` / `ERROR.zh-CN.md` | Failure mode catalog. |
+| `docs/governance/SECURITY.md` / `SECURITY.zh-CN.md` | Security policy. |
+| `docs/governance/THIRD_PARTY_NOTICES.md` / `*.zh-CN.md` | Third-party notices. |
+| `docs/project-docs.manifest.json` | Project documentation manifest. |
+| `docs/axi-workspace-governance/` | Mirrored workspace governance catalog and state. |
 
 ## Top-Level Inventory
 
 - `AGENTS.md`
 - `ARCHITECTURE-AXI-STACK.md`
-- `docs/state/CHANGELOG.md`
-- `docs/state/CHANGELOG.zh-CN.md`
-- `docs/state/MILESTONE.md`
-- `README.md`
-- `README.zh-CN.md`
-- `docs/state/TODO.md`
+- `README.md` / `README.zh-CN.md`
+- `plans/` (root-level planning category index)
+- `docs/state/{PRD,TDD,VERIFICATION,MILESTONE,CHANGELOG,TODO,ERROR}.md` and `.zh-CN.md` mirrors
+- `docs/governance/{SECURITY,THIRD_PARTY_NOTICES}.md` and `.zh-CN.md` mirrors
+- `docs/content/{en,zh}/plans/` (durable plan library)
+- `docs/axi-workspace-governance/` (mirror of `infra/axi-workspace-governance/docs/`)
+- `docs/project-docs.manifest.json` / `projects.index.json` / `sources.lock.json`
+- `app/` (canonical application code; see `app/AGENTS.md`)
+- `blinko` (imported reference repo)
 - `todo/`
-- `plans/`
-- `docs/governance/SECURITY.md`
-- `docs/governance/SECURITY.zh-CN.md`
-- `docs/state/TODO.md`
-- `docs/state/TODO.zh-CN.md`
-- `docs/content/en/plans/`
-- `docs/content/zh/plans/`
-- `app/`
-- `blinko`
-- `docs/`
 
 ## Source of Truth
 

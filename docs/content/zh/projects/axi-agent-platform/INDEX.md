@@ -3,12 +3,12 @@ id: axi-docs-zh-projects-axi-agent-platform
 title: Axi Agent Platform
 type: project
 status: draft
-tags: [Axi Docs, 项目, projects, core]
-created: 2026-06-10
-modified: 2026-06-10
+tags: [Axi Docs, Projects, projects, core]
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Agent Platform
-graph-tags: [项目, projects]
-description: Axi Agent 规范的 monorepo，承载运行时/API 表面、MCP 服务、终端传输、Codex remote bridge，以及 Axi Todo。
+graph-tags: [Projects, projects]
+description: Multi-agent collaboration platform combining a FastAPI backend, React dashboard, SubAgent worktree isolation, an MCP model swarm, and the Axi Todo tool.
 project:
   id: axi-agent-platform
   partition: projects
@@ -16,9 +16,9 @@ project:
   source-section: core
 ---
 
-# Axi Agent Platform — 档案索引
+# Axi Agent Platform — Dossier Index
 
-## 本档案包含的文件
+## Pieces in this Dossier
 
 - [`README.md`](./README.md)
 - [`AGENTS.md`](./AGENTS.md)
@@ -28,8 +28,8 @@ project:
 - [`PRD.md`](./PRD.md)
 - [`TDD.md`](./TDD.md)
 
-## 档案路由
+## Dossier Routing
 
-- 本地根目录：`docs/content/zh/projects/`
-- 另一语言版本：`docs/content/en/projects/axi-agent-platform/`
-- 工作区条目：`/Volumes/code/workspace/projects/axi-agent-platform`
+- Locale root: `docs/content/zh/projects/`
+- Other locale: `docs/content/en/projects/axi-agent-platform/`
+- Workspace entry: `/Volumes/code/workspace/projects/axi-agent-platform`

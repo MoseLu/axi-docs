@@ -3,40 +3,40 @@ id: axi-docs-zh-projects-axi-proxy-companion
 title: Axi Proxy Companion
 type: project
 status: draft
-tags: [Axi Docs, 项目, tools, core]
-created: 2026-06-10
-modified: 2026-06-10
+tags: [Axi Docs, Projects, tools, reference]
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Proxy Companion
-graph-tags: [项目, tools]
-description: 用于控制与检查本地 proxy 后端的 macOS proxy 伴生工具。
+graph-tags: [Projects, tools]
+description: Native macOS AppKit companion that starts, stops, inspects, and reports traffic for registered local proxy backends without changing the macOS system proxy.
 project:
   id: axi-proxy-companion
   partition: tools
   path: /Volumes/code/workspace/tools/axi-proxy-companion
-  source-section: core
+  source-section: reference
 ---
 
-# Axi Proxy Companion — PRD 切片
+# Axi Proxy Companion — PRD Slice
 
-> Axi Docs 针对 **Axi Proxy Companion** 的 PRD 切片。这*不是*项目本身的 PRD，它记录的是 Axi Docs 用于呈现该项目自身的需求。
+> Axi Docs PRD slice for **Axi Proxy Companion**. This is *not* the project PRD; it captures Axi Docs's own requirements for presenting this project.
 
 ## REQ-PROJ-AXI-PROXY-COMPANION-001
 
-| 字段 | 值 |
+| Field | Value |
 | --- | --- |
-| Requirement | 为 Axi Proxy Companion 维护一份可被发现的 Axi Docs 档案。 |
-| Acceptance | `docs/content/{en,zh}/projects/axi-proxy-companion/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md` 均存在且 frontmatter 合法。 |
-| Source | `WORKSPACE_INDEX.md`（工作区策略）。 |
+| Requirement | Maintain a discoverable Axi Docs dossier for Axi Proxy Companion. |
+| Acceptance | `docs/content/{en,zh}/projects/axi-proxy-companion/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md` exist with valid frontmatter. |
+| Source | `WORKSPACE_INDEX.md` (workspace policy). |
 
 ## REQ-PROJ-AXI-PROXY-COMPANION-002
 
-| 字段 | 值 |
+| Field | Value |
 | --- | --- |
-| Requirement | 档案反映权威的工作区路径、分区与用途陈述。 |
-| Acceptance | `pnpm --dir app projects:check --project=axi-proxy-companion` 执行成功。 |
-| Source | `WORKSPACE_INDEX.md` 分区表。 |
+| Requirement | Dossier reflects the canonical workspace path, partition, and purpose statement. |
+| Acceptance | `pnpm --dir app projects:check --project=axi-proxy-companion` succeeds. |
+| Source | `WORKSPACE_INDEX.md` partition table. |
 
-## 非目标
+## Non-Goals
 
-- Axi Docs 不拥有该项目，只对其进行索引。
-- Axi Docs 不复制项目内部的设计、测试或路线图。
+- Axi Docs does not own the project; it only indexes it.
+- Axi Docs does not duplicate the project's internal design, tests, or roadmap.

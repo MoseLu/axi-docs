@@ -3,35 +3,35 @@ id: axi-docs-zh-projects-axi-video-downloader
 title: Axi Video Downloader
 type: project
 status: draft
-tags: [Axi Docs, 项目, tools, shared]
-created: 2026-06-10
-modified: 2026-06-10
+tags: [Axi Docs, Projects, tools, reference]
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Video Downloader
-graph-tags: [项目, tools]
-description: 本地视频下载工具。
+graph-tags: [Projects, tools]
+description: Local Python tool that coordinates a Flask UI, Android device automation, mitmproxy capture, downloads, and SQLite tracking for personal-device video capture.
 project:
   id: axi-video-downloader
   partition: tools
   path: /Volumes/code/workspace/tools/axi-video-downloader
-  source-section: shared
+  source-section: reference
 ---
 
-# Axi Video Downloader —— TDD 分片
+# Axi Video Downloader — TDD Slice
 
-> Axi Video Downloader 在 Axi Docs 中的 TDD 分片。描述的是档案自身的测试设计，而非项目本身。
+> Axi Docs TDD slice for **Axi Video Downloader**. Describes the test design for the dossier itself, not the project.
 
-## 单元检查
+## Unit checks
 
-- `pnpm --dir app projects:check` 会遍历 `docs/content/{en,zh}/projects/axi-video-downloader/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md`，并断言每个期望文件都存在且 frontmatter 有效。
-- `pnpm --dir app projects:check --project=axi-video-downloader` 会在该项目范围内运行同样的检查。
+- `pnpm --dir app projects:check` walks `docs/content/{en,zh}/projects/axi-video-downloader/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md` and asserts every expected piece exists with valid frontmatter.
+- `pnpm --dir app projects:check --project=axi-video-downloader` runs the same checks scoped to this project.
 
-## 手工检查
+## Manual checks
 
-- 在 Axi Docs Web 应用中打开档案，确认它在 `/en/projects/axi-video-downloader`（以及 `/zh/...`）下能正确路由。
-- 验证知识图谱为该项目渲染了一个节点（graph-title 和 graph-tags 必须足够唯一）。
+- Open the dossier in the Axi Docs web app and confirm it routes under `/en/projects/axi-video-downloader` (and `/zh/...`).
+- Verify the knowledge graph renders a node for this project (graph-title and graph-tags must be unique enough).
 
-## 失败模式
+## Failure modes
 
-- 文件缺失 → `projects:check` 非零退出，错误信息中包含缺失的路径。
-- 用途说明过时 → 重新运行 `projects:build` 以从 `WORKSPACE_INDEX.md` 重新生成。
-- 项目根路径过时 → 先更新 `WORKSPACE_INDEX.md`，档案会随之同步。
+- Missing piece → `projects:check` exits non-zero with the missing path in the error.
+- Stale purpose statement → re-run `projects:build` to regenerate from `WORKSPACE_INDEX.md`.
+- Stale project root path → update `WORKSPACE_INDEX.md` first; the dossier follows.

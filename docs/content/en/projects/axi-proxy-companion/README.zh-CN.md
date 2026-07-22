@@ -3,17 +3,17 @@ id: axi-docs-en-projects-axi-proxy-companion
 title: Axi Proxy Companion
 type: project
 status: draft
-tags: [Axi Docs, Projects, tools, core]
-created: 2026-06-10
-modified: 2026-06-10
+tags: [Axi Docs, Projects, tools, reference]
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Proxy Companion
 graph-tags: [Projects, tools]
-description: macOS proxy companion for controlling and checking a local proxy backend.
+description: Native macOS AppKit companion that starts, stops, inspects, and reports traffic for registered local proxy backends without changing the macOS system proxy.
 project:
   id: axi-proxy-companion
   partition: tools
   path: /Volumes/code/workspace/tools/axi-proxy-companion
-  source-section: core
+  source-section: reference
 ---
 
 # Axi Proxy Companion — README.zh-CN.md

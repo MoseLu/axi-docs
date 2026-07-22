@@ -4,11 +4,11 @@ title: Axi Tauri Starter
 type: project
 status: draft
 tags: [Axi Docs, Projects, shared, shared]
-created: 2026-06-10
-modified: 2026-06-10
+created: 2026-07-22
+modified: 2026-07-22
 graph-title: Axi Tauri Starter
 graph-tags: [Projects, shared]
-description: Workspace-level reference for the shared Tauri 2 shell shape and cache bootstrap used by desktop shells.
+description: Shared reference for Tauri 2 desktop-shell layout, command conventions, and reusable npm, pnpm, Cargo, and Rust cache bootstrap.
 project:
   id: axi-tauri-starter
   partition: shared
@@ -23,11 +23,11 @@ project:
 
 ## Summary
 
-Workspace-level reference for the shared Tauri 2 shell shape and cache bootstrap used by desktop shells.
+Shared reference for Tauri 2 desktop-shell layout, command conventions, and reusable npm, pnpm, Cargo, and Rust cache bootstrap.
 
 ## Stack
 
-Bash, Markdown
+_Stack not recorded in WORKSPACE_INDEX.md._
 
 ## Authoritative Documents
 
@@ -38,7 +38,7 @@ Bash, Markdown
 
 ## Notes
 
-Copy patterns into current product subapps rather than treating this as a product.
+_No notes._
 
 ## Verification (suggested)
 

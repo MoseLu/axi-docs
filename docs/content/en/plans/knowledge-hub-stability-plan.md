@@ -91,7 +91,7 @@ Three phases. Each phase is a stable stopping point — landing phase N must not
 - Related docs:
   - `todo/04-roadmap.md` — source of "下一轮重点" scope.
   - `todo/02-legacy-audit.md` — source of owner-action table and audit history.
-  - `docs/state/MILESTONE.md` M2/M4 — source governance and registry milestones this plan supports.
+  - `docs/state/MILESTONE.md` M2/M4 — source governance and registry delivery gates this plan supports.
   - `docs/state/PRD.md` REQ-BOUNDARY-001 / REQ-VERIFY-001 — owner scope and verification.
   - `app/src/mcp/server.ts` — primary file under change.
   - `app/vite.config.plugin.ts` — secondary file under change.

@@ -79,7 +79,7 @@
     "three-spritetext": "^1.10.0"
   },
   "devDependencies": {
-    "@commitlint/cli": "^19.8.1",
+    "@commitlint/cli": "^21.2.1",
     "@commitlint/config-conventional": "^19.8.1",
     "@eslint/js": "^9.24.0",
     "@testing-library/jest-dom": "^6.4.0",

@@ -4,8 +4,8 @@ title: Workspace Project Dossiers
 type: index
 status: draft
 tags: [Axi Docs, Projects, Index, English]
-created: 2026-07-22
-modified: 2026-07-22
+created: 2026-07-26
+modified: 2026-07-26
 graph-title: Workspace Project Dossiers
 graph-tags: [Projects, Index]
 description: Axi Docs keeps a per-project dossier for every active entry in `WORKSPACE_INDEX.md`. The dossier is generated from the workspace index; re-run `pnpm --dir app projects:build` to refresh it.
@@ -27,23 +27,23 @@ description: Axi Docs keeps a per-project dossier for every active entry in `WOR
 
 | Project | Partition | Status | Stack | Notes |
 | --- | --- | --- | --- | --- |
-| [Axi Agent Platform](./axi-agent-platform/README.md) | `projects/` | unready |  |  |
-| [Axi Docs](./axi-docs/README.md) | `projects/` | unready |  |  |
+| [Axi Agent Platform](./axi-agent-platform/README.md) | `projects/` | stale |  |  |
+| [Axi Docs](./axi-docs/README.md) | `projects/` | stale |  |  |
 | [Axi Image Preview](./axi-image-preview/README.md) | `projects/` | verified |  |  |
-| [Axi Notify / Mobile](./axi-notify-mobile/README.md) | `projects/` | unready |  |  |
+| [Axi Notify / Mobile](./axi-notify-mobile/README.md) | `projects/` | stale |  |  |
 | [Axi Pet](./axi-pet/README.md) | `projects/` | stale |  |  |
 | [Axi Pet Desktop](./axi-pet-desktop/README.md) | `projects/` | unready |  |  |
-| [Axi Workbench](./axi-workbench/README.md) | `projects/` | unready |  |  |
-| [体育管理应用](./sports-management/README.md) | `projects/` | unready |  |  |
+| [Axi Workbench](./axi-workbench/README.md) | `projects/` | stale |  |  |
+| [体育管理应用](./sports-management/README.md) | `projects/` | stale |  |  |
 
 ## Shared and Infrastructure (7)
 
 | Project | Partition | Status | Stack | Notes |
 | --- | --- | --- | --- | --- |
-| [Axi Local Registry](./axi-registry/README.md) | `infra/` | unready |  |  |
+| [Axi Local Registry](./axi-registry/README.md) | `infra/` | stale |  |  |
 | [Axi Rules](./axi-rules/README.md) | `projects/` | stale |  |  |
-| [Axi Skills](./axi-skills/README.md) | `shared/` | unready |  |  |
-| [Axi Tauri Starter](./axi-tauri-starter/README.md) | `shared/` | unready |  |  |
+| [Axi Skills](./axi-skills/README.md) | `shared/` | stale |  |  |
+| [Axi Tauri Starter](./axi-tauri-starter/README.md) | `shared/` | stale |  |  |
 | [Axi UI](./axi-ui/README.md) | `shared/` | verified |  |  |
 | [Workspace Relationship Graph](./workspace-relationship-graph/README.md) | `infra/` | external-canonical | JSON, Node CLI, MCP stdio | Use before cross-project edits; not a code project or git repo. |
 | [Workspace Dev Services](./workspace-dev-services/README.md) | `infra/` | active | JSON, Node.js, PM2, LaunchAgent | Runtime state lives under `.devsvc`; use the config and wrapper as editable entrypoints. |
@@ -53,10 +53,10 @@ description: Axi Docs keeps a per-project dossier for every active entry in `WOR
 | Project | Partition | Status | Stack | Notes |
 | --- | --- | --- | --- | --- |
 | [Axi Artboard](./axi-artboard/README.md) | `products/` | unready |  |  |
-| [Axi Feishu Codex Bridge](./axi-feishu-codex-bridge/README.md) | `tools/` | unready |  |  |
-| [Axi Proxy Companion](./axi-proxy-companion/README.md) | `tools/` | unready |  |  |
-| [Axi Video Downloader](./axi-video-downloader/README.md) | `tools/` | unready |  |  |
-| [IELTS Vocabulary](./ielts-vocab/README.md) | `products/` | unready |  |  |
+| [Axi Feishu Codex Bridge](./axi-feishu-codex-bridge/README.md) | `tools/` | stale |  |  |
+| [Axi Proxy Companion](./axi-proxy-companion/README.md) | `tools/` | stale |  |  |
+| [Axi Video Downloader](./axi-video-downloader/README.md) | `tools/` | stale |  |  |
+| [IELTS Vocabulary](./ielts-vocab/README.md) | `products/` | stale |  |  |
 | [Cockpit Tools Reference](./cockpit-tools-reference/README.md) | `references/` | reference | Tauri, Vite, TypeScript, Rust | Keep the product name as Cockpit Tools and do not rename it into Axi. |
 | [DBSkill Reference](./dbskill-reference/README.md) | `references/` | reference | Shell, Markdown, Python | Keep as a reference only; do not promote to a workspace-owned product. |
 | [Sub2API Reference](./sub2api-reference/README.md) | `references/` | reference | Go, Vue, PostgreSQL, Redis, Docker | Upstream third-party service repo; not an Axi owner or Axi application. |

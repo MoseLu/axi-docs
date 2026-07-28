@@ -4,14 +4,14 @@ title: Axi Workspace Project Catalog
 type: reference
 status: evergreen
 tags: [workspace, catalog, repositories]
-created: 2026-07-22
-modified: 2026-07-22
+created: 2026-07-28
+modified: 2026-07-28
 agent-readable: true
 ---
 
 # Axi Workspace Project Catalog
 
-最后生成：2026-07-22
+最后生成：2026-07-28
 
 | Section | ID | Name | Owner | Status | Lifecycle | Branch | Docs | Path | Canonical Remote |
 |---|---|---|---|---|---|---|---|---|---|
@@ -39,3 +39,4 @@ agent-readable: true
 
 - `Docs=yes` 表示仓库根目录存在 `docs/` 目录。
 - `Branch` 为当前本地分支，用于识别工作树状态。
+- `/Volumes/code/workspace/incubator` 是 non-project partition，故意不出现在本 project catalog。

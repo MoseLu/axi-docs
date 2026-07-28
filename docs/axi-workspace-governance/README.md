@@ -4,14 +4,14 @@ title: Axi Workspace Governance Index
 type: reference
 status: evergreen
 tags: [workspace, governance, polyrepo]
-created: 2026-07-22
-modified: 2026-07-22
+created: 2026-07-28
+modified: 2026-07-28
 agent-readable: true
 ---
 
 # Axi Workspace Governance Index
 
-最后生成：2026-07-22
+最后生成：2026-07-28
 
 ## 摘要
 
@@ -21,6 +21,7 @@ agent-readable: true
 - 已登记条目：19
 - canonical 条目：19
 - active / active-* 条目：19
+- 非项目孵化区：`/Volumes/code/workspace/incubator`（不计入登记条目）
 
 ## Section 统计
 
@@ -49,6 +50,7 @@ agent-readable: true
 - 不在 `/Volumes/code/workspace` 执行 `git init`，也不从根目录 commit / push / clean / reset。
 - 代码修改进入拥有该代码的项目仓库；治理修改进入 `infra/axi-workspace-governance`。
 - 根层 `WORKSPACE_INDEX.md`、`AGENTS.md`、`workspace.graph.json` 和 `.workspace/*.json` 是 agent 接手与路由表面，不是业务代码。
+- `/Volumes/code/workspace/incubator` 承载未完成 idea / PRD / prototype；它不是项目、仓库、provider 或发布单元。
 
 ## 分发链路
 
@@ -60,6 +62,7 @@ agent-readable: true
 
 ```bash
 pnpm workspace:docs:sync
+pnpm workspace:incubator:check
 pnpm workspace:registry:sync
 pnpm workspace:audit
 ```

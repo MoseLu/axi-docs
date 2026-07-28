@@ -4,20 +4,21 @@ title: Axi Workspace Repo Topology
 type: reference
 status: evergreen
 tags: [workspace, topology, architecture]
-created: 2026-07-22
-modified: 2026-07-22
+created: 2026-07-28
+modified: 2026-07-28
 agent-readable: true
 ---
 
 # Axi Workspace Repo Topology
 
-最后生成：2026-07-22
+最后生成：2026-07-28
 
 ## 控制面
 
 | Component | Path | Role |
 |---|---|---|
 | workspace container | `/Volumes/code/workspace` | 非 Git 仓库；只承载项目目录、参考目录、生成快照和 launcher shim |
+| workspace incubator | `/Volumes/code/workspace/incubator` | 未完成 idea / PRD / prototype 的非项目验证区；不进入 project graph |
 | workspace.json | `/Volumes/code/workspace/infra/axi-workspace-governance/workspace.json` | 权威治理清单 |
 | registry | `/Volumes/code/workspace/infra/axi-workspace-governance/.workspace/registry.json` | 生成式注册表 |
 | docs source | `/Volumes/code/workspace/infra/axi-workspace-governance/docs` | 权威索引文档目录 |

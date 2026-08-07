@@ -2,19 +2,23 @@
 id: axi-docs-zh-projects-axi-workbench
 title: Axi Workbench
 type: project
-status: draft
+status: active
 tags: [Axi Docs, Projects, projects, core]
-created: 2026-07-22
-modified: 2026-07-22
+created: 2026-08-07
+modified: 2026-08-07
 graph-title: Axi Workbench
 graph-tags: [Projects, projects]
-description: Canonical AxiomaticWorld workbench for the six-layer control plane, dashboard applications, shared contracts, local services, AI integrations, fleet tooling, and app scaffolding.
+description: Canonical AxiomaticWorld workbench for the six-layer control plane, two independent user applications (Web admin apps/workbench and mobile app apps/workbench-mobile), shared contracts, local services, AI integrations, fleet tooling, and app scaffolding.
 project:
   id: axi-workbench
   partition: projects
   path: /Volumes/code/workspace/projects/axi-workbench
   source-section: core
 ---
+## 2026-08-07 同步记录
+
+已记录 v3 双应用姿态（独立的 Web 管理端 + 移动端）及新共享底座包 `@axi/workbench-foundation`。源镜像在项目根 `README.md`；权威长文位于 `docs/state/PRD.md` 与 `docs/state/TDD.md`。
+
 
 # Axi Workbench
 

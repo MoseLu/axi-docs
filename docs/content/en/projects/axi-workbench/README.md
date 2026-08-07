@@ -2,19 +2,23 @@
 id: axi-docs-en-projects-axi-workbench
 title: Axi Workbench
 type: project
-status: draft
+status: active
 tags: [Axi Docs, Projects, projects, core]
-created: 2026-07-22
-modified: 2026-07-22
+created: 2026-08-07
+modified: 2026-08-07
 graph-title: Axi Workbench
 graph-tags: [Projects, projects]
-description: Canonical AxiomaticWorld workbench for the six-layer control plane, dashboard applications, shared contracts, local services, AI integrations, fleet tooling, and app scaffolding.
+description: Canonical AxiomaticWorld workbench for the six-layer control plane, two independent user applications (Web admin apps/workbench and mobile app apps/workbench-mobile), shared contracts, local services, AI integrations, fleet tooling, and app scaffolding.
 project:
   id: axi-workbench
   partition: projects
   path: /Volumes/code/workspace/projects/axi-workbench
   source-section: core
 ---
+## 2026-08-07 Refresh Note
+
+Captured the v3 dual-app posture (independent Web + mobile applications) and the new shared foundation package `@axi/workbench-foundation`. Source mirror is at the project root `README.md`; canonical long-form lives at `docs/state/PRD.md` and `docs/state/TDD.md`.
+
 
 # Axi Workbench
 

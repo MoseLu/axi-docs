@@ -1,12 +1,12 @@
 {
   "schemaVersion": "2026-06-11",
-  "generatedAt": "2026-07-22T20:52:00.593Z",
+  "generatedAt": "2026-08-07T06:52:07.714Z",
   "source": "infra/axi-workspace-governance/workspace.json",
   "summary": {
-    "total": 18,
-    "verified": 2,
+    "total": 19,
+    "verified": 4,
     "documented": 0,
-    "stale": 14,
+    "stale": 13,
     "unready": 2
   },
   "projects": [
@@ -28,7 +28,7 @@
         "readOrder[2] path does not exist: UPGRADE_v1.1.0.md",
         "currentWork.todo path does not exist: TODO.md",
         "currentWork.milestone path does not exist: MILESTONE.md",
-        "verification is stale: 34 days old (max 30)"
+        "verification is stale: 50 days old (max 30)"
       ],
       "warnings": [
         "documents.verification references docs/state/VERIFICATION.md but the file does not exist at /Volumes/code/workspace/projects/axi-agent-platform/docs/state/VERIFICATION.md"
@@ -125,7 +125,7 @@
       "graphMatched": true,
       "errors": [
         "readOrder must contain at most 5 item(s)",
-        "verification is stale: 34 days old (max 30)"
+        "verification is stale: 50 days old (max 30)"
       ],
       "warnings": [],
       "summary": "Workspace documentation hub combining a React reader, knowledge-source adapters, knowledge graph, MCP document bus, and generated project dossier mirrors.",
@@ -184,7 +184,7 @@
         "currentWork.todo path does not exist: TODO.md",
         "currentWork.milestone path does not exist: MILESTONE.md",
         "decisions.changelog path does not exist: CHANGELOG.md",
-        "verification is stale: 34 days old (max 30)"
+        "verification is stale: 50 days old (max 30)"
       ],
       "warnings": [
         "documents.verification references docs/state/VERIFICATION.md but the file does not exist at /Volumes/code/workspace/tools/axi-feishu-codex-bridge/docs/state/VERIFICATION.md"
@@ -290,7 +290,7 @@
       "errors": [
         "currentWork.todo path does not exist: TODO.md",
         "currentWork.milestone path does not exist: MILESTONE.md",
-        "verification is stale: 34 days old (max 30)"
+        "verification is stale: 50 days old (max 30)"
       ],
       "warnings": [
         "documents.verification references VERIFICATION.md but the file does not exist at /Volumes/code/workspace/projects/axi-notify/VERIFICATION.md"
@@ -353,7 +353,7 @@
         "readOrder[4] path does not exist: TDD.md",
         "currentWork.todo path does not exist: TODO.md",
         "currentWork.milestone path does not exist: MILESTONE.md",
-        "verification is stale: 41 days old (max 30)"
+        "verification is stale: 57 days old (max 30)"
       ],
       "warnings": [
         "documents.verification references docs/state/VERIFICATION.md but the file does not exist at /Volumes/code/workspace/projects/axi-pet/docs/state/VERIFICATION.md"
@@ -442,7 +442,7 @@
         "readOrder[4] path does not exist: PRD.md",
         "currentWork.todo path does not exist: TODO.md",
         "currentWork.milestone path does not exist: MILESTONE.md",
-        "verification is stale: 34 days old (max 30)"
+        "verification is stale: 50 days old (max 30)"
       ],
       "warnings": [
         "documents.verification references docs/state/VERIFICATION.md but the file does not exist at /Volumes/code/workspace/tools/axi-proxy-companion/docs/state/VERIFICATION.md"
@@ -501,7 +501,7 @@
         "readOrder[4] path does not exist: PRD.md",
         "currentWork.todo path does not exist: TODO.md",
         "currentWork.milestone path does not exist: MILESTONE.md",
-        "verification is stale: 34 days old (max 30)"
+        "verification is stale: 50 days old (max 30)"
       ],
       "warnings": [
         "documents.verification references docs/state/VERIFICATION.md but the file does not exist at /Volumes/code/workspace/infra/axi-registry/docs/state/VERIFICATION.md"
@@ -552,7 +552,7 @@
       "graphId": "axi-rules",
       "graphMatched": true,
       "errors": [
-        "verification is stale: 41 days old (max 30)"
+        "verification is stale: 57 days old (max 30)"
       ],
       "warnings": [],
       "summary": "Local authority for Axi agent routing, memory, safety, verification, and generated project/rule indexes, with a React visualization of the memory pipeline.",
@@ -606,7 +606,7 @@
         "readOrder[4] path does not exist: MILESTONE.md",
         "currentWork.todo path does not exist: TODO.md",
         "currentWork.milestone path does not exist: MILESTONE.md",
-        "verification is stale: 34 days old (max 30)"
+        "verification is stale: 50 days old (max 30)"
       ],
       "warnings": [],
       "summary": "Shared version-controlled skill catalog for Codex, Claude, Cursor, MiniMax, and compatible Axi agent runtimes, with verifier-backed runtime and i18n contracts.",
@@ -662,7 +662,7 @@
         "currentWork.todo path does not exist: TODO.md",
         "currentWork.milestone path does not exist: MILESTONE.md",
         "decisions.changelog path does not exist: CHANGELOG.md",
-        "verification is stale: 34 days old (max 30)"
+        "verification is stale: 50 days old (max 30)"
       ],
       "warnings": [
         "documents.verification references docs/state/VERIFICATION.md but the file does not exist at /Volumes/code/workspace/shared/axi-tauri-starter/docs/state/VERIFICATION.md"
@@ -746,7 +746,7 @@
         ],
         "knownFailures": []
       },
-      "lastVerifiedAt": "2026-07-19"
+      "lastVerifiedAt": "2026-07-23"
     },
     {
       "id": "axi-video-downloader",
@@ -765,7 +765,7 @@
         "readOrder[4] path does not exist: PRD.md",
         "currentWork.todo path does not exist: TODO.md",
         "currentWork.milestone path does not exist: MILESTONE.md",
-        "verification is stale: 34 days old (max 30)"
+        "verification is stale: 50 days old (max 30)"
       ],
       "warnings": [],
       "summary": "Local Python tool that coordinates a Flask UI, Android device automation, mitmproxy capture, downloads, and SQLite tracking for personal-device video capture.",
@@ -812,29 +812,23 @@
       "kind": "project",
       "lifecycle": "active-canonical",
       "owner": "libu",
-      "readiness": "stale",
+      "readiness": "verified",
       "score": 10,
       "manifestPath": "/Volumes/code/workspace/projects/axi-workbench/docs/project-docs.manifest.json",
       "handoffPath": "/Volumes/code/workspace/projects/axi-workbench/docs/HANDOFF.md",
       "graphId": "axi-workbench",
       "graphMatched": true,
-      "errors": [
-        "readOrder[4] path does not exist: PRD.md",
-        "currentWork.todo path does not exist: TODO.md",
-        "currentWork.milestone path does not exist: MILESTONE.md",
-        "verification is stale: 34 days old (max 30)"
-      ],
-      "warnings": [
-        "documents.verification references docs/state/VERIFICATION.md but the file does not exist at /Volumes/code/workspace/projects/axi-workbench/docs/state/VERIFICATION.md"
-      ],
-      "summary": "Canonical AxiomaticWorld workbench for the six-layer control plane, dashboard applications, shared contracts, local services, AI integrations, fleet tooling, and app scaffolding.",
+      "errors": [],
+      "warnings": [],
+      "summary": "Canonical AxiomaticWorld workbench for the six-layer control plane: independent Web and mobile applications plus a production Go API plane (ZITADEL, Gin gateway, identity adapter, modular platform core), shared contracts, local services, AI integrations, fleet tooling, and app scaffolding.",
       "commands": {
         "setup": [
           "pnpm install"
         ],
         "start": [
-          "pnpm dev",
-          "pnpm dev:web",
+          "make docker-up && make migrate-identity && make migrate-platform",
+          "pnpm dev:workbench",
+          "pnpm dev:mobile",
           "pnpm --filter @axi/workstation-control-plane start",
           "pnpm --filter @axi/workstation-communication-gateway start"
         ],
@@ -843,12 +837,13 @@
           "python3 infra/fleet-console/scripts/fleetctl.py validate"
         ],
         "verify": [
-          "pnpm type-check",
-          "pnpm test",
-          "pnpm test:workstation",
-          "pnpm --dir apps/devsvc-dashboard typecheck",
-          "pnpm --dir apps/axi-coder typecheck",
-          "npm --prefix apps/verification-inbox run typecheck",
+          "make verify-go",
+          "make verify-helm",
+          "pnpm --filter @epap/api-client --filter @axi/workbench-foundation --filter @axi/workbench --filter @axi/workbench-mobile type-check",
+          "pnpm --filter @axi/workbench --filter @axi/workbench-mobile test",
+          "pnpm --filter @axi/workbench --filter @axi/workbench-mobile build",
+          "node apps/workbench/scripts/verify-ui-contracts.mjs",
+          "pnpm --filter @axi/workbench-mobile verify:contracts",
           "pnpm check:boundaries"
         ],
         "smoke": [
@@ -856,19 +851,21 @@
         ]
       },
       "currentWork": {
-        "todo": "TODO.md",
-        "milestone": "MILESTONE.md",
+        "todo": "docs/state/TODO.md",
+        "milestone": "docs/state/MILESTONE.md",
         "active": [
           "Keep the root documentation suite current",
           "Align verification commands with the real project stack",
+          "Keep Web Axi Dashboard Chrome and WeChat-style mobile composition independent",
           "Preserve ownership and cross-project boundaries",
-          "Complete the operational handoff milestone"
+          "Complete Go API plane cluster integration: ZITADEL OIDC, Mailpit/SMTP, PostgreSQL/Redis fault recovery and Helm deployment"
         ],
         "knownFailures": [
-          "The root AGENTS.md still describes the pre-v2 manifest as legacy and should be reconciled in a separately authorized guidance update."
+          "The root AGENTS.md still describes the pre-v2 manifest as legacy and should be reconciled in a separately authorized guidance update.",
+          "No Kubernetes cluster or production ZITADEL/SMTP credentials are attached to this local workspace; cluster end-to-end acceptance remains external."
         ]
       },
-      "lastVerifiedAt": "2026-06-18"
+      "lastVerifiedAt": "2026-08-07"
     },
     {
       "id": "ielts-vocab",
@@ -888,7 +885,7 @@
         "readOrder[4] path does not exist: TDD.md",
         "currentWork.todo path does not exist: TODO.md",
         "currentWork.milestone path does not exist: MILESTONE.md",
-        "verification is stale: 34 days old (max 30)"
+        "verification is stale: 50 days old (max 30)"
       ],
       "warnings": [
         "documents.verification references docs/state/VERIFICATION.md but the file does not exist at /Volumes/code/workspace/products/ielts-vocab/docs/state/VERIFICATION.md"
@@ -943,7 +940,7 @@
         "readOrder[4] path does not exist: TDD.md",
         "currentWork.todo path does not exist: TODO.md",
         "currentWork.milestone path does not exist: MILESTONE.md",
-        "verification is stale: 34 days old (max 30)"
+        "verification is stale: 50 days old (max 30)"
       ],
       "warnings": [],
       "summary": "Quasar and Vue 3 sports-management application skeleton with Pinia, Vue Router, Vue I18n, and a Capacitor Android wrapper; the backend directory is only a placeholder.",
@@ -979,6 +976,58 @@
         ]
       },
       "lastVerifiedAt": "2026-06-18"
+    },
+    {
+      "id": "story-graph",
+      "name": "Story Graph",
+      "path": "/Volumes/code/workspace/products/story-graph",
+      "kind": "product",
+      "lifecycle": "active-product",
+      "owner": "Mose",
+      "readiness": "verified",
+      "score": 10,
+      "manifestPath": "/Volumes/code/workspace/products/story-graph/docs/project-docs.manifest.json",
+      "handoffPath": "/Volumes/code/workspace/products/story-graph/docs/HANDOFF.md",
+      "graphId": "story-graph",
+      "graphMatched": true,
+      "errors": [],
+      "warnings": [],
+      "summary": "Evidence-driven local novel relationship graph workbench with a Python pipeline, SQLite evidence store, and React/Vite viewer.",
+      "commands": {
+        "setup": [
+          "pnpm --dir app install"
+        ],
+        "start": [
+          "pnpm --dir app run dev"
+        ],
+        "health": [
+          "test -f db/graph.db"
+        ],
+        "verify": [
+          "python3 -m unittest -q tests/test_evidence_pipeline.py",
+          "python3 -m unittest -q tests/test_event_features.py",
+          "node --test app/server/evidence-store.test.mjs",
+          "pnpm --dir app run build",
+          "pnpm --dir app run tokens:check",
+          "pnpm --dir app run tokens:consistency"
+        ],
+        "smoke": [
+          "test -f app/package.json && test -f db/graph.db"
+        ]
+      },
+      "currentWork": {
+        "todo": "TODO.md",
+        "milestone": "docs/state/MILESTONE.md",
+        "active": [
+          "多代叙事图谱 v2 已完成：默认长卷只读取证据闭环的叙事事件，使用主线地图、五段式账本与人物/组织/地点档案解释人物变化；待证实体与关系停留在审核队列。",
+          "PRD v3 + 文档 scaffolding（本次迭代）：新增 TODO.md / docs/state/TODO.md / docs/state/MILESTONE.md；CHANGE.md 顶部加 ## Unreleased + Re-verified at: 2026-08-05；manifest 补 docs_entrypoints / documents；提交日志 docs/logs/submit/2026-08-05-doc-v3-batch-submit.md。",
+          "Run the focused verification commands from the canonical workspace path.",
+          "Retire the rollback checkout only after owner acceptance.",
+          "Tighten `tailwind.config.ts` `content` glob to stop scanning `node_modules`."
+        ],
+        "knownFailures": []
+      },
+      "lastVerifiedAt": "2026-08-05"
     }
   ]
 }

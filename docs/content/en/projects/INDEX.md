@@ -4,8 +4,8 @@ title: Workspace Project Dossiers
 type: index
 status: draft
 tags: [Axi Docs, Projects, Index, English]
-created: 2026-08-07
-modified: 2026-08-07
+created: 2026-08-08
+modified: 2026-08-08
 graph-title: Workspace Project Dossiers
 graph-tags: [Projects, Index]
 description: Axi Docs keeps a per-project dossier for every active entry in `WORKSPACE_INDEX.md`. The dossier is generated from the workspace index; re-run `pnpm --dir app projects:build` to refresh it.

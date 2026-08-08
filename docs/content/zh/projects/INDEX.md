@@ -4,8 +4,8 @@ title: 工作区项目档案
 type: index
 status: draft
 tags: [Axi Docs, Projects, Index, i18n]
-created: 2026-08-07
-modified: 2026-08-07
+created: 2026-08-08
+modified: 2026-08-08
 graph-title: 工作区项目档案
 graph-tags: [Projects, Index]
 description: Axi Docs 为 `WORKSPACE_INDEX.md` 中每个 active 项目维护一份档案。档案由工作区索引自动生成；变更后请运行 `pnpm --dir app projects:build` 重新生成。

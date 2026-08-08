@@ -1,11 +1,11 @@
 # Workspace Project Handoff Readiness
 
-Generated: 2026-07-22T20:52:00.593Z
+Generated: 2026-08-07T06:52:07.714Z
 
-- Total: 18
-- Verified: 2
+- Total: 19
+- Verified: 4
 - Documented: 0
-- Stale: 14
+- Stale: 13
 - Unready: 2
 
 | Project | Readiness | Score | Last verified | Current work |
@@ -23,8 +23,9 @@ Generated: 2026-07-22T20:52:00.593Z
 | `axi-rules` | stale | 10/10 | 2026-06-11 | Maintain the frontend contract track registered in todo/index.json. |
 | `axi-skills` | stale | 10/10 | 2026-06-18 | Keep the shared skill catalog free of runtime artifacts, caches, secrets, and nested repository state. |
 | `axi-tauri-starter` | stale | 10/10 | 2026-06-18 | Keep the root documentation suite current. |
-| `axi-ui` | verified | 10/10 | 2026-07-19 | Own the canonical Black Gold preset in @axi/tokens and @axi/core. |
+| `axi-ui` | verified | 10/10 | 2026-07-23 | Own the canonical Black Gold preset in @axi/tokens and @axi/core. |
 | `axi-video-downloader` | stale | 10/10 | 2026-06-18 | Keep the zero-context manifest aligned with the actual Python entrypoints and hardware prerequisites. |
-| `axi-workbench` | stale | 10/10 | 2026-06-18 | Keep the root documentation suite current |
+| `axi-workbench` | verified | 10/10 | 2026-08-07 | Keep the root documentation suite current |
 | `ielts-vocab` | stale | 10/10 | 2026-06-18 | Keep the deployed split backend stable. |
 | `sports-management` | stale | 10/10 | 2026-06-18 | Maintain a parseable, evidence-backed root documentation suite. |
+| `story-graph` | verified | 10/10 | 2026-08-05 | 多代叙事图谱 v2 已完成：默认长卷只读取证据闭环的叙事事件，使用主线地图、五段式账本与人物/组织/地点档案解释人物变化；待证实体与关系停留在审核队列。 |

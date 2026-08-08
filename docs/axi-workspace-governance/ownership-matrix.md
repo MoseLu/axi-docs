@@ -4,14 +4,14 @@ title: Axi Workspace Ownership Matrix
 type: reference
 status: evergreen
 tags: [workspace, ownership, governance]
-created: 2026-07-22
-modified: 2026-07-22
+created: 2026-08-07
+modified: 2026-08-07
 agent-readable: true
 ---
 
 # Axi Workspace Ownership Matrix
 
-最后生成：2026-07-22
+最后生成：2026-08-07
 
 ## hubu
 
@@ -46,3 +46,9 @@ agent-readable: true
 | Repo | Section | Lifecycle | Canonical | Remote |
 |---|---|---|---|---|
 | `C:\Users\12081\.openclaw` | infra | external-canonical | yes | [link](https://github.com/axiomaticworld/openclaw-gateway) |
+
+## Mose
+
+| Repo | Section | Lifecycle | Canonical | Remote |
+|---|---|---|---|---|
+| `../../products/story-graph` | products | active-product | yes | [link](https://github.com/MoseLu/story-graph.git) |

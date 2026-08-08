@@ -4,18 +4,18 @@ title: Axi Workspace Project Completion
 type: reference
 status: evergreen
 tags: [workspace, completion, status]
-created: 2026-07-22
-modified: 2026-07-22
+created: 2026-08-07
+modified: 2026-08-07
 agent-readable: true
 ---
 
 # Axi Workspace Project Completion
 
-最后生成：2026-07-22
+最后生成：2026-08-07
 
 ## 摘要
 
-- 已登记项目：34
+- 已登记项目：35
 - Axi 项目：20
 - 完成：1
 - 可用及以上：9
@@ -54,7 +54,7 @@ agent-readable: true
 | `axi-tauri-starter` | 未评估 | 低 | partial | docs:partial<br>handoff:stale<br>... | 补齐 VERIFICATION.md：verify 命令已声明但缺沉淀位置。运行 `node bin/axi-todo.mjs verify-log` 或 workspace-verification.mjs 生成。 |
 | `axi-ui` | 可用 | 中 | partial | Workspace verify covers file-line guard, typecheck, and tests.<br>Axi Coder and dashboard surfaces consume linked @axi packages.<br>... | Continue additive package hardening without breaking @axi/* style/runtime contracts. |
 | `axi-video-downloader` | 未评估 | 低 | partial | docs:partial<br>handoff:stale<br>... | - |
-| `axi-workbench` | 建设中 | 中 | partial | DevSvc Dashboard and Axi Coder are registered as hosted workbench surfaces.<br>Workspace verify covers dashboard, Axi Coder, verification inbox, and fleet console.<br>... | Finish the project completion data and UI loop for Axi Coder.<br>Continue consolidating dashboard/control-plane documentation and evidence.<br>... |
+| `axi-workbench` | 建设中 | 中 | partial | DevSvc Dashboard and Axi Coder are registered as hosted workbench surfaces.<br>Workspace verify covers dashboard, Axi Coder, verification inbox, and fleet console.<br>... | Finish the project completion data and UI loop for Axi Coder.<br>Continue consolidating dashboard/control-plane documentation and evidence. |
 | `axi-workspace-governance` | 可用 | 中 | partial | workspace:docs:sync generates catalog and completion docs.<br>workspace-project validate remains the root graph sanity check.<br>... | Keep generated docs, graph, and mirrored Axi Docs sources synchronized after project moves.<br>补齐 VERIFICATION.md：verify 命令已声明但缺沉淀位置。运行 `node bin/axi-todo.mjs verify-log` 或 workspace-verification.mjs 生成。 |
 
 ## 其他纳管项目
@@ -74,6 +74,7 @@ agent-readable: true
 | `ollama-local` | 未评估 | 低 | missing | handoff:unready<br>verify:/Users/mose/.cc-connect/bin/ollama-local embed --model mxbai-embed-large:latest --text smoke<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 TODO.md，让待办和里程碑可审计。<br>... |
 | `opencodex` | 未评估 | 低 | partial | docs:partial<br>handoff:unready<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 VERIFICATION.md：verify 命令已声明但缺沉淀位置。运行 `node bin/axi-todo.mjs verify-log` 或 workspace-verification.mjs 生成。 |
 | `sports-management` | 未评估 | 低 | partial | docs:partial<br>handoff:stale<br>... | - |
+| `story-graph` | 未评估 | 高 | partial | products/story-graph/AGENTS.md<br>products/story-graph/docs/HANDOFF.md<br>... | Run the focused Python, Node, and viewer build verification from the canonical path.<br>Retire the rollback checkout only after owner acceptance.<br>... |
 | `sub2api` | 未评估 | 低 | partial | docs:partial<br>handoff:unready<br>... | 补齐 docs/project-docs.manifest.json 文档接入清单。<br>补齐 VERIFICATION.md：verify 命令已声明但缺沉淀位置。运行 `node bin/axi-todo.mjs verify-log` 或 workspace-verification.mjs 生成。 |
 
 ## 备注

@@ -4,30 +4,30 @@ title: Axi Workspace Governance Index
 type: reference
 status: evergreen
 tags: [workspace, governance, polyrepo]
-created: 2026-07-28
-modified: 2026-07-28
+created: 2026-08-07
+modified: 2026-08-07
 agent-readable: true
 ---
 
 # Axi Workspace Governance Index
 
-最后生成：2026-07-28
+最后生成：2026-08-07
 
 ## 摘要
 
 - 工作区容器：`/Volumes/code/workspace`（非 Git 仓库 / 非代码提交单元）
 - 治理仓库根目录：`/Volumes/code/workspace/infra/axi-workspace-governance`
 - 治理仓库远端：`https://github.com/axiomaticworld/axi-workspace-governance.git`
-- 已登记条目：19
-- canonical 条目：19
-- active / active-* 条目：19
+- 已登记条目：20
+- canonical 条目：20
+- active / active-* 条目：20
 - 非项目孵化区：`/Volumes/code/workspace/incubator`（不计入登记条目）
 
 ## Section 统计
 
 - `infra`: 2
 - `projects`: 8
-- `products`: 2
+- `products`: 3
 - `shared`: 4
 - `tools`: 3
 - `agent`: 0

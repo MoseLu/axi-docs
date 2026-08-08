@@ -4,14 +4,14 @@ title: Axi Workspace Repo Topology
 type: reference
 status: evergreen
 tags: [workspace, topology, architecture]
-created: 2026-07-28
-modified: 2026-07-28
+created: 2026-08-07
+modified: 2026-08-07
 agent-readable: true
 ---
 
 # Axi Workspace Repo Topology
 
-最后生成：2026-07-28
+最后生成：2026-08-07
 
 ## 控制面
 
@@ -41,7 +41,7 @@ agent-readable: true
 
 - `../../projects/axi-agent-platform` | Axi Agent Platform | branch=`dev` | canonical=yes | compliance=`polyrepo-mixed-stack`
   remote: https://github.com/axiomaticworld/axi-agent-platform.git
-- `../../projects/axi-docs` | Axi Docs | branch=`dev` | canonical=yes | compliance=`node-single-repo`
+- `../../projects/axi-docs` | Axi Docs | branch=`agent/workspace-incubator` | canonical=yes | compliance=`node-single-repo`
   remote: https://github.com/axiomaticworld/axi-docs.git
 - `../../projects/axi-image-preview` | Axi Image Preview | branch=`dev` | canonical=yes | compliance=`node-single-repo`
   remote: https://github.com/axiomaticworld/axi-image-preview.git
@@ -63,11 +63,13 @@ agent-readable: true
   remote: https://github.com/MoseLu/axi-artboard.git
 - `../../products/ielts-vocab` | IELTS Vocabulary | branch=`dev` | canonical=yes | compliance=`node-monorepo-approved`
   remote: https://github.com/axiomaticworld/ielts-vocab.git
+- `../../products/story-graph` | Story Graph | branch=`dev` | canonical=yes | compliance=`polyrepo-mixed-stack`
+  remote: https://github.com/MoseLu/story-graph.git
 
 ## Shared
 
-- `../../projects/axi-rules` | Axi Rules | branch=`dev` | canonical=yes | compliance=`constraint-index`
-  remote: https://github.com/axiomaticworld/axi-rules.git
+- `../../projects/axi-rules` | Axi Rules | branch=`agent/workspace-incubator` | canonical=yes | compliance=`constraint-index`
+  remote: https://github.com/MoseLu/axi-rules.git
 - `../../shared/axi-skills` | Axi Skills | branch=`dev` | canonical=yes | compliance=`agent-skill-catalog`
   remote: https://github.com/MoseLu/axi-skills.git
 - `../../shared/axi-tauri-starter` | Axi Tauri Starter | branch=`dev` | canonical=yes | compliance=`template-reference`

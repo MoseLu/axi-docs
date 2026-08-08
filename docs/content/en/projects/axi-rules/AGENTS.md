@@ -2,19 +2,23 @@
 id: axi-docs-en-projects-axi-rules
 title: Axi Rules
 type: project
-status: draft
+status: active
 tags: [Axi Docs, Projects, projects, shared]
 created: 2026-07-22
-modified: 2026-07-22
+modified: 2026-08-08
 graph-title: Axi Rules
 graph-tags: [Projects, projects]
-description: Local authority for Axi agent routing, memory, safety, verification, and generated project/rule indexes, with a React visualization of the memory pipeline.
+description: Axi shared rule and SOP authority. The 2026-08 workbench batch added AR-LIFECYCLE-004/005, AR-VERIFY-004/005, and AR-HANDOFF-006 covering the v3 dual-app workbench posture, dual-lane verification recipe, and docs/rules freshness sync. Total rules now 55 (was 50).
 project:
   id: axi-rules
   partition: projects
   path: /Volumes/code/workspace/projects/axi-rules
   source-section: shared
 ---
+## 2026-08-08 Refresh Note
+
+axi-rules gained six new AR-* rule entries in the 2026-08 workbench follow-up (AR-LIFECYCLE-004/005, AR-VERIFY-004/005, AR-HANDOFF-006). Total rules now 55. Mirror reflects that delta; canonical rule definitions live in projects/axi-rules/rules/*/AGENTS.md.
+
 
 # Axi Rules — Agent Contract
 

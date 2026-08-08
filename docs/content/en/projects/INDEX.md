@@ -4,8 +4,8 @@ title: Workspace Project Dossiers
 type: index
 status: draft
 tags: [Axi Docs, Projects, Index, English]
-created: 2026-07-26
-modified: 2026-07-26
+created: 2026-08-07
+modified: 2026-08-07
 graph-title: Workspace Project Dossiers
 graph-tags: [Projects, Index]
 description: Axi Docs keeps a per-project dossier for every active entry in `WORKSPACE_INDEX.md`. The dossier is generated from the workspace index; re-run `pnpm --dir app projects:build` to refresh it.
@@ -33,7 +33,7 @@ description: Axi Docs keeps a per-project dossier for every active entry in `WOR
 | [Axi Notify / Mobile](./axi-notify-mobile/README.md) | `projects/` | stale |  |  |
 | [Axi Pet](./axi-pet/README.md) | `projects/` | stale |  |  |
 | [Axi Pet Desktop](./axi-pet-desktop/README.md) | `projects/` | unready |  |  |
-| [Axi Workbench](./axi-workbench/README.md) | `projects/` | stale |  |  |
+| [Axi Workbench](./axi-workbench/README.md) | `projects/` | verified |  |  |
 | [体育管理应用](./sports-management/README.md) | `projects/` | stale |  |  |
 
 ## Shared and Infrastructure (7)
@@ -48,7 +48,7 @@ description: Axi Docs keeps a per-project dossier for every active entry in `WOR
 | [Workspace Relationship Graph](./workspace-relationship-graph/README.md) | `infra/` | external-canonical | JSON, Node CLI, MCP stdio | Use before cross-project edits; not a code project or git repo. |
 | [Workspace Dev Services](./workspace-dev-services/README.md) | `infra/` | active | JSON, Node.js, PM2, LaunchAgent | Runtime state lives under `.devsvc`; use the config and wrapper as editable entrypoints. |
 
-## Reference Repos (13)
+## Reference Repos (14)
 
 | Project | Partition | Status | Stack | Notes |
 | --- | --- | --- | --- | --- |
@@ -57,6 +57,7 @@ description: Axi Docs keeps a per-project dossier for every active entry in `WOR
 | [Axi Proxy Companion](./axi-proxy-companion/README.md) | `tools/` | stale |  |  |
 | [Axi Video Downloader](./axi-video-downloader/README.md) | `tools/` | stale |  |  |
 | [IELTS Vocabulary](./ielts-vocab/README.md) | `products/` | stale |  |  |
+| [Story Graph](./story-graph/README.md) | `products/` | verified |  |  |
 | [Cockpit Tools Reference](./cockpit-tools-reference/README.md) | `references/` | reference | Tauri, Vite, TypeScript, Rust | Keep the product name as Cockpit Tools and do not rename it into Axi. |
 | [DBSkill Reference](./dbskill-reference/README.md) | `references/` | reference | Shell, Markdown, Python | Keep as a reference only; do not promote to a workspace-owned product. |
 | [Sub2API Reference](./sub2api-reference/README.md) | `references/` | reference | Go, Vue, PostgreSQL, Redis, Docker | Upstream third-party service repo; not an Axi owner or Axi application. |
@@ -68,4 +69,4 @@ description: Axi Docs keeps a per-project dossier for every active entry in `WOR
 
 ## Total
 
-**28** dossiers under this locale tree。
+**29** dossiers under this locale tree。

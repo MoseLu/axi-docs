@@ -2,10 +2,10 @@
 id: axi-docs-en-projects-dbskill
 title: dbskill — TDD Slice
 type: project
-status: draft
+status: active
 tags: [Axi Docs, Projects, shared, dbskill]
 created: 2026-06-10
-modified: 2026-06-10
+modified: 2026-08-08
 graph-title: dbskill
 graph-tags: [Projects, shared]
 description: Axi Docs TDD slice for the dbskill mirror.
@@ -17,6 +17,9 @@ project:
   mirror-strategy: hand-curated
   reason-not-in-build-script: not listed in WORKSPACE_INDEX.md
 ---
+## 2026-08-08 Refresh Note
+
+Brought forward to match the workbench 2026-08 batch. Frontmatter refreshes `status: draft` -> `status: active`, `modified` -> `2026-08-08`. The body (REQs / Authoritative Documents / current state) keeps its existing content. Canonical project entry remains the project root AGENTS.md; subsequent batches bring the rest of the dossier body in line with each project's latest verified state. See `projects/axi-workbench/docs/audit/2026-08-08-axi-docs-axi-rules-staleness.md` for the cross-project freshness audit that motivated this pass.
 
 # dbskill — TDD Slice
 

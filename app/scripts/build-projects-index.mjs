@@ -664,7 +664,9 @@ async function main() {
   // present in the freshly-parsed list. This lets us keep dbskill /
   // codex-plus-app (and any future hand-curated mirrors) across rebuilds
   // without polluting the handoff snapshot or WORKSPACE_INDEX.md.
-  if (!flags.has('--no-index')) {
+  // A check must be read-only: validation should never create timestamp-only
+  // worktree noise in the generated index.
+  if (!flags.has('--no-index') && !flags.has('--check')) {
     let preserved = [];
     if (await exists(INDEX_JSON)) {
       try {

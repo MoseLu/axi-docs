@@ -17,6 +17,10 @@ export const HANDOFF_MAX_AGE_DAYS = 14;
 export const WORKSPACE_FALLBACK_PATH = '/Volumes/code/workspace/WORKSPACE_INDEX.md';
 
 const WORKSPACE_ROOT_PREFIX = '/Volumes/code/workspace/';
+const EXCLUDED_DOSSIER_PATHS = new Set([
+  '/Volumes/code/workspace/infra/axi-workspace-governance',
+  '/Volumes/code/workspace/infra/axi-registry',
+]);
 
 /**
  * Inferred partition from the project's absolute path. Mirrors the
@@ -86,40 +90,42 @@ export function extractProjectsFromHandoff(snapshot, now = new Date()) {
     throw new Error('handoff snapshot missing projects[] (array)');
   }
   const generatedAt = typeof snapshot.generatedAt === 'string' ? snapshot.generatedAt : null;
-  return snapshot.projects.map((raw) => {
-    requireString(raw.id, 'id');
-    requireString(raw.path, 'path');
-    requireString(raw.name, 'name');
-    requireString(raw.summary, 'summary');
-    requireStringArray(raw.commands?.verify, 'commands.verify');
-    if (typeof raw.readiness !== 'string') {
-      throw new Error(`handoff project ${raw.id} missing readiness (string)`);
-    }
-    if (typeof raw.kind !== 'string') {
-      throw new Error(`handoff project ${raw.id} missing kind (string)`);
-    }
-    if (typeof raw.lifecycle !== 'string') {
-      throw new Error(`handoff project ${raw.id} missing lifecycle (string)`);
-    }
-    const partition = inferPartition(raw.path);
-    const section = inferSection({ kind: raw.kind, lifecycle: raw.lifecycle, partition });
-    return {
-      id: raw.id,
-      name: raw.name,
-      partition,
-      path: raw.path,
-      purpose: raw.summary,
-      stack: '',
-      status: raw.readiness,
-      notes: typeof raw.notes === 'string' ? raw.notes : '',
-      section,
-      kind: raw.kind,
-      lifecycle: raw.lifecycle,
-      verification: raw.commands.verify.join('; '),
-      handoffGeneratedAt: generatedAt,
-      handoffManifestPath: typeof raw.manifestPath === 'string' ? raw.manifestPath : null,
-    };
-  });
+  return snapshot.projects
+    .filter((raw) => !EXCLUDED_DOSSIER_PATHS.has(raw?.path))
+    .map((raw) => {
+      requireString(raw.id, 'id');
+      requireString(raw.path, 'path');
+      requireString(raw.name, 'name');
+      requireString(raw.summary, 'summary');
+      requireStringArray(raw.commands?.verify, 'commands.verify');
+      if (typeof raw.readiness !== 'string') {
+        throw new Error(`handoff project ${raw.id} missing readiness (string)`);
+      }
+      if (typeof raw.kind !== 'string') {
+        throw new Error(`handoff project ${raw.id} missing kind (string)`);
+      }
+      if (typeof raw.lifecycle !== 'string') {
+        throw new Error(`handoff project ${raw.id} missing lifecycle (string)`);
+      }
+      const partition = inferPartition(raw.path);
+      const section = inferSection({ kind: raw.kind, lifecycle: raw.lifecycle, partition });
+      return {
+        id: raw.id,
+        name: raw.name,
+        partition,
+        path: raw.path,
+        purpose: raw.summary,
+        stack: '',
+        status: raw.readiness,
+        notes: typeof raw.notes === 'string' ? raw.notes : '',
+        section,
+        kind: raw.kind,
+        lifecycle: raw.lifecycle,
+        verification: raw.commands.verify.join('; '),
+        handoffGeneratedAt: generatedAt,
+        handoffManifestPath: typeof raw.manifestPath === 'string' ? raw.manifestPath : null,
+      };
+    });
 }
 
 /**

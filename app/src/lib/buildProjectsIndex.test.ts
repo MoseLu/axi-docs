@@ -56,9 +56,10 @@ describe('inferSection', () => {
 })
 
 describe('extractProjectsFromHandoff', () => {
-  it('produces 5 fixture projects with correct section labels (B1)', () => {
+  it('omits dedicated governance and registry surfaces from dossier output (B1)', () => {
     const projects = extractProjectsFromHandoff(loadFixture(), new Date('2026-06-11'))
-    expect(projects).toHaveLength(5)
+    expect(projects).toHaveLength(4)
+    expect(projects.map((project) => project.id)).not.toContain('axi-registry')
     const sections = projects.reduce<Record<string, number>>((acc, p) => {
       acc[p.section] = (acc[p.section] || 0) + 1
       return acc
@@ -66,10 +67,27 @@ describe('extractProjectsFromHandoff', () => {
     // 2 canonical (axi-docs, axi-pet) → core
     // 1 shared-provider (axi-rules) → shared
     // 1 tool (axi-feishu-codex-bridge) → reference
-    // 1 infra (axi-registry) → shared
     expect(sections.core).toBe(2)
-    expect(sections.shared).toBe(2)
+    expect(sections.shared).toBe(1)
     expect(sections.reference).toBe(1)
+  })
+
+  it('omits the workspace-governance mirror when supplied by handoff', () => {
+    const snapshot = loadFixture()
+    snapshot.projects.push({
+      id: 'axi-workspace-governance',
+      name: 'Axi Workspace Governance',
+      path: '/Volumes/code/workspace/infra/axi-workspace-governance',
+      kind: 'axi-workspace-governance',
+      lifecycle: 'active-governance',
+      readiness: 'verified',
+      summary: 'Workspace governance.',
+      commands: { verify: ['pnpm handoff:test'] },
+    })
+
+    const projects = extractProjectsFromHandoff(snapshot, new Date('2026-06-11'))
+
+    expect(projects.map((project) => project.id)).not.toContain('axi-workspace-governance')
   })
 
   it('maps readiness to status and commands.verify to a joined string', () => {

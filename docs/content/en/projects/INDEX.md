@@ -4,8 +4,8 @@ title: Workspace Project Dossiers
 type: index
 status: draft
 tags: [Axi Docs, Projects, Index, English]
-created: 2026-08-08
-modified: 2026-08-08
+created: 2026-08-10
+modified: 2026-08-10
 graph-title: Workspace Project Dossiers
 graph-tags: [Projects, Index]
 description: Axi Docs keeps a per-project dossier for every active entry in `WORKSPACE_INDEX.md`. The dossier is generated from the workspace index; re-run `pnpm --dir app projects:build` to refresh it.
@@ -36,12 +36,11 @@ description: Axi Docs keeps a per-project dossier for every active entry in `WOR
 | [Axi Workbench](./axi-workbench/README.md) | `projects/` | verified |  |  |
 | [体育管理应用](./sports-management/README.md) | `projects/` | stale |  |  |
 
-## Shared and Infrastructure (7)
+## Shared and Infrastructure (6)
 
 | Project | Partition | Status | Stack | Notes |
 | --- | --- | --- | --- | --- |
-| [Axi Local Registry](./axi-registry/README.md) | `infra/` | stale |  |  |
-| [Axi Rules](./axi-rules/README.md) | `projects/` | stale |  |  |
+| [Axi Rules](./axi-rules/README.md) | `projects/` | verified |  |  |
 | [Axi Skills](./axi-skills/README.md) | `shared/` | stale |  |  |
 | [Axi Tauri Starter](./axi-tauri-starter/README.md) | `shared/` | stale |  |  |
 | [Axi UI](./axi-ui/README.md) | `shared/` | verified |  |  |
@@ -69,4 +68,4 @@ description: Axi Docs keeps a per-project dossier for every active entry in `WOR
 
 ## Total
 
-**29** dossiers under this locale tree。
+**28** dossiers under this locale tree。

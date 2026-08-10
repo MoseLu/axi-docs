@@ -1,11 +1,11 @@
 {
-  "generated_at": "2026-08-10T12:19:00.897Z",
+  "generated_at": "2026-08-10T12:24:16.277Z",
   "source": "handoff",
   "handoffSource": true,
   "handoffGeneratedAt": "2026-08-10T12:18:23.506Z",
   "handoffPath": "/Volumes/code/workspace/.workspace/project-handoff.json",
   "handoffMaxAgeDays": 14,
-  "count": 31,
+  "count": 29,
   "preservedAddenda": [
     "codex-plus-app"
   ],
@@ -155,22 +155,6 @@
       "handoffManifestPath": "/Volumes/code/workspace/tools/axi-proxy-companion/docs/project-docs.manifest.json"
     },
     {
-      "id": "axi-registry",
-      "name": "Axi Local Registry",
-      "partition": "infra",
-      "path": "/Volumes/code/workspace/infra/axi-registry",
-      "purpose": "Local-only Verdaccio registry for authenticated publication and local consumption of @axi/* runtime packages.",
-      "stack": "",
-      "status": "stale",
-      "notes": "",
-      "section": "shared",
-      "kind": "infra",
-      "lifecycle": "active-infra",
-      "verification": "node -e \"JSON.parse(require('fs').readFileSync('docs/project-docs.manifest.json','utf8'))\"; for f in README.md README.zh-CN.md AGENTS.md CHANGELOG.md TODO.md MILESTONE.md INDEX.md PRD.md TDD.md; do test -f \"$f\" || exit 1; done",
-      "handoffGeneratedAt": "2026-08-10T12:18:23.506Z",
-      "handoffManifestPath": "/Volumes/code/workspace/infra/axi-registry/docs/project-docs.manifest.json"
-    },
-    {
       "id": "axi-rules",
       "name": "Axi Rules",
       "partition": "projects",
@@ -265,22 +249,6 @@
       "verification": "make verify-go; make verify-helm; pnpm --filter @epap/api-client --filter @axi/workbench-foundation --filter @axi/workbench --filter @axi/workbench-mobile type-check; pnpm --filter @axi/workbench --filter @axi/workbench-mobile test; pnpm --filter @axi/workbench --filter @axi/workbench-mobile build; node apps/workbench/scripts/verify-ui-contracts.mjs; pnpm --filter @axi/workbench-mobile verify:contracts; pnpm check:boundaries",
       "handoffGeneratedAt": "2026-08-10T12:18:23.506Z",
       "handoffManifestPath": "/Volumes/code/workspace/projects/axi-workbench/docs/project-docs.manifest.json"
-    },
-    {
-      "id": "axi-workspace-governance",
-      "name": "Axi Workspace Governance",
-      "partition": "infra",
-      "path": "/Volumes/code/workspace/infra/axi-workspace-governance",
-      "purpose": "Workspace registry, relationship graph, generated catalog, zero-context handoff checks, and governance audit scripts.",
-      "stack": "",
-      "status": "stale",
-      "notes": "",
-      "section": "shared",
-      "kind": "axi-workspace-governance",
-      "lifecycle": "active-governance",
-      "verification": "pnpm handoff:test; pnpm completion:test",
-      "handoffGeneratedAt": "2026-08-10T12:18:23.506Z",
-      "handoffManifestPath": "/Volumes/code/workspace/infra/axi-workspace-governance/docs/project-docs.manifest.json"
     },
     {
       "id": "ielts-vocab",

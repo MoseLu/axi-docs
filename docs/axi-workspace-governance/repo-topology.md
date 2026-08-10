@@ -63,7 +63,7 @@ agent-readable: true
   remote: https://github.com/MoseLu/axi-artboard.git
 - `../../products/ielts-vocab` | IELTS Vocabulary | branch=`dev` | canonical=yes | compliance=`node-monorepo-approved`
   remote: https://github.com/axiomaticworld/ielts-vocab.git
-- `../../products/story-graph` | Story Graph | branch=`dev` | canonical=yes | compliance=`polyrepo-mixed-stack`
+- `../../products/story-graph` | Story Graph | branch=`dev` | canonical=yes | compliance=`node-monorepo-approved`
   remote: https://github.com/MoseLu/story-graph.git
 
 ## Shared

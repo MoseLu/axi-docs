@@ -17,7 +17,7 @@ project:
 ---
 ## 2026-08-07 Refresh Note
 
-Project root `MILESTONE.md` is a builder-friendly stub. Canonical milestone lives at `docs/state/MILESTONE.md` (4 milestones with evidence + exit criteria). Workbench status is currently **verified**, with last verified 2026-08-07.
+Project root `MILESTONE.md` is a builder-friendly stub. Canonical milestone lives at `docs/state/MILESTONE.md` (four milestone records with evidence + exit criteria). Workbench status is currently **verified**, with last verified 2026-08-07.
 
 
 # Axi Workbench — Milestone

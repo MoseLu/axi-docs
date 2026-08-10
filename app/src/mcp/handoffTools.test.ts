@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import * as knowledgeBase from '../lib/knowledgeBase'
-import { getToolSchemas } from './server'
+import { getToolCapability, getToolSchemas } from './server'
 
 afterEach(() => {
   vi.restoreAllMocks()
@@ -13,6 +13,19 @@ const TOOL_NAMES_WITH_HANDOFF = new Set([
 
 function findTool(name: string) {
   return getToolSchemas().find((t) => t.name === name)
+}
+
+async function callTool(name: string, args: Record<string, unknown>, caller: 'human' | 'bounded_agent' = 'human') {
+  const { createServer } = await import('./server')
+  const server = createServer(caller)
+  const handlers = (server as unknown as { _requestHandlers?: Map<string, (req: unknown) => Promise<unknown>> })._requestHandlers
+  expect(handlers).toBeInstanceOf(Map)
+  const handler = handlers!.get('tools/call')
+  expect(handler).toBeDefined()
+  return handler!({ method: 'tools/call', params: { name, arguments: args } }) as Promise<{
+    isError?: boolean
+    content: Array<{ type: string; text: string }>
+  }>
 }
 
 describe('mcp tools: handoff schema', () => {
@@ -37,19 +50,6 @@ describe('mcp tools: handoff / onboard runtime', () => {
   // Reach the registered handler via the SDK's internal Map. The keys are
   // method names ('tools/list', 'tools/call') and the values are functions
   // that accept a fully-formed JSON-RPC request object.
-  async function callTool(name: string, args: Record<string, unknown>) {
-    const { createServer } = await import('./server')
-    const server = createServer()
-    const handlers = (server as unknown as { _requestHandlers?: Map<string, (req: unknown) => Promise<unknown>> })._requestHandlers
-    expect(handlers).toBeInstanceOf(Map)
-    const handler = handlers!.get('tools/call')
-    expect(handler).toBeDefined()
-    return handler!({ method: 'tools/call', params: { name, arguments: args } }) as Promise<{
-      isError?: boolean
-      content: Array<{ type: string; text: string }>
-    }>
-  }
-
   it('project_onboard returns the project handoff card when the project is present (T1)', async () => {
     vi.spyOn(knowledgeBase, 'getProjectHandoffCard').mockResolvedValue({
       state: 'ok',
@@ -171,5 +171,58 @@ describe('mcp tools: handoff / onboard runtime', () => {
     expect(parsed.smoke.enabled).toBe(true)
     expect(parsed.smoke.ran).toBe(false)
     expect(parsed.smoke.output).toContain('no smoke command')
+  })
+})
+
+describe('mcp tools: workflow-first Agent boundary', () => {
+  it('publishes machine-readable read-only/effect annotations', () => {
+    const write = findTool('obsidian_write')
+    const summary = findTool('axi_docs_context_summary')
+    expect(getToolCapability('obsidian_write')).toMatchObject({ access: 'side_effect', agentAllowed: false })
+    expect(getToolCapability('axi_docs_context_summary')).toMatchObject({ access: 'read_only', agentAllowed: true })
+    expect(write?.annotations).toMatchObject({ readOnlyHint: false, destructiveHint: true })
+    expect(write?.xAxiCapability).toMatchObject({ access: 'side_effect', agentAllowed: false })
+    expect(summary?.annotations).toMatchObject({ readOnlyHint: true, destructiveHint: false })
+  })
+
+  it('converts bounded Agent document writes into a workflow approval proposal', async () => {
+    const response = await callTool('obsidian_write', {
+      source: 'obsidian',
+      path: 'agent-output.md',
+      content: '# proposal only',
+      axiExecution: {
+        actor: 'bounded_agent',
+        traceId: 'trace-docs-agent-test',
+        idempotencyKey: 'idempotency-docs-agent-test',
+      },
+    }, 'bounded_agent')
+    const parsed = JSON.parse(response.content[0].text)
+    expect(response.isError).toBe(true)
+    expect(parsed.code).toBe('approval_required')
+    expect(parsed.proposal.action.tool).toBe('obsidian_write')
+    expect(parsed.proposal.actionDigest).toMatch(/^[a-f0-9]{64}$/)
+  })
+
+  it('does not expose raw document read to a bounded Agent', async () => {
+    const response = await callTool('axi_docs_read', {
+      source: 'obsidian',
+      path: 'private.md',
+    }, 'bounded_agent')
+    const parsed = JSON.parse(response.content[0].text)
+    expect(response.isError).toBe(true)
+    expect(parsed.code).toBe('agent_tool_not_allowed')
+  })
+
+  it('returns a versioned fixed context summary for a bounded Agent', async () => {
+    vi.spyOn(knowledgeBase, 'readKnowledgeFile').mockResolvedValue('# Title\n\nA bounded context.')
+    const response = await callTool('axi_docs_context_summary', {
+      source: 'axi-docs',
+      path: 'docs/example.md',
+    }, 'bounded_agent')
+    const parsed = JSON.parse(response.content[0].text)
+    expect(response.isError).not.toBe(true)
+    expect(parsed.contextRef.id).toBe('axi-docs:axi-docs:docs/example.md')
+    expect(parsed.contextRef.version).toMatch(/^[a-f0-9]{64}$/)
+    expect(parsed.summary.excerpt).toContain('bounded context')
   })
 })

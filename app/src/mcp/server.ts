@@ -715,8 +715,166 @@ Return exactly:
 
 // ─── 工具定义 ─────────────────────────────────────────────────────────────────
 
+export type ToolAccessMode = 'read_only' | 'side_effect'
+export type CallerIdentity = 'human' | 'bounded_agent'
+
+export interface ToolCapability {
+  access: ToolAccessMode
+  agentAllowed: boolean
+  description: string
+}
+
+const READ_ONLY_AGENT_TOOL: ToolCapability = {
+  access: 'read_only',
+  agentAllowed: true,
+  description: '只读检索或固定摘要，可由受限 Agent 在有效工作流路由下使用。',
+}
+
+const READ_ONLY_HUMAN_TOOL: ToolCapability = {
+  access: 'read_only',
+  agentAllowed: false,
+  description: '只读原文或开放输出；不向受限 Agent 暴露。',
+}
+
+const EFFECT_TOOL: ToolCapability = {
+  access: 'side_effect',
+  agentAllowed: false,
+  description: '会写入、运行命令或触发外部副作用；受限 Agent 只能提出工作流审批提案。',
+}
+
+/** Machine-readable capability catalogue for task-execution-routing/v1 consumers. */
+export const MCP_TOOL_CAPABILITIES: Record<string, ToolCapability> = {
+  obsidian_scan: READ_ONLY_AGENT_TOOL,
+  obsidian_read: READ_ONLY_HUMAN_TOOL,
+  obsidian_write: EFFECT_TOOL,
+  obsidian_list: READ_ONLY_AGENT_TOOL,
+  obsidian_search: READ_ONLY_AGENT_TOOL,
+  obsidian_fulltext_search: READ_ONLY_AGENT_TOOL,
+  obsidian_write_note: EFFECT_TOOL,
+  knowledge_catalog: READ_ONLY_AGENT_TOOL,
+  knowledge_search: READ_ONLY_AGENT_TOOL,
+  axi_docs_list_sources: READ_ONLY_AGENT_TOOL,
+  axi_docs_search: READ_ONLY_AGENT_TOOL,
+  axi_docs_read: READ_ONLY_HUMAN_TOOL,
+  axi_docs_context_summary: READ_ONLY_AGENT_TOOL,
+  axi_docs_skill_search: READ_ONLY_AGENT_TOOL,
+  axi_docs_workspace_status: READ_ONLY_AGENT_TOOL,
+  axi_docs_project_summary: READ_ONLY_AGENT_TOOL,
+  axi_docs_project_onboard: READ_ONLY_AGENT_TOOL,
+  axi_docs_handoff_check: EFFECT_TOOL,
+  axi_docs_get_tool_capabilities: READ_ONLY_AGENT_TOOL,
+  blinko_list_notes: READ_ONLY_AGENT_TOOL,
+  blinko_read_note: READ_ONLY_HUMAN_TOOL,
+  blinko_write_note: EFFECT_TOOL,
+  blinko_search: READ_ONLY_AGENT_TOOL,
+}
+
+export function getToolCapability(name: string): ToolCapability {
+  // Unknown tools are effects by default, so a future registration cannot
+  // accidentally become available to an Agent without a policy review.
+  return MCP_TOOL_CAPABILITIES[name] ?? EFFECT_TOOL
+}
+
+type ToolCallResult = { content: Array<{ type: 'text'; text: string }>; isError?: boolean }
+
+function asRecord(value: unknown): Record<string, unknown> | null {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : null
+}
+
+function resolveCallerIdentity(defaultIdentity: CallerIdentity, args: Record<string, unknown> | undefined): CallerIdentity {
+  const execution = asRecord(args?.axiExecution)
+  return defaultIdentity === 'bounded_agent' || execution?.actor === 'bounded_agent'
+    ? 'bounded_agent'
+    : 'human'
+}
+
+function canonicalJson(value: unknown): string {
+  if (Array.isArray(value)) return `[${value.map(canonicalJson).join(',')}]`
+  if (value && typeof value === 'object') {
+    return `{${Object.entries(value as Record<string, unknown>)
+      .sort(([left], [right]) => left.localeCompare(right))
+      .map(([key, nested]) => `${JSON.stringify(key)}:${canonicalJson(nested)}`)
+      .join(',')}}`
+  }
+  return JSON.stringify(value)
+}
+
+function actionDigest(action: Record<string, unknown>): string {
+  return crypto.createHash('sha256').update(canonicalJson(action)).digest('hex')
+}
+
+function agentEffectProposal(name: string, args: Record<string, unknown>): ToolCallResult {
+  const execution = asRecord(args.axiExecution)
+  const traceId = typeof execution?.traceId === 'string' ? execution.traceId : ''
+  const idempotencyKey = typeof execution?.idempotencyKey === 'string' ? execution.idempotencyKey : ''
+  if (!traceId || !idempotencyKey) {
+    return {
+      content: [{ type: 'text', text: JSON.stringify({ code: 'workflow_required', message: '受限 Agent 的副作用提案必须携带工作流 traceId 和 idempotencyKey。' }) }],
+      isError: true,
+    }
+  }
+  const actionArguments = { ...args }
+  delete actionArguments.axiExecution
+  const action = { kind: 'axi_docs_tool_effect', tool: name, arguments: actionArguments }
+  const digest = actionDigest(action)
+  return {
+    content: [{
+      type: 'text',
+      text: JSON.stringify({
+        schemaVersion: 'task-execution-routing/v1',
+        code: 'approval_required',
+        proposal: {
+          proposalId: `axi-docs-${digest.slice(0, 24)}`,
+          traceId,
+          idempotencyKey,
+          summary: `Bounded Agent requested ${name}; no document or command was executed.`,
+          action,
+          actionDigest: digest,
+        },
+      }, null, 2),
+    }],
+    isError: true,
+  }
+}
+
+function guardBoundedAgentTool(
+  name: string,
+  args: Record<string, unknown> | undefined,
+  caller: CallerIdentity,
+): ToolCallResult | null {
+  if (resolveCallerIdentity(caller, args) !== 'bounded_agent') return null
+  const capability = getToolCapability(name)
+  if (capability.agentAllowed) return null
+  if (capability.access === 'side_effect') return agentEffectProposal(name, args ?? {})
+  return {
+    content: [{ type: 'text', text: JSON.stringify({ code: 'agent_tool_not_allowed', message: `${name} is not available to a bounded Agent.` }) }],
+    isError: true,
+  }
+}
+
+async function fixedDocumentContextSummary(source: string, filePath: string) {
+  const content = await knowledgeBase.readKnowledgeFile(source, filePath)
+  if (content === null) return null
+  const version = crypto.createHash('sha256').update(content).digest('hex')
+  return {
+    contextRef: {
+      id: `axi-docs:${source}:${filePath}`,
+      version,
+      uri: `axi-docs://${encodeURIComponent(source)}/${filePath.split('/').map(encodeURIComponent).join('/')}`,
+    },
+    summary: {
+      characterCount: content.length,
+      lineCount: content.split('\n').length,
+      excerpt: content.slice(0, 2000),
+      truncated: content.length > 2000,
+    },
+  }
+}
+
 export function getToolSchemas() {
-  return [
+  const tools = [
     {
       name: 'obsidian_scan',
       description: '扫描 Obsidian 知识库的目录，返回文件/文件夹列表',
@@ -984,6 +1142,23 @@ export function getToolSchemas() {
         required: ['project'],
       },
     },
+    {
+      name: 'axi_docs_context_summary',
+      description: '为受限 Agent 返回指定文档的固定长度只读上下文摘要，以及可追溯的 contextRef（id/version/uri）。',
+      inputSchema: {
+        type: 'object',
+        properties: {
+          source: { type: 'string', description: 'source id（必填）' },
+          path: { type: 'string', description: '文档相对路径（必填）' },
+        },
+        required: ['source', 'path'],
+      },
+    },
+    {
+      name: 'axi_docs_get_tool_capabilities',
+      description: '返回每个 Axi Docs MCP 工具的只读/副作用能力标注及受限 Agent 可用性。',
+      inputSchema: { type: 'object', properties: {} },
+    },
     // ── Blinko 工具 ──────────────────────────────────────────────────────────────
     {
       name: 'blinko_list_notes',
@@ -1051,11 +1226,29 @@ export function getToolSchemas() {
       },
     },
   ]
+
+  return tools.map((tool) => {
+    const capability = getToolCapability(tool.name)
+    return {
+      ...tool,
+      annotations: {
+        readOnlyHint: capability.access === 'read_only',
+        destructiveHint: capability.access === 'side_effect',
+        idempotentHint: capability.access === 'read_only',
+      },
+      xAxiCapability: {
+        access: capability.access,
+        agentAllowed: capability.agentAllowed,
+      },
+    }
+  })
 }
 
 // ─── Server 工厂 ────────────────────────────────────────────────────────────────
 
-export function createServer() {
+export function createServer(
+  defaultCaller: CallerIdentity = process.env.AXI_DOCS_CALLER === 'bounded_agent' ? 'bounded_agent' : 'human',
+) {
   const server = new Server(
     { name: 'axi-docs-mcp', version: '1.0.0' },
     { capabilities: { tools: {} } },
@@ -1068,6 +1261,8 @@ export function createServer() {
   server.setRequestHandler(CallToolRequestSchema, async (request) => {
     const { name, arguments: args } = request.params
     try {
+      const guarded = guardBoundedAgentTool(name, args, defaultCaller)
+      if (guarded) return guarded
       switch (name) {
         case 'obsidian_scan': {
           const source = (args?.source as string) || 'obsidian'
@@ -1206,6 +1401,19 @@ export function createServer() {
           const content = await knowledgeBase.readKnowledgeFile(source, filePath)
           if (content === null) return { content: [{ type: 'text', text: `文件不存在: ${source}:${filePath}` }], isError: true }
           return { content: [{ type: 'text', text: content }] }
+        }
+
+        case 'axi_docs_context_summary': {
+          const source = args?.source as string
+          const filePath = args?.path as string
+          if (!source || !filePath) return { content: [{ type: 'text', text: '错误: source 和 path 参数必填' }], isError: true }
+          const summary = await fixedDocumentContextSummary(source, filePath)
+          if (summary === null) return { content: [{ type: 'text', text: `文件不存在: ${source}:${filePath}` }], isError: true }
+          return { content: [{ type: 'text', text: JSON.stringify(summary, null, 2) }] }
+        }
+
+        case 'axi_docs_get_tool_capabilities': {
+          return { content: [{ type: 'text', text: JSON.stringify(MCP_TOOL_CAPABILITIES, null, 2) }] }
         }
 
         case 'axi_docs_skill_search': {
@@ -1363,6 +1571,9 @@ function loadOrCreateToken(): string {
 }
 
 const AUTH_TOKEN = loadOrCreateToken()
+// Agent Platform receives a separate credential. It must never reuse the
+// human/UI token, so the caller identity can be enforced at the MCP boundary.
+const BOUNDED_AGENT_TOKEN = process.env.AXI_DOCS_BOUNDED_AGENT_TOKEN || ''
 
 // ─── 请求安全常量 ──────────────────────────────────────────────────────────
 
@@ -1430,20 +1641,33 @@ function recordAuthSuccess(ip: string): void {
 
 // ─── 认证中间件 ───────────────────────────────────────────────────────────────
 
+function requestToken(req: http.IncomingMessage): string {
+  const authHeader = req.headers.authorization
+  const url = new URL(req.url || '/', `http://${req.headers.host}`)
+  return authHeader?.startsWith('Bearer ')
+    ? authHeader.slice(7)
+    : url.searchParams.get('token') ?? ''
+}
+
+function tokenEquals(token: string, expected: string): boolean {
+  if (!expected) return false
+  const actualDigest = crypto.createHash('sha256').update(token).digest()
+  const expectedDigest = crypto.createHash('sha256').update(expected).digest()
+  return crypto.timingSafeEqual(actualDigest, expectedDigest) && token.length === expected.length
+}
+
+function getHttpCallerIdentity(req: http.IncomingMessage): CallerIdentity | null {
+  const token = requestToken(req)
+  if (tokenEquals(token, BOUNDED_AGENT_TOKEN)) return 'bounded_agent'
+  if (tokenEquals(token, AUTH_TOKEN)) return 'human'
+  return null
+}
+
 function authMiddleware(req: http.IncomingMessage): boolean {
   const ip = getClientIp(req)
   if (isRateLimited(ip)) return false
 
-  const authHeader = req.headers.authorization
-  const url = new URL(req.url || '/', `http://${req.headers.host}`)
-  const token = authHeader?.startsWith('Bearer ')
-    ? authHeader.slice(7)
-    : url.searchParams.get('token') ?? ''
-
-  const ok = crypto.timingSafeEqual(
-    Buffer.from(token.padEnd(64)),
-    Buffer.from(AUTH_TOKEN.padEnd(64)),
-  ) && token.length === AUTH_TOKEN.length
+  const ok = getHttpCallerIdentity(req) !== null
 
   if (ok) { recordAuthSuccess(ip) } else { recordAuthFailure(ip) }
   return ok
@@ -1511,7 +1735,7 @@ async function startHttpServer(port: number) {
         } else if (request.method === 'tools/call') {
           // 手动处理 tools/call，因为 MCP SDK 的 HTTP 传输需要额外依赖
           const { name, arguments: args } = request.params
-          const result = await handleToolCall(name, args || {})
+          const result = await handleToolCall(name, args || {}, getHttpCallerIdentity(req) ?? 'human')
           const response = { jsonrpc: '2.0', id, result }
           res.end(JSON.stringify(response))
         } else {
@@ -1590,6 +1814,16 @@ async function startHttpServer(port: number) {
           case 'write': {
             if (!filePath) throw new Error('path 参数必填')
             const payload = JSON.parse(await readBody(req))
+            const guarded = guardBoundedAgentTool(
+              'obsidian_write',
+              { source, path: filePath, content: payload.content || '', axiExecution: payload.axiExecution },
+              getHttpCallerIdentity(req) ?? 'human',
+            )
+            if (guarded) {
+              statusCode = 409
+              result = guarded.content[0].text
+              break
+            }
             const writeResult = await writeFile(source, filePath, payload.content || '')
             if (!writeResult.success) {
               statusCode = 400
@@ -1723,7 +1957,7 @@ async function startHttpServer(port: number) {
   httpServer.listen(port, bindAddress, () => {
     console.error(`[axi-docs-mcp] HTTP 服务已启动: http://${bindAddress}:${port}`)
     console.error(`[axi-docs-mcp] 健康检查: http://${bindAddress}:${port}/health`)
-    console.error(`[axi-docs-mcp] 访问 token: ${AUTH_TOKEN}`)
+    console.error('[axi-docs-mcp] 访问 token 已配置（值已脱敏，不写入日志）')
     console.error(`[axi-docs-mcp] MCP JSON-RPC: http://${bindAddress}:${port}/mcp`)
     console.error(`[axi-docs-mcp] REST API:     http://${bindAddress}:${port}/api/scan`)
   })
@@ -1732,7 +1966,13 @@ async function startHttpServer(port: number) {
 }
 
 // 手动处理工具调用（HTTP 模式下绕过 MCP SDK 的 transport）
-async function handleToolCall(name: string, args: Record<string, unknown>) {
+async function handleToolCall(
+  name: string,
+  args: Record<string, unknown>,
+  defaultCaller: CallerIdentity = 'human',
+) {
+  const guarded = guardBoundedAgentTool(name, args, defaultCaller)
+  if (guarded) return guarded
   switch (name) {
     case 'obsidian_scan': {
       const source = (args.source as string) || 'obsidian'
@@ -1816,6 +2056,17 @@ async function handleToolCall(name: string, args: Record<string, unknown>) {
       const content = await knowledgeBase.readKnowledgeFile(source, filePath)
       if (content === null) return { content: [{ type: 'text', text: `文件不存在: ${source}:${filePath}` }], isError: true }
       return { content: [{ type: 'text', text: content }] }
+    }
+    case 'axi_docs_context_summary': {
+      const source = args.source as string
+      const filePath = args.path as string
+      if (!source || !filePath) return { content: [{ type: 'text', text: '错误: source 和 path 参数必填' }], isError: true }
+      const summary = await fixedDocumentContextSummary(source, filePath)
+      if (summary === null) return { content: [{ type: 'text', text: `文件不存在: ${source}:${filePath}` }], isError: true }
+      return { content: [{ type: 'text', text: JSON.stringify(summary, null, 2) }] }
+    }
+    case 'axi_docs_get_tool_capabilities': {
+      return { content: [{ type: 'text', text: JSON.stringify(MCP_TOOL_CAPABILITIES, null, 2) }] }
     }
     case 'axi_docs_skill_search': {
       const query = args.query as string

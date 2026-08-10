@@ -71,6 +71,9 @@ Axi Docs 是 **「文档枢纽 + 知识图谱 + MCP 文档总线 + 工作区项�
 - **不假装是源**：`docs/axi-workspace-governance/*` 是只读镜像，对它的「修改」应回写到 `infra/axi-workspace-governance/`，然后重新生成镜像。
 - **可消费**：通过 workspace graph（`workspace-project`）查询 `axi-docs` 的 `consumes` / `consumers` / `provides` / `contracts`；不要在业务代码里硬编码跨项目绝对路径。
 - **可被消费**：本项目以 MCP 工具 `axi_docs_*`、Web 前端构建产物、知识图谱 JSON 形式对外提供文档能力；下游消费者（其他项目、AI 代理、CC-Connect）应通过这些契约入口接入。
+- **受限 Agent 消费者**：按 `task-execution-routing/v1` 使用专用身份，只能取得标注的
+  只读、版本化上下文；任何文档写入必须返回副作用提案并交由 Workbench 审批，不能通过
+  MCP 或 REST 直写旁路。人工 UI/MCP 的授权路径保持原样。
 
 ---
 

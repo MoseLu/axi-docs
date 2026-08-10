@@ -4,14 +4,14 @@ title: Axi Workspace ADR Index
 type: reference
 status: evergreen
 tags: [workspace, adr, governance]
-created: 2026-08-07
-modified: 2026-08-07
+created: 2026-08-10
+modified: 2026-08-10
 agent-readable: true
 ---
 
 # Axi Workspace ADR Index
 
-最后生成：2026-08-07
+最后生成：2026-08-10
 
 ## ADR 列表
 
@@ -19,6 +19,7 @@ agent-readable: true
 - [ADR-002-progressive-repository-naming-policy](ADR-002-progressive-repository-naming-policy.md)
 - [ADR-003-workspace-root-is-non-git-container](ADR-003-workspace-root-is-non-git-container.md)
 - [ADR-004-apm-agent-context-package-layer](ADR-004-apm-agent-context-package-layer.md)
+- [ADR-005-workflow-first-bounded-agent](ADR-005-workflow-first-bounded-agent.md)
 
 ## 约束
 

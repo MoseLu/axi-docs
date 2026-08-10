@@ -16,6 +16,9 @@ not versioned.
 ## [Unreleased]
 
 ### Added
+- 2026-08-10: MCP 工具能力现按 `task-execution-routing/v1` 标注只读/副作用。
+  受限 Agent 只能获取带 SHA-256 版本引用的固定上下文摘要；原始读取、未知工具和
+  所有写入均拒绝或转换为 `approval_required` 副作用提案，人工 UI/MCP 授权不变。
 - 2026-07-22: 全量重建 `docs/content/{en,zh}/projects/` 下 17 个 handoff 项目档案
   （axi-agent-platform、axi-workbench、axi-skills、axi-registry、axi-pet 等，除
   已单独刷新的 axi-ui 外的全部 handoff 项目）。旧片段停留在 2026-06-10/06-11

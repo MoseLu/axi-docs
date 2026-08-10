@@ -138,6 +138,18 @@
         "source": "app/.env or process environment; generated locally when omitted"
       },
       {
+        "name": "AXI_DOCS_BOUNDED_AGENT_TOKEN",
+        "required": false,
+        "secret": true,
+        "source": "app/.env or process environment; required when a bounded Agent MCP identity is enabled"
+      },
+      {
+        "name": "AXI_DOCS_CALLER",
+        "required": false,
+        "secret": false,
+        "source": "app/.env or process environment; defaults to human"
+      },
+      {
         "name": "ALLOWED_ORIGINS",
         "required": false,
         "secret": false,
@@ -161,13 +173,15 @@
     "provides": [
       "Axi Docs web reader",
       "axi_docs_* MCP document tools",
+      "Versioned read-only context and approval-only effect proposals for bounded Agents",
       "Knowledge graph and document-source adapters",
       "Generated workspace project dossier mirrors"
     ],
     "consumes": [
       "Workspace project metadata",
       "Locked Axi Skills documentation source",
-      "Configured Obsidian, Blinko, dbskill, and extra documentation sources"
+      "Configured Obsidian, Blinko, dbskill, and extra documentation sources",
+      "task-execution-routing/v1 governance contract"
     ],
     "files": [
       "docs/project-docs.manifest.json",
@@ -175,7 +189,8 @@
       "docs/projects.index.json",
       "app/src/config/documentSources.ts",
       "app/src/lib/knowledgeBase.ts",
-      "app/src/mcp/server.ts"
+      "app/src/mcp/server.ts",
+      "app/src/mcp/handoffTools.test.ts"
     ]
   },
   "currentWork": {

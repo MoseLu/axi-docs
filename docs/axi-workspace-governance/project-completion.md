@@ -4,14 +4,14 @@ title: Axi Workspace Project Completion
 type: reference
 status: evergreen
 tags: [workspace, completion, status]
-created: 2026-08-07
-modified: 2026-08-07
+created: 2026-08-10
+modified: 2026-08-10
 agent-readable: true
 ---
 
 # Axi Workspace Project Completion
 
-最后生成：2026-08-07
+最后生成：2026-08-10
 
 ## 摘要
 
@@ -49,7 +49,7 @@ agent-readable: true
 | `axi-pet-desktop` | 未评估 | 高 | partial | Root AGENTS.md, docs/HANDOFF.md, root CHANGE.md written on 2026-06-19.<br>infra/axi-workspace-governance/workspace.json has axi-pet-desktop entry.<br>... | Add GitHub remote + .github/workflows/* CI lane (P1, owner-approved).<br>Lock contract package version-sync workflow with axi-pet (P1).<br>... |
 | `axi-proxy-companion` | 未评估 | 低 | partial | docs:partial<br>handoff:stale<br>... | 补齐 VERIFICATION.md：verify 命令已声明但缺沉淀位置。运行 `node bin/axi-todo.mjs verify-log` 或 workspace-verification.mjs 生成。 |
 | `axi-registry` | 可用 | 中 | partial | Workspace graph registers registry health verification.<br>Axi UI declares the registry as its package distribution boundary.<br>... | Keep registry health visible when shared packages are published or consumed.<br>补齐 VERIFICATION.md：verify 命令已声明但缺沉淀位置。运行 `node bin/axi-todo.mjs verify-log` 或 workspace-verification.mjs 生成。 |
-| `axi-rules` | 未评估 | 低 | partial | docs:partial<br>handoff:stale<br>... | - |
+| `axi-rules` | 未评估 | 低 | partial | docs:partial<br>handoff:verified<br>... | - |
 | `axi-skills` | 可用 | 中 | ready | Repository verifier covers skill entrypoints, logical names, forbidden runtime artifacts, and generated index output.<br>i18n verifier protects the English runtime source while tracking translation batch coverage.<br>... | Keep the generated skill index and i18n batch manifest synchronized after skill catalog changes. |
 | `axi-tauri-starter` | 未评估 | 低 | partial | docs:partial<br>handoff:stale<br>... | 补齐 VERIFICATION.md：verify 命令已声明但缺沉淀位置。运行 `node bin/axi-todo.mjs verify-log` 或 workspace-verification.mjs 生成。 |
 | `axi-ui` | 可用 | 中 | partial | Workspace verify covers file-line guard, typecheck, and tests.<br>Axi Coder and dashboard surfaces consume linked @axi packages.<br>... | Continue additive package hardening without breaking @axi/* style/runtime contracts. |

@@ -95,6 +95,18 @@ Axi Docs 是一个文档同步与查看平台，提供以下功能：
 - 支持认证 Token 验证（生产环境）
 - 提供健康检查端点 `/health`
 
+#### Workflow-first 受限 Agent 身份
+
+- `bounded_agent` 是独立调用身份，必须使用
+  `AXI_DOCS_BOUNDED_AGENT_TOKEN`；不得复用人工/UI 的 `MCP_AUTH_TOKEN`。
+- 该身份只能调用能力目录标为 `read_only` 且 `agentAllowed=true` 的 MCP
+  工具，取得带内容哈希版本的 `contextRef`；原始文档读取和未知工具默认拒绝。
+- 该身份请求 `obsidian_write`、`blinko_*` 写入或其他副作用时，服务只返回
+  `task-execution-routing/v1` 的 `approval_required` 副作用提案及精确
+  `actionDigest`，绝不直接落盘或调用外部写接口。
+- 人工 MCP/UI 的既有授权路径不因该 Agent 约束而改变；跨项目控制流由
+  Workbench durable approval 的 `APPROVED_EFFECT` 持有。
+
 ### 3. 组件库 (`src/components/`)
 
 **职责**：UI 组件，支持可复用和组合
@@ -246,6 +258,8 @@ pnpm preview
 | `BLINKO_URL` | `http://localhost:1111` | Blinko 服务地址 |
 | `BLINKO_TOKEN` | 空 | Blinko API Token |
 | `MCP_AUTH_TOKEN` | 自动生成 | MCP 访问 Token |
+| `AXI_DOCS_BOUNDED_AGENT_TOKEN` | 空 | 受限 Agent 专用 MCP 身份凭证 |
+| `AXI_DOCS_CALLER` | `human` | 进程默认调用身份；部署中由专用 Token 识别 Agent |
 | `ANTHROPIC_API_KEY` | 空 | Anthropic API Key |
 
 ---

@@ -1,6 +1,6 @@
 {
   "schemaVersion": "2026-06-11",
-  "generatedAt": "2026-08-10T12:18:23.506Z",
+  "generatedAt": "2026-08-15T02:09:49.406Z",
   "source": "infra/axi-workspace-governance/workspace.json",
   "summary": {
     "total": 20,
@@ -24,7 +24,7 @@
       "graphId": "axi-agent-platform",
       "graphMatched": true,
       "errors": [
-        "verification is stale: 53 days old (max 30)"
+        "verification is stale: 58 days old (max 30)"
       ],
       "warnings": [
         "documents.verification references docs/state/VERIFICATION.md but the file does not exist at /Volumes/code/workspace/projects/axi-agent-platform/docs/state/VERIFICATION.md"
@@ -121,7 +121,7 @@
       "graphMatched": true,
       "errors": [
         "readOrder must contain at most 5 item(s)",
-        "verification is stale: 53 days old (max 30)"
+        "verification is stale: 58 days old (max 30)"
       ],
       "warnings": [],
       "summary": "Workspace documentation hub combining a React reader, knowledge-source adapters, knowledge graph, MCP document bus, and generated project dossier mirrors.",
@@ -180,7 +180,7 @@
         "currentWork.todo path does not exist: TODO.md",
         "currentWork.milestone path does not exist: MILESTONE.md",
         "decisions.changelog path does not exist: CHANGELOG.md",
-        "verification is stale: 53 days old (max 30)"
+        "verification is stale: 58 days old (max 30)"
       ],
       "warnings": [
         "documents.verification references docs/state/VERIFICATION.md but the file does not exist at /Volumes/code/workspace/tools/axi-feishu-codex-bridge/docs/state/VERIFICATION.md"
@@ -286,7 +286,7 @@
       "errors": [
         "currentWork.todo path does not exist: TODO.md",
         "currentWork.milestone path does not exist: MILESTONE.md",
-        "verification is stale: 53 days old (max 30)"
+        "verification is stale: 58 days old (max 30)"
       ],
       "warnings": [
         "documents.verification references VERIFICATION.md but the file does not exist at /Volumes/code/workspace/projects/axi-notify/VERIFICATION.md"
@@ -349,7 +349,7 @@
         "readOrder[4] path does not exist: TDD.md",
         "currentWork.todo path does not exist: TODO.md",
         "currentWork.milestone path does not exist: MILESTONE.md",
-        "verification is stale: 60 days old (max 30)"
+        "verification is stale: 65 days old (max 30)"
       ],
       "warnings": [
         "documents.verification references docs/state/VERIFICATION.md but the file does not exist at /Volumes/code/workspace/projects/axi-pet/docs/state/VERIFICATION.md"
@@ -438,7 +438,7 @@
         "readOrder[4] path does not exist: PRD.md",
         "currentWork.todo path does not exist: TODO.md",
         "currentWork.milestone path does not exist: MILESTONE.md",
-        "verification is stale: 53 days old (max 30)"
+        "verification is stale: 58 days old (max 30)"
       ],
       "warnings": [
         "documents.verification references docs/state/VERIFICATION.md but the file does not exist at /Volumes/code/workspace/tools/axi-proxy-companion/docs/state/VERIFICATION.md"
@@ -497,7 +497,7 @@
         "readOrder[4] path does not exist: PRD.md",
         "currentWork.todo path does not exist: TODO.md",
         "currentWork.milestone path does not exist: MILESTONE.md",
-        "verification is stale: 53 days old (max 30)"
+        "verification is stale: 58 days old (max 30)"
       ],
       "warnings": [
         "documents.verification references docs/state/VERIFICATION.md but the file does not exist at /Volumes/code/workspace/infra/axi-registry/docs/state/VERIFICATION.md"
@@ -602,7 +602,7 @@
         "readOrder[4] path does not exist: MILESTONE.md",
         "currentWork.todo path does not exist: TODO.md",
         "currentWork.milestone path does not exist: MILESTONE.md",
-        "verification is stale: 53 days old (max 30)"
+        "verification is stale: 58 days old (max 30)"
       ],
       "warnings": [],
       "summary": "Shared version-controlled skill catalog for Codex, Claude, Cursor, MiniMax, and compatible Axi agent runtimes, with verifier-backed runtime and i18n contracts.",
@@ -658,7 +658,7 @@
         "currentWork.todo path does not exist: TODO.md",
         "currentWork.milestone path does not exist: MILESTONE.md",
         "decisions.changelog path does not exist: CHANGELOG.md",
-        "verification is stale: 53 days old (max 30)"
+        "verification is stale: 58 days old (max 30)"
       ],
       "warnings": [
         "documents.verification references docs/state/VERIFICATION.md but the file does not exist at /Volumes/code/workspace/shared/axi-tauri-starter/docs/state/VERIFICATION.md"
@@ -761,7 +761,7 @@
         "readOrder[4] path does not exist: PRD.md",
         "currentWork.todo path does not exist: TODO.md",
         "currentWork.milestone path does not exist: MILESTONE.md",
-        "verification is stale: 53 days old (max 30)"
+        "verification is stale: 58 days old (max 30)"
       ],
       "warnings": [],
       "summary": "Local Python tool that coordinates a Flask UI, Android device automation, mitmproxy capture, downloads, and SQLite tracking for personal-device video capture.",
@@ -876,7 +876,7 @@
       "graphId": "axi-workspace-governance",
       "graphMatched": true,
       "errors": [
-        "verification is stale: 53 days old (max 30)"
+        "verification is stale: 58 days old (max 30)"
       ],
       "warnings": [
         "documents.verification is missing; run `pnpm workspace:docs:sync` to add `VERIFICATION.md` to the manifest"
@@ -927,7 +927,7 @@
         "readOrder[4] path does not exist: TDD.md",
         "currentWork.todo path does not exist: TODO.md",
         "currentWork.milestone path does not exist: MILESTONE.md",
-        "verification is stale: 53 days old (max 30)"
+        "verification is stale: 58 days old (max 30)"
       ],
       "warnings": [
         "documents.verification references docs/state/VERIFICATION.md but the file does not exist at /Volumes/code/workspace/products/ielts-vocab/docs/state/VERIFICATION.md"
@@ -982,7 +982,7 @@
         "readOrder[4] path does not exist: TDD.md",
         "currentWork.todo path does not exist: TODO.md",
         "currentWork.milestone path does not exist: MILESTONE.md",
-        "verification is stale: 53 days old (max 30)"
+        "verification is stale: 58 days old (max 30)"
       ],
       "warnings": [],
       "summary": "Quasar and Vue 3 sports-management application skeleton with Pinia, Vue Router, Vue I18n, and a Capacitor Android wrapper; the backend directory is only a placeholder.",

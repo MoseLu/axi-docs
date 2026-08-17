@@ -299,4 +299,49 @@ pnpm preview
 
 ---
 
-*最后更新：2026-03-26*
+*最后更新：2026-03-26；2026-08-08 增 Gotchas 章节*
+
+---
+
+## Gotchas（踩过的坑）
+
+### `docs/projects.index.json` 是生成产物，不可手改
+
+`docs/projects.index.json` 与 `docs/content/{en,zh}/projects/<id>/*.md` 全部由
+`scripts/build-projects-index.mjs` 从
+`/Volumes/code/workspace/.workspace/project-handoff.json`（首选）和
+`/Volumes/code/workspace/WORKSPACE_INDEX.md`（兜底）自动重建。
+
+**严禁**：
+
+- `Edit` / `Write` `docs/projects.index.json` 的 `projects` 数组 — 下一次
+  `pnpm --dir app projects:build` 会按 handoff 真源整列冲掉。
+- 直接 `rm -rf docs/content/{en,zh}/projects/<id>/` 删除 dossier — `projects:build`
+  会基于 `preservedAddenda` 字段（status 含 `hand-curated` 字面量）尝试恢复，
+  或在 handoff 中含该 id 时再次生成。
+
+**正确路径**：
+
+- 增删 dossier → 改 handoff 生成器
+  (`infra/axi-workspace-governance/scripts/project-handoff.mjs`)；
+  或改 build script 里的"显式 skip"清单（如 `axi-workspace-governance` /
+  `axi-registry` 在 `scripts/build-projects-index.mjs:228-229`）。
+- 改 dossier 内容（描述/状态/技术栈）→ 改项目根 `AGENTS.md` / `README.md`，
+  重新跑 `pnpm --dir app projects:build` 让 dossier 重建。
+- 仅"逃生口"项目（无任何项目根门面，如 `codex-plus-app`）需手工维护 dossier —
+  此时把 dossier 加进 `preservedAddenda`，并在文件 frontmatter 中显式标
+  `status: hand-curated`，避免被无差别冲掉。
+
+### `axi-workspace-governance` 永远不在 `projects.index.json`
+
+`scripts/build-projects-index.mjs:228` 显式 skip 该项目（连同 `axi-registry`），
+因为它的展示面是 `docs/axi-workspace-governance/` 镜像目录，不是 dossier 总表。
+**不要**把它加回 `projects.index.json` —— 下一次 build 会再次冲掉。如需在
+dossier 总表出现，需改 build script（默认不改）。
+
+### handoff 优先于 `WORKSPACE_INDEX.md`
+
+`build-projects-index.mjs` 走"handoff 优先"策略：从
+`/Volumes/code/workspace/.workspace/project-handoff.json` 解析 19 项 active Axi
+项目，再从 `WORKSPACE_INDEX.md` 联合 references 与 virtual 项目（标
+`supplementary: true`）。如果两源对同一项目说法冲突，以 handoff 为准。

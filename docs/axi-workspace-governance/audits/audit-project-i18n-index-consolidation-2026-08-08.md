@@ -122,6 +122,16 @@
 | **P2** | `dbskill/` zh 端多 `README.zh-CN.md` 而 en 端缺 | 补 en 端 `README.zh-CN.md` | ✅ 已自动满足（P0.2 删除孤儿 `dbskill/` 后，原本的不一致随之消失；`dbskill-reference/` 双侧已完整镜像） |
 | **P3** | `INDEX.md` Total 数字未说明 hand-curated addendum | 注释或扩写为 "29 auto-generated + 1 hand-curated (`dbskill`) + 1 placeholder (`codex-plus-app`) = 30" | ✅ 已完成（zh + en 双侧 INDEX.md 末段改为 "**30** dossiers：29 auto + 1 hand-curated placeholder (`codex-plus-app`)"） |
 
+## 4.3 经验已沉淀
+
+2026-08-08 实施时踩到的关键陷阱——`projects.json` / `projects.index.json` 是生成产物不可手改——已写入 `projects/axi-docs/app/AGENTS.md` 末尾的 **Gotchas（踩过的坑）** 章节（3 个子条目）：
+
+1. `docs/projects.index.json` 是生成产物，不可手改（含严禁动作清单 + 正确路径 + `axi-workspace-governance` 显式 skip 说明）。
+2. `axi-workspace-governance` 永远不在 `projects.index.json`（解释 build script 第 228 行）。
+3. handoff 优先于 `WORKSPACE_INDEX.md`（解释双源合并策略）。
+
+`axi-rules` 自带的 `AGENTS.md` 早在第 192–194 行就有等价 Gotcha（"index/projects.json is generated. Do not hand-edit them"），无需补充。
+
 ## 4.1 实施新增项
 
 为支持上述修复，对 `projects/axi-rules/scripts/build-index.py` 做了 3 项小改动（`make rules-build` 自动重新生成 `index/projects.json`，`make rules-validate` 已通过）：

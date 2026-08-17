@@ -6,8 +6,8 @@
 | ID | 标题 | 严重度 | Guard 命令 | 状态 | 触发场景 |
 |----|------|--------|------------|------|----------|
 | [R001](R001-no-fragmented-commits.md) | 不允许把单个 feature 拆成多个并列 commit | must-follow | `pnpm --dir app rule:check-fragmented-commits` | active | `git commit` 时 staged 文件跨 ≥3 个根目录 |
-| [R002](R002-naming-singular-plural.md) | 命名漂移:同一概念必须使用同一单词(单复数一致) | must-follow | `pnpm --dir app rule:check-naming-drift` | active | 任意代码 / 文档 / 配置写入 |
-| [R003](R003-mcp-log-dir-must-match.md) | MCP 读端与 launcher 写端必须共享日志目录常量 | must-follow | `pnpm --dir app rule:check-mcp-log-dir` | active | 任意 MCP 日志路径相关代码改动 |
+| R002 | (pending — 命名漂移:同一概念必须使用同一单词) | must-follow | `pnpm --dir app rule:check-naming-drift` | pending | (commit 3 落地) |
+| R003 | (pending — MCP 读端与 launcher 写端必须共享日志目录常量) | must-follow | `pnpm --dir app rule:check-mcp-log-dir` | pending | (commit 3 落地) |
 
 ## 状态枚举
 

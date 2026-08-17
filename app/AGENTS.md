@@ -299,7 +299,20 @@ pnpm preview
 
 ---
 
-*最后更新：2026-03-26；2026-08-08 增 Gotchas 章节*
+*最后更新：2026-03-26；2026-08-08 增 Gotchas 章节；2026-08-17 增 Rules reminder*
+
+---
+
+## Rules reminder
+
+> 本节列出当前生效的 R-NNN 约束(详见 `docs/rules/`)。每条带守卫命令,
+> 违反即在 `pnpm --dir app verify` 链退出 1。
+
+- [R001](docs/rules/R001-no-fragmented-commits.md) — 不允许把单个 feature 拆成多个并列 commit
+- [R002](docs/rules/R002-naming-singular-plural.md) — 命名漂移:同一概念必须使用同一单词(单复数一致)
+- [R003](docs/rules/R003-mcp-log-dir-must-match.md) — MCP 读端与 launcher 写端必须共享日志目录常量
+
+完整列表与新增流程见 [`docs/rules/README.md`](docs/rules/README.md)。
 
 ---
 

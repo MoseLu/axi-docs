@@ -16,6 +16,17 @@ not versioned.
 ## [Unreleased]
 
 ### Added
+- 2026-08-17: 新增 `docs/rules/` 约束性经验日志模块,承载可被 hook 拦截的硬规则
+  (区别于 ERROR.md 的结构化 RCA 与 submit/ 的 per-commit 流水)。
+  首版落地 R001(不允许把单个 feature 拆成多个并列 commit)、
+  R002(命名漂移:同一概念必须使用同一单词)、
+  R003(MCP 读端与 launcher 写端必须共享日志目录常量)三条约束,
+  配套 `app/scripts/check-{fragmented-commits,naming-drift,mcp-log-dir}.mjs`
+  守卫脚本,接入 `pnpm --dir app rule:check` 与 `pnpm --dir app verify` 链。
+  新增 `app/scripts/lint-rules-doc.mjs` 校验 R-NNN 结构与 INDEX 对齐,
+  接入 `pnpm --dir app governance:check`。在根级 `app/AGENTS.md` 顶部加
+  Rules reminder;`docs/project-docs.manifest.json` 的 `documents.rules`
+  与 `commands.verify.rule:check` 已同步登记。
 - 2026-08-10: MCP 工具能力现按 `task-execution-routing/v1` 标注只读/副作用。
   受限 Agent 只能获取带 SHA-256 版本引用的固定上下文摘要；原始读取、未知工具和
   所有写入均拒绝或转换为 `approval_required` 副作用提案，人工 UI/MCP 授权不变。

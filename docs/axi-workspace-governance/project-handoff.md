@@ -1,6 +1,6 @@
 # Workspace Project Handoff Readiness
 
-Generated: 2026-08-15T02:09:49.406Z
+Generated: 2026-08-17T02:38:25.812Z
 
 - Total: 20
 - Verified: 5
@@ -20,7 +20,7 @@ Generated: 2026-08-15T02:09:49.406Z
 | `axi-pet-desktop` | unready | 0/10 | - | - |
 | `axi-proxy-companion` | stale | 10/10 | 2026-06-18 | Keep the zero-context manifest aligned with backend definitions, local ports, runtime paths, and secret boundaries. |
 | `axi-registry` | stale | 10/10 | 2026-06-18 | Keep the zero-context manifest aligned with actual commands and package contracts. |
-| `axi-rules` | verified | 10/10 | 2026-08-10 | Ship and harden scripts/handoff-workflow.py as the AR-HANDOFF-004 mechanical gate. |
+| `axi-rules` | verified | 10/10 | 2026-08-17 | Ship and harden scripts/handoff-workflow.py as the AR-HANDOFF-004 mechanical gate. |
 | `axi-skills` | stale | 10/10 | 2026-06-18 | Keep the shared skill catalog free of runtime artifacts, caches, secrets, and nested repository state. |
 | `axi-tauri-starter` | stale | 10/10 | 2026-06-18 | Keep the root documentation suite current. |
 | `axi-ui` | verified | 10/10 | 2026-07-23 | Own the canonical Black Gold preset in @axi/tokens and @axi/core. |

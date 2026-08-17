@@ -53,7 +53,8 @@
     ],
     "verify": [
       "pnpm --dir app verify",
-      "pnpm --dir app test:run"
+      "pnpm --dir app test:run",
+      "pnpm --dir app rule:check"
     ],
     "smoke": [
       "pnpm --dir app docs:check",
@@ -244,6 +245,7 @@
     "securityZh": "docs/governance/SECURITY.zh-CN.md",
     "error": "docs/state/ERROR.md",
     "errorZh": "docs/state/ERROR.zh-CN.md",
+    "rules": "docs/rules/INDEX.md",
     "manifest": "docs/project-docs.manifest.json",
     "verification": "docs/state/VERIFICATION.md",
     "planningIndex": "plans/README.md",

@@ -1,7 +1,7 @@
 # 当前架构 backlog（Zero-context handoff follow-up）
 
-> 来源：`TODO.md` 历史 ZC-DOCS-001 ~ ZC-DOCS-005。
-> 状态复核日期：2026-06-11
+> 来源：`TODO.md` 历史 ZC-DOCS-001 ~ ZC-DOCS-006。
+> 状态复核日期：2026-08-17
 > 依赖：`infra/axi-workspace-governance` 的 `.workspace/project-handoff.json` 生成契约。
 
 本文件是当前真实架构缺口的统一目录；`TODO.md` 的 facade 链接到这里。每个 P0/P1 任务都包含 Problem、Solution、Expected Result、Acceptance、Evidence、Dependencies、Status 七字段，新 Agent 可以独立领取、验证和关闭。
@@ -143,3 +143,55 @@ Evidence:
 
 Dependencies:
 - 无。
+
+---
+
+## ZC-DOCS-006 | 新增约束性经验日志模块 (docs/rules/)
+
+Priority: P1
+Status: COMPLETED (2026-08-17, commits: be2f11d / f30e779 / c9d5df5 / <commit-4>)
+
+Problem:
+工作区里多个项目反复踩同一类坑(axi-ui 提交拆分过细触发 hook 驳回;
+ielts-vocab `mac-app`/`mac-apps` 单复数漂移导致 MCP `get_logs` 读不到日志),
+但目前缺一个**约束性**(do / don't)而非文档性(叙事 / 复盘)的统一沉淀点。
+`docs/state/ERROR.md` 是结构化 RCA,门槛偏高;`app/AGENTS.md` 的 Gotchas
+章节只承载 app/ 包内踩坑;`docs/logs/submit/` 是 per-commit 流水。
+
+Solution:
+在 axi-docs 项目内新增 `docs/rules/` 模块,每条约束以单文件 Markdown 存在,
+带结构化字段(Trigger / Constraint / Guard / Evidence / Related),
+配对一个 `pnpm --dir app rule:check-<id>` Node 校验脚本,接入
+`pnpm --dir app verify` 链,违反即 exit 1 + 给出修复路径。
+编号沿用 R-NNN(独立于 axi-rules 的 AR-*,避免 governance 影响面)。
+新增 `app/scripts/lint-rules-doc.mjs` 仿 `lint-error-doc.mjs` 的 5 段校验,
+接入 `pnpm --dir app governance:check`。
+
+Acceptance:
+- [x] `docs/rules/{README.md, INDEX.md, _template.md}` 存在,README 说明如何新增规则、如何接入 verify。
+- [x] R001 / R002 / R003 落地,各有 Trigger / Constraint / Guard / Evidence / Related 5 段。
+- [x] `app/scripts/check-{fragmented-commits, naming-drift, mcp-log-dir}.mjs` 三个守卫脚本,
+      每个可独立 `pnpm rule:check-<id>` 跑通(正向 exit 0,负向 exit 1)。
+- [x] `app/scripts/run-all-rule-checks.mjs` 从 INDEX.md 自动调度全部 R-NNN,
+      接入 `pnpm rule:check`。
+- [x] `pnpm --dir app rules-doc:lint` 校验 R-NNN 结构、frontmatter 必填字段、INDEX 对齐。
+- [x] `pnpm --dir app governance:check` 含 `rules-doc:lint`。
+- [x] `docs/project-docs.manifest.json.documents.rules` 与 `commands.verify.rule:check` 已登记。
+- [x] `app/AGENTS.md` 顶部 Rules reminder 列出 R001~R003 链接。
+
+Evidence:
+- commit 1: `chore(rules): add docs/rules module skeleton` (be2f11d)
+- commit 2: `feat(rules): add R001 no-fragmented-commits guard + check-* scripts` (f30e779)
+- commit 3: `feat(rules): add R002 naming-drift + R003 mcp-log-dir guards` (c9d5df5)
+- commit 4: `chore(docs): register rules module in manifest, AGENTS, CHANGELOG, TODO` (<sha>)
+- `pnpm --dir app rule:check` exit 0;`pnpm --dir app rules-doc:lint` exit 0。
+
+Dependencies:
+- 无。可作为后续将 recurring 经验升级为 axi-rules AR-* 的素材池。
+
+## Out of scope (留作 follow-up)
+
+- 从 `axi-submit-log-post-commit.mjs` 的 commit trailer 自动落 R-NNN。
+- pre-commit git hook 实时拦截(本次只在 verify 链拦,降低改动面)。
+- 跨项目 CLI 命令 `workspace-rules add`,让非 axi-docs 项目也能开 R-NNN。
+- R-NNN → AR-* 升级路径(需要 governance 决策,留作后续)。

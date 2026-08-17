@@ -46,6 +46,8 @@ Axi Docs 是 **「文档枢纽 + 知识图谱 + MCP 文档总线 + 工作区项�
 | 议题 | 权威来源 |
 |------|----------|
 | 跨项目行为规则、SOP、提交协议、commit-msg Lore trailer 强制 | [`axi-rules`](../../axi-rules/INDEX.md)（兜底权威；本仓不自有该层规则） |
+| `@axi/*` 共享包的新消费者集成（scenario matrix、dependency order、Verdaccio wiring、gallery 参考实现） | [`shared/axi-ui/docs/INTEGRATION.md`](../../../shared/axi-ui/docs/INTEGRATION.md)（AR-ROUTING-007） |
+| `@axi/*` 包结构、组件清单、Public API、Release ledger | [`shared/axi-ui/INDEX.md`](../../../shared/axi-ui/INDEX.md) 与 `shared/axi-ui/docs/axi-ui/COMPONENTS.md` / `PUBLIC_API.md` / `RELEASES.md` |
 | 模块划分、技术栈、组件规则、API 规范、环境变量 | [`app/AGENTS.md`](app/AGENTS.md) |
 | 产品内容（用户可见的英文/中文文档） | `docs/content/en/README.md`, `docs/content/zh/README.md` |
 | 根级规划分类入口（给当前目录巡检 agent） | `plans/README.md` |
@@ -114,4 +116,4 @@ pnpm --dir app build
 
 ---
 
-*最后更新：2026-06-20 — Authoritative Sources 表新增 `axi-rules` 一行；优先级链首位补 `axi-rules` 兜底（仅限行为/SOP/规则族层面；本项目内容归属与边界仍以本文件为准）。修复 2026-06-19 跨仓自洽性评审发现的"axi-rules 单方面声明从属、axi-docs 不自知"的不对称。*
+*最后更新：2026-08-18 — Authoritative Sources 表新增 `shared/axi-ui/docs/INTEGRATION.md` 与 `shared/axi-ui/INDEX.md` 两行，把 `@axi/*` 共享包文档入口纳入本仓权威清单；与 `axi-rules` 的 AR-ROUTING-007 对齐，避免新消费者绕开 INTEGRATION.md 直接读 package metadata。*

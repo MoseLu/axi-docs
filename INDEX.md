@@ -13,7 +13,7 @@
 | `README.md` | English entrypoint and quickstart. |
 | `README.zh-CN.md` | Simplified Chinese entrypoint. |
 | `AGENTS.md` | Agent rules, boundaries, verification, read order. |
-| `ARCHITECTURE-AXI-STACK.md` | Axi Skills × Axi Rules × Axi Docs shared-stack architecture (capability / behavior / knowledge layers). |
+| `ARCHITECTURE-AXI-STACK.md` | Axi Skills × Axi Rules × Axi Docs × shared/axi-ui shared-stack architecture (capability / behavior / knowledge / shared-UI layers). |
 | `plans/README.md` | Root-level planning category index for agents inspecting the current directory. |
 | `docs/content/{en,zh}/plans/` | Durable idea-to-landing plan library; execution items link out to Axi Todo. |
 | `docs/state/PRD.md` | Product/project requirements and non-goals. |
@@ -27,6 +27,8 @@
 | `docs/governance/THIRD_PARTY_NOTICES.md` / `*.zh-CN.md` | Third-party notices. |
 | `docs/project-docs.manifest.json` | Project documentation manifest. |
 | `docs/axi-workspace-governance/` | Mirrored workspace governance catalog and state. |
+| `/Volumes/code/workspace/shared/axi-ui/docs/INTEGRATION.md` | External authoritative entrypoint for new `@axi/*` consumer projects (see AR-ROUTING-007 in axiom-rules). |
+| `/Volumes/code/workspace/shared/axi-ui/INDEX.md` | External authoritative entrypoint for axiom-ui maintainers (Package Map, Document Map). |
 
 ## Top-Level Inventory
 

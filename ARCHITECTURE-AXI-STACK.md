@@ -246,11 +246,11 @@ pnpm --dir app build            # 生产构建
 
 ### 6.6 引用矩阵
 
-| 消费方 ↓ / 被引用 → | axi-skills | axi-rules | axi-docs |
-|---|:---:|:---:|:---:|
-| **axi-skills** | — | ❌ | ❌ |
-| **axi-rules** | 🟡 路由层（projects.json line 27）| — | 🟡 fallback knowledge（Resolution Order #4）|
-| **axi-docs** | 🟢 数据源（documentSources.ts / sources.lock.json）| ❌ | — |
+| 消费方 ↓ / 被引用 → | axi-skills | axi-rules | axi-docs | shared/axi-ui |
+|---|:---:|:---:|:---:|:---:|
+| **axi-skills** | — | ❌ | ❌ | ❌ |
+| **axi-rules** | 🟡 路由层（projects.json line 27）| — | 🟡 fallback knowledge（Resolution Order #4）| 🟡 路由层 + AR-ROUTING-003/004/007（@axi/* 共享包与新消费者入门）|
+| **axi-docs** | 🟢 数据源（documentSources.ts / sources.lock.json）| ❌ | — | 🟡 文档枢纽：shared/axi-ui/docs/INTEGRATION.md 是新 @axi/* 消费者的首要文档入口；docs/state/PRD.md / TDD.md / CHANGELOG.md 由 docs/content 镜像 |
 
 > 🟢 = 数据/内容消费 · 🟡 = 索引/路由层引用 · ❌ = 无显式依赖
 
@@ -314,10 +314,13 @@ pnpm --dir app build            # 生产构建
 | `axi-rules/AGENTS.md` | `/Volumes/code/workspace/projects/axi-rules/AGENTS.md` | 任何进入工作区的 agent |
 | `axi-rules/INDEX.md` | `/Volumes/code/workspace/projects/axi-rules/INDEX.md` | 同上（机器优先 json）|
 | `axi-rules/index/projects.json` | 同上 | 机器（项目路由）|
+| `axi-rules/rules/agent-routing/AGENTS.md` | `/Volumes/code/workspace/projects/axi-rules/rules/agent-routing/AGENTS.md` | AR-ROUTING-003/004/007：共享包变更与 @axi/* 新消费者入门 |
 | `axi-docs/AGENTS.md` | `/Volumes/code/workspace/projects/axi-docs/AGENTS.md` | 进入 axi-docs 的 agent |
 | `axi-docs/app/AGENTS.md` | `/Volumes/code/workspace/projects/axi-docs/app/AGENTS.md` | 进入 `app/` 的 agent |
 | `axi-docs/docs/project-docs.manifest.json` | `/Volumes/code/workspace/projects/axi-docs/docs/project-docs.manifest.json` | 文档巡检子代理 |
+| `shared/axi-ui/docs/INTEGRATION.md` | `/Volumes/code/workspace/shared/axi-ui/docs/INTEGRATION.md` | 新 `@axi/*` 消费者项目首选入口（AR-ROUTING-007）|
+| `shared/axi-ui/INDEX.md` | `/Volumes/code/workspace/shared/axi-ui/INDEX.md` | 维护者首选入口（含 Package Map / Document Map）|
 
 ---
 
-*最后更新：2026-06-10 — 由 axi-docs 维护者从三个项目根级 AGENTS.md / README.md / INDEX.md / app/AGENTS.md / index/projects.md 现场整理；下次规则或技能目录结构变化时请同步本文件。*
+*最后更新：2026-08-18 — 新增 shared/axi-ui 引用矩阵列；补 `AR-ROUTING-003/004/007` 与 `shared/axi-ui/docs/INTEGRATION.md` / `INDEX.md` 引用表条目；下次 axiom-ui 包结构或 axiom-rules 规则族再次变更时同步本文件。*

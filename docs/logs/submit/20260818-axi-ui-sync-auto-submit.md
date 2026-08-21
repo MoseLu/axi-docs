@@ -20,7 +20,8 @@
 
 ## Created Commit SHA(s)
 
-待 git commit 完成后回填。
+- axiom-docs: `ff8f871` (docs(sync): surface shared/axi-ui INTEGRATION.md + INDEX.md as authoritative entries)
+- axiom-rules（同伴 commit）: `fa2ddbb` (sync(axi-ui): surface 9 @axi/* + gallery reference + new consumer INTEGRATION entrypoint)
 
 ## Push State
 

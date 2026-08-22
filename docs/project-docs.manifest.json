@@ -12,10 +12,8 @@
     "AGENTS.md",
     "README.md",
     "app/AGENTS.md",
-    "plans/README.md",
     "docs/state/TODO.md",
-    "docs/state/MILESTONE.md",
-    "docs/content/en/plans/idea-to-landing.md"
+    "docs/state/MILESTONE.md"
   ],
   "entrypoints": [
     {
@@ -262,7 +260,7 @@
   },
   "verification": {
     "status": "verified",
-    "lastVerifiedAt": "2026-06-18",
+    "lastVerifiedAt": "2026-08-22",
     "commands": [
       "pnpm --dir app docs:check",
       "pnpm --dir app verify"
@@ -291,7 +289,7 @@
     "CHANGE.md"
   ],
   "created": "2026-06-07",
-  "updated": "2026-06-18",
+  "updated": "2026-08-22",
   "writer": "zero-context-handoff",
   "source": "Repository-local AGENTS.md, README.md, TODO.md, app/AGENTS.md, app/package.json, app/.env.example, and executable documentation/build entrypoints."
 }

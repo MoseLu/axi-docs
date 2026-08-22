@@ -2,7 +2,7 @@ import type { DocSource } from '../types'
 
 export type SiteLocale = 'zh' | 'en'
 export type DocSetId = 'guide' | 'skills' | 'workspace'
-export type GuideSectionId = 'introduction' | 'content' | 'knowledge' | 'operations'
+export type GuideSectionId = 'introduction' | 'content' | 'knowledge' | 'architecture' | 'operations'
 export type GuidePageId =
   | 'what-is-axi-docs'
   | 'getting-started'
@@ -15,6 +15,7 @@ export type GuidePageId =
   | 'skills'
   | 'workspace'
   | 'knowledge-graph'
+  | 'frontend-bff'
   | 'localization'
   | 'configuration'
 
@@ -121,6 +122,7 @@ const GUIDE_SECTION_DEFINITIONS: Array<{ id: GuideSectionId; pageIds: GuidePageI
   { id: 'introduction', pageIds: ['what-is-axi-docs', 'getting-started', 'routing'] },
   { id: 'content', pageIds: ['document-sources', 'plans', 'markdown', 'frontmatter', 'search'] },
   { id: 'knowledge', pageIds: ['skills', 'workspace', 'knowledge-graph'] },
+  { id: 'architecture', pageIds: ['frontend-bff'] },
   { id: 'operations', pageIds: ['localization', 'configuration'] },
 ]
 const GUIDE_PAGE_IDS: GuidePageId[] = GUIDE_SECTION_DEFINITIONS.flatMap((section) => section.pageIds)
@@ -213,6 +215,7 @@ export const siteConfig = {
         skills: '技能库',
         workspace: '工作区',
         'knowledge-graph': '知识图谱',
+        'frontend-bff': '前端 BFF 模式',
         localization: '国际化',
         configuration: '配置与数据源',
       },
@@ -220,6 +223,7 @@ export const siteConfig = {
         introduction: '简介',
         content: '内容与写作',
         knowledge: '知识系统',
+        architecture: '架构参考',
         operations: '运维与扩展',
       },
       docSets: {
@@ -329,6 +333,7 @@ export const siteConfig = {
         skills: 'Skills Library',
         workspace: 'Workspace',
         'knowledge-graph': 'Knowledge Graph',
+        'frontend-bff': 'Frontend BFF Pattern',
         localization: 'Localization',
         configuration: 'Configuration and Sources',
       },
@@ -336,6 +341,7 @@ export const siteConfig = {
         introduction: 'Introduction',
         content: 'Content and Writing',
         knowledge: 'Knowledge System',
+        architecture: 'Architecture Reference',
         operations: 'Operations and Extensions',
       },
       docSets: {

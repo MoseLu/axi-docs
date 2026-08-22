@@ -20,8 +20,8 @@ describe('siteConfig', () => {
     expect(en.lang).toBe('en-US')
     expect(zh.themeConfig.nav.map((item) => item.text)).toEqual(['指南', '技能库', '工作区'])
     expect(en.themeConfig.nav.map((item) => item.text)).toEqual(['Guide', 'Skills', 'Workspace'])
-    expect(zh.themeConfig.guideSections.map((section) => section.text)).toEqual(['简介', '内容与写作', '知识系统', '运维与扩展'])
-    expect(zh.themeConfig.guideSections.flatMap((section) => section.items)).toHaveLength(13)
+    expect(zh.themeConfig.guideSections.map((section) => section.text)).toEqual(['简介', '内容与写作', '知识系统', '架构参考', '运维与扩展'])
+    expect(zh.themeConfig.guideSections.flatMap((section) => section.items)).toHaveLength(14)
     expect(en.themeConfig.guideSections[1].items.map((item) => item.text)).toEqual([
       'Document Sources',
       'Plans Library',
@@ -32,6 +32,7 @@ describe('siteConfig', () => {
     expect(zh.themeConfig.docSets.find((item) => item.id === 'guide')?.sourceId).toBe('axi-docs-zh')
     expect(en.themeConfig.docSets.find((item) => item.id === 'guide')?.sourceId).toBe('axi-docs-en')
     expect(buildGuideRoute('zh', 'getting-started')).toBe('/zh/guide/getting-started')
+    expect(buildGuideRoute('en', 'frontend-bff')).toBe('/en/guide/frontend-bff')
     expect(buildDocSetRoute('en', 'skills')).toBe('/en/skills')
   })
 
@@ -41,6 +42,7 @@ describe('siteConfig', () => {
       expect.objectContaining({ code: 'en', label: 'English', lang: 'en-US' }),
     ])
     expect(isSiteLocale('zh')).toBe(true)
+    expect(isGuidePageId('frontend-bff')).toBe(true)
     expect(isGuidePageId('next-steps')).toBe(false)
     expect(isDocSetId('workspace')).toBe(true)
   })

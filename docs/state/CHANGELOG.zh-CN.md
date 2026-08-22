@@ -14,6 +14,7 @@
 ## [Unreleased]
 
 ### Added
+- 2026-08-22: 新增双语 `docs/content/{en,zh}/guide/frontend-bff.md`，并在指南中登记“架构参考”分组，记录前端 BFF 模式的边界、接口契约、可靠性、安全、测试和渐进式引入检查表。
 - 2026-06-07: 根级 `AGENTS.md` 创建（与 `app/AGENTS.md` 形成「根级门面 + 应用包内部规则」双层结构）。
 - 2026-06-07: 根级 `CHANGELOG.md` 创建（本文件，按 Keep a Changelog 1.1 规范）。
 - 2026-06-07: 8 份子代理 i18n 审计完成，审计报告见

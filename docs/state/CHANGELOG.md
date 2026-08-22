@@ -16,6 +16,7 @@ not versioned.
 ## [Unreleased]
 
 ### Added
+- 2026-08-22: 新增双语 `docs/content/{en,zh}/guide/frontend-bff.md`，并在指南中登记“架构参考”分组，记录前端 BFF 模式的边界、接口契约、可靠性、安全、测试和渐进式引入检查表。
 - 2026-08-17: 新增 `docs/rules/` 约束性经验日志模块,承载可被 hook 拦截的硬规则
   (区别于 ERROR.md 的结构化 RCA 与 submit/ 的 per-commit 流水)。
   首版落地 R001(不允许把单个 feature 拆成多个并列 commit)、

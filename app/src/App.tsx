@@ -5,6 +5,7 @@ import { DocumentDetailPage } from './components/DocumentDetailPage'
 import { ErrorBoundary } from './components/ErrorBoundary'
 import { KnowledgeWorkbench } from './components/KnowledgeWorkbench'
 import { NotFoundPage } from './components/NotFoundPage'
+import { WorkspaceArchitecturePage } from './components/WorkspaceArchitecturePage'
 import { getKnowledgeCategoryMeta, normalizeKnowledgeCategoryKey } from './config/knowledgeRules'
 import {
   DEFAULT_LOCALE,
@@ -512,6 +513,8 @@ function HubPage({ pageMode }: { pageMode: PageMode }) {
                   title={appCopy.notFound.invalidDocument}
                 />
               )
+            ) : params['*'] === 'architecture' ? (
+              <WorkspaceArchitecturePage />
             ) : workspaceSource ? (
               <KnowledgeWorkbench
                 activeTag={activeTag}
@@ -596,6 +599,7 @@ function App() {
       <Route path="/" element={<Navigate replace to={DEFAULT_GUIDE_ROUTE} />} />
       <Route path="/:locale/guide/:guideId" element={<HubPage pageMode="home" />} />
       <Route path="/:locale/:collection" element={<HubPage pageMode="home" />} />
+      <Route path="/workspace/architecture" element={<WorkspaceArchitecturePage />} />
       <Route path="/nodes/:categoryId" element={<LegacyCategoryRedirect />} />
       <Route path="/nodes/:categoryId/sub/:subId" element={<LegacyCategoryRedirect />} />
       <Route path="/docs/:sourceId/*" element={<HubPage pageMode="document" />} />

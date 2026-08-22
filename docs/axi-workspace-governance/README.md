@@ -44,6 +44,31 @@ agent-readable: true
 - [治理 ADR](adr/README.md)
 - [ADR-003: Workspace root is a non-git container](adr/ADR-003-workspace-root-is-non-git-container.md)
 
+## 架构文档
+
+> 来源：[`.workspace/reports/workspace-doc-audit.html`](workspace-doc-audit.html) · v5 · 2026-08-21
+
+| 文档 | 说明 |
+|------|------|
+| [architecture/](architecture/) | 6 大架构层文档 |
+| [workflows/](workflows/) | 工作流文档 |
+
+### 架构层（architecture/）
+
+| 文档 | 说明 |
+|------|------|
+| [ARCHITECTURE-OVERVIEW.md](architecture/ARCHITECTURE-OVERVIEW.md) | 架构总览，6 大层 + 1 条闭环 |
+| [ARCHITECTURE-LAYERS.md](architecture/ARCHITECTURE-LAYERS.md) | 6 大架构层的详细说明 |
+| [ARCHITECTURE-DATA-FLOW.md](architecture/ARCHITECTURE-DATA-FLOW.md) | 从真源到消费方的 5 步链条 |
+| [ARCHITECTURE-BOOTSTRAP.md](architecture/ARCHITECTURE-BOOTSTRAP.md) | 新建/修改前的 5 步门槛 |
+| [ARCHITECTURE-CHANGE-TRIGGERS.md](architecture/ARCHITECTURE-CHANGE-TRIGGERS.md) | 改一处触发整个工作区的连锁反应 |
+
+### 工作流（workflows/）
+
+| 文档 | 说明 |
+|------|------|
+| [WORKFLOW-CLOSED-LOOP.md](workflows/WORKFLOW-CLOSED-LOOP.md) | 闭合链路，提交前的强制校验流程 |
+
 ## 工作区根目录契约
 
 - `/Volumes/code/workspace` 只承载项目目录、参考目录、生成快照和 launcher shim。

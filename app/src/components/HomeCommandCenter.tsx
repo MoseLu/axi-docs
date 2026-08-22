@@ -588,6 +588,22 @@ export function HomeCommandCenter({
                         : `${section.count} ${guideLocale === 'zh' ? '篇文档' : 'docs'}`}</small>
                     </button>
                   ))}
+                  {/* Architecture Visualization Entry */}
+                  <button
+                    key="workspace-architecture"
+                    onClick={() => {
+                      if (onOpenItem) {
+                        // Navigate to workspace source and show architecture page
+                        const workspaceSourceId = sources.find((s) => s.type === 'local')?.id || 'workspace'
+                        onOpenItem(workspaceSourceId, 'architecture')
+                      }
+                    }}
+                    type="button"
+                  >
+                    <strong>🗺️ {guideLocale === 'zh' ? '架构可视化' : 'Architecture Visualization'}</strong>
+                    <span>{guideLocale === 'zh' ? '6 大架构层 + 1 条闭环' : '6 Architecture Layers + 1 Closed Loop'}</span>
+                    <small>{guideLocale === 'zh' ? '交互式工作区架构图' : 'Interactive workspace architecture diagram'}</small>
+                  </button>
                 </div>
               )}
             </section>

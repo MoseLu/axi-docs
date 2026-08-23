@@ -1,9 +1,9 @@
 # Workspace Project Handoff Readiness
 
-Generated: 2026-08-23T01:40:24.751Z
+Generated: 2026-08-23T07:11:10.851Z
 
-- Total: 20
-- Verified: 18
+- Total: 21
+- Verified: 19
 - Documented: 0
 - Stale: 0
 - Unready: 2
@@ -27,6 +27,7 @@ Generated: 2026-08-23T01:40:24.751Z
 | `axi-ui` | verified | 10/10 | 2026-08-23 | Own the canonical Black Gold preset in @axi/tokens and @axi/core. |
 | `axi-video-downloader` | verified | 10/10 | 2026-08-23 | Keep the zero-context manifest aligned with the actual Python entrypoints and hardware prerequisites. |
 | `axi-workbench` | verified | 10/10 | 2026-08-07 | Align verification commands with the real project stack |
+| `axi-workspace-governance` | verified | 10/10 | 2026-08-23 | Keep manifest v2, generated handoff guides, and workspace registry consistency checks in sync. |
 | `ielts-vocab` | verified | 10/10 | 2026-08-23 | Keep the deployed split backend stable. |
 | `sports-management` | verified | 10/10 | 2026-08-23 | Maintain a parseable, evidence-backed root documentation suite. |
 | `story-graph` | verified | 10/10 | 2026-08-05 | 多代叙事图谱 v2 已完成：默认长卷只读取证据闭环的叙事事件，使用主线地图、五段式账本与人物/组织/地点档案解释人物变化；待证实体与关系停留在审核队列。 |

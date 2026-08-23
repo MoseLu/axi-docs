@@ -20,6 +20,7 @@ agent-readable: true
 - [ADR-003-workspace-root-is-non-git-container](ADR-003-workspace-root-is-non-git-container.md)
 - [ADR-004-apm-agent-context-package-layer](ADR-004-apm-agent-context-package-layer.md)
 - [ADR-005-agent-bff-ownership](ADR-005-agent-bff-ownership.md)
+- [ADR-005-workflow-first-bounded-agent](ADR-005-workflow-first-bounded-agent.md)
 - [ADR-006-gateway-taxonomy](ADR-006-gateway-taxonomy.md)
 - [ADR-007-naming-alias-contract](ADR-007-naming-alias-contract.md)
 

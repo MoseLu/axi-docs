@@ -4,14 +4,14 @@ title: Axi Workspace Ownership Matrix
 type: reference
 status: evergreen
 tags: [workspace, ownership, governance]
-created: 2026-08-17
-modified: 2026-08-17
+created: 2026-08-23
+modified: 2026-08-23
 agent-readable: true
 ---
 
 # Axi Workspace Ownership Matrix
 
-最后生成：2026-08-17
+最后生成：2026-08-23
 
 ## hubu
 
@@ -51,4 +51,5 @@ agent-readable: true
 
 | Repo | Section | Lifecycle | Canonical | Remote |
 |---|---|---|---|---|
+| `../../products/axi-soul-world` | products | active-product | yes | [link](https://github.com/MoseLu/Axi-Soul-World.git) |
 | `../../products/story-graph` | products | active-product | yes | [link](https://github.com/MoseLu/story-graph.git) |

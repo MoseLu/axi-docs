@@ -4,14 +4,14 @@ title: Axi Workspace Repo Topology
 type: reference
 status: evergreen
 tags: [workspace, topology, architecture]
-created: 2026-08-17
-modified: 2026-08-17
+created: 2026-08-23
+modified: 2026-08-23
 agent-readable: true
 ---
 
 # Axi Workspace Repo Topology
 
-最后生成：2026-08-17
+最后生成：2026-08-23
 
 ## 控制面
 
@@ -45,7 +45,7 @@ agent-readable: true
   remote: https://github.com/axiomaticworld/axi-docs.git
 - `../../projects/axi-image-preview` | Axi Image Preview | branch=`dev` | canonical=yes | compliance=`node-single-repo`
   remote: https://github.com/axiomaticworld/axi-image-preview.git
-- `../../projects/axi-notify` | Axi Notify / Mobile | branch=`dev` | canonical=yes | compliance=`android-fullstack`
+- `../../projects/axi-notify` | Axi Notify | branch=`dev` | canonical=yes | compliance=`android-fullstack`
   remote: https://github.com/axiomaticworld/axi-notify.git
 - `../../projects/axi-pet` | Axi Pet | branch=`dev` | canonical=yes | compliance=`node-monorepo-approved`
   remote: https://github.com/moeru-ai/airi.git
@@ -61,6 +61,8 @@ agent-readable: true
 
 - `../../products/axi-artboard` | Axi Artboard | branch=`dev` | canonical=yes | compliance=`node-monorepo-approved`
   remote: https://github.com/MoseLu/axi-artboard.git
+- `../../products/axi-soul-world` | Axi Soul World | branch=`dev` | canonical=yes | compliance=`android-fullstack`
+  remote: https://github.com/MoseLu/Axi-Soul-World.git
 - `../../products/ielts-vocab` | IELTS Vocabulary | branch=`dev` | canonical=yes | compliance=`node-monorepo-approved`
   remote: https://github.com/axiomaticworld/ielts-vocab.git
 - `../../products/story-graph` | Story Graph | branch=`dev` | canonical=yes | compliance=`node-monorepo-approved`
@@ -93,3 +95,4 @@ agent-readable: true
 - `../../projects/axi-pet`
 - `../../products/ielts-vocab`
 - `../../shared/axi-ui`
+- `../../products/story-graph`

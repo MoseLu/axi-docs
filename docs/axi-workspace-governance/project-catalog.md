@@ -4,14 +4,14 @@ title: Axi Workspace Project Catalog
 type: reference
 status: evergreen
 tags: [workspace, catalog, repositories]
-created: 2026-08-17
-modified: 2026-08-17
+created: 2026-08-23
+modified: 2026-08-23
 agent-readable: true
 ---
 
 # Axi Workspace Project Catalog
 
-最后生成：2026-08-17
+最后生成：2026-08-23
 
 | Section | ID | Name | Owner | Status | Lifecycle | Branch | Docs | Path | Canonical Remote |
 |---|---|---|---|---|---|---|---|---|---|
@@ -20,12 +20,13 @@ agent-readable: true
 | projects | axi-agent-platform | Axi Agent Platform | libu | active | active-canonical | dev | yes | `../../projects/axi-agent-platform` | [link](https://github.com/axiomaticworld/axi-agent-platform.git) |
 | projects | axi-docs | Axi Docs | libu | active | active-canonical | dev | yes | `../../projects/axi-docs` | [link](https://github.com/axiomaticworld/axi-docs.git) |
 | projects | axi-image-preview | Axi Image Preview | libu | active | active-canonical | dev | yes | `../../projects/axi-image-preview` | [link](https://github.com/axiomaticworld/axi-image-preview.git) |
-| projects | axi-notify-mobile | Axi Notify / Mobile | hubu | active | active-canonical | dev | yes | `../../projects/axi-notify` | [link](https://github.com/axiomaticworld/axi-notify.git) |
+| projects | axi-notify | Axi Notify | hubu | active | active-canonical | dev | yes | `../../projects/axi-notify` | [link](https://github.com/axiomaticworld/axi-notify.git) |
 | projects | axi-pet | Axi Pet | libu | development | active-local | dev | yes | `../../projects/axi-pet` | [link](https://github.com/moeru-ai/airi.git) |
 | projects | axi-pet-desktop | Axi Pet Desktop | libu | active | active-local | dev | yes | `../../projects/axi-pet-desktop` | [link](https://github.com/moeru-ai/airi.git) |
 | projects | sports-management | 体育管理应用 | hubu | development | active-product | dev | yes | `../../projects/axi-sports-management-app` | [link](https://github.com/axiomaticworld/sports-management-app.git) |
 | projects | axi-workbench | Axi Workbench | libu | active | active-canonical | dev | yes | `../../projects/axi-workbench` | [link](https://github.com/axiomaticworld/axi-workbench.git) |
 | products | axi-artboard | Axi Artboard | libu | active | feature-stage | dev | yes | `../../products/axi-artboard` | - |
+| products | axi-soul-world | Axi Soul World | Mose | active | active-product | dev | yes | `../../products/axi-soul-world` | [link](https://github.com/MoseLu/Axi-Soul-World.git) |
 | products | ielts-vocab | IELTS Vocabulary | libu | active | active-product | dev | yes | `../../products/ielts-vocab` | [link](https://github.com/axiomaticworld/ielts-vocab.git) |
 | products | story-graph | Story Graph | Mose | active | active-product | dev | yes | `../../products/story-graph` | [link](https://github.com/MoseLu/story-graph.git) |
 | shared | axi-rules | Axi Rules | libu | active | active-shared-provider | dev | yes | `../../projects/axi-rules` | - |

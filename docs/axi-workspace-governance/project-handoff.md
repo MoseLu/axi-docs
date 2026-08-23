@@ -1,6 +1,6 @@
 # Workspace Project Handoff Readiness
 
-Generated: 2026-08-23T07:11:10.851Z
+Generated: 2026-08-23T09:21:12.508Z
 
 - Total: 21
 - Verified: 19
@@ -17,7 +17,7 @@ Generated: 2026-08-23T07:11:10.851Z
 | `axi-image-preview` | verified | 10/10 | 2026-08-23 | Migrate CSS to SCSS across the gallery components. |
 | `axi-notify` | verified | 10/10 | 2026-08-23 | Desktop badge and unread summary |
 | `axi-pet` | verified | 10/10 | 2026-08-23 | Keep the root documentation suite complete and current. |
-| `axi-pet-desktop` | verified | 10/10 | 2026-08-23 | Maintain the Tauri shell + React frontend sync. |
+| `axi-pet-desktop` | verified | 10/10 | 2026-08-23 | Maintain the Electron shell + React frontend sync. |
 | `axi-proxy-companion` | verified | 10/10 | 2026-08-23 | Keep the zero-context manifest aligned with backend definitions, local ports, runtime paths, and secret boundaries. |
 | `axi-registry` | verified | 10/10 | 2026-08-23 | Keep the zero-context manifest aligned with actual commands and package contracts. |
 | `axi-rules` | verified | 10/10 | 2026-08-17 | Ship and harden scripts/handoff-workflow.py as the AR-HANDOFF-004 mechanical gate. |

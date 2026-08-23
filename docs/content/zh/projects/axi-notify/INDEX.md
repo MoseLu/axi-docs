@@ -1,5 +1,5 @@
 ---
-id: axi-docs-en-projects-axi-notify-mobile
+id: axi-docs-zh-projects-axi-notify
 title: Axi Notify / Mobile
 type: project
 status: active
@@ -10,14 +10,14 @@ graph-title: Axi Notify / Mobile
 graph-tags: [Projects, projects]
 description: Workflow contracts, a Go and SQLite notification Relay, and the Axi Mobile Android client for cloud event to FCM to device delivery.
 project:
-  id: axi-notify-mobile
+  id: axi-notify
   partition: projects
   path: /Volumes/code/workspace/projects/axi-notify
   source-section: core
 ---
-## 2026-08-08 Refresh Note
+## 2026-08-08 同步记录
 
-Brought forward to match the workbench 2026-08 batch. Frontmatter refreshes `status: draft` -> `status: active`, `modified` -> `2026-08-08`. The body (REQs / Authoritative Documents / current state) keeps its existing content. Canonical project entry remains the project root AGENTS.md; subsequent batches bring the rest of the dossier body in line with each project's latest verified state. See `projects/axi-workbench/docs/audit/2026-08-08-axi-docs-axi-rules-staleness.md` for the cross-project freshness audit that motivated this pass.
+与 workbench 2026-08 batch 同步。Frontmatter 把 `status: draft` 改为 `status: active`，`modified` 改为 `2026-08-08`。ZH 镜像与对应 EN 镜像配套保留原 `status: draft` 主体（REQs / Authoritative Documents / 当前状态）。project 端权威入口仍是各项目根 `AGENTS.md`；后续 batch 会逐步把每个 dossier 的正文（Current State、Authoritative Documents、Exit Criteria）对齐到对应项目的最新 verified 状态。详细动机见 `projects/axi-workbench/docs/audit/2026-08-08-axi-docs-axi-rules-staleness.md`。
 
 # Axi Notify / Mobile — Dossier Index
 
@@ -33,6 +33,6 @@ Brought forward to match the workbench 2026-08 batch. Frontmatter refreshes `sta
 
 ## Dossier Routing
 
-- Locale root: `docs/content/en/projects/`
-- Other locale: `docs/content/zh/projects/axi-notify-mobile/`
+- Locale root: `docs/content/zh/projects/`
+- Other locale: `docs/content/en/projects/axi-notify/`
 - Workspace entry: `/Volumes/code/workspace/projects/axi-notify`

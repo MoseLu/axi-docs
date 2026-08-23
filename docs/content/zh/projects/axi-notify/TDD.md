@@ -1,5 +1,5 @@
 ---
-id: axi-docs-zh-projects-axi-notify-mobile
+id: axi-docs-zh-projects-axi-notify
 title: Axi Notify / Mobile
 type: project
 status: active
@@ -10,7 +10,7 @@ graph-title: Axi Notify / Mobile
 graph-tags: [Projects, projects]
 description: Workflow contracts, a Go and SQLite notification Relay, and the Axi Mobile Android client for cloud event to FCM to device delivery.
 project:
-  id: axi-notify-mobile
+  id: axi-notify
   partition: projects
   path: /Volumes/code/workspace/projects/axi-notify
   source-section: core
@@ -25,12 +25,12 @@ project:
 
 ## Unit checks
 
-- `pnpm --dir app projects:check` walks `docs/content/{en,zh}/projects/axi-notify-mobile/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md` and asserts every expected piece exists with valid frontmatter.
-- `pnpm --dir app projects:check --project=axi-notify-mobile` runs the same checks scoped to this project.
+- `pnpm --dir app projects:check` walks `docs/content/{en,zh}/projects/axi-notify/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md` and asserts every expected piece exists with valid frontmatter.
+- `pnpm --dir app projects:check --project=axi-notify` runs the same checks scoped to this project.
 
 ## Manual checks
 
-- Open the dossier in the Axi Docs web app and confirm it routes under `/en/projects/axi-notify-mobile` (and `/zh/...`).
+- Open the dossier in the Axi Docs web app and confirm it routes under `/en/projects/axi-notify` (and `/zh/...`).
 - Verify the knowledge graph renders a node for this project (graph-title and graph-tags must be unique enough).
 
 ## Failure modes

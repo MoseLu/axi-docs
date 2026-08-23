@@ -1,5 +1,5 @@
 ---
-id: axi-docs-en-projects-axi-notify-mobile
+id: axi-docs-en-projects-axi-notify
 title: Axi Notify / Mobile
 type: project
 status: active
@@ -10,7 +10,7 @@ graph-title: Axi Notify / Mobile
 graph-tags: [Projects, projects]
 description: Workflow contracts, a Go and SQLite notification Relay, and the Axi Mobile Android client for cloud event to FCM to device delivery.
 project:
-  id: axi-notify-mobile
+  id: axi-notify
   partition: projects
   path: /Volumes/code/workspace/projects/axi-notify
   source-section: core
@@ -28,7 +28,7 @@ Brought forward to match the workbench 2026-08 batch. Frontmatter refreshes `sta
 | Field | Value |
 | --- | --- |
 | Requirement | Maintain a discoverable Axi Docs dossier for Axi Notify / Mobile. |
-| Acceptance | `docs/content/{en,zh}/projects/axi-notify-mobile/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md` exist with valid frontmatter. |
+| Acceptance | `docs/content/{en,zh}/projects/axi-notify/README.md, AGENTS.md, INDEX.md, TODO.md, MILESTONE.md, PRD.md, TDD.md` exist with valid frontmatter. |
 | Source | `WORKSPACE_INDEX.md` (workspace policy). |
 
 ## REQ-PROJ-AXI-NOTIFY-MOBILE-002
@@ -36,7 +36,7 @@ Brought forward to match the workbench 2026-08 batch. Frontmatter refreshes `sta
 | Field | Value |
 | --- | --- |
 | Requirement | Dossier reflects the canonical workspace path, partition, and purpose statement. |
-| Acceptance | `pnpm --dir app projects:check --project=axi-notify-mobile` succeeds. |
+| Acceptance | `pnpm --dir app projects:check --project=axi-notify` succeeds. |
 | Source | `WORKSPACE_INDEX.md` partition table. |
 
 ## Non-Goals

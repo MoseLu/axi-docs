@@ -30,7 +30,7 @@ description: Axi Docs 为 `WORKSPACE_INDEX.md` 中每个 active 项目维护一�
 | [Axi Agent Platform](./axi-agent-platform/README.md) | `projects/` | stale |  |  |
 | [Axi Docs](./axi-docs/README.md) | `projects/` | stale |  |  |
 | [Axi Image Preview](./axi-image-preview/README.md) | `projects/` | verified |  |  |
-| [Axi Notify / Mobile](./axi-notify-mobile/README.md) | `projects/` | stale |  |  |
+| [Axi Notify]|(./axi-notify/README.md) | `projects/` | stale |  |  |
 | [Axi Pet](./axi-pet/README.md) | `projects/` | stale |  |  |
 | [Axi Pet Desktop](./axi-pet-desktop/README.md) | `projects/` | unready |  |  |
 | [Axi Workbench](./axi-workbench/README.md) | `projects/` | verified |  |  |

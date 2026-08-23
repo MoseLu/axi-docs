@@ -1,5 +1,5 @@
 ---
-id: axi-docs-zh-projects-axi-notify-mobile
+id: axi-docs-zh-projects-axi-notify
 title: Axi Notify / Mobile
 type: project
 status: active
@@ -10,7 +10,7 @@ graph-title: Axi Notify / Mobile
 graph-tags: [Projects, projects]
 description: Workflow contracts, a Go and SQLite notification Relay, and the Axi Mobile Android client for cloud event to FCM to device delivery.
 project:
-  id: axi-notify-mobile
+  id: axi-notify
   partition: projects
   path: /Volumes/code/workspace/projects/axi-notify
   source-section: core
@@ -27,7 +27,7 @@ project:
 ## Read Order
 
 1. This file (dossier).
-2. `docs/content/{en,zh}/projects/axi-notify-mobile/README.md` (dossier summary).
+2. `docs/content/{en,zh}/projects/axi-notify/README.md` (dossier summary).
 3. Project root `AGENTS.md` at `/Volumes/code/workspace/projects/axi-notify/AGENTS.md`.
 4. Project root `README.md` at `/Volumes/code/workspace/projects/axi-notify/README.md`.
 

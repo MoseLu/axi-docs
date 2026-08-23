@@ -1,5 +1,5 @@
 ---
-id: axi-docs-en-projects-axi-notify-mobile
+id: axi-docs-en-projects-axi-notify
 title: Axi Notify / Mobile
 type: project
 status: draft
@@ -10,7 +10,7 @@ graph-title: Axi Notify / Mobile
 graph-tags: [Projects, projects]
 description: Workflow contracts, a Go and SQLite notification Relay, and the Axi Mobile Android client for cloud event to FCM to device delivery.
 project:
-  id: axi-notify-mobile
+  id: axi-notify
   partition: projects
   path: /Volumes/code/workspace/projects/axi-notify
   source-section: core

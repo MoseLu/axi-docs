@@ -1,19 +1,19 @@
 # Workspace Project Handoff Readiness
 
-Generated: 2026-08-23T09:21:12.508Z
+Generated: 2026-08-23T20:44:00.206Z
 
 - Total: 21
-- Verified: 19
+- Verified: 21
 - Documented: 0
 - Stale: 0
-- Unready: 2
+- Unready: 0
 
 | Project | Readiness | Score | Last verified | Current work |
 |---|---|---:|---|---|
 | `axi-agent-platform` | verified | 10/10 | 2026-08-23 | SubAgent worktree lifecycle coverage |
 | `axi-artboard` | verified | 10/10 | 2026-08-23 | Maintain canvas / artboard frontend. |
 | `axi-docs` | verified | 10/10 | 2026-08-22 | Keep the project documentation contract and generated dossier coverage complete. |
-| `axi-feishu-codex-bridge` | unready | 10/10 | 2026-08-23 | Complete end-to-end smoke coverage for all three Codex execution surfaces. |
+| `axi-feishu-codex-bridge` | verified | 10/10 | 2026-08-23 | Complete end-to-end smoke coverage for all three Codex execution surfaces. |
 | `axi-image-preview` | verified | 10/10 | 2026-08-23 | Migrate CSS to SCSS across the gallery components. |
 | `axi-notify` | verified | 10/10 | 2026-08-23 | Desktop badge and unread summary |
 | `axi-pet` | verified | 10/10 | 2026-08-23 | Keep the root documentation suite complete and current. |
@@ -23,7 +23,7 @@ Generated: 2026-08-23T09:21:12.508Z
 | `axi-rules` | verified | 10/10 | 2026-08-17 | Ship and harden scripts/handoff-workflow.py as the AR-HANDOFF-004 mechanical gate. |
 | `axi-skills` | verified | 10/10 | 2026-08-23 | Keep the shared skill catalog free of runtime artifacts, caches, secrets, and nested repository state. |
 | `axi-soul-world` | verified | 10/10 | 2026-08-23 | Establish the canonical product repository and main/dev release workflow. |
-| `axi-tauri-starter` | unready | 10/10 | 2026-08-23 | Keep the root documentation suite current. |
+| `axi-tauri-starter` | verified | 10/10 | 2026-08-23 | Keep the root documentation suite current. |
 | `axi-ui` | verified | 10/10 | 2026-08-23 | Own the canonical Black Gold preset in @axi/tokens and @axi/core. |
 | `axi-video-downloader` | verified | 10/10 | 2026-08-23 | Keep the zero-context manifest aligned with the actual Python entrypoints and hardware prerequisites. |
 | `axi-workbench` | verified | 10/10 | 2026-08-07 | Align verification commands with the real project stack |

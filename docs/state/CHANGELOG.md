@@ -15,6 +15,9 @@ not versioned.
 
 ## [Unreleased]
 
+### Changed
+- 2026-08-24: 同步刷新 `axi-soul-world` dossier (en/zh 16 份) 至当前产品状态：去掉过期的 `axi-mood-app/android` 路径，加入 `axi-soul-api` / `apps/web-admin` / `apps/web-bff` 三端拆分，反映 Todo v3、`axi-soul-api` C++20 分层骨架、回环 `/healthz` `/readyz` 等已落地变更。同步刷新 `docs/projects.index.json`、`app/public/workspace-project-handoff.json`、`docs/axi-workspace-governance/*` 治理镜像。
+
 ### Added
 - 2026-08-22: 新增双语 `docs/content/{en,zh}/guide/frontend-bff.md`，并在指南中登记“架构参考”分组，记录前端 BFF 模式的边界、接口契约、可靠性、安全、测试和渐进式引入检查表。
 - 2026-08-17: 新增 `docs/rules/` 约束性经验日志模块,承载可被 hook 拦截的硬规则

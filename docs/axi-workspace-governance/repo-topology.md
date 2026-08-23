@@ -39,7 +39,7 @@ agent-readable: true
 
 ## Projects
 
-- `../../projects/axi-agent-platform` | Axi Agent Platform | branch=`dev` | canonical=yes | compliance=`polyrepo-mixed-stack`
+- `../../projects/axi-agent-platform` | Axi Agent Platform | branch=`feature/unified-personal-todo` | canonical=yes | compliance=`polyrepo-mixed-stack`
   remote: https://github.com/axiomaticworld/axi-agent-platform.git
 - `../../projects/axi-docs` | Axi Docs | branch=`dev` | canonical=yes | compliance=`node-single-repo`
   remote: https://github.com/axiomaticworld/axi-docs.git
@@ -61,7 +61,7 @@ agent-readable: true
 
 - `../../products/axi-artboard` | Axi Artboard | branch=`dev` | canonical=yes | compliance=`node-monorepo-approved`
   remote: https://github.com/MoseLu/axi-artboard.git
-- `../../products/axi-soul-world` | Axi Soul World | branch=`dev` | canonical=yes | compliance=`android-fullstack`
+- `../../products/axi-soul-world` | Axi Soul World | branch=`feature/qr-p0` | canonical=yes | compliance=`android-fullstack`
   remote: https://github.com/MoseLu/Axi-Soul-World.git
 - `../../products/ielts-vocab` | IELTS Vocabulary | branch=`dev` | canonical=yes | compliance=`node-monorepo-approved`
   remote: https://github.com/axiomaticworld/ielts-vocab.git

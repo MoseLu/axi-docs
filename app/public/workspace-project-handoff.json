@@ -1,13 +1,13 @@
 {
   "schemaVersion": "2026-06-11",
-  "generatedAt": "2026-08-23T01:40:24.751Z",
+  "generatedAt": "2026-08-23T20:44:00.206Z",
   "source": "infra/axi-workspace-governance/workspace.json",
   "summary": {
-    "total": 20,
-    "verified": 18,
+    "total": 21,
+    "verified": 21,
     "documented": 0,
     "stale": 0,
-    "unready": 2
+    "unready": 0
   },
   "projects": [
     {
@@ -83,9 +83,7 @@
       "graphId": "axi-artboard",
       "graphMatched": true,
       "errors": [],
-      "warnings": [
-        "documents.verification is missing; run `pnpm workspace:docs:sync` to add `VERIFICATION.md` to the manifest"
-      ],
+      "warnings": [],
       "summary": "Single-page canvas / artboard frontend for the Axi Spun-out Products line.",
       "commands": {
         "setup": [
@@ -174,15 +172,13 @@
       "kind": "tool",
       "lifecycle": "active-tool-local-runtime",
       "owner": "libu",
-      "readiness": "unready",
+      "readiness": "verified",
       "score": 10,
       "manifestPath": "/Volumes/code/workspace/tools/axi-feishu-codex-bridge/docs/project-docs.manifest.json",
       "handoffPath": "/Volumes/code/workspace/tools/axi-feishu-codex-bridge/docs/HANDOFF.md",
       "graphId": "axi-feishu-codex-bridge",
       "graphMatched": true,
-      "errors": [
-        "decisions.changelog path does not exist: CHANGELOG.md"
-      ],
+      "errors": [],
       "warnings": [
         "documents.verification references docs/state/VERIFICATION.md but the file does not exist at /Volumes/code/workspace/tools/axi-feishu-codex-bridge/docs/state/VERIFICATION.md"
       ],
@@ -389,32 +385,31 @@
       "graphId": "axi-pet-desktop",
       "graphMatched": true,
       "errors": [],
-      "warnings": [
-        "documents.verification is missing; run `pnpm workspace:docs:sync` to add `VERIFICATION.md` to the manifest"
-      ],
-      "summary": "macOS desktop runtime for the Axi Pet virtual companion; Tauri shell plus React frontend.",
+      "warnings": [],
+      "summary": "macOS desktop runtime for the Axi Pet virtual companion; Electron shell plus React frontend.",
       "commands": {
         "setup": [
           "pnpm install"
         ],
         "start": [
-          "pnpm tauri dev"
+          "pnpm dev"
         ],
         "health": [
-          "pnpm tauri info"
+          "test -f apps/desktop-pet/electron.vite.config.ts"
         ],
         "verify": [
-          "pnpm tauri build --debug"
+          "pnpm typecheck",
+          "pnpm -F @axi-pet-desktop/desktop-pet test:run"
         ],
         "smoke": [
-          "pnpm tauri info"
+          "pnpm -F @axi-pet-desktop/desktop-pet e2e:linux"
         ]
       },
       "currentWork": {
         "todo": "docs/HANDOFF.md",
         "milestone": "docs/HANDOFF.md",
         "active": [
-          "Maintain the Tauri shell + React frontend sync.",
+          "Maintain the Electron shell + React frontend sync.",
           "Keep the desktop runtime aligned with the Web companion."
         ],
         "knownFailures": []
@@ -643,21 +638,22 @@
       "graphMatched": true,
       "errors": [],
       "warnings": [],
-      "summary": "A multi-surface local-first product root with stable cross-runtime contracts, a local runtime boundary, and the Axi Mood Android record surface.",
+      "summary": "A multi-surface local-first product: core backend in this repo, Axi Mood on Android, and an admin Web (later Mac) that logs in by phone QR scan.",
       "commands": {
         "setup": [],
         "start": [],
         "health": [
-          "test -f README.md && test -f PRD.md && test -f BACKEND_CONTRACT.md"
+          "test -f README.md && test -f PRD.md && test -f BACKEND_CONTRACT.md && test -f docs/architecture/three-surface-bff.md"
         ],
         "verify": [
           "git diff --check",
-          "cd axi-mood-app/android && ./gradlew :app:checkDesignTokens",
-          "cd axi-mood-app/android && ./gradlew :app:testDebugUnitTest",
+          "test -f axi-soul-api/README.md && test -f apps/web-admin/index.html && test -f apps/web-bff/README.md",
+          "cd apps/android && ./gradlew :app:checkDesignTokens",
+          "cd apps/android && ./gradlew :app:testDebugUnitTest",
           "cargo test --manifest-path axi-auth-helper/Cargo.toml"
         ],
         "smoke": [
-          "test -f axi-mood-app/android/gradlew && test -f axi-auth-helper/Cargo.toml"
+          "test -f apps/android/gradlew && test -f axi-auth-helper/Cargo.toml && test -f apps/web-admin/index.html"
         ]
       },
       "currentWork": {
@@ -665,11 +661,12 @@
         "milestone": "IMPLEMENTATION_PLAN.md",
         "active": [
           "Establish the canonical product repository and main/dev release workflow.",
+          "Refine the Axi Mood Android Todo module with conventional filters, sections, progress, and task-row states.",
           "Keep the Axi Mood Android record flow aligned with the product contract.",
-          "Separate product-core and local-runtime work from future remote or host deployments."
+          "Split the repo into axi-soul-api, admin Web, Web BFF, and Axi Mood with WeChat-style QR login."
         ],
         "knownFailures": [
-          "The formal C++ backend and Web BFF are contract-planned but not implemented in this repository."
+          "axi-soul-api has no runnable C++ service yet; admin Web is a login-shell mock; Android QR scan/approve is not implemented."
         ]
       },
       "lastVerifiedAt": "2026-08-23"
@@ -681,15 +678,13 @@
       "kind": "shared",
       "lifecycle": "active-shared-reference",
       "owner": "libu",
-      "readiness": "unready",
+      "readiness": "verified",
       "score": 10,
       "manifestPath": "/Volumes/code/workspace/shared/axi-tauri-starter/docs/project-docs.manifest.json",
       "handoffPath": "/Volumes/code/workspace/shared/axi-tauri-starter/docs/HANDOFF.md",
       "graphId": "axi-tauri-starter",
       "graphMatched": true,
-      "errors": [
-        "decisions.changelog path does not exist: CHANGELOG.md"
-      ],
+      "errors": [],
       "warnings": [
         "documents.verification references docs/state/VERIFICATION.md but the file does not exist at /Volumes/code/workspace/shared/axi-tauri-starter/docs/state/VERIFICATION.md"
       ],
@@ -886,6 +881,51 @@
         ]
       },
       "lastVerifiedAt": "2026-08-07"
+    },
+    {
+      "id": "axi-workspace-governance",
+      "name": "Axi Workspace Governance",
+      "path": "/Volumes/code/workspace/infra/axi-workspace-governance",
+      "kind": "axi-workspace-governance",
+      "lifecycle": "active-governance",
+      "owner": "",
+      "readiness": "verified",
+      "score": 10,
+      "manifestPath": "/Volumes/code/workspace/infra/axi-workspace-governance/docs/project-docs.manifest.json",
+      "handoffPath": "/Volumes/code/workspace/infra/axi-workspace-governance/docs/HANDOFF.md",
+      "graphId": "axi-workspace-governance",
+      "graphMatched": true,
+      "errors": [],
+      "warnings": [
+        "documents.verification is missing; run `pnpm workspace:docs:sync` to add `VERIFICATION.md` to the manifest"
+      ],
+      "summary": "Workspace registry, relationship graph, generated catalog, zero-context handoff checks, and governance audit scripts.",
+      "commands": {
+        "setup": [
+          "pnpm install"
+        ],
+        "start": [],
+        "health": [
+          "pnpm workspace:audit"
+        ],
+        "verify": [
+          "pnpm handoff:test",
+          "pnpm completion:test"
+        ],
+        "smoke": [
+          "pnpm handoff:test && pnpm completion:test"
+        ]
+      },
+      "currentWork": {
+        "todo": "docs/state/TODO.md",
+        "milestone": "docs/state/MILESTONE.md",
+        "active": [
+          "Keep manifest v2, generated handoff guides, and workspace registry consistency checks in sync.",
+          "Maintain the task-execution-routing/v1 workflow-first contract."
+        ],
+        "knownFailures": []
+      },
+      "lastVerifiedAt": "2026-08-23"
     },
     {
       "id": "ielts-vocab",

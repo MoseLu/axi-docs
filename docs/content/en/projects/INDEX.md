@@ -4,8 +4,8 @@ title: Workspace Project Dossiers
 type: index
 status: draft
 tags: [Axi Docs, Projects, Index, English]
-created: 2026-08-10
-modified: 2026-08-10
+created: 2026-08-23
+modified: 2026-08-23
 graph-title: Workspace Project Dossiers
 graph-tags: [Projects, Index]
 description: Axi Docs keeps a per-project dossier for every active entry in `WORKSPACE_INDEX.md`. The dossier is generated from the workspace index; re-run `pnpm --dir app projects:build` to refresh it.
@@ -27,35 +27,36 @@ description: Axi Docs keeps a per-project dossier for every active entry in `WOR
 
 | Project | Partition | Status | Stack | Notes |
 | --- | --- | --- | --- | --- |
-| [Axi Agent Platform](./axi-agent-platform/README.md) | `projects/` | stale |  |  |
-| [Axi Docs](./axi-docs/README.md) | `projects/` | stale |  |  |
+| [Axi Agent Platform](./axi-agent-platform/README.md) | `projects/` | verified |  |  |
+| [Axi Docs](./axi-docs/README.md) | `projects/` | verified |  |  |
 | [Axi Image Preview](./axi-image-preview/README.md) | `projects/` | verified |  |  |
-| [Axi Notify]|(./axi-notify/README.md) | `projects/` | stale |  |  |
-| [Axi Pet](./axi-pet/README.md) | `projects/` | stale |  |  |
-| [Axi Pet Desktop](./axi-pet-desktop/README.md) | `projects/` | unready |  |  |
+| [Axi Notify](./axi-notify/README.md) | `projects/` | verified |  |  |
+| [Axi Pet](./axi-pet/README.md) | `projects/` | verified |  |  |
+| [Axi Pet Desktop](./axi-pet-desktop/README.md) | `projects/` | verified |  |  |
 | [Axi Workbench](./axi-workbench/README.md) | `projects/` | verified |  |  |
-| [体育管理应用](./sports-management/README.md) | `projects/` | stale |  |  |
+| [体育管理应用](./sports-management/README.md) | `projects/` | verified |  |  |
 
 ## Shared and Infrastructure (6)
 
 | Project | Partition | Status | Stack | Notes |
 | --- | --- | --- | --- | --- |
 | [Axi Rules](./axi-rules/README.md) | `projects/` | verified |  |  |
-| [Axi Skills](./axi-skills/README.md) | `shared/` | stale |  |  |
-| [Axi Tauri Starter](./axi-tauri-starter/README.md) | `shared/` | stale |  |  |
+| [Axi Skills](./axi-skills/README.md) | `shared/` | verified |  |  |
+| [Axi Tauri Starter](./axi-tauri-starter/README.md) | `shared/` | verified |  |  |
 | [Axi UI](./axi-ui/README.md) | `shared/` | verified |  |  |
 | [Workspace Relationship Graph](./workspace-relationship-graph/README.md) | `infra/` | external-canonical | JSON, Node CLI, MCP stdio | Use before cross-project edits; not a code project or git repo. |
 | [Workspace Dev Services](./workspace-dev-services/README.md) | `infra/` | active | JSON, Node.js, PM2, LaunchAgent | Runtime state lives under `.devsvc`; use the config and wrapper as editable entrypoints. |
 
-## Reference Repos (14)
+## Reference Repos (15)
 
 | Project | Partition | Status | Stack | Notes |
 | --- | --- | --- | --- | --- |
-| [Axi Artboard](./axi-artboard/README.md) | `products/` | unready |  |  |
-| [Axi Feishu Codex Bridge](./axi-feishu-codex-bridge/README.md) | `tools/` | stale |  |  |
-| [Axi Proxy Companion](./axi-proxy-companion/README.md) | `tools/` | stale |  |  |
-| [Axi Video Downloader](./axi-video-downloader/README.md) | `tools/` | stale |  |  |
-| [IELTS Vocabulary](./ielts-vocab/README.md) | `products/` | stale |  |  |
+| [Axi Artboard](./axi-artboard/README.md) | `products/` | verified |  |  |
+| [Axi Feishu Codex Bridge](./axi-feishu-codex-bridge/README.md) | `tools/` | verified |  |  |
+| [Axi Proxy Companion](./axi-proxy-companion/README.md) | `tools/` | verified |  |  |
+| [Axi Soul World](./axi-soul-world/README.md) | `products/` | verified |  |  |
+| [Axi Video Downloader](./axi-video-downloader/README.md) | `tools/` | verified |  |  |
+| [IELTS Vocabulary](./ielts-vocab/README.md) | `products/` | verified |  |  |
 | [Story Graph](./story-graph/README.md) | `products/` | verified |  |  |
 | [Cockpit Tools Reference](./cockpit-tools-reference/README.md) | `references/` | reference | Tauri, Vite, TypeScript, Rust | Keep the product name as Cockpit Tools and do not rename it into Axi. |
 | [DBSkill Reference](./dbskill-reference/README.md) | `references/` | reference | Shell, Markdown, Python | Keep as a reference only; do not promote to a workspace-owned product. |
@@ -68,4 +69,4 @@ description: Axi Docs keeps a per-project dossier for every active entry in `WOR
 
 ## Total
 
-**28** dossiers under this locale tree。
+**29** dossiers under this locale tree。

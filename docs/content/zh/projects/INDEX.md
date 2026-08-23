@@ -4,8 +4,8 @@ title: 工作区项目档案
 type: index
 status: draft
 tags: [Axi Docs, Projects, Index, i18n]
-created: 2026-08-10
-modified: 2026-08-10
+created: 2026-08-23
+modified: 2026-08-23
 graph-title: 工作区项目档案
 graph-tags: [Projects, Index]
 description: Axi Docs 为 `WORKSPACE_INDEX.md` 中每个 active 项目维护一份档案。档案由工作区索引自动生成；变更后请运行 `pnpm --dir app projects:build` 重新生成。
@@ -27,35 +27,36 @@ description: Axi Docs 为 `WORKSPACE_INDEX.md` 中每个 active 项目维护一�
 
 | 项目 | 分区 | 状态 | 技术栈 | 备注 |
 | --- | --- | --- | --- | --- |
-| [Axi Agent Platform](./axi-agent-platform/README.md) | `projects/` | stale |  |  |
-| [Axi Docs](./axi-docs/README.md) | `projects/` | stale |  |  |
+| [Axi Agent Platform](./axi-agent-platform/README.md) | `projects/` | verified |  |  |
+| [Axi Docs](./axi-docs/README.md) | `projects/` | verified |  |  |
 | [Axi Image Preview](./axi-image-preview/README.md) | `projects/` | verified |  |  |
-| [Axi Notify]|(./axi-notify/README.md) | `projects/` | stale |  |  |
-| [Axi Pet](./axi-pet/README.md) | `projects/` | stale |  |  |
-| [Axi Pet Desktop](./axi-pet-desktop/README.md) | `projects/` | unready |  |  |
+| [Axi Notify](./axi-notify/README.md) | `projects/` | verified |  |  |
+| [Axi Pet](./axi-pet/README.md) | `projects/` | verified |  |  |
+| [Axi Pet Desktop](./axi-pet-desktop/README.md) | `projects/` | verified |  |  |
 | [Axi Workbench](./axi-workbench/README.md) | `projects/` | verified |  |  |
-| [体育管理应用](./sports-management/README.md) | `projects/` | stale |  |  |
+| [体育管理应用](./sports-management/README.md) | `projects/` | verified |  |  |
 
 ## 共享与基础设施 (6)
 
 | 项目 | 分区 | 状态 | 技术栈 | 备注 |
 | --- | --- | --- | --- | --- |
 | [Axi Rules](./axi-rules/README.md) | `projects/` | verified |  |  |
-| [Axi Skills](./axi-skills/README.md) | `shared/` | stale |  |  |
-| [Axi Tauri Starter](./axi-tauri-starter/README.md) | `shared/` | stale |  |  |
+| [Axi Skills](./axi-skills/README.md) | `shared/` | verified |  |  |
+| [Axi Tauri Starter](./axi-tauri-starter/README.md) | `shared/` | verified |  |  |
 | [Axi UI](./axi-ui/README.md) | `shared/` | verified |  |  |
 | [Workspace Relationship Graph](./workspace-relationship-graph/README.md) | `infra/` | external-canonical | JSON, Node CLI, MCP stdio | Use before cross-project edits; not a code project or git repo. |
 | [Workspace Dev Services](./workspace-dev-services/README.md) | `infra/` | active | JSON, Node.js, PM2, LaunchAgent | Runtime state lives under `.devsvc`; use the config and wrapper as editable entrypoints. |
 
-## 参考仓库 (14)
+## 参考仓库 (15)
 
 | 项目 | 分区 | 状态 | 技术栈 | 备注 |
 | --- | --- | --- | --- | --- |
-| [Axi Artboard](./axi-artboard/README.md) | `products/` | unready |  |  |
-| [Axi Feishu Codex Bridge](./axi-feishu-codex-bridge/README.md) | `tools/` | stale |  |  |
-| [Axi Proxy Companion](./axi-proxy-companion/README.md) | `tools/` | stale |  |  |
-| [Axi Video Downloader](./axi-video-downloader/README.md) | `tools/` | stale |  |  |
-| [IELTS Vocabulary](./ielts-vocab/README.md) | `products/` | stale |  |  |
+| [Axi Artboard](./axi-artboard/README.md) | `products/` | verified |  |  |
+| [Axi Feishu Codex Bridge](./axi-feishu-codex-bridge/README.md) | `tools/` | verified |  |  |
+| [Axi Proxy Companion](./axi-proxy-companion/README.md) | `tools/` | verified |  |  |
+| [Axi Soul World](./axi-soul-world/README.md) | `products/` | verified |  |  |
+| [Axi Video Downloader](./axi-video-downloader/README.md) | `tools/` | verified |  |  |
+| [IELTS Vocabulary](./ielts-vocab/README.md) | `products/` | verified |  |  |
 | [Story Graph](./story-graph/README.md) | `products/` | verified |  |  |
 | [Cockpit Tools Reference](./cockpit-tools-reference/README.md) | `references/` | reference | Tauri, Vite, TypeScript, Rust | Keep the product name as Cockpit Tools and do not rename it into Axi. |
 | [DBSkill Reference](./dbskill-reference/README.md) | `references/` | reference | Shell, Markdown, Python | Keep as a reference only; do not promote to a workspace-owned product. |
@@ -68,4 +69,4 @@ description: Axi Docs 为 `WORKSPACE_INDEX.md` 中每个 active 项目维护一�
 
 ## Total
 
-**28** 份档案分布在本语种树下。
+**29** 份档案分布在本语种树下。
